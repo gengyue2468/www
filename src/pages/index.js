@@ -41,7 +41,7 @@ const Home = () => {
           Geng Yue
         </TextScramble>
         <TextScramble as="p" className="opacity-75">
-          Hey👋! I'm a senior school graduate who is about to go to university.
+          Hey👋! I&apos;m a senior school graduate who is about to go to university.
           Here is my online garden and laboratory.
         </TextScramble>
       </div>
@@ -54,7 +54,7 @@ const Home = () => {
         {error && <Error error={error} />}
         {loading &&
           Array.from({ length: 6 }).map((_, index) => (
-            <HomeSkeleton index={index} />
+            <HomeSkeleton key={index} />
           ))}
 
         <div className="flex flex-col space-y-2">
