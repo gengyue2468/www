@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
-import { AlertCircleIcon } from "lucide-react"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import moment from 'moment';
+import HomeSkeleton from '@/components/Home-skeleton';
+import { TextScramble } from '@/components/ui/text-scramble';
+import { TextEffect } from '@/components/ui/text-effect';
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -34,47 +31,41 @@ const Home = () => {
   }, []);
 
   return (
-    <Layout title="Home">
-      <div className='mb-6 border-b border-b-neutral-300 dark:border-b-neutral-700 py-6'>
-        <h1 className="text-4xl font-bold mb-8">家</h1>
-        <p className='text-2xl opacity-75'>你好! 很好去见你这里在我的网络花园!</p>
+    <Layout title="Geng Yue">
+      <div className='mb-8'>
+       <TextScramble as="h1" className="font-bold mb-2.5">Geng Yue</TextScramble>
+        <TextScramble as='p' className='opacity-75'>Hey👋! I'm a senior school graduate who is about to go to university.
+          Here is my online garden and laboratory.</TextScramble>
       </div>
 
-      {loading && (
-        <div>loading...</div>
-      )}
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircleIcon />
-          <AlertTitle className="font-bold">An Error Occurred.</AlertTitle>
-          <AlertDescription>
-            <p>{error}</p>
-          </AlertDescription>
-        </Alert>
-      )}
-      <div className='flex flex-col space-y-6'>
-        {posts.map((post) => (
-          <div key={post.id} className="border-b border-b-neutral-300 dark:border-b-neutral-700 py-6 w-full">
-            <Link href={`/${post.id}`}>
-              <div className='flex flex-row justify-between items-center space-x-8'>
-                <div className='w-1/3'>
-                  <LazyLoadImage
-                    src={post.properties.Image.files[0].file.url} alt={post.properties.Title.title[0]?.plain_text || 'Untitled'} className='w-full rounded-lg' />
-                </div>
-                <div className='w-2/3'>
-                  <h2 className="text-2xl font-bold mb-2">
-                    {post.properties.Title.title[0]?.plain_text || 'Untitled'}
-                  </h2>
-                  <p className="opacity-75 font-medium">
-                    {post.properties.Description?.rich_text[0]?.plain_text || 'No description'}
-                  </p>
-                </div>
-              </div>
-
-            </Link>
-          </div>
+      <div className=''>
+          <TextScramble as="h1" className="font-bold mb-2.5">Recent Published</TextScramble>
+        
+        {error &&
+          <Error error={error} />
+        }
+        {loading && Array.from({ length: 6 }).map((_, index) => (
+          <HomeSkeleton index={index} />
         ))}
+
+        <div className='flex flex-col space-y-2'>
+          {posts.map((post) => (
+            <div key={post.id} className="w-full mb-2 transition-all duration-500 opacity-75 hover:opacity-100">
+              <Link href={`/${post.id}`}>
+                <div className='flex flex-row justify-between items-center space-x-8'>
+                  <TextScramble as="h1" className="font-semibold">
+                    {post.properties.Title.title[0]?.plain_text || 'Untitled'}
+                  </TextScramble>
+                  <TextScramble as="h2" className="font-medium opacity-75 ">
+                    {moment(post.properties.Date?.date?.start).format('MMM DD, YYYY')}
+                  </TextScramble>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
       </div>
+
     </Layout>
   );
 };

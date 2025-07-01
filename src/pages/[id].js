@@ -1,5 +1,11 @@
+import Layout from '@/components/Layout';
+import { TextScramble } from '@/components/ui/text-scramble';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import moment from 'moment';
+import { ArrowLeft } from 'lucide-react';
+import PostSkeleton from '@/components/Post-skeleton';
+import Error from '@/components/Error';
 
 const PostPage = () => {
   const router = useRouter();
@@ -15,9 +21,10 @@ const PostPage = () => {
       try {
         const res = await fetch(`/api/notion/${id}`);
         if (!res.ok) throw new Error('Failed to fetch post');
-        
+
         const data = await res.json();
         setPost(data);
+        console.log(data)
       } catch (error) {
         setError(error.message);
       } finally {
@@ -28,20 +35,24 @@ const PostPage = () => {
     fetchPost();
   }, [id]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!post) return <div>Post not found</div>;
-
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">
-        {post.page.properties.Title.title[0]?.plain_text || 'Untitled'}
-      </h1>
-      <div className="prose prose-lg">
-        {/* 渲染文章内容块 */}
-        {renderBlocks(post.blocks.results)}
-      </div>
-    </div>
+    <Layout title={post?.page.properties.Title.title[0]?.plain_text || 'Loading...'}>
+      <button onClick={() => router.push('/')} className='flex flex-row space-x-2 items-center opacity-75 mb-4 hover:opacity-100 transition-all duration-500 cursor-pointer'>
+        <ArrowLeft size={16} />
+      </button>
+      {loading && <PostSkeleton /> }
+      {error && <Error error={error} /> }
+      {!loading && (
+        <div><TextScramble as="h1" className="font-bold mb-2">
+          {post.page.properties.Title.title[0]?.plain_text || 'Untitled'}
+        </TextScramble>
+          <TextScramble as="h2" className="font-semibold opacity-75">
+            {moment(post.page.properties.Date?.date?.start).format('MMM DD, YYYY')}
+          </TextScramble>
+          <div className="prose dark:prose-inset mt-4">
+            {renderBlocks(post.blocks.results)}
+          </div></div>)}
+    </Layout>
   );
 };
 
@@ -49,7 +60,7 @@ const PostPage = () => {
 const renderBlocks = (blocks) => {
   return blocks.map((block) => {
     const { id, type } = block;
-    
+
     // 根据不同类型的块渲染不同内容
     switch (type) {
       case 'paragraph':
@@ -71,8 +82,8 @@ const renderBlocks = (blocks) => {
           </h2>
         );
       case 'image':
-        const imageUrl = block.image.external 
-          ? block.image.external.url 
+        const imageUrl = block.image.external
+          ? block.image.external.url
           : block.image.file.url;
         return (
           <div key={id} className="my-6">
