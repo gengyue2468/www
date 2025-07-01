@@ -5,6 +5,7 @@ import moment from 'moment';
 import HomeSkeleton from '@/components/Home-skeleton';
 import { TextScramble } from '@/components/ui/text-scramble';
 import { TextEffect } from '@/components/ui/text-effect';
+import Error from '@/components/Error'
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
