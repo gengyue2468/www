@@ -10,14 +10,14 @@ const Home = () => {
         <p className="mb-4">
           <span className="serif italic mr-1.5">Crafting & Polishing.</span>
           <span>
-            I'm a senior high school graduate who is about to go to university.
+            I’m a senior high school graduate who is about to go to university.
           </span>
         </p>
 
         <p className="mb-6">
           <span>
-            Since junior high school, I've been starting doing freelance
-            projects according to my interest. I'm mostly interested in
+            Since junior high school, I’ve been starting doing freelance
+            projects according to my interest. I’m mostly interested in
             combining the useage of{" "}
             <span className="italic serif">Artificial Intelligence</span> with{" "}
             <span className="serif italic">Web Development</span> for a better
@@ -31,10 +31,10 @@ const Home = () => {
           Honor GT Pro with Snapdragon 8 Elite chip 12+256GB.
         </p>
 
-        <p className="mb-2">Apple iMac 24' (2021) with M1 chip 16+512GB.</p>
+        <p className="mb-2">Apple iMac 24’ (2021) with M1 chip 16+512GB.</p>
 
         <p className="mb-6">
-          HP OMEN 11 16' (2025) with i9-14900HX processor and NVIDiA RTX5070
+          HP OMEN 11 16’ (2025) with i9-14900HX processor and NVIDiA RTX5070
           graphics 32GB+1TB.
         </p>
 
