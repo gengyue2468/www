@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import { ThemeProvider } from "next-themes";
-import '@fontsource-variable/public-sans';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/newsreader/wght-italic.css';
 import Head from "next/head";
 import { useState, useEffect } from "react";
 

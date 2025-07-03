@@ -1,83 +1,52 @@
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import Layout from "@/components/Layout";
-import moment from "moment";
-import HomeSkeleton from "@/components/Home-skeleton";
 import { TextScramble } from "@/components/ui/text-scramble";
-import { TextEffect } from "@/components/ui/text-effect";
-import Error from "@/components/Error";
 
 const Home = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await fetch("/api/notion");
-        if (!res.ok)
-          throw new Error(
-            "Failed to Fetch Posts, Please Check Your Internet Connection."
-          );
-
-        const data = await res.json();
-        setPosts(data);
-        console.log(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPosts();
-  }, []);
-
   return (
     <Layout title="Geng Yue">
       <div className="mb-8">
-        <TextScramble as="h1" className="font-bold mb-2.5">
-          Geng Yue
-        </TextScramble>
-        <TextScramble as="p" className="opacity-75">
-          Hey👋! I&apos;m a senior school graduate who is about to go to university.
-          Here is my online garden and laboratory.
-        </TextScramble>
-      </div>
+        <h1 className="font-semibold mb-6">Geng Yue</h1>
 
-      <div className="">
-        <TextScramble as="h1" className="font-bold mb-2.5">
-          Recent Published
-        </TextScramble>
+        <p className="mb-4">
+          <span className="serif italic mr-1.5">Crafting & Polishing.</span>
+          <span>
+            I'm a senior high school graduate who is about to go to university.
+          </span>
+        </p>
 
-        {error && <Error error={error} />}
-        {loading &&
-          Array.from({ length: 6 }).map((_, index) => (
-            <HomeSkeleton key={index} />
-          ))}
+        <p className="mb-6">
+          <span>
+            Since junior high school, I've been starting doing freelance
+            projects according to my interest. I'm mostly interested in
+            combining the useage of{" "}
+            <span className="italic serif">Artificial Intelligence</span> with{" "}
+            <span className="serif italic">Web Development</span> for a better
+            web.
+          </span>
+        </p>
 
-        <div className="flex flex-col space-y-2">
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className="w-full mb-2 transition-all duration-500 opacity-75 hover:opacity-100"
-            >
-              <Link href={`/${post.id}`}>
-                <div className="flex flex-row justify-between items-center space-x-8">
-                  <TextScramble as="h1" className="font-semibold">
-                    {post.properties.Title.title[0]?.plain_text || "Untitled"}
-                  </TextScramble>
-                  <TextScramble as="h2" className="font-medium opacity-75 ">
-                    {moment(post.properties.Date?.date?.start).format(
-                      "MMM DD, YYYY"
-                    )}
-                  </TextScramble>
-                </div>
-              </Link>
-            </div>
-          ))}
-        </div>
+        <h1 className="font-semibold mb-6">My Equipments</h1>
+
+        <p className="mb-2">
+          Honor GT Pro with Snapdragon 8 Elite chip 12+256GB.
+        </p>
+
+        <p className="mb-2">Apple iMac 24' (2021) with M1 chip 16+512GB.</p>
+
+        <p className="mb-6">
+          HP OMEN 11 16' (2025) with i9-14900HX processor and NVIDiA RTX5070
+          graphics 32GB+1TB.
+        </p>
+
+        <h1 className="font-semibold mb-6">Contact</h1>
+
+        <p className="mb-2">GitHub: @gengyue2468</p>
+
+        <p className="mb-2">Email: gengyue2468@outlook.com</p>
+
+        <p className="mb-2">Tencent QQ:3041299667</p>
+
+        <p className="mb-2">WeChat: gengyue2468</p>
       </div>
     </Layout>
   );

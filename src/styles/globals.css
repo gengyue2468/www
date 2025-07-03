@@ -81,8 +81,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Public Sans Variable','Noto Sans SC', sans-serif;
-  @apply bg-background text-foreground selection:bg-neutral-200 dark:selection:bg-neutral-800;
+  font-family: 'Geist Variable','Noto Sans SC', sans-serif;
+  @apply bg-background text-foreground selection:bg-neutral-200 dark:selection:bg-neutral-800 antialiased;
 }
 
 .dark {
@@ -126,4 +126,8 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.serif{
+  font-family: 'Newsreader Variable', serif;
 }

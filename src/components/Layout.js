@@ -1,34 +1,82 @@
 import Head from "next/head";
-import { Spotlight } from "./ui/spotlight";
+import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import { Laptop2Icon, MoonIcon, SunIcon } from "lucide-react";
+import { useRouter } from "next/router";
+import { motion } from "motion/react";
 
-export default function Layout({ title, children }) {
-    const { theme, setTheme, resolvedTheme } = useTheme();
+const Nav = [
+  {
+    name: "About",
+    href: "/",
+  },
+  {
+    name: "Thoughts",
+    href: "/thoughts",
+  },
+  {
+    name: "Lab",
+    href: "/lab",
+  },
+];
 
-    return (
-        <div className="w-screen min-h-screen">
-            <Head>
-                <title>{title}</title>
-            </Head>
-            <div className="max-w-xl mx-auto px-6 py-48 *:text-balance relative w-full">
-                <Button onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')} variant="outline" className="absolute bg-transparent backdrop-blur-2xl rounded-full size-10 right-6 top-48 text-foreground border-foreground/25! border">
-                    {theme === "system" && <Laptop2Icon size="6" />}
-                    {theme === "light" && <SunIcon size="6" />}
-                    {theme === "dark" && <MoonIcon size="6" />}
+export default function Layout({ title, note, children }) {
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const router = useRouter();
+
+  return (
+    <div className="">
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <div className="flex flex-col sm:flex-row justify-between">
+        <div className="max-w-4xl mr-auto flex flex-col sm:flex-row justify-between text-balance">
+          <div className="z-50 sticky top-0 sm:left-0 bg-background/75 backdrop-blur-lg h-auto sm:h-screen w-full sm:w-64 sm:mt-0 px-2 py-1 sm:py-16 flex flex-row sm:flex-col justify-between sm:justify-start items-center">
+            <div className="flex flex-row sm:flex-col italic">
+              {Nav.map((item) => (
+                <Button
+                  key={item.name}
+                  variant="link"
+                  onClick={() => router.push(item.href)}
+                  className={cn(
+                    "transition-all duration-500 cursor-pointer serif text-base",
+                    router.asPath === item.href
+                      ? "opacity-100 font-semibold"
+                      : "opacity-75"
+                  )}
+                >
+                  {item.name}
                 </Button>
-                <main>{children}</main>
+              ))}
             </div>
-
-            <Spotlight
-                className='bg-neutral-300 dark:bg-neutral-700 blur-2xl'
-                size={96}
-                springOptions={{
-                    bounce: 0.3,
-                    duration: 0.1,
-                }}
-            />
+            <div className="flex justify-center">
+              <Button
+                onClick={() =>
+                  setTheme(resolvedTheme === "dark" ? "light" : "dark")
+                }
+                variant="ghost"
+                className="rounded-full size-10 text-foreground"
+              >
+                {theme === "system" && <Laptop2Icon size="6" />}
+                {theme === "light" && <SunIcon size="6" />}
+                {theme === "dark" && <MoonIcon size="6" />}
+              </Button>
+            </div>
+          </div>
+          <motion.div
+            initial={{ opacity: 0, filter: "blur(5px)" }}
+            animate={{ opacity: 1, filter: "blur(0px)" }}
+            transition={{ duration: 0.25 }}
+            className="w-full border-none sm:border sm:border-l px-6 sm:px-16 py-6 sm:py-16"
+          >
+            <main>{children}</main>
+          </motion.div>
         </div>
-    )
+        <div className="sticky right-0 w-full sm:w-64 sm:mt-0 px-2 py-0 sm:py-16">
+          {note}
+        </div>
+      </div>
+    </div>
+  );
 }
