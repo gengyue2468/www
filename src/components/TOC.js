@@ -48,7 +48,7 @@ export default function TOC({ headings, activeHeadingId }) {
           </AccordionTrigger>
           <AccordionContent className="flex flex-col space-y-1">
             {!headings.length && <Loader />}
-            {headings.length &&
+            {headings &&
               headings.map((heading) => (
                 <motion.a
                   key={heading.inlineText}
