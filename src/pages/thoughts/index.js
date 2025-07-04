@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import Layout from "@/components/Layout";
-import moment from "moment";
+import Post from "@/components/Post";
 import { motion } from "motion/react";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader";
@@ -35,7 +34,23 @@ const Home = () => {
 
   return (
     <Layout title="Thoughts">
-      <div className="w-screen sm:w-full">
+      <div className="w-full">
+        <h1 className="font-semibold mb-6">Thoughts</h1>
+
+        <p className="mb-4">
+          <span className="serif italic mr-1.5">Ridiculous Thoughts.</span>
+          <span>
+            Just random thoughts that reveals my perspectives. They are not so
+            long, and contains little content. They are not so meaningful, and
+            just stupid, sometimes are just completely wrong.
+          </span>
+        </p>
+
+        <p className="mb-4">
+          But I do grow through{" "}
+          <span className="serif italic mr-1.5">Infinite Errors..</span>
+        </p>
+
         {error && <Error error={error} />}
         {loading && <Loader />}
         {!loading && (
@@ -44,31 +59,8 @@ const Home = () => {
             animate={{ opacity: 1, filter: "blur(0px)" }}
             transition={{ duration: 0.25 }}
           >
-            <div className="flex flex-row justify-between items-center mb-2 opacity-50">
-              <small>Name</small>
-              <small>Date</small>
-            </div>
-            <div className="flex flex-col space-y-2">
-              {posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="w-full mb-2 transition-all duration-500 opacity-100 hover:opacity-75 cursor-pointer"
-                >
-                  <Link href={`/thoughts/${post.id}`}>
-                    <div className="flex flex-row justify-between items-center space-x-8">
-                      <h1 className="font-medium">
-                        {post.properties.Title.title[0]?.plain_text ||
-                          "Untitled"}
-                      </h1>
-                      <h2 className="opacity-75 ">
-                        {moment(post.properties.Date?.date?.start).format(
-                          "MMM DD, YYYY"
-                        )}
-                      </h2>
-                    </div>
-                  </Link>
-                </div>
-              ))}
+            <div className="flex flex-col space-y-2 w-full">
+              <Post posts={posts} />
             </div>
           </motion.div>
         )}

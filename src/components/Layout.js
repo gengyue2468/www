@@ -21,7 +21,7 @@ const Nav = [
   },
 ];
 
-export default function Layout({ title, note, children }) {
+export default function Layout({ title, note, sticky, children }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const router = useRouter();
 
@@ -30,9 +30,9 @@ export default function Layout({ title, note, children }) {
       <Head>
         <title>{title}</title>
       </Head>
-      <div className="flex flex-col sm:flex-row justify-between">
-        <div className="max-w-4xl mr-auto flex flex-col sm:flex-row justify-between text-balance">
-          <div className="z-50 sticky top-0 sm:left-0 bg-background/75 backdrop-blur-lg h-auto sm:h-screen w-full sm:w-64 sm:mt-0 px-2 py-1 sm:py-16 flex flex-row sm:flex-col justify-between sm:justify-start items-center">
+      <div className="flex flex-grow flex-col sm:flex-row justify-between">
+        <div className="max-w-4xl w-full flex flex-col sm:flex-row justify-between text-balance">
+          <div className="z-50 sticky top-0 sm:left-0 bg-background/75 backdrop-blur-lg h-auto sm:h-screen w-full sm:w-48 sm:mt-0 px-2 py-1 sm:py-16 flex flex-row sm:flex-col justify-between sm:justify-start items-center">
             <div className="flex flex-row sm:flex-col italic">
               {Nav.map((item) => (
                 <Button
@@ -40,7 +40,7 @@ export default function Layout({ title, note, children }) {
                   variant="link"
                   onClick={() => router.push(item.href)}
                   className={cn(
-                    "transition-all duration-500 cursor-pointer serif text-base",
+                    "transition-all duration-500 cursor-pointer serif text-sm sm:text-base",
                     router.asPath === item.href
                       ? "opacity-100 font-semibold"
                       : "opacity-75"
@@ -68,12 +68,12 @@ export default function Layout({ title, note, children }) {
             initial={{ opacity: 0, filter: "blur(5px)" }}
             animate={{ opacity: 1, filter: "blur(0px)" }}
             transition={{ duration: 0.25 }}
-            className="w-full border-none sm:border sm:border-l px-6 sm:px-16 py-6 sm:py-16"
+            className="w-full px-6 sm:px-16 py-6 sm:py-16"
           >
             <main>{children}</main>
           </motion.div>
         </div>
-        <div className="sticky right-0 w-full sm:w-64 sm:mt-0 px-2 py-0 sm:py-16">
+        <div className="sticky right-0 w-full sm:w-64 sm:mt-0 py-2 sm:py-16">
           {note}
         </div>
       </div>
