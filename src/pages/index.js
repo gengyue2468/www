@@ -5,7 +5,7 @@ const Home = () => {
     <Layout
       title="Geng Yue"
       note={
-        <footer>
+        <footer className="px-6 py-2 sm:py-0">
           <p className="serif italic">“Nothing is impossible.”</p>
           <p className="serif italic mt-2">
             “The happiness of your life depends on the quality of your
