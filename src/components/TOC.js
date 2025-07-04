@@ -22,7 +22,7 @@ export default function TOC({ headings, activeHeadingId }) {
       setIsLargeDevice(newIsLargeDevice);
 
       // 根据设备尺寸变化自动设置打开的面板
-      setActivePanel(newIsLargeDevice ? "item-1" : "");
+      setActivePanel(newIsLargeDevice ? "toc" : "");
     };
 
     window.addEventListener("resize", handleResize);
