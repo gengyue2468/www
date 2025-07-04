@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import '@fontsource-variable/geist';
 import '@fontsource-variable/newsreader/wght-italic.css';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 import Head from "next/head";
 import { useState, useEffect } from "react";
 

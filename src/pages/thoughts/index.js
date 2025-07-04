@@ -48,7 +48,7 @@ const Home = () => {
 
         <p className="mb-4">
           But I do grow through{" "}
-          <span className="serif italic mr-1.5">Infinite Errors..</span>
+          <span className="serif italic mr-1.5">Infinite Errors.</span>
         </p>
 
         {error && <Error error={error} />}

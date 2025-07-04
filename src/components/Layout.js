@@ -32,7 +32,7 @@ export default function Layout({ title, note, sticky, children }) {
       </Head>
       <div className="flex flex-grow flex-col sm:flex-row justify-between">
         <div className="max-w-4xl w-full flex flex-col sm:flex-row justify-between text-balance">
-          <div className="z-50 sticky top-0 sm:left-0 bg-background/75 backdrop-blur-lg h-auto sm:h-screen w-full sm:w-48 sm:mt-0 px-2 py-1 sm:py-16 flex flex-row sm:flex-col justify-between sm:justify-start items-center">
+          <div className="z-50 sticky top-0 sm:left-0 bg-background/75 backdrop-blur-lg h-auto sm:h-screen w-full sm:w-48 sm:mt-0 px-2 py-0.5 sm:py-16 flex flex-row sm:flex-col justify-between sm:justify-start items-center">
             <div className="flex flex-row sm:flex-col italic">
               {Nav.map((item) => (
                 <Button
@@ -58,9 +58,9 @@ export default function Layout({ title, note, sticky, children }) {
                 variant="ghost"
                 className="rounded-full size-10 text-foreground"
               >
-                {theme === "system" && <Laptop2Icon size="6" />}
-                {theme === "light" && <SunIcon size="6" />}
-                {theme === "dark" && <MoonIcon size="6" />}
+                {theme === "system" && <Laptop2Icon size={6} />}
+                {theme === "light" && <SunIcon size={6} />}
+                {theme === "dark" && <MoonIcon ssize={6} />}
               </Button>
             </div>
           </div>

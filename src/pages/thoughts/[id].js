@@ -2,31 +2,51 @@ import Layout from "@/components/Layout";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
 import moment from "moment";
-import { ArrowLeft, ChevronDown, ChevronDownIcon } from "lucide-react";
+import { AlertCircleIcon, ArrowDownToLineIcon, ArrowLeft } from "lucide-react";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader";
 import { motion } from "framer-motion";
 import { serialize } from "next-mdx-remote/serialize";
 import { MDXRemote } from "next-mdx-remote";
-import { Button } from "@/components/ui/button";
 import TOC from "@/components/TOC";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // 自定义MDX组件
 const components = {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  AlertCircleIcon,
   h1: ({ children, id }) => (
-    <h1 id={id} className="font-semibold mb-2">
+    <h1 id={id} className="font-semibold my-2.5">
       {children}
     </h1>
   ),
-  p: ({ children }) => <p className="mb-4">{children}</p>,
+  p: ({ children }) => <p className="mb-6">{children}</p>,
   img: ({ src, alt }) => (
-    <div className="my-6">
-      <img src={src} alt={alt} className="w-full h-auto rounded-lg shadow-md" />
+    <div className="my-8">
+      <LazyLoadImage
+        effect="blur"
+        src={src}
+        alt={alt}
+        className="w-full h-auto rounded-lg"
+      />
+      <div className="flex flex-row justify-between items-center">
+        <span className="text-sm italic serif">{alt}</span>
+        <Button
+          onClick={() => open(src)}
+          variant="secondary"
+          className="size-6 rounded-full p-2 cursor-pointer"
+        >
+          <ArrowDownToLineIcon size={3} />
+        </Button>
+      </div>
     </div>
   ),
 };
 
-// 计算阅读时间（每分钟200字估算）
 const calculateReadingTime = (content) => {
   const wordsPerMinute = 200;
   const wordCount = content?.split(/\s+/).length || 0;
@@ -194,7 +214,7 @@ const PostPage = () => {
               <div className="flex items-center text-sm opacity-75 mb-6">
                 <span>
                   {moment(post.page.properties.Date?.date?.start).format(
-                    "MMM DD, YYYY"
+                    "MMMM Do, YYYY"
                   )}
                 </span>
                 <span className="mx-2">•</span>
@@ -206,6 +226,7 @@ const PostPage = () => {
               >
                 <MDXRemote {...mdxSource} components={components} />
               </div>
+              <div className="mb-64 sm:mb-80" />
             </div>
           </motion.div>
         )}
