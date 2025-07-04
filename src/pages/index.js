@@ -1,5 +1,4 @@
 import Layout from "@/components/Layout";
-import { TextScramble } from "@/components/ui/text-scramble";
 
 const Home = () => {
   return (
@@ -7,13 +6,13 @@ const Home = () => {
       title="Geng Yue"
       note={
         <footer>
-          <p className="serif italic">"Nothing is impossible."</p>
+          <p className="serif italic">“Nothing is impossible.”</p>
           <p className="serif italic mt-2">
-            "The happiness of your life depends on the quality of your
-            thoughts."
+            “The happiness of your life depends on the quality of your
+            thoughts.”
           </p>
           <p className="serif italic mt-2">
-            "Say something positive, and you'll see something positive."
+            “Say something positive, and you’ll see something positive.”
           </p>
         </footer>
       }
@@ -33,8 +32,8 @@ const Home = () => {
           <span>
             Since junior high school, I’ve been starting doing freelance
             projects according to my interest. I’m mostly interested in
-            combining the useage of{" "}
-            <span className="italic serif">Artificial Intelligence</span> with{" "}
+            combining the useage of
+            <span className="italic serif">Artificial Intelligence</span> with
             <span className="serif italic">Web Development</span> for a better
             web.
           </span>

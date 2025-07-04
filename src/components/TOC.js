@@ -1,56 +1,33 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
-import { Button } from "./ui/button";
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import Loader from "./Loader";
 
 export default function TOC({ headings, activeHeadingId }) {
-  const [open, setOpen] = useState(false);
-  const isFirstMount = useRef(true);
-  useEffect(() => {
-    const isSmallDevice = window.innerWidth < 768;
+  // 使用更直观的状态名：isLargeDevice
+  const [isLargeDevice, setIsLargeDevice] = useState(window.innerWidth >= 768);
 
-    if (isFirstMount.current) {
-      setOpen(!isSmallDevice);
-      isFirstMount.current = false;
-      return;
-    }
-    if (open === !isSmallDevice) return;
-    setOpen(!isSmallDevice);
-  }, []);
+  // 用于存储当前打开的面板值
+  const [activePanel, setActivePanel] = useState(isLargeDevice ? "toc" : "");
+
+  // 监听窗口大小变化
   useEffect(() => {
     const handleResize = () => {
-      const isSmallDevice = window.innerWidth < 768;
-      if (open === isSmallDevice) {
-        setOpen(!isSmallDevice);
-      }
+      const newIsLargeDevice = window.innerWidth >= 768;
+      setIsLargeDevice(newIsLargeDevice);
+
+      // 根据设备尺寸变化自动设置打开的面板
+      setActivePanel(newIsLargeDevice ? "item-1" : "");
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [open]);
-
-  const collapseVariants = {
-    open: {
-      opacity: 1,
-      maxHeight: 9999,
-      margin: "8px 0",
-      transition: {
-        duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
-        staggerChildren: 0.05,
-      },
-    },
-    closed: {
-      opacity: 0,
-      maxHeight: 0,
-      margin: 0,
-      transition: {
-        duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
-        delay: 0,
-      },
-    },
-  };
+  }, []);
 
   const itemVariants = {
     open: { y: 0 },
@@ -64,47 +41,38 @@ export default function TOC({ headings, activeHeadingId }) {
       transition={{ duration: 0.25 }}
       className="fixed sm:sticky bottom-0 sm:right-0 sm:top-16 px-6 w-full bg-background/75 backdrop-blur-lg transition-all duration-500"
     >
-      {headings && (
-        <div className="flex justify-between items-center">
-          <h2 className="font-semibold text-sm">Table of Contents</h2>
-          <Button
-            onClick={() => setOpen(!open)}
-            variant="ghost"
-            className="visible sm:hidden cursor-pointer rounded-full p-0.5 size-10"
-          >
-            {open ? <ChevronUpIcon size={10} /> : <ChevronDownIcon size={10} />}
-          </Button>
-        </div>
-      )}
-
-      <motion.div
-        variants={collapseVariants}
-        initial={false}
-        animate={open ? "open" : "closed"}
-        className="space-y-2 text-sm overflow-hidden"
-      >
-        {headings &&
-          headings.map((heading) => (
-            <motion.a
-              key={heading.inlineText}
-              href={`#${heading.inlineText}`}
-              variants={itemVariants}
-              className={`block pl-${(heading.level - 1) * 4} ${
-                heading.id === activeHeadingId
-                  ? "text-primary text-sm font-medium opacity-100 transition-all duration-500"
-                  : "opacity-50"
-              }`}
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById(heading.id)?.scrollIntoView({
-                  behavior: "smooth",
-                });
-              }}
-            >
-              {heading.text}
-            </motion.a>
-          ))}
-      </motion.div>
+      <Accordion type="single" collapsible value={activePanel}>
+        <AccordionItem value="toc">
+          <AccordionTrigger className="py-2.5 sm:py-3">
+            Table of Contents
+          </AccordionTrigger>
+          <AccordionContent className="flex flex-col space-y-1">
+            {!headings.length && <Loader />}
+            {headings.length &&
+              headings.map((heading) => (
+                <motion.a
+                  key={heading.inlineText}
+                  href={`#${heading.inlineText}`}
+                  variants={itemVariants}
+                  className={`block pl-${(heading.level - 1) * 4} ${
+                    heading.id === activeHeadingId
+                      ? "text-primary text-sm font-medium opacity-100 transition-all duration-500"
+                      : "opacity-50"
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById(heading.id)?.scrollIntoView({
+                      behavior: "smooth",
+                    });
+                  }}
+                >
+                  {heading.text}
+                </motion.a>
+              ))}
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-2"></AccordionItem>
+      </Accordion>
     </motion.div>
   );
 }
