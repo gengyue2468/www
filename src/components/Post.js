@@ -61,7 +61,7 @@ const Post = ({ posts }) => {
                   {months[sortedMonths[0]].posts.map((post) => (
                     <div key={post.id} className="w-full">
                       <Link href={`/thoughts/${post.id}`}>
-                        <div className="flex items-center w-full">
+                        <div className="flex items-center w-full py-1.5">
                           <h1 className="font-medium mr-2 truncate">
                             {post.properties.Title.title[0]?.plain_text ||
                               "Untitled"}
@@ -85,13 +85,13 @@ const Post = ({ posts }) => {
                   return (
                     <div key={month} className="mb-6">
                       <div className="flex justify-end">
-                        <h4 className="mb-2 opacity-75 text-lg">{monthName}</h4>
+                        <h4 className="mb-2 opacity-75">{monthName}</h4>
                       </div>
                       <div className="">
                         {monthPosts.map((post) => (
                           <div
                             key={post.id}
-                            className="w-full py-2 transition-all duration-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
+                            className="w-full py-1.5"
                           >
                             <Link href={`/thoughts/${post.id}`}>
                               <div className="flex items-center w-full">

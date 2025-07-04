@@ -53,17 +53,13 @@ const Home = () => {
 
         {error && <Error error={error} />}
         {loading && <Loader />}
-        {!loading && (
-          <motion.div
-            initial={{ opacity: 0, filter: "blur(5px)" }}
-            animate={{ opacity: 1, filter: "blur(0px)" }}
-            transition={{ duration: 0.25 }}
-          >
-            <div className="flex flex-col space-y-2 w-full">
-              <Post posts={posts} />
-            </div>
-          </motion.div>
-        )}
+        <motion.div
+          initial={{ opacity: 0, filter: "blur(5px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          transition={{ duration: 0.25 }}
+        >
+          {!loading && <Post posts={posts} />}{" "}
+        </motion.div>
       </div>
     </Layout>
   );
