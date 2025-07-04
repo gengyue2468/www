@@ -41,7 +41,12 @@ export default function TOC({ headings, activeHeadingId }) {
       transition={{ duration: 0.25 }}
       className="fixed sm:sticky bottom-0 sm:right-0 sm:top-16 px-6 w-full bg-background/75 backdrop-blur-lg transition-all duration-500"
     >
-      <Accordion type="single" collapsible value={activePanel}>
+      <Accordion
+        type="single"
+        collapsible
+        value={activePanel}
+        onValueChange={setActivePanel}
+      >
         <AccordionItem value="toc">
           <AccordionTrigger className="py-2.5 sm:py-3">
             Table of Contents
