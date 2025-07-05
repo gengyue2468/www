@@ -21,7 +21,6 @@ const Home = () => {
 
         const data = await res.json();
         setPosts(data);
-        console.log(data);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -52,7 +51,7 @@ const Home = () => {
         </p>
 
         {error && <Error error={error} />}
-        {loading && <Loader />}
+        {loading &&  <Loader />}
         <motion.div
           initial={{ opacity: 0, filter: "blur(5px)" }}
           animate={{ opacity: 1, filter: "blur(0px)" }}

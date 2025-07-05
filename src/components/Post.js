@@ -85,7 +85,7 @@ const Post = ({ posts }) => {
                   return (
                     <div key={month} className="mb-6">
                       <div className="flex justify-end">
-                        <h4 className="mb-2 opacity-75">{monthName}</h4>
+                        <h4 className="mb-2 opacity-80">{monthName}</h4>
                       </div>
                       <div className="">
                         {monthPosts.map((post) => (

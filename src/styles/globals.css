@@ -131,3 +131,7 @@ body {
 .serif{
   font-family: 'Newsreader Variable', serif;
 }
+
+.font-mono{
+  font-family: 'Geist Mono Variable', monospace;
+}

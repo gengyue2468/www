@@ -2,7 +2,14 @@ import Layout from "@/components/Layout";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
 import moment from "moment";
-import { AlertCircleIcon, ArrowDownToLineIcon, ArrowLeft } from "lucide-react";
+import {
+  AlertCircleIcon,
+  ArrowDownToLineIcon,
+  ArrowLeft,
+  CopyIcon,
+  DotIcon,
+  QuoteIcon,
+} from "lucide-react";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader";
 import { motion } from "framer-motion";
@@ -12,6 +19,7 @@ import TOC from "@/components/TOC";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Post from "@/components/Post";
 
 // 自定义MDX组件
 const components = {
@@ -25,6 +33,15 @@ const components = {
     </h1>
   ),
   p: ({ children }) => <p className="mb-6">{children}</p>,
+  a: ({ children, href, target }) => (
+    <a
+      href={href}
+      target={target || "_self"}
+      className="text-primary hover:text-primary/80 transition-colors duration-200 border-b border-primary/30 hover:border-primary/60 serif italic"
+    >
+      {children}
+    </a>
+  ),
   img: ({ src, alt }) => (
     <div className="my-8">
       <LazyLoadImage
@@ -57,6 +74,7 @@ const calculateReadingTime = (content) => {
 const PostPage = () => {
   const router = useRouter();
   const { id } = router.query;
+  const [posts, setPosts] = useState(null);
   const [post, setPost] = useState(null);
   const [mdxSource, setMdxSource] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,11 +90,13 @@ const PostPage = () => {
     const fetchPost = async () => {
       try {
         const res = await fetch(`../api/notion/${id}`);
-        if (!res.ok) throw new Error("Failed to fetch post");
+        const resAll = await fetch(`../api/notion`);
+        if (!res.ok || !resAll.ok) throw new Error("Failed to fetch post");
 
         const data = await res.json();
+        const AllData = await resAll.json();
         setPost(data);
-        console.log(data);
+        setPosts(AllData);
 
         // 从Content属性获取原始MDX内容
         const mdxContent = data.page.properties.Content.rich_text
@@ -226,6 +246,11 @@ const PostPage = () => {
               >
                 <MDXRemote {...mdxSource} components={components} />
               </div>
+
+              <hr className="my-8 opacity-0"/>
+
+              <h1 className="font-semibold mb-2">All Thoughts</h1>
+              <Post posts={posts} />
               <div className="mb-64 sm:mb-80" />
             </div>
           </motion.div>
