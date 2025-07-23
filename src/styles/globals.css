@@ -81,7 +81,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Geist Variable','Noto Sans SC', sans-serif;
+  font-family: "Inter Variable", "Noto Sans SC", sans-serif;
+ font-feature-settings: "cv02" 0;
   @apply bg-background text-foreground selection:bg-neutral-200 dark:selection:bg-neutral-800 antialiased;
 }
 
@@ -126,12 +127,23 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+  a {
+    @apply border-b-2 hover:opacity-75 transition-all;
+  }
 }
 
-.serif{
-  font-family: 'Newsreader Variable', serif;
+.serif {
+  font-family: "Newsreader Variable", serif;
 }
 
-.font-mono{
-  font-family: 'Geist Mono Variable', monospace;
+.font-mono {
+  font-family: "Jetbrains Mono Variable", monospace;
+}
+
+.spinner animate {
+  animation-play-state: running;
+}
+
+.spinner.paused animate {
+  animation-play-state: paused !important;
 }

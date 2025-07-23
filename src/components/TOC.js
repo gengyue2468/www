@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/accordion";
 import Loader from "./Loader";
 
-export default function TOC({ headings, activeHeadingId }) {
+export default function TOC({ headings, activeHeadingId, loading }) {
   // 使用更直观的状态名：isLargeDevice
   const [isLargeDevice, setIsLargeDevice] = useState(window.innerWidth >= 768);
 
@@ -41,43 +41,43 @@ export default function TOC({ headings, activeHeadingId }) {
       transition={{ duration: 0.25 }}
       className="fixed sm:sticky bottom-0 sm:right-0 sm:top-16 px-6 w-full bg-background/75 backdrop-blur-lg transition-all duration-500"
     >
-      <Accordion
-        type="single"
-        collapsible
-        value={activePanel}
-        onValueChange={setActivePanel}
-      >
-        <AccordionItem value="toc">
-          <AccordionTrigger className="py-2.5 sm:py-3">
-            Table of Contents
-          </AccordionTrigger>
-          <AccordionContent className="flex flex-col space-y-1">
-            {!headings.length && <Loader />}
-            {headings &&
-              headings.map((heading) => (
-                <motion.a
-                  key={heading.inlineText}
-                  href={`#${heading.inlineText}`}
-                  variants={itemVariants}
-                  className={`block pl-${(heading.level - 1) * 4} ${
-                    heading.id === activeHeadingId
-                      ? "text-primary text-sm font-medium opacity-100 transition-all duration-500"
-                      : "opacity-50"
-                  }`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById(heading.id)?.scrollIntoView({
-                      behavior: "smooth",
-                    });
-                  }}
-                >
-                  {heading.text}
-                </motion.a>
-              ))}
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="item-2"></AccordionItem>
-      </Accordion>
+      {loading === true || !loading && headings.length !== 0 && (
+        <Accordion
+          type="single"
+          collapsible
+          value={activePanel}
+          onValueChange={setActivePanel}
+        >
+          <AccordionItem value="toc">
+            <AccordionTrigger className="py-2.5 sm:py-3">目录</AccordionTrigger>
+            <AccordionContent className="flex flex-col space-y-1">
+              {!headings.length && <Loader />}
+              {headings &&
+                headings.map((heading) => (
+                  <motion.a
+                    key={heading.inlineText}
+                    href={`#${heading.inlineText}`}
+                    variants={itemVariants}
+                    className={`block pl-${(heading.level - 1) * 4} ${
+                      heading.id === activeHeadingId
+                        ? "text-primary text-sm font-medium opacity-100 transition-all duration-500"
+                        : "opacity-50"
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById(heading.id)?.scrollIntoView({
+                        behavior: "smooth",
+                      });
+                    }}
+                  >
+                    {heading.text}
+                  </motion.a>
+                ))}
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2"></AccordionItem>
+        </Accordion>
+      )}
     </motion.div>
   );
 }

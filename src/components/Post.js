@@ -34,6 +34,7 @@ const groupPostsByDate = (posts) => {
 
 // 渲染分组后的文章列表
 const Post = ({ posts }) => {
+  moment.locale('zh-cn');
   const groupedPosts = groupPostsByDate(posts);
   const sortedYears = Object.keys(groupedPosts).sort((a, b) => b - a); // 倒序排列年份
 
@@ -50,7 +51,7 @@ const Post = ({ posts }) => {
               <>
                 {/* 首个月份与年份在同一行 */}
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold">{year}</h3>
+                  <h3 className="font-semibold">{year} 年</h3>
                   <h4 className="font-medium opacity-80">
                     {months[sortedMonths[0]].name}
                   </h4>
@@ -64,7 +65,7 @@ const Post = ({ posts }) => {
                         <div className="flex items-center w-full py-1.5">
                           <h1 className="font-medium mr-2 truncate">
                             {post.properties.Title.title[0]?.plain_text ||
-                              "Untitled"}
+                              "未命名"}
                           </h1>
                           <div className="h-px flex-grow border-t border-dashed border-neutral-300 dark:border-neutral-600" />
                           <h2 className="opacity-75 whitespace-nowrap ml-2">
@@ -97,7 +98,7 @@ const Post = ({ posts }) => {
                               <div className="flex items-center w-full">
                                 <h1 className="font-medium mr-2 truncate">
                                   {post.properties.Title.title[0]?.plain_text ||
-                                    "Untitled"}
+                                    "未命名"}
                                 </h1>
                                 <div className="h-px flex-grow border-t border-dashed border-neutral-300 dark:border-neutral-600" />
                                 <h2 className="opacity-75 whitespace-nowrap ml-2">

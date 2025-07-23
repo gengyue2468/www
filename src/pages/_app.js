@@ -2,8 +2,8 @@ import "@/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import "@fontsource-variable/geist-mono";
-import "@fontsource-variable/geist";
+import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/inter";
 import "@fontsource-variable/newsreader/wght-italic.css";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import Head from "next/head";
@@ -17,7 +17,6 @@ export default function App({ Component, pageProps }) {
   }, []);
   return (
     <>
-      {" "}
       {isClient && (
         <ThemeProvider
           attribute="class"

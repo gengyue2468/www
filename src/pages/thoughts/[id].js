@@ -20,6 +20,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Post from "@/components/Post";
+import axios from "axios";
 
 // 自定义MDX组件
 const components = {
@@ -89,17 +90,28 @@ const PostPage = () => {
 
     const fetchPost = async () => {
       try {
-        const res = await fetch(`../api/notion/${id}`);
-        const resAll = await fetch(`../api/notion`);
-        if (!res.ok || !resAll.ok) throw new Error("Failed to fetch post");
+        //清除文章
+        setPost(null);
+        setMdxSource(null);
+        setLoading(true);
+        // 发起两个请求
+        const res = await axios.get(`../api/notion/${id}`);
+        const resAll = await axios.get(`../api/notion`);
 
-        const data = await res.json();
-        const AllData = await resAll.json();
-        setPost(data);
-        setPosts(AllData);
+        // 检查请求状态（axios不会自动为4xx/5xx状态抛错）
+        if (res.status < 200 || res.status >= 300) {
+          throw new Error(`拉取单篇文章失败: ${res.statusText}`);
+        }
+        if (resAll.status < 200 || resAll.status >= 300) {
+          throw new Error(`拉取所有文章失败: ${resAll.statusText}`);
+        }
 
-        // 从Content属性获取原始MDX内容
-        const mdxContent = data.page.properties.Content.rich_text
+        // 设置获取到的数据
+        setPost(res.data);
+        setPosts(resAll.data);
+
+        // 从获取到的单篇文章数据中提取MDX内容（修复了未定义的data变量）
+        const mdxContent = res.data.page.properties.Content.rich_text
           .map((item) => item.plain_text)
           .join("");
 
@@ -110,7 +122,17 @@ const PostPage = () => {
         const serialized = await serialize(mdxContent);
         setMdxSource(serialized);
       } catch (error) {
-        setError(error.message);
+        // 处理各种可能的错误
+        if (error.response) {
+          // 服务器返回错误响应
+          setError(`请求失败: ${error.response.data.message || error.message}`);
+        } else if (error.request) {
+          // 请求发出但无响应
+          setError("网络错误，无法连接到服务器");
+        } else {
+          // 其他错误
+          setError(error.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -205,8 +227,14 @@ const PostPage = () => {
 
   return (
     <Layout
-      title={post?.page.properties.Title.title[0]?.plain_text || "Loading..."}
-      note={<TOC headings={headings} activeHeadingId={activeHeading} />}
+      title={post?.page.properties.Title.title[0]?.plain_text || "载入中..."}
+      note={
+        <TOC
+          headings={headings}
+          activeHeadingId={activeHeading}
+          loading={loading}
+        />
+      }
     >
       <motion.div
         initial={{ opacity: 0, filter: "blur(5px)" }}
@@ -229,7 +257,7 @@ const PostPage = () => {
           >
             <div>
               <h1 className="font-semibold mb-2">
-                {post.page.properties.Title.title[0]?.plain_text || "Untitled"}
+                {post.page.properties.Title.title[0]?.plain_text || "未命名"}
               </h1>
               <div className="flex items-center text-sm opacity-75 mb-6">
                 <span>
@@ -238,7 +266,7 @@ const PostPage = () => {
                   )}
                 </span>
                 <span className="mx-2">•</span>
-                <span>{readingTime} min read</span>
+                <span>{readingTime} 分钟阅读</span>
               </div>
               <div
                 ref={contentRef}
@@ -247,9 +275,9 @@ const PostPage = () => {
                 <MDXRemote {...mdxSource} components={components} />
               </div>
 
-              <hr className="my-8 opacity-0"/>
+              <hr className="my-8 opacity-0" />
 
-              <h1 className="font-semibold mb-2">All Thoughts</h1>
+              <h1 className="font-semibold mb-2">所有随想</h1>
               <Post posts={posts} />
               <div className="mb-64 sm:mb-80" />
             </div>

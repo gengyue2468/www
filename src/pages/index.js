@@ -3,64 +3,40 @@ import Layout from "@/components/Layout";
 const Home = () => {
   return (
     <Layout
-      title="Geng Yue"
-      note={
-        <footer className="px-6 py-2 sm:py-0">
-          <p className="serif italic">“Nothing is impossible.”</p>
-          <p className="serif italic mt-2">
-            “The happiness of your life depends on the quality of your
-            thoughts.”
-          </p>
-          <p className="serif italic mt-2">
-            “Say something positive, and you’ll see something positive.”
-          </p>
-        </footer>
-      }
-      sticky={false}
+      title="耿越"
     >
       <div className="mb-8">
-        <h1 className="font-semibold mb-6">Geng Yue</h1>
-
-        <p className="mb-4">
-          <span className="serif italic mr-1.5">Crafting & Polishing.</span>
-          <span>
-            I’m a senior high school graduate who is about to go to university.
-          </span>
-        </p>
+        <h1 className="font-semibold mb-6">耿越</h1>
 
         <p className="mb-6">
-          <span>
-            Since junior high school, I’ve been starting doing freelance
-            projects according to my interest. I’m mostly interested in
-            combining the useage of
-            <span className="italic serif">Artificial Intelligence</span> with
-            <span className="serif italic">Web Development</span> for a better
-            web.
-          </span>
+          你好👋! 我是<a href="https://hust.edu.cn">@华中科技大学</a>
+          计算机科学与技术专业的一名大一新生。
         </p>
 
-        <h1 className="font-semibold mb-6">My Equipments</h1>
+        <h1 className="font-semibold mb-6">我的设备</h1>
 
         <p className="mb-2">
-          Honor GT Pro with Snapdragon 8 Elite chip 12+256GB.
+          荣耀 GT Pro 配备 骁龙8至尊领先版 芯片 及 12+256GB 内存组合.
         </p>
 
-        <p className="mb-2">Apple iMac 24’ (2021) with M1 chip 16+512GB.</p>
+        <p className="mb-2">
+          Apple iMac 24’ (2021) 配备Apple M1 芯片 及 16+512GB 内存组合.
+        </p>
 
         <p className="mb-6">
-          HP OMEN 11 16’ (2025) with i9-14900HX processor and NVIDIA RTX5070
-          graphics 32GB+1TB.
+          惠普 暗影精灵 11 16’ (2025) 配备 英特尔 i9-14900HX 处理器 和 英伟达
+          RTX5070 显示卡 及 32GB+1TB 内存组合.
         </p>
 
-        <h1 className="font-semibold mb-6">Contact</h1>
+        <h1 className="font-semibold mb-6">联系我</h1>
 
-        <p className="mb-2">GitHub: @gengyue2468</p>
-
-        <p className="mb-2">Email: gengyue2468@outlook.com</p>
-
-        <p className="mb-2">Tencent QQ:3041299667</p>
-
-        <p className="mb-2">WeChat: gengyue2468</p>
+        <p className="mb-2">
+          GitHub: <a href="https://github.com/gengyue2468">@gengyue2468</a>
+        </p>
+        <p className="mb-2">
+          电子邮件:
+          <a href="mailto:gengyue2468@outlook.com">gengyue2468@outlook.com</a>
+        </p>
       </div>
     </Layout>
   );

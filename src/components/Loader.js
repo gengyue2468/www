@@ -8,7 +8,7 @@ export default function Loader() {
     <div className="animate-pulse">
       <div className="flex flex-row space-x-1.5 items-center">
         <Loader2Icon size={16} className="animate-spin" />{" "}
-        <span className="opacity-75">Connecting Notion...</span>
+        <span className="opacity-75">正在连接至 Notion...</span>
       </div>
       <motion.small
         className="opacity-75"
@@ -16,13 +16,9 @@ export default function Loader() {
         animate={{ opacity: 0.75 }}
         transition={{ delay: 9 }}
       >
-        The loading process might take much longer than expected, you could sit
-        and relax to wait or{" "}
-        <button
-          onClick={router.reload}
-          className="underline cursor-pointer"
-        >
-          try reload.
+        加载时间过长？试试
+        <button onClick={router.reload} className="underline cursor-pointer">
+          重载页面.
         </button>
       </motion.small>
     </div>
