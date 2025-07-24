@@ -7,8 +7,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Loader from "./Loader";
+import { cn } from "@/lib/utils";
 
-export default function TOC({ headings, activeHeadingId, loading }) {
+export default function TOC({ headings, activeHeadingId, loading, isSticky }) {
   // 使用更直观的状态名：isLargeDevice
   const [isLargeDevice, setIsLargeDevice] = useState(window.innerWidth >= 768);
 
@@ -39,9 +40,14 @@ export default function TOC({ headings, activeHeadingId, loading }) {
       initial={{ opacity: 0, filter: "blur(5px)" }}
       animate={{ opacity: 1, filter: "blur(0px)" }}
       transition={{ duration: 0.25 }}
-      className="fixed sm:sticky bottom-0 sm:right-0 sm:top-16 px-6 w-full bg-background/75 backdrop-blur-lg transition-all duration-500"
+      className={cn(
+        "right-0 bg-background/50 backdrop-blur-lg transition-all rounded-3xl duration-300 border border-neutral-300/50 dark:border-neutral-700/50 px-4 py-2",
+        isSticky
+          ? "translate-x-4 sm:translate-x-96 w-64 min-h-10 "
+          : "rounded-ful w-48 sm:w-64 min-h-10"
+      )}
     >
-      {loading === true || !loading && headings.length !== 0 && (
+      {loading === false && (
         <Accordion
           type="single"
           collapsible
@@ -49,9 +55,16 @@ export default function TOC({ headings, activeHeadingId, loading }) {
           onValueChange={setActivePanel}
         >
           <AccordionItem value="toc">
-            <AccordionTrigger className="py-2.5 sm:py-3">目录</AccordionTrigger>
+            <AccordionTrigger className="border-none text-xs">
+              目录
+            </AccordionTrigger>
             <AccordionContent className="flex flex-col space-y-1">
-              {!headings.length && <Loader />}
+              {!headings.length && loading && <Loader />}
+              {!headings.length && (
+                <span className="text-center text-xs opacity-50 my-8">
+                  没有目录
+                </span>
+              )}
               {headings &&
                 headings.map((heading) => (
                   <motion.a

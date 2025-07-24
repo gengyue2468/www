@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader";
 import axios from "axios";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -35,12 +36,25 @@ const Home = () => {
   return (
     <Layout title="随想">
       <div className="w-full">
-        <h1 className="font-semibold mb-6">随想</h1>
+        <h1 className="font-extrabold text-3xl mb-2">随想</h1>
 
-        <p className="mb-4">恭喜你！旅行者，你成功来到了我的大脑的荒漠.</p>
+        <div className="flex flex-row space-x-4 items-center text-balance">
+          <div className="w-2/3">
+            <p className="font-medium text-lg sm:text-xl">
+              Hey, Lois. Did you see Stewie? Heeeeeeeeee~
+            </p>
+          </div>
+          <div className="w-1/3">
+            <LazyLoadImage
+              effect="blur"
+              src="/static/petter-griffin.webp"
+              className="rounded-full size-24 sm:size-36"
+            />
+          </div>
+        </div>
 
-        {error && <Error error={error} />}
-        {loading && <Loader />}
+        {error && !posts && <Error error={error} />}
+        {loading && !error && <Loader />}
         <motion.div
           initial={{ opacity: 0, filter: "blur(5px)" }}
           animate={{ opacity: 1, filter: "blur(0px)" }}

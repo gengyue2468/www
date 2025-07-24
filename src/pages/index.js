@@ -1,45 +1,392 @@
 import Layout from "@/components/Layout";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { motion } from "motion/react";
 
 const Home = () => {
   return (
-    <Layout
-      title="耿越"
-    >
+    <Layout title="关于 | 耿越">
       <div className="mb-8">
-        <h1 className="font-semibold mb-6">耿越</h1>
+        <h1 className="font-extrabold text-3xl mb-2">
+          关于
+        </h1>
 
-        <p className="mb-6">
-          你好👋! 我是<a href="https://hust.edu.cn">@华中科技大学</a>
-          计算机科学与技术专业的一名大一新生。
-        </p>
+        <div className="flex flex-row space-x-4 items-center text-balance">
+          <div className="w-2/3">
+            <p className="font-medium text-lg sm:text-xl">
+              你好👋! 我是<a href="https://hust.edu.cn">@华中科技大学</a>
+              计算机科学与技术专业的一名大一新生。
+            </p>
+          </div>
+          <div className="w-1/3">
+            <LazyLoadImage
+              effect="blur"
+              src="/static/author.webp"
+              className="rounded-full size-24 sm:size-36"
+            />
+          </div>
+        </div>
 
-        <h1 className="font-semibold mb-6">我的设备</h1>
+        <h1 className="font-bold text-2xl my-6">我的设备</h1>
 
-        <p className="mb-2">
-          荣耀 GT Pro 配备 骁龙8至尊领先版 芯片 及 12+256GB 内存组合.
-        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card>
+            <CardContent className="font-medium flex flex-col space-y-2">
+              <p className="flex flex-row space-x-2 items-center">
+                <CPUIcon /> <span>高通骁龙® 8 至尊领先版</span>
+              </p>
+              <p className="flex flex-row space-x-2 items-center">
+                <RAMIcon /> <span>12GB + 12GB</span>
+              </p>
+              <p className="flex flex-row space-x-2 items-center">
+                <StorageIcon /> <span>256GB</span>
+              </p>
+            </CardContent>
+            <CardFooter className="flex flex-row justify-between items-center opacity-75 text-balance">
+              <p className="text-sm">荣耀GT Pro（第一代）</p>
+              <div>
+                <PhoneIcon />
+              </div>
+            </CardFooter>
+          </Card>
 
-        <p className="mb-2">
-          Apple iMac 24’ (2021) 配备Apple M1 芯片 及 16+512GB 内存组合.
-        </p>
+          <Card>
+            <CardContent className="font-medium flex flex-col space-y-2">
+              <p className="flex flex-row space-x-2 items-center">
+                <CPUIcon /> <span>Apple® M1</span>
+              </p>
+              <p className="flex flex-row space-x-2 items-center">
+                <RAMIcon /> <span>16GB</span>
+              </p>
+              <p className="flex flex-row space-x-2 items-center">
+                <StorageIcon /> <span>512GB</span>
+              </p>
+            </CardContent>
+            <CardFooter className="flex flex-row justify-between items-center opacity-75 text-balance">
+              <p className="text-sm">Apple iMac（2021）</p>
+              <div>
+                <MacIcon />
+              </div>
+            </CardFooter>
+          </Card>
 
-        <p className="mb-6">
-          惠普 暗影精灵 11 16’ (2025) 配备 英特尔 i9-14900HX 处理器 和 英伟达
-          RTX5070 显示卡 及 32GB+1TB 内存组合.
-        </p>
+          <Card>
+            <CardContent className="font-medium flex flex-col space-y-2">
+              <p className="flex flex-row space-x-2 items-center">
+                <CPUIcon /> <span>英特尔® 酷睿™ i9-14900HX</span>
+              </p>
+              <p className="flex flex-row space-x-2 items-center">
+                <GraphicsIcon /> <span>Nvidia GeForce RTX 5070</span>
+              </p>
+              <p className="flex flex-row space-x-2 items-center">
+                <RAMIcon /> <span>32GB</span>
+              </p>
+              <p className="flex flex-row space-x-2 items-center">
+                <StorageIcon /> <span>1TB</span>
+              </p>
+            </CardContent>
+            <CardFooter className="flex flex-row justify-between items-center opacity-75 text-balance">
+              <p className="text-sm">惠普 暗影精灵 11（2025）</p>
+              <div>
+                <LaptopIcon />
+              </div>
+            </CardFooter>
+          </Card>
 
-        <h1 className="font-semibold mb-6">联系我</h1>
+          <Card>
+            <CardContent className="font-medium flex flex-col space-y-2">
+              <p className="text-8xl text-center mb-6">?</p>
+            </CardContent>
+            <CardFooter className="flex flex-row justify-between items-center opacity-75 text-balance">
+              <p className="text-sm">即将推出</p>
+              <div>?</div>
+            </CardFooter>
+          </Card>
+        </div>
 
-        <p className="mb-2">
-          GitHub: <a href="https://github.com/gengyue2468">@gengyue2468</a>
-        </p>
-        <p className="mb-2">
-          电子邮件:
-          <a href="mailto:gengyue2468@outlook.com">gengyue2468@outlook.com</a>
-        </p>
+        <h1 className="font-bold text-2xl mt-12 mb-6">联系我</h1>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card>
+            <CardContent className="font-medium flex flex-col space-y-2">
+              <p className="flex flex-row space-x-2 items-center">
+                <UserIcon /> <span>耿越</span>
+              </p>
+              <p className="flex flex-row space-x-2 items-center">
+                <LinkIcon />{" "}
+                <a href="https://github.com/gengyue2468">@gengyue2468</a>
+              </p>
+            </CardContent>
+            <CardFooter className="flex flex-row justify-between items-center opacity-75 text-balance">
+              <p className="text-sm">GitHub 账户</p>
+              <div>
+                <GitHubIcon />
+              </div>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardContent className="font-medium flex flex-col space-y-2">
+              <p className="flex flex-row space-x-2 items-center">
+                <UserIcon /> <span>耿越</span>
+              </p>
+              <p className="flex flex-row space-x-2 items-center">
+                <LinkIcon />{" "}
+                <a href="mailto:gengyue2468@outlook.com">
+                  gengyue2468@outlook.com
+                </a>
+              </p>
+            </CardContent>
+            <CardFooter className="flex flex-row justify-between items-center opacity-75 text-balance">
+              <p className="text-sm">电子邮件</p>
+              <div>
+                <EmailIcon />
+              </div>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardContent className="font-medium flex flex-col space-y-2">
+              <p className="flex flex-row space-x-2 items-center">
+                <LinkIcon /> gengyue2468
+              </p>
+            </CardContent>
+            <CardFooter className="flex flex-row justify-between items-center opacity-75 text-balance">
+              <p className="text-sm">微信</p>
+              <div>
+                <WeChatIcon />
+              </div>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardContent className="font-medium flex flex-col space-y-2">
+              <p className="flex flex-row space-x-2 items-center">
+                <LinkIcon /> 3041299667
+              </p>
+            </CardContent>
+            <CardFooter className="flex flex-row justify-between items-center opacity-75 text-balance">
+              <p className="text-sm">腾讯QQ</p>
+              <div>
+                <QQIcon />
+              </div>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     </Layout>
   );
 };
 
 export default Home;
+
+const CPUIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="size-5"
+    >
+      <path d="M16.5 7.5h-9v9h9v-9Z" />
+      <path
+        fillRule="evenodd"
+        d="M8.25 2.25A.75.75 0 0 1 9 3v.75h2.25V3a.75.75 0 0 1 1.5 0v.75H15V3a.75.75 0 0 1 1.5 0v.75h.75a3 3 0 0 1 3 3v.75H21A.75.75 0 0 1 21 9h-.75v2.25H21a.75.75 0 0 1 0 1.5h-.75V15H21a.75.75 0 0 1 0 1.5h-.75v.75a3 3 0 0 1-3 3h-.75V21a.75.75 0 0 1-1.5 0v-.75h-2.25V21a.75.75 0 0 1-1.5 0v-.75H9V21a.75.75 0 0 1-1.5 0v-.75h-.75a3 3 0 0 1-3-3v-.75H3A.75.75 0 0 1 3 15h.75v-2.25H3a.75.75 0 0 1 0-1.5h.75V9H3a.75.75 0 0 1 0-1.5h.75v-.75a3 3 0 0 1 3-3h.75V3a.75.75 0 0 1 .75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h10.5a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75H6.75a.75.75 0 0 1-.75-.75V6.75Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+};
+
+const RAMIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="size-5"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="currentColor"
+        d="M2 5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h3a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zm3 4h6v3H5zm8 0h6v3h-6z"
+      />
+    </svg>
+  );
+};
+
+const StorageIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="size-5"
+      viewBox="0 0 32 32"
+    >
+      <path
+        fill="currentColor"
+        d="M6.5 9A4.5 4.5 0 0 0 2 13.5v5A4.5 4.5 0 0 0 6.5 23h19a4.5 4.5 0 0 0 4.5-4.5v-5A4.5 4.5 0 0 0 25.5 9zM21 14.5a1.5 1.5 0 1 1-3 0a1.5 1.5 0 0 1 3 0m3.5 1.5a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3"
+      />
+    </svg>
+  );
+};
+
+const GraphicsIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="size-5"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="currentColor"
+        d="M2 7v1.5h1V17h1.5V7zm4 0v9h1v1h7v-1h8V7zm11.5 2a2.5 2.5 0 0 1 2.5 2.5a2.5 2.5 0 0 1-2.5 2.5a2.5 2.5 0 0 1-2.5-2.5A2.5 2.5 0 0 1 17.5 9"
+      />
+    </svg>
+  );
+};
+
+const PhoneIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className="size-5"
+    >
+      <path d="M8 16.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z" />
+      <path
+        fillRule="evenodd"
+        d="M4 4a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V4Zm4-1.5v.75c0 .414.336.75.75.75h2.5a.75.75 0 0 0 .75-.75V2.5h1A1.5 1.5 0 0 1 14.5 4v12a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 16V4A1.5 1.5 0 0 1 7 2.5h1Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+};
+
+const LaptopIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="size-5"
+      viewBox="0 0 48 48"
+    >
+      <g
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="4"
+      >
+        <path d="M8 8h32v20H8zm0 20L4 41h40l-4-13" />
+        <path d="M19.9 35h8.2l1.9 6H18z" />
+      </g>
+    </svg>
+  );
+};
+
+const MacIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="size-5"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="currentColor"
+        d="M13.112 7.508a1.5 1.5 0 0 0 .39-1c0-.048 0-.1-.006-.144a1.5 1.5 0 0 0-.576.162a1.63 1.63 0 0 0-.92 1.39a1 1 0 0 0 .009.135a1.33 1.33 0 0 0 1.103-.543m-3.335 5.078a3.7 3.7 0 0 0 .517.619a.9.9 0 0 0 .648.288a1.8 1.8 0 0 0 .561-.147a1.7 1.7 0 0 1 .648-.138a1.7 1.7 0 0 1 .631.138a1.6 1.6 0 0 0 .585.141a.97.97 0 0 0 .633-.279a3.5 3.5 0 0 0 .493-.6a4 4 0 0 0 .384-.691q.068-.157.123-.327a1.7 1.7 0 0 1-.492-.324a1.556 1.556 0 0 1 .3-2.5a1.72 1.72 0 0 0-1.351-.712a2 2 0 0 0-.81.144a3.3 3.3 0 0 1-.6.186a2.2 2.2 0 0 1-.537-.159a2 2 0 0 0-.678-.159a1.75 1.75 0 0 0-.877.249a1.85 1.85 0 0 0-.648.658A2.35 2.35 0 0 0 9 10.212a4 4 0 0 0 .231 1.288a4.3 4.3 0 0 0 .546 1.086m11.712-8.505H2.51a.51.51 0 0 0-.51.511V17.46a.51.51 0 0 0 .51.511h7.781l-.113 1.69a.82.82 0 0 1-.262.554l-.791.7a.16.16 0 0 0 .105.281h5.54a.16.16 0 0 0 .1-.282l-.8-.7a.8.8 0 0 1-.269-.567l-.1-1.68h7.783A.51.51 0 0 0 22 17.46V4.592a.51.51 0 0 0-.511-.511M12 4.214a.186.186 0 0 1 .019.372h-.038A.186.186 0 0 1 12 4.214m9.36 10.925H2.64V4.721h18.72z"
+      />
+    </svg>
+  );
+};
+
+const GitHubIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="size-5"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="currentColor"
+        d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"
+      />
+    </svg>
+  );
+};
+
+const UserIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="size-5"
+    >
+      <path
+        fillRule="evenodd"
+        d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+};
+
+const LinkIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className="size-5"
+    >
+      <path d="M12.232 4.232a2.5 2.5 0 0 1 3.536 3.536l-1.225 1.224a.75.75 0 0 0 1.061 1.06l1.224-1.224a4 4 0 0 0-5.656-5.656l-3 3a4 4 0 0 0 .225 5.865.75.75 0 0 0 .977-1.138 2.5 2.5 0 0 1-.142-3.667l3-3Z" />
+      <path d="M11.603 7.963a.75.75 0 0 0-.977 1.138 2.5 2.5 0 0 1 .142 3.667l-3 3a2.5 2.5 0 0 1-3.536-3.536l1.225-1.224a.75.75 0 0 0-1.061-1.06l-1.224 1.224a4 4 0 1 0 5.656 5.656l3-3a4 4 0 0 0-.225-5.865Z" />
+    </svg>
+  );
+};
+
+const EmailIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className="size-5"
+    >
+      <path d="M3 4a2 2 0 0 0-2 2v1.161l8.441 4.221a1.25 1.25 0 0 0 1.118 0L19 7.162V6a2 2 0 0 0-2-2H3Z" />
+      <path d="m19 8.839-7.77 3.885a2.75 2.75 0 0 1-2.46 0L1 8.839V14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.839Z" />
+    </svg>
+  );
+};
+
+const WeChatIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="size-5"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="currentColor"
+        d="M15.85 8.14c.39 0 .77.03 1.14.08C16.31 5.25 13.19 3 9.44 3c-4.25 0-7.7 2.88-7.7 6.43c0 2.05 1.15 3.86 2.94 5.04L3.67 16.5l2.76-1.19c.59.21 1.21.38 1.87.47c-.09-.39-.14-.79-.14-1.21c-.01-3.54 3.44-6.43 7.69-6.43M12 5.89a.96.96 0 1 1 0 1.92a.96.96 0 0 1 0-1.92M6.87 7.82a.96.96 0 1 1 0-1.92a.96.96 0 0 1 0 1.92"
+      />
+      <path
+        fill="currentColor"
+        d="M22.26 14.57c0-2.84-2.87-5.14-6.41-5.14s-6.41 2.3-6.41 5.14s2.87 5.14 6.41 5.14c.58 0 1.14-.08 1.67-.2L20.98 21l-1.2-2.4c1.5-.94 2.48-2.38 2.48-4.03m-8.34-.32a.96.96 0 1 1 .96-.96c.01.53-.43.96-.96.96m3.85 0a.96.96 0 1 1 0-1.92a.96.96 0 0 1 0 1.92"
+      />
+    </svg>
+  );
+};
+
+const QQIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="size-5"
+      viewBox="0 0 24 24"
+    >
+      <g fill="none">
+        <path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+        <path
+          fill="currentColor"
+          d="M12 2a6.285 6.285 0 0 0-6.276 5.937l-.146 2.63a28 28 0 0 0-.615 1.41c-1.24 3.073-1.728 5.773-1.088 6.032c.335.135.913-.426 1.566-1.432a6.67 6.67 0 0 0 1.968 3.593c-1.027.35-1.91.828-1.91 1.33c0 .509 2.48.503 4.239.5h.001c.549-.002 1.01-.008 1.38-.057a6.7 6.7 0 0 0 1.76 0c.37.05.833.055 1.382.056c1.76.004 4.239.01 4.239-.499c0-.502-.883-.979-1.909-1.33a6.67 6.67 0 0 0 1.967-3.586c.65 1.002 1.227 1.56 1.56 1.425c.64-.259.154-2.96-1.088-6.032a28 28 0 0 0-.607-1.395l-.147-2.645A6.285 6.285 0 0 0 12 2"
+        />
+      </g>
+    </svg>
+  );
+};

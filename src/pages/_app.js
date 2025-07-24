@@ -8,6 +8,7 @@ import "@fontsource-variable/newsreader/wght-italic.css";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import Head from "next/head";
 import { useState, useEffect } from "react";
+import Bar from "@/components/Bar";
 
 export default function App({ Component, pageProps }) {
   const [isClient, setIsClient] = useState(false);
@@ -31,6 +32,7 @@ export default function App({ Component, pageProps }) {
             />
           </Head>
           <Component {...pageProps} />
+          <Bar />
           <Analytics />
           <SpeedInsights />
         </ThemeProvider>

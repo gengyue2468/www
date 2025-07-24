@@ -66,10 +66,22 @@ const components = {
 };
 
 const calculateReadingTime = (content) => {
-  const wordsPerMinute = 200;
-  const wordCount = content?.split(/\s+/).length || 0;
-  const minutes = Math.ceil(wordCount / wordsPerMinute);
-  return minutes;
+  const chineseCharsPerMinute = 200;
+  const englishWordsPerMinute = 200;
+  
+  if (!content) return 0;
+  
+  const chineseChars = content.match(/[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g);
+  const chineseCount = chineseChars ? chineseChars.length : 0;
+  
+  const englishContent = content.replace(/[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g, ' ');
+  const englishWords = englishContent.match(/\b[\w']+\b/g);
+  const englishCount = englishWords ? englishWords.length : 0;
+  
+  const chineseMinutes = chineseCount / chineseCharsPerMinute;
+  const englishMinutes = englishCount / englishWordsPerMinute;
+
+  return Math.ceil(chineseMinutes + englishMinutes) || 1;
 };
 
 const PostPage = () => {
@@ -225,41 +237,73 @@ const PostPage = () => {
     };
   }, [headings, activeHeading]); // 依赖headings（标题变化时重新监听）和activeHeading
 
+  // 状态管理：是否处于sticky状态
+  const [isSticky, setIsSticky] = useState(false);
+
+  // 监听滚动事件，判断是否需要显示文字
+  useEffect(() => {
+    const handleScroll = () => {
+      // 当滚动超过20px时，认为进入sticky状态
+      setIsSticky(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <Layout
       title={post?.page.properties.Title.title[0]?.plain_text || "载入中..."}
-      note={
+    >
+      <div className="sticky top-2 sm:top-4 flex flex-row justify-between z-20">
+        <button
+          onClick={() => router.push("/thoughts")}
+          className={`
+        border border-neutral-300/50 dark:border-neutral-700/50 
+        bg-background/50 backdrop-blur-lg 
+         z-40! cursor-pointer 
+        flex items-center 
+        rounded-full transition-all duration-300 
+        hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50
+        ${
+          isSticky
+            ? "w-22 h-10 px-4 py-2 space-x-2 -translate-x-4 sm:-translate-x-32"
+            : "size-10 justify-center"
+        }
+      `}
+        >
+          <ArrowLeft size={16} />
+          {isSticky && (
+            <span className="transition-all duration-300 text-xs truncate overflow-hidden font-medium">
+              返回
+            </span>
+          )}
+        </button>
         <TOC
           headings={headings}
           activeHeadingId={activeHeading}
           loading={loading}
+          isSticky={isSticky}
         />
-      }
-    >
+      </div>
       <motion.div
         initial={{ opacity: 0, filter: "blur(5px)" }}
         animate={{ opacity: 1, filter: "blur(0px)" }}
-        transition={{ duration: 0.25 }}
+        transition={{ duration: 0.6 }}
       >
-        <button
-          onClick={() => router.push("/thoughts")}
-          className="flex flex-row space-x-2 items-center opacity-75 mb-4 hover:opacity-100 transition-all duration-500 cursor-pointer"
-        >
-          <ArrowLeft size={16} />
-        </button>
-        {loading && <Loader />}
-        {error && <Error error={error} />}
+        {loading && !error && <Loader />}
+        {error && !mdxSource && <Error error={error} />}
         {!loading && mdxSource && (
           <motion.div
             initial={{ opacity: 0, filter: "blur(5px)" }}
             animate={{ opacity: 1, filter: "blur(0px)" }}
             transition={{ duration: 0.25 }}
           >
-            <div>
-              <h1 className="font-semibold mb-2">
+            <div className="mt-8">
+              <h1 className="font-extrabold text-3xl mb-2 text-balance">
                 {post.page.properties.Title.title[0]?.plain_text || "未命名"}
               </h1>
-              <div className="flex items-center text-sm opacity-75 mb-6">
+              <div className="flex items-center text-xs opacity-75 mb-8">
                 <span>
                   {moment(post.page.properties.Date?.date?.start).format(
                     "MMMM Do, YYYY"
@@ -270,16 +314,16 @@ const PostPage = () => {
               </div>
               <div
                 ref={contentRef}
-                className="prose dark:prose-inset max-w-none"
+                className="prose dark:prose-inset max-w-none mt-6 text-base sm:text-lg leading-loose"
               >
                 <MDXRemote {...mdxSource} components={components} />
               </div>
 
               <hr className="my-8 opacity-0" />
 
-              <h1 className="font-semibold mb-2">所有随想</h1>
+              <h1 className="font-bold text-2xl mb-2">所有随想</h1>
               <Post posts={posts} />
-              <div className="mb-64 sm:mb-80" />
+              <div className="mb-0" />
             </div>
           </motion.div>
         )}

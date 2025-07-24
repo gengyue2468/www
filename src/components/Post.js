@@ -39,7 +39,7 @@ const Post = ({ posts }) => {
   const sortedYears = Object.keys(groupedPosts).sort((a, b) => b - a); // 倒序排列年份
 
   return (
-    <div className="w-full">
+    <div className="w-full my-8">
       {sortedYears.map((year) => {
         const months = groupedPosts[year];
         const sortedMonths = Object.keys(months).sort((a, b) => b - a); // 倒序排列月份
@@ -51,24 +51,24 @@ const Post = ({ posts }) => {
               <>
                 {/* 首个月份与年份在同一行 */}
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold">{year} 年</h3>
-                  <h4 className="font-medium opacity-80">
+                  <h3 className="font-bold text-xl">{year} 年</h3>
+                  <h4 className="font-medium opacity-75 text-xs">
                     {months[sortedMonths[0]].name}
                   </h4>
                 </div>
 
                 {/* 首个月份的文章列表 */}
-                <div className="mb-6">
+                <div className="mb-6 flex flex-col space-y-1">
                   {months[sortedMonths[0]].posts.map((post) => (
-                    <div key={post.id} className="w-full">
+                    <div key={post.id} className="w-full transition-all duration-300 hover:opacity-75">
                       <Link href={`/thoughts/${post.id}`}>
-                        <div className="flex items-center w-full py-1.5">
-                          <h1 className="font-medium mr-2 truncate">
+                        <div className="flex items-center w-full py-2.5">
+                          <h1 className="font-semibold text-lg sm:text-xl mr-2 truncate text-foreground!">
                             {post.properties.Title.title[0]?.plain_text ||
                               "未命名"}
                           </h1>
                           <div className="h-px flex-grow border-t border-dashed border-neutral-300 dark:border-neutral-600" />
-                          <h2 className="opacity-75 whitespace-nowrap ml-2">
+                          <h2 className="opacity-75 whitespace-nowrap ml-2 text-xs text-foreground!">
                             {moment(post.properties.Date?.date?.start).format(
                               "Do"
                             )}
@@ -85,23 +85,23 @@ const Post = ({ posts }) => {
 
                   return (
                     <div key={month} className="mb-6">
-                      <div className="flex justify-end">
-                        <h4 className="mb-2 opacity-80">{monthName}</h4>
+                      <div className="flex justify-end items-center">
+                        <h4 className="opacity-75 font-medium text-xs text-foreground!">{monthName}</h4>
                       </div>
-                      <div className="">
+                      <div className="flex flex-col space-y-1">
                         {monthPosts.map((post) => (
                           <div
                             key={post.id}
-                            className="w-full py-1.5"
+                            className="w-full py-2.5 transition-all duration-300 hover:opacity-75"
                           >
                             <Link href={`/thoughts/${post.id}`}>
                               <div className="flex items-center w-full">
-                                <h1 className="font-medium mr-2 truncate">
+                                <h1 className="font-semibold text-lg sm:text-xl mr-2 truncate text-foreground">
                                   {post.properties.Title.title[0]?.plain_text ||
                                     "未命名"}
                                 </h1>
                                 <div className="h-px flex-grow border-t border-dashed border-neutral-300 dark:border-neutral-600" />
-                                <h2 className="opacity-75 whitespace-nowrap ml-2">
+                                <h2 className="opacity-75 whitespace-nowrap ml-2 text-xs text-foreground!">
                                   {moment(
                                     post.properties.Date?.date?.start
                                   ).format("Do")}
