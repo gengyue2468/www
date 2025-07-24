@@ -306,7 +306,7 @@ const PostPage = () => {
               <div className="flex items-center text-xs opacity-75 mb-8">
                 <span>
                   {moment(post.page.properties.Date?.date?.start).format(
-                    "MMMM Do, YYYY"
+                    "YYYY年MM月DD日"
                   )}
                 </span>
                 <span className="mx-2">•</span>

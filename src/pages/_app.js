@@ -9,9 +9,12 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import Bar from "@/components/Bar";
+import 'moment/locale/zh-cn';
+import moment from "moment";
 
 export default function App({ Component, pageProps }) {
   const [isClient, setIsClient] = useState(false);
+  moment.locale('zh-cn');
 
   useEffect(() => {
     setIsClient(true);
