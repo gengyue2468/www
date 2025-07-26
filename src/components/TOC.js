@@ -41,7 +41,7 @@ export default function TOC({ headings, activeHeadingId, loading, isSticky }) {
       animate={{ opacity: 1, filter: "blur(0px)" }}
       transition={{ duration: 0.25 }}
       className={cn(
-        "right-0 bg-background/50 backdrop-blur-lg transition-all rounded-3xl duration-300 border border-neutral-300/50 dark:border-neutral-700/50 px-4 py-2",
+        "shadow-sm right-0 bg-background/50 backdrop-blur-lg transition-all rounded-3xl duration-300 border border-neutral-300/50 dark:border-neutral-700/50 px-4 py-2",
         isSticky
           ? "translate-x-4 sm:translate-x-96 w-64 min-h-10 "
           : "rounded-ful w-48 sm:w-64 min-h-10"

@@ -23,6 +23,8 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Post from "@/components/Post";
 import axios from "axios";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card } from "@/components/ui/card";
 
 // 自定义MDX组件
 const components = {
@@ -45,41 +47,65 @@ const components = {
       {children}
     </a>
   ),
-  img: ({ src, alt }) => (
-    <div className="my-20">
-      <LazyLoadImage
-        effect="blur"
-        src={src}
-        alt={alt}
-        className="w-full h-auto rounded-3xl"
-      />
-      <div className="flex flex-row justify-between items-center">
-        <span className="text-xs opacity-75">{alt}</span>
-        <button
-          onClick={() => open(src)}
-          variant="secondary"
-          className="flex flex-row space-x-0.5! opacity-75 items-center rounded-full px-2 py-1.5 cursor-pointer bg-accent hover:bg-accent/50 transition-colors duration-300"
-        >
-          <ZoomInIcon className="size-3.5" />  <span className="text-xs ml-0.5">定睛细看</span>
-        </button>
+  img: ({ src, alt }) => {
+    const [loading, setLoading] = useState(true);
+
+    // 当src变化时重新显示加载状态
+    useEffect(() => {
+      setLoading(true);
+    }, [src]);
+
+    return (
+      <div className="my-16 transition-all duration-300">
+        {loading && (
+          <Card className="w-full h-auto min-h-96 rounded-3xl flex items-center justify-center animate-pulse">
+            <Loader type="no-notion" word="图片" />
+          </Card>
+        )}
+
+        <LazyLoadImage
+          effect="blur"
+          src={src}
+          alt={alt}
+          beforeLoad={() => setLoading(true)}
+          onLoad={() => setLoading(false)}
+          onError={() => setLoading(false)}
+          className="w-full h-auto rounded-3xl brightness-100 dark:brightness-50"
+        />
+
+        <div className="flex flex-row justify-between items-center mt-1">
+          <span className="text-xs opacity-75">{alt}</span>
+          <button
+            onClick={() => open(src)}
+            className="flex flex-row space-x-0.5 opacity-75 items-center rounded-full px-2 py-1.5 cursor-pointer bg-accent hover:bg-accent/50 transition-colors duration-300"
+          >
+            <ZoomInIcon className="size-3.5" />{" "}
+            <span className="text-xs ml-0.5">定睛细看</span>
+          </button>
+        </div>
       </div>
-    </div>
-  ),
+    );
+  },
 };
 
 const calculateReadingTime = (content) => {
   const chineseCharsPerMinute = 200;
   const englishWordsPerMinute = 200;
-  
+
   if (!content) return 0;
-  
-  const chineseChars = content.match(/[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g);
+
+  const chineseChars = content.match(
+    /[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g
+  );
   const chineseCount = chineseChars ? chineseChars.length : 0;
-  
-  const englishContent = content.replace(/[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g, ' ');
+
+  const englishContent = content.replace(
+    /[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g,
+    " "
+  );
   const englishWords = englishContent.match(/\b[\w']+\b/g);
   const englishCount = englishWords ? englishWords.length : 0;
-  
+
   const chineseMinutes = chineseCount / chineseCharsPerMinute;
   const englishMinutes = englishCount / englishWordsPerMinute;
 
@@ -261,7 +287,7 @@ const PostPage = () => {
         <button
           onClick={() => router.push("/thoughts")}
           className={`
-        border border-neutral-300/50 dark:border-neutral-700/50 
+       shadow-sm border border-neutral-300/50 dark:border-neutral-700/50 
         bg-background/50 backdrop-blur-lg 
          z-40! cursor-pointer 
         flex items-center 

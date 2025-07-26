@@ -30,10 +30,10 @@ export default function Bar() {
       <motion.button
         
         className={cn(
-          "cursor-pointer flex flex-col items-center justify-center size-12 rounded-full transition-all duration-300 ",
+          "cursor-pointer flex flex-col items-center justify-center size-12 rounded-full transition-all duration-300 backdrop-blur-lg",
           active
-            ? "bg-neutral-200/50 dark:bg-neutral-800/50 backdrop-blur-3xl text-primary"
-            : "hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50"
+            ? "bg-neutral-300/25 dark:bg-neutral-700/10 text-primary"
+            : "hover:bg-neutral-300/25 dark:hover:bg-neutral-700/10"
         )}
         {...props}
       >
@@ -50,7 +50,7 @@ export default function Bar() {
         blurIntensity={0.75}
         blurLayers={2}
       />
-      <div className="shadow-sm z-20 transition-all duration-300 fixed bottom-8 left-1/2 -translate-x-1/2 border border-neutral-300/25 dark:border-neutral-700/25 bg-opacity-50 backdrop-blur-lg p-1.5 rounded-full max-w-full">
+      <div className="shadow-sm z-20 transition-all duration-300 fixed bottom-8 left-1/2 -translate-x-1/2 border border-neutral-300/25 dark:border-neutral-700/15 bg-opacity-50 backdrop-blur-lg p-1.5 rounded-full max-w-full">
         <div className="flex flex-row items-center justify-center space-x-0.5">
           {Nav.map((item, index) => (
             <Button
