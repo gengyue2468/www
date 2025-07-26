@@ -49,12 +49,12 @@ export default function Error({ error, type }) {
             variant="secondary"
             className="mt-2 cursor-pointer"
           >
-            <RotateCcwIcon /> <span>重试加载</span>
+            <RotateCcwIcon /> <span>试试重载</span>
           </Button>
         </CardContent>
         <CardFooter className="flex flex-col items-center">
           <p className="text-center text-xs opacity-75 mt-2 text-foreground">
-            如果联系技术人员，请向它们提供错误代码:{error}.
+            如果联系技术人员，请向它们提供错误信息:{error}.
           </p>
         </CardFooter>
       </Card>

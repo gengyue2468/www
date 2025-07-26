@@ -71,6 +71,8 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.488 0.243 264.376);
 }
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -119,7 +121,7 @@ body {
   font-variant-ligatures: contextual;
   -moz-font-feature-settings: "calt";
   -webkit-font-feature-settings: "calt";
-  @apply bg-background text-foreground selection:bg-primary selection:text-white antialiased;
+  @apply bg-gradient-to-br from-background via-background to-primary/5 min-h-screen text-foreground selection:bg-primary selection:text-white antialiased tracking-wide;
 }
 
 @layer base {
@@ -132,7 +134,10 @@ body {
   a {
     @apply border-b-2 text-primary border-primary hover:bg-primary hover:text-white duration-300 transition-all;
   }
-  img{
+  p {
+    @apply leading-[1.7];
+  }
+  img {
     @apply shadow-sm;
   }
 }

@@ -4,11 +4,13 @@ import { useEffect, useState, useRef } from "react";
 import moment from "moment";
 import {
   AlertCircleIcon,
+  ArrowDownIcon,
   ArrowDownToLineIcon,
   ArrowLeft,
   CopyIcon,
   DotIcon,
   QuoteIcon,
+  ZoomInIcon,
 } from "lucide-react";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader";
@@ -29,7 +31,7 @@ const components = {
   AlertTitle,
   AlertCircleIcon,
   h1: ({ children, id }) => (
-    <h1 id={id} className="font-semibold my-2.5">
+    <h1 id={id} className="font-bold text-2xl my-8">
       {children}
     </h1>
   ),
@@ -44,22 +46,22 @@ const components = {
     </a>
   ),
   img: ({ src, alt }) => (
-    <div className="my-8">
+    <div className="my-20">
       <LazyLoadImage
         effect="blur"
         src={src}
         alt={alt}
-        className="w-full h-auto rounded-lg"
+        className="w-full h-auto rounded-3xl"
       />
       <div className="flex flex-row justify-between items-center">
-        <span className="text-sm italic serif">{alt}</span>
-        <Button
+        <span className="text-xs opacity-75">{alt}</span>
+        <button
           onClick={() => open(src)}
           variant="secondary"
-          className="size-6 rounded-full p-2 cursor-pointer"
+          className="flex flex-row space-x-0.5! opacity-75 items-center rounded-full px-2 py-1.5 cursor-pointer bg-accent hover:bg-accent/50 transition-colors duration-300"
         >
-          <ArrowDownToLineIcon size={3} />
-        </Button>
+          <ZoomInIcon className="size-3.5" />  <span className="text-xs ml-0.5">定睛细看</span>
+        </button>
       </div>
     </div>
   ),
@@ -244,7 +246,7 @@ const PostPage = () => {
   useEffect(() => {
     const handleScroll = () => {
       // 当滚动超过20px时，认为进入sticky状态
-      setIsSticky(window.scrollY > 20);
+      setIsSticky(window.scrollY > 128);
     };
 
     window.addEventListener("scroll", handleScroll);

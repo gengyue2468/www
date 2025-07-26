@@ -58,24 +58,26 @@ export default function TOC({ headings, activeHeadingId, loading, isSticky }) {
             <AccordionTrigger className="border-none text-xs">
               目录
             </AccordionTrigger>
-            <AccordionContent className="flex flex-col space-y-1">
+            <AccordionContent className="flex flex-col space-y-1.5">
               {!headings.length && loading && <Loader />}
               {!headings.length && (
                 <span className="text-center text-xs opacity-50 my-8">
                   没有目录
                 </span>
               )}
+              <div className="mt-1" />
               {headings &&
                 headings.map((heading) => (
                   <motion.a
                     key={heading.inlineText}
                     href={`#${heading.inlineText}`}
                     variants={itemVariants}
-                    className={`block pl-${(heading.level - 1) * 4} ${
+                    className={cn(
+                      "text-xs hover:bg-background! no-underline! text-foreground border-none",
                       heading.id === activeHeadingId
-                        ? "text-primary text-sm font-medium opacity-100 transition-all duration-500"
+                        ? "text-primary font-medium opacity-100 transition-all duration-500 "
                         : "opacity-50"
-                    }`}
+                    )}
                     onClick={(e) => {
                       e.preventDefault();
                       document.getElementById(heading.id)?.scrollIntoView({

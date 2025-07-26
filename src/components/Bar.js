@@ -2,6 +2,7 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
 import { cn } from "@/lib/utils";
 import { ProgressiveBlur } from "./ui/progressive-blur";
+import { motion } from "motion/react";
 
 export default function Bar() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -26,17 +27,18 @@ export default function Bar() {
 
   const Button = ({ active, children, ...props }) => {
     return (
-      <button
+      <motion.button
+        
         className={cn(
           "cursor-pointer flex flex-col items-center justify-center size-12 rounded-full transition-all duration-300 ",
           active
-            ? "bg-neutral-200/50 dark:bg-neutral-800/50 text-primary"
+            ? "bg-neutral-200/50 dark:bg-neutral-800/50 backdrop-blur-3xl text-primary"
             : "hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50"
         )}
         {...props}
       >
         {children}
-      </button>
+      </motion.button>
     );
   };
 
@@ -48,8 +50,8 @@ export default function Bar() {
         blurIntensity={0.75}
         blurLayers={2}
       />
-      <div className="shadow-sm z-20 transition-all duration-300 fixed bottom-8 left-1/2 -translate-x-1/2 border border-neutral-300/50 dark:border-neutral-700/50 bg-opacity-25 backdrop-blur-3xl px-2 py-1 rounded-full max-w-full">
-        <div className="flex flex-row items-center justify-center space-x-0">
+      <div className="shadow-sm z-20 transition-all duration-300 fixed bottom-8 left-1/2 -translate-x-1/2 border border-neutral-300/25 dark:border-neutral-700/25 bg-opacity-50 backdrop-blur-lg p-1.5 rounded-full max-w-full">
+        <div className="flex flex-row items-center justify-center space-x-0.5">
           {Nav.map((item, index) => (
             <Button
               onClick={() => router.push(item.href)}

@@ -63,7 +63,7 @@ const Post = ({ posts }) => {
                     <div key={post.id} className="w-full transition-all duration-300 hover:opacity-75">
                       <Link href={`/thoughts/${post.id}`}>
                         <div className="flex items-center w-full py-2.5">
-                          <h1 className="font-semibold text-lg sm:text-xl mr-2 truncate text-foreground!">
+                          <h1 className="font-semibold text-base sm:text-lg mr-2 truncate text-foreground!">
                             {post.properties.Title.title[0]?.plain_text ||
                               "未命名"}
                           </h1>
@@ -96,7 +96,7 @@ const Post = ({ posts }) => {
                           >
                             <Link href={`/thoughts/${post.id}`}>
                               <div className="flex items-center w-full">
-                                <h1 className="font-semibold text-lg sm:text-xl mr-2 truncate text-foreground">
+                                <h1 className="font-semibold text-base sm:text-lg mr-2 truncate text-foreground">
                                   {post.properties.Title.title[0]?.plain_text ||
                                     "未命名"}
                                 </h1>
