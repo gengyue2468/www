@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
-import LastDeploymentTime from "./last-deploy-time";
 
 export default function Layout({ title, note, sticky, children }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -26,6 +25,12 @@ export default function Layout({ title, note, sticky, children }) {
       href: "/design",
     },
   ];
+  const [deployTime, setDeployTime] = useState("");
+  useEffect(() => {
+    fetch("/deploy-time.json")
+      .then((res) => res.json())
+      .then((data) => setTime(data.deployTime));
+  }, []);
   return (
     <div className="">
       <Head>
@@ -68,9 +73,7 @@ export default function Layout({ title, note, sticky, children }) {
         <footer className="mt-32 opacity-50">
           <p className="flex flex-row">
             网站上次部署于
-            {new Date(
-              process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_CREATED_AT
-            ).toLocaleString()}
+            {deployTime}
           </p>
           <p>© {new Date().getFullYear()}</p>
         </footer>
