@@ -26,7 +26,7 @@ export default function TOC({ headings, activeHeadingId, loading, isSticky }) {
       className={cn(
         "right-0 bg-accent/50 transition-all duration-300 backdrop-blur-lg rounded-3xl px-4 py-2",
         isSticky
-          ? "translate-x-2 sm:translate-x-96 w-64 min-h-10 "
+          ? "translate-x-0 sm:translate-x-0 w-64 min-h-10 "
           : "rounded-ful w-48 sm:w-64 min-h-10"
       )}
     >

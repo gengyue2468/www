@@ -68,7 +68,9 @@ export default function Layout({ title, note, sticky, children }) {
         <footer className="mt-32 opacity-50">
           <p className="flex flex-row">
             网站上次部署于
-            <LastDeploymentTime />
+            {new Date(
+              process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_CREATED_AT
+            ).toLocaleString()}
           </p>
           <p>© {new Date().getFullYear()}</p>
         </footer>

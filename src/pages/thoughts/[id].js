@@ -273,8 +273,7 @@ const PostPage = () => {
   // 监听滚动事件，判断是否需要显示文字
   useEffect(() => {
     const handleScroll = () => {
-      // 当滚动超过20px时，认为进入sticky状态
-      setIsSticky(window.scrollY > 128);
+      setIsSticky(window.scrollY > 114514);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -285,7 +284,7 @@ const PostPage = () => {
     <Layout
       title={post?.page.properties.Title.title[0]?.plain_text || "载入中..."}
     >
-      <div className="sticky top-2 sm:top-4 flex flex-row justify-between z-20">
+      <div className="top-2 sm:top-4 flex flex-row justify-between z-20 mb-8">
         <button
           onClick={() => router.push("/thoughts")}
           className={`
@@ -295,7 +294,7 @@ const PostPage = () => {
         rounded-full
         ${
           isSticky
-            ? "size-10 justify-center -translate-x-2 sm:-translate-x-32"
+            ? "size-10 justify-center -translate-x-0 sm:-translate-x-0"
             : "size-10 justify-center"
         }
       `}
