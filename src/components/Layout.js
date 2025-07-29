@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
+import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
 
@@ -29,7 +29,7 @@ export default function Layout({ title, note, sticky, children }) {
   useEffect(() => {
     fetch("/deploy-time.json")
       .then((res) => res.json())
-      .then((data) => setTime(data.deployTime));
+      .then((data) => setDeployTime(data.deployTime));
   }, []);
   return (
     <div className="">
