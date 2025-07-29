@@ -58,7 +58,7 @@ const Post = ({ posts }) => {
                 </div>
 
                 {/* 首个月份的文章列表 */}
-                <div className="mb-8 flex flex-col space-y-4">
+                <div className="mb-8 flex flex-col space-y-0 sm:space-y-4">
                   {months[sortedMonths[0]].posts.map((post) => (
                     <div key={post.id} className="w-full transition-all duration-300 hover:opacity-50">
                       <Link href={`/thoughts/${post.id}`}>
@@ -88,7 +88,7 @@ const Post = ({ posts }) => {
                       <div className="flex justify-end items-center">
                         <h4 className="opacity-50 font-medium text-foreground!">{monthName}</h4>
                       </div>
-                      <div className="flex flex-col space-y-4">
+                      <div className="flex flex-col space-y-0 sm:space-y-4">
                         {monthPosts.map((post) => (
                           <div
                             key={post.id}
