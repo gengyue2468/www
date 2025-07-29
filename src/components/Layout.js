@@ -73,7 +73,7 @@ export default function Layout({ title, note, sticky, children }) {
         <footer className="mt-32 opacity-50">
           <p className="flex flex-row">
             网站上次部署于
-            {deployTime}
+            {moment(deployTime).format("YYYY年MM月DD日HH:mm:ss")}
           </p>
           <p>© {new Date().getFullYear()}</p>
         </footer>
