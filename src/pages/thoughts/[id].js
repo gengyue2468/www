@@ -36,9 +36,9 @@ const Img = ({ src, alt }) => {
   return (
     <div className="my-16 transition-all duration-300">
       {loading && (
-        <Card className="w-full h-auto min-h-96 rounded-3xl flex items-center justify-center animate-pulse">
+        <div className="w-full h-auto min-h-96 rounded-xl bg-accent/50 flex items-center justify-center animate-pulse">
           <Loader type="no-notion" word="图片" />
-        </Card>
+        </div>
       )}
 
       <LazyLoadImage
@@ -48,17 +48,17 @@ const Img = ({ src, alt }) => {
         beforeLoad={() => setLoading(true)}
         onLoad={() => setLoading(false)}
         onError={() => setLoading(false)}
-        className="w-full h-auto rounded-3xl brightness-100 dark:brightness-50"
+        className="w-full h-auto rounded-xl brightness-100"
       />
 
-      <div className="flex flex-row justify-between items-center mt-1">
-        <span className="text-xs opacity-75">{alt}</span>
+      <div className="text-base flex flex-row justify-between items-center mt-1">
+        <span className="opacity-50">{alt}</span>
         <button
           onClick={() => open(src)}
-          className="flex flex-row space-x-0.5 opacity-75 items-center rounded-full px-2 py-1.5 cursor-pointer bg-accent hover:bg-accent/50 transition-colors duration-300"
+          className="flex flex-row space-x-0.5 opacity-50 items-center rounded-full px-4 py-2 cursor-pointer bg-accent hover:bg-accent/50 transition-colors duration-300"
         >
-          <ZoomInIcon className="size-3.5" />{" "}
-          <span className="text-xs ml-0.5">定睛细看</span>
+          <ZoomInIcon className="size-6" />
+          <span className="ml-0.5">定睛细看</span>
         </button>
       </div>
     </div>
@@ -71,11 +71,13 @@ const components = {
   AlertTitle,
   AlertCircleIcon,
   h1: ({ children, id }) => (
-    <h1 id={id} className="font-bold text-2xl my-8">
-      {children}
+    <h1 id={id} className="text-lg sm:text-3xl opacity-50 my-8">
+      - {children}
     </h1>
   ),
-  p: ({ children }) => <p className="mb-6">{children}</p>,
+  p: ({ children }) => (
+    <p className="my-8 text-lg sm:text-3xl text-balance">{children}</p>
+  ),
   a: ({ children, href, target }) => (
     <a
       href={href}
@@ -287,25 +289,18 @@ const PostPage = () => {
         <button
           onClick={() => router.push("/thoughts")}
           className={`
-       shadow-sm border border-neutral-300/50 dark:border-neutral-700/50 
-        bg-background/50 backdrop-blur-lg 
+       bg-accent/50 transition-all duration-300 backdrop-blur-lg 
          z-40! cursor-pointer 
         flex items-center 
-        rounded-full transition-all duration-300 
-        hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50
+        rounded-full
         ${
           isSticky
-            ? "w-22 h-10 px-4 py-2 space-x-2 -translate-x-4 sm:-translate-x-32"
+            ? "size-10 justify-center -translate-x-2 sm:-translate-x-32"
             : "size-10 justify-center"
         }
       `}
         >
-          <ArrowLeft size={16} />
-          {isSticky && (
-            <span className="transition-all duration-300 text-xs truncate overflow-hidden font-medium">
-              返回
-            </span>
-          )}
+          <ArrowLeft size={20} className="opacity-50" />
         </button>
         <TOC
           headings={headings}
@@ -328,10 +323,10 @@ const PostPage = () => {
             transition={{ duration: 0.25 }}
           >
             <div className="mt-8">
-              <h1 className="font-extrabold text-3xl mb-2 text-balance">
+              <h1 className="leading-relaxed text-balance text-3xl sm:text-6xl font-semibold serif mb-4">
                 {post.page.properties.Title.title[0]?.plain_text || "未命名"}
               </h1>
-              <div className="flex items-center text-xs opacity-75 mb-8">
+              <div className="flex items-center text-lg sm:text-3xl mb-8">
                 <span>
                   {moment(post.page.properties.Date?.date?.start).format(
                     "YYYY年MM月DD日"
@@ -349,7 +344,10 @@ const PostPage = () => {
 
               <hr className="my-8 opacity-0" />
 
-              <h1 className="font-bold text-2xl mb-2">所有随想</h1>
+              <h1 className="text-lg sm:text-3xl opacity-50 my-4">
+                <span className="invisible">-</span> 所有随想
+              </h1>
+
               <Post posts={posts} />
               <div className="mb-0" />
             </div>

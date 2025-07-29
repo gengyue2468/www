@@ -51,24 +51,24 @@ const Post = ({ posts }) => {
               <>
                 {/* 首个月份与年份在同一行 */}
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-bold text-xl">{year} 年</h3>
-                  <h4 className="font-medium opacity-75 text-xs">
+                  <h3 className="text-lg sm:text-3xl opacity-50"><span className="invisible">-</span> {year} 年</h3>
+                  <h4 className="font-medium opacity-50">
                     {months[sortedMonths[0]].name}
                   </h4>
                 </div>
 
                 {/* 首个月份的文章列表 */}
-                <div className="mb-6 flex flex-col space-y-1">
+                <div className="mb-8 flex flex-col space-y-4">
                   {months[sortedMonths[0]].posts.map((post) => (
-                    <div key={post.id} className="w-full transition-all duration-300 hover:opacity-75">
+                    <div key={post.id} className="w-full transition-all duration-300 hover:opacity-50">
                       <Link href={`/thoughts/${post.id}`}>
                         <div className="flex items-center w-full py-2.5">
-                          <h1 className="font-semibold text-base sm:text-lg mr-2 truncate text-foreground!">
-                            {post.properties.Title.title[0]?.plain_text ||
+                          <h1 className="text-lg sm:text-3xl mr-2 truncate text-foreground!">
+                            - {post.properties.Title.title[0]?.plain_text ||
                               "未命名"}
                           </h1>
-                          <div className="h-px flex-grow border-t border-dashed border-neutral-300 dark:border-neutral-600" />
-                          <h2 className="opacity-75 whitespace-nowrap ml-2 text-xs text-foreground!">
+                          <div className="h-px flex-grow border-t border-dashed border-neutral-600 dark:border-neutral-400" />
+                          <h2 className="opacity-50 whitespace-nowrap ml-2 text-foreground!">
                             {moment(post.properties.Date?.date?.start).format(
                               "Do"
                             )}
@@ -84,24 +84,24 @@ const Post = ({ posts }) => {
                   const { name: monthName, posts: monthPosts } = months[month];
 
                   return (
-                    <div key={month} className="mb-6">
+                    <div key={month} className="mb-8">
                       <div className="flex justify-end items-center">
-                        <h4 className="opacity-75 font-medium text-xs text-foreground!">{monthName}</h4>
+                        <h4 className="opacity-50 font-medium text-foreground!">{monthName}</h4>
                       </div>
-                      <div className="flex flex-col space-y-1">
+                      <div className="flex flex-col space-y-4">
                         {monthPosts.map((post) => (
                           <div
                             key={post.id}
-                            className="w-full py-2.5 transition-all duration-300 hover:opacity-75"
+                            className="w-full py-2.5 transition-all duration-300 hover:opacity-50"
                           >
                             <Link href={`/thoughts/${post.id}`}>
                               <div className="flex items-center w-full">
-                                <h1 className="font-semibold text-base sm:text-lg mr-2 truncate text-foreground">
-                                  {post.properties.Title.title[0]?.plain_text ||
+                                <h1 className="text-lg sm:text-3xl mr-2 truncate text-foreground">
+                                  - {post.properties.Title.title[0]?.plain_text ||
                                     "未命名"}
                                 </h1>
-                                <div className="h-px flex-grow border-t border-dashed border-neutral-300 dark:border-neutral-600" />
-                                <h2 className="opacity-75 whitespace-nowrap ml-2 text-xs text-foreground!">
+                                <div className="h-px flex-grow border-t border-dashed border-neutral-600 dark:border-neutral-400" />
+                                <h2 className="opacity-50 whitespace-nowrap ml-2 text-foreground!">
                                   {moment(
                                     post.properties.Date?.date?.start
                                   ).format("Do")}

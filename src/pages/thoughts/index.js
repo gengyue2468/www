@@ -34,21 +34,27 @@ const Home = () => {
   }, []);
 
   return (
-    <Layout title="随想">
+    <Layout title="他的脑洞">
       <div className="w-full">
-        <h1 className="font-extrabold text-3xl mb-2">随想</h1>
+        <h1 className="leading-relaxed text-balance text-3xl sm:text-6xl font-semibold">
+          <span className="serif">他的脑洞非常大</span>
+          <br />
+          <span className="serif">他喜欢在这里倒垃圾</span>
+          <br />
+          <span className="serif">他更喜欢倒脏水在这里</span>
+        </h1>
 
-        <div className="flex flex-row space-x-4 items-center text-balance">
+        <div className="flex flex-row space-x-4 justify-between items-center text-balance">
           <div className="w-2/3">
-            <p className="font-medium text-lg sm:text-xl">
-              Hey, Lois. Did you see Stewie? Heeeeeeeeee~
-            </p>
+            <h2 className="text-lg sm:text-3xl mt-4 font-medium">
+              Heeeeeee ~ （Peter Griffin 音）
+            </h2>
           </div>
           <div className="w-1/3">
             <LazyLoadImage
               effect="blur"
               src="/static/petter-griffin.webp"
-              className="rounded-full size-24 sm:size-36"
+              className="rounded-full size-24 sm:size-54 object-cover object-center"
             />
           </div>
         </div>

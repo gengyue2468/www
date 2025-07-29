@@ -10,25 +10,8 @@ import Loader from "./Loader";
 import { cn } from "@/lib/utils";
 
 export default function TOC({ headings, activeHeadingId, loading, isSticky }) {
-  // 使用更直观的状态名：isLargeDevice
-  const [isLargeDevice, setIsLargeDevice] = useState(window.innerWidth >= 768);
+  const [activePanel, setActivePanel] = useState("");
 
-  // 用于存储当前打开的面板值
-  const [activePanel, setActivePanel] = useState(isLargeDevice ? "toc" : "");
-
-  // 监听窗口大小变化
-  useEffect(() => {
-    const handleResize = () => {
-      const newIsLargeDevice = window.innerWidth >= 768;
-      setIsLargeDevice(newIsLargeDevice);
-
-      // 根据设备尺寸变化自动设置打开的面板
-      setActivePanel(newIsLargeDevice ? "toc" : "");
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const itemVariants = {
     open: { y: 0 },
@@ -41,9 +24,9 @@ export default function TOC({ headings, activeHeadingId, loading, isSticky }) {
       animate={{ opacity: 1, filter: "blur(0px)" }}
       transition={{ duration: 0.25 }}
       className={cn(
-        "shadow-sm right-0 bg-background/50 backdrop-blur-lg transition-all rounded-3xl duration-300 border border-neutral-300/50 dark:border-neutral-700/50 px-4 py-2",
+        "right-0 bg-accent/50 transition-all duration-300 backdrop-blur-lg rounded-3xl px-4 py-2",
         isSticky
-          ? "translate-x-4 sm:translate-x-96 w-64 min-h-10 "
+          ? "translate-x-2 sm:translate-x-96 w-64 min-h-10 "
           : "rounded-ful w-48 sm:w-64 min-h-10"
       )}
     >
@@ -53,15 +36,16 @@ export default function TOC({ headings, activeHeadingId, loading, isSticky }) {
           collapsible
           value={activePanel}
           onValueChange={setActivePanel}
+          className="opacity-50"
         >
           <AccordionItem value="toc">
-            <AccordionTrigger className="border-none text-xs">
+            <AccordionTrigger className="text-base border-none mt-0">
               目录
             </AccordionTrigger>
             <AccordionContent className="flex flex-col space-y-1.5">
               {!headings.length && loading && <Loader />}
               {!headings.length && (
-                <span className="text-center text-xs opacity-50 my-8">
+                <span className="text-base text-center opacity-50 my-8">
                   没有目录
                 </span>
               )}
@@ -73,7 +57,7 @@ export default function TOC({ headings, activeHeadingId, loading, isSticky }) {
                     href={`#${heading.inlineText}`}
                     variants={itemVariants}
                     className={cn(
-                      "text-xs hover:bg-background! no-underline! text-foreground border-none",
+                      "text-base no-underline! text-foreground border-none",
                       heading.id === activeHeadingId
                         ? "text-primary font-medium opacity-100 transition-all duration-500 "
                         : "opacity-50"

@@ -1,4 +1,4 @@
-const CPUIcon = () => {
+const CPUIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -16,7 +16,7 @@ const CPUIcon = () => {
   );
 };
 
-const RAMIcon = () => {
+const RAMIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -31,12 +31,13 @@ const RAMIcon = () => {
   );
 };
 
-const StorageIcon = () => {
+const StorageIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       className="size-5"
       viewBox="0 0 32 32"
+      {...props}
     >
       <path
         fill="currentColor"
@@ -46,7 +47,7 @@ const StorageIcon = () => {
   );
 };
 
-const GraphicsIcon = () => {
+const GraphicsIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -61,7 +62,7 @@ const GraphicsIcon = () => {
   );
 };
 
-const PhoneIcon = () => {
+const PhoneIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -79,7 +80,7 @@ const PhoneIcon = () => {
   );
 };
 
-const LaptopIcon = () => {
+const LaptopIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -100,7 +101,7 @@ const LaptopIcon = () => {
   );
 };
 
-const MacIcon = () => {
+const MacIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -115,7 +116,7 @@ const MacIcon = () => {
   );
 };
 
-const GitHubIcon = () => {
+const GitHubIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -130,13 +131,14 @@ const GitHubIcon = () => {
   );
 };
 
-const UserIcon = () => {
+const UserIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="currentColor"
       className="size-5"
+      {...props}
     >
       <path
         fillRule="evenodd"
@@ -147,7 +149,7 @@ const UserIcon = () => {
   );
 };
 
-const LinkIcon = () => {
+const LinkIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -161,7 +163,7 @@ const LinkIcon = () => {
   );
 };
 
-const EmailIcon = () => {
+const EmailIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -175,7 +177,7 @@ const EmailIcon = () => {
   );
 };
 
-const WeChatIcon = () => {
+const WeChatIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -194,7 +196,7 @@ const WeChatIcon = () => {
   );
 };
 
-const QQIcon = () => {
+const QQIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -212,7 +214,7 @@ const QQIcon = () => {
   );
 };
 
-const PadIcon = () => {
+const PadIcon = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -242,5 +244,5 @@ export {
   WeChatIcon,
   LinkIcon,
   UserIcon,
-  PadIcon
+  PadIcon,
 };

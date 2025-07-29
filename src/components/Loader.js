@@ -7,12 +7,12 @@ export default function Loader({ type, word }) {
   return (
     <div className="animate-pulse my-32">
       <div className="flex flex-col space-y-1.5 items-center">
-        <Loader2Icon size={36} className="animate-spin" />{" "}
-        <span className="opacity-75 text-xs">
+        <Loader2Icon size={54} className="animate-spin" />{" "}
+        <span className="opacity-50">
           {type !== "no-notion" ? "连接 Notion..." : `${word}加载中...`}
         </span>{" "}
-        <motion.small
-          className="opacity-75 text-xs"
+        <motion.p
+          className="opacity-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.75 }}
           transition={{ delay: 9 }}
@@ -21,7 +21,7 @@ export default function Loader({ type, word }) {
           <button onClick={router.reload} className="underline cursor-pointer">
             重载页面.
           </button>
-        </motion.small>
+        </motion.p>
       </div>
     </div>
   );

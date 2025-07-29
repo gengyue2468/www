@@ -6,7 +6,6 @@ import "@fontsource-variable/jetbrains-mono";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/newsreader/wght-italic.css";
 import "react-lazy-load-image-component/src/effects/blur.css";
-import Head from "next/head";
 import { useState, useEffect } from "react";
 import Bar from "@/components/Bar";
 import 'moment/locale/zh-cn';
@@ -28,14 +27,7 @@ export default function App({ Component, pageProps }) {
           enableSystem
           disableTransitionOnChange
         >
-          <Head>
-            <link
-              href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap"
-              rel="stylesheet"
-            />
-          </Head>
           <Component {...pageProps} />
-          <Bar />
           <Analytics />
           <SpeedInsights />
         </ThemeProvider>

@@ -3,6 +3,24 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "Helvetica";
+  src: url("/fonts/helvetica-now-var.woff2") format("woff2");
+  display: swap;
+}
+
+@font-face {
+  font-family: "FF Hei";
+  src: url("/fonts/ff-hei.woff2") format("woff2");
+  display: swap;
+}
+
+@font-face {
+  font-family: "MTR Song";
+  src: url("/fonts/GangTieSongTiSpecial-1.woff2") format("woff2");
+  display: swap;
+}
+
 :root {
   --radius: 0.65rem;
   --background: oklch(1 0 0);
@@ -116,12 +134,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Inter Variable", "Noto Sans SC", sans-serif;
-  font-feature-settings: "cv02" 0, "calt", "frac", "ccmp", "ss03";
-  font-variant-ligatures: contextual;
-  -moz-font-feature-settings: "calt";
-  -webkit-font-feature-settings: "calt";
-  @apply bg-gradient-to-br from-background via-background to-primary/5 min-h-screen text-foreground selection:bg-primary selection:text-white antialiased tracking-wide;
+  font-family: "Helvetica", "FF Hei", sans-serif;
+  @apply bg-neutral-300 dark:bg-neutral-700;
 }
 
 @layer base {
@@ -130,9 +144,6 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-  }
-  a {
-    @apply border-b-2 text-primary border-primary hover:bg-primary hover:text-white duration-300 transition-all;
   }
   p {
     @apply leading-[1.7];
@@ -143,7 +154,7 @@ body {
 }
 
 .serif {
-  font-family: "Newsreader Variable", serif;
+  font-family: "MTR Song", serif;
 }
 
 .font-mono {
