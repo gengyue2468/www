@@ -27,8 +27,8 @@ const Img = ({ src, alt, ...props }) => {
         onClick={() => setZoom(zoom ? false : true)}
         placeholderSrc={`${site.cdn}/static/placeholder.webp`}
         className={cn(
-          "cursor-pointer w-full h-auto brigSShtness-100",
-          zoom ? "fixed top-0 z-50 w-full rounded-none" : "rounded-xl "
+          "cursor-pointer w-full h-auto brightness-100",
+          zoom ? "rounded-xl" : "rounded-xl "
         )}
       />
 
