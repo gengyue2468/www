@@ -2,27 +2,21 @@ import Layout from "@/components/Layout";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
 import moment from "moment";
-import { AlertCircleIcon, ArrowLeft, ZoomInIcon } from "lucide-react";
+import { ArrowLeft, ZoomInIcon } from "lucide-react";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader";
 import { motion } from "framer-motion";
 import { serialize } from "next-mdx-remote/serialize";
 import { MDXRemote } from "next-mdx-remote";
-import TOC from "@/components/TOC";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Post from "@/components/Post";
 import axios from "axios";
 import { site } from "@/lib/site.config";
+import { cn } from "@/lib/utils";
 
 const Img = ({ src, alt, ...props }) => {
   const imageUrl = `${site.cdn}/${src}`;
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-  }, [src]);
-
+  const [zoom, setZoom] = useState(false);
   return (
     <div className="my-16 transition-all duration-300">
       <LazyLoadImage
@@ -30,14 +24,18 @@ const Img = ({ src, alt, ...props }) => {
         effect="blur"
         src={imageUrl}
         alt={alt}
-        placeholderSrc={`${site.cdn}/static/family-guy.webp`}
-        className="w-full h-auto rounded-xl brightness-100"
+        onClick={() => setZoom(zoom ? false : true)}
+        placeholderSrc={`${site.cdn}/static/placeholder.webp`}
+        className={cn(
+          "cursor-pointer w-full h-auto brigSShtness-100",
+          zoom ? "fixed top-0 z-50 w-full rounded-none" : "rounded-xl "
+        )}
       />
 
       <div className="text-base flex flex-row justify-between items-center mt-1">
         <span className="opacity-50">{alt}</span>
         <button
-          onClick={() => open(src)}
+          onClick={() => setZoom(true)}
           className="flex flex-row space-x-0.5 opacity-50 items-center rounded-full px-4 py-2 cursor-pointer bg-accent hover:bg-accent/50 transition-colors duration-300"
         >
           <ZoomInIcon className="size-6" />
@@ -49,10 +47,6 @@ const Img = ({ src, alt, ...props }) => {
 };
 
 const components = {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  AlertCircleIcon,
   h1: ({ children, id }) => (
     <h1 id={id} className="text-lg sm:text-3xl opacity-50 my-8">
       - {children}
@@ -166,134 +160,18 @@ const PostPage = () => {
     fetchPost();
   }, [id]);
 
-  useEffect(() => {
-    if (!contentRef.current) return;
-
-    // 获取所有h1标题
-    const headingElements = Array.from(
-      contentRef.current.querySelectorAll("h1")
-    );
-    if (headingElements.length === 0) {
-      setHeadings([]);
-      return;
-    }
-
-    // 为每个标题生成唯一ID并提取信息
-    const extractedHeadings = headingElements.map((heading, index) => {
-      const text = heading.innerText.trim() || `Untitled-${index}`; // 处理空标题
-      // 生成合法ID：替换空格为横线，移除特殊字符，加索引确保唯一
-      const slug = text
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "") // 移除特殊字符
-        .replace(/\s+/g, "-") // 空格转横线
-        .replace(/-+/g, "-"); // 合并连续横线
-      const id = `heading-${index}-${slug}`; // 最终ID（如：heading-0-intro）
-
-      // 给标题元素设置生成的ID（用于后续滚动定位）
-      heading.id = id;
-
-      return {
-        id, // 生成的唯一ID
-        text, // 标题文本
-        level: parseInt(heading.tagName.charAt(1), 10), // 标题级别（h1为1）
-      };
-    });
-
-    setHeadings(extractedHeadings);
-    // 初始化活跃标题为第一个标题
-    if (extractedHeadings.length > 0) {
-      setActiveHeading(extractedHeadings[0].id);
-    }
-  }, [mdxSource]); // 当内容更新时重新提取标题
-
-  // 2. 监听滚动，更新当前活跃标题
-  useEffect(() => {
-    if (!contentRef.current || headings.length === 0) return;
-
-    const updateActiveHeading = () => {
-      const scrollY = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      // 视口阈值：标题顶部进入视口下1/4处时判定为活跃（更符合阅读习惯）
-      const threshold = viewportHeight / 4;
-
-      let currentActiveId = "";
-
-      // 遍历所有标题，找到当前视口内最顶部的标题
-      headings.forEach(({ id }) => {
-        const headingElement = document.getElementById(id);
-        if (!headingElement) return;
-
-        const rect = headingElement.getBoundingClientRect();
-        // 标题顶部距离视口顶部的距离（可为负数，代表已滚过）
-        const topInViewport = rect.top;
-
-        // 条件：标题顶部 <= 阈值（进入视口内），且标题底部 > 0（未完全滚出视口）
-        if (topInViewport <= threshold && topInViewport + rect.height > 0) {
-          currentActiveId = id; // 最后满足条件的标题即为当前活跃标题
-        }
-      });
-
-      // 仅在变化时更新状态（减少重渲染）
-      if (currentActiveId !== activeHeading) {
-        setActiveHeading(currentActiveId);
-      }
-    };
-
-    // 监听滚动事件（被动模式提升性能）
-    window.addEventListener("scroll", updateActiveHeading, { passive: true });
-    // 初始化时执行一次（页面加载后立即判断）
-    updateActiveHeading();
-
-    // 清理函数：移除事件监听
-    return () => {
-      window.removeEventListener("scroll", updateActiveHeading);
-    };
-  }, [headings, activeHeading]); // 依赖headings（标题变化时重新监听）和activeHeading
-
-  // 状态管理：是否处于sticky状态
-  const [isSticky, setIsSticky] = useState(false);
-
-  // 监听滚动事件，判断是否需要显示文字
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsSticky(window.scrollY > 114514);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <Layout
-      title={
-        !error && post?.page.properties.Title.title[0]?.plain_text || error
-          ? "错误！"
-          : "载入中..."
-      }
+      title={post?.page.properties.Title.title[0]?.plain_text || "载入中..."}
     >
       <div className="top-2 sm:top-4 flex flex-row justify-between z-20 mb-8">
         <button
           onClick={() => router.push("/thoughts")}
-          className={`
-       bg-accent/50 transition-all duration-300 backdrop-blur-lg 
-         z-40! cursor-pointer 
-        flex items-center 
-        rounded-full
-        ${
-          isSticky
-            ? "size-10 justify-center -translate-x-0 sm:-translate-x-0"
-            : "size-10 justify-center"
-        }
-      `}
+          className="cursor-pointer rounded-full"
         >
-          <ArrowLeft size={20} className="opacity-50" />
+          <ArrowLeft className="size-6 sm:size-8 opacity-50" />
         </button>
-        <TOC
-          headings={headings}
-          activeHeadingId={activeHeading}
-          loading={loading}
-          isSticky={isSticky}
-        />
       </div>
       <motion.div
         initial={{ opacity: 0, filter: "blur(5px)" }}

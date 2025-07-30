@@ -1,7 +1,6 @@
 import Layout from "@/components/Layout";
 import Error from "@/components/Error";
 import { useRouter } from "next/router";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 
 export default function NotFound() {
   const router = useRouter();

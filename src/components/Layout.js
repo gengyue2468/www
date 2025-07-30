@@ -5,8 +5,8 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
 import moment from "moment";
 
-export default function Layout({ title, note, sticky, children }) {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+export default function Layout({ title, children }) {
+  const { setTheme, resolvedTheme } = useTheme();
   const router = useRouter();
   const Nav = [
     {
@@ -37,8 +37,7 @@ export default function Layout({ title, note, sticky, children }) {
       <Head>
         <title>{title}</title>
       </Head>
-
-      <div className="max-w-4xl mx-auto py-32 px-6">
+      <div className="max-w-4xl mx-auto py-32 px-6 z-0">
         <main>{children}</main>
         <div className="mt-16 flex flex-col space-y-0 sm:space-y-4">
           <h1 className="text-lg sm:text-3xl opacity-50 my-4">

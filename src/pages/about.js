@@ -7,11 +7,11 @@ export default function About() {
     <Layout title="他的简介">
       <div>
         <h1 className="leading-relaxed text-balance text-3xl sm:text-6xl font-semibold">
-          <span className="serif">他是 一*个人</span>
+          <span className="serif">他是 一<sup>*</sup>个人</span>
           <br />
-          <span className="serif">他是 一个*人</span>
+          <span className="serif">他是 一个<sup>*</sup>人</span>
           <br />
-          <span className="serif">他是 一个人*</span>
+          <span className="serif">他是 一个人<sup>*</sup></span>
         </h1>
         <div className="flex flex-row space-x-4 justify-between items-center text-balance">
           <div className="w-2/3">

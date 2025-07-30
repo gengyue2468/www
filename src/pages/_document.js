@@ -18,7 +18,7 @@ class MyDocument extends Document {
 
       @font-face {
         font-family: "MTR Song";
-        src: url(/fonts/GangTieSongTiSpecial-1.woff2) format("woff2");
+        src: url(/fonts/MTR-Sung.woff2) format("woff2");
         display: swap;
       }
     `;
