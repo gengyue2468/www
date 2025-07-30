@@ -1,4 +1,4 @@
-import { UserIcon } from "@/components/Icon";
+import { site } from "@/lib/site.config";
 import Layout from "@/components/Layout";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
@@ -22,7 +22,8 @@ export default function About() {
           <div className="w-1/3">
             <LazyLoadImage
               effect="blur"
-              src="/static/chris-griffin.webp"
+              alt="Chris Griffin"
+              src={`${site.cdn}/static/chris-griffin.webp`}
               className="rounded-full size-24 sm:size-54 object-cover object-center"
             />
           </div>

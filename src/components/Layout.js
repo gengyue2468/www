@@ -76,7 +76,10 @@ export default function Layout({ title, note, sticky, children }) {
             网站上次部署于
             {moment(deployTime).format("YYYY年MM月DD日HH:mm:ss")}
           </p>
-          <p>© {new Date().getFullYear()}</p>
+          <p>
+            Copyright © <span className="">{new Date().getFullYear()}</span>{" "}
+            保留所有权利.
+          </p>
         </footer>
       </div>
     </div>

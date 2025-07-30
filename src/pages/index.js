@@ -1,4 +1,4 @@
-import { UserIcon } from "@/components/Icon";
+import { site } from "@/lib/site.config";
 import Layout from "@/components/Layout";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
@@ -14,14 +14,19 @@ export default function Home() {
               href="https://hust.edu.cn"
             >
               <LazyLoadImage
-                src="/static/sign/hust.png"
+                src={`${site.cdn}/static/sign/hust.png`}
                 className="h-10 sm:h-18 rounded-full mr-1"
                 effect="blur"
+                alt="华中科技大学"
               />
               华中科技大学
             </a>
-            <span>计算机科学与技术专业</span>
-            <br />
+            <a
+              className="flex items-center hover:opacity-75 transition-all duration-300"
+              href="http://www.cs.hust.edu.cn/"
+            >
+              计算机科学与技术专业
+            </a>
             的大一新生
           </span>
         </h1>
@@ -33,8 +38,9 @@ export default function Home() {
           </div>
           <div className="w-1/3">
             <LazyLoadImage
+              alt="logo"
               effect="blur"
-              src="/static/author.webp"
+              src={`${site.cdn}/static/author.webp`}
               className="rounded-full size-24 sm:size-54 object-cover object-center"
             />
           </div>

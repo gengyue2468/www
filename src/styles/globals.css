@@ -3,24 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@font-face {
-  font-family: "Helvetica";
-  src: url("/fonts/helvetica-now-var.woff2") format("woff2");
-  display: swap;
-}
-
-@font-face {
-  font-family: "FF Hei";
-  src: url("/fonts/ff-hei.woff2") format("woff2");
-  display: swap;
-}
-
-@font-face {
-  font-family: "MTR Song";
-  src: url("/fonts/GangTieSongTiSpecial-1.woff2") format("woff2");
-  display: swap;
-}
-
 :root {
   --radius: 0.65rem;
   --background: oklch(1 0 0);
@@ -90,7 +72,6 @@
   --sidebar-ring: oklch(0.488 0.243 264.376);
 }
 
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -135,7 +116,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: "Helvetica", "FF Hei", sans-serif;
-  @apply bg-neutral-300 dark:bg-neutral-700;
+  @apply bg-neutral-300 dark:bg-neutral-700 selection:bg-neutral-200/50 dark:selection:bg-neutral-800/50;
 }
 
 @layer base {
@@ -154,7 +135,7 @@ body {
 }
 
 .serif {
-  font-family: "MTR Song", serif;
+  font-family: "MTR Song", "Newsreader Variable", serif;
 }
 
 .font-mono {

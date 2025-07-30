@@ -1,3 +1,4 @@
+import { site } from "@/lib/site.config";
 import { useRouter } from "next/router";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
@@ -22,8 +23,9 @@ export default function Error({ error, type }) {
         </div>
         <div className="w-1/3">
           <LazyLoadImage
+            alt="Brian Griffin"
             effect="blur"
-            src="/static/brian-griffin.webp"
+            src={`${site.cdn}/static/brian-griffin.webp`}
             className="rounded-full size-24 sm:size-54 object-cover object-center"
           />
         </div>

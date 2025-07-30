@@ -2,16 +2,7 @@ import Layout from "@/components/Layout";
 import { useRouter } from "next/router";
 import { useEffect, useState, useRef } from "react";
 import moment from "moment";
-import {
-  AlertCircleIcon,
-  ArrowDownIcon,
-  ArrowDownToLineIcon,
-  ArrowLeft,
-  CopyIcon,
-  DotIcon,
-  QuoteIcon,
-  ZoomInIcon,
-} from "lucide-react";
+import { AlertCircleIcon, ArrowLeft, ZoomInIcon } from "lucide-react";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader";
 import { motion } from "framer-motion";
@@ -19,14 +10,13 @@ import { serialize } from "next-mdx-remote/serialize";
 import { MDXRemote } from "next-mdx-remote";
 import TOC from "@/components/TOC";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Post from "@/components/Post";
 import axios from "axios";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/ui/card";
+import { site } from "@/lib/site.config";
 
-const Img = ({ src, alt }) => {
+const Img = ({ src, alt, ...props }) => {
+  const imageUrl = `${site.cdn}/${src}`;
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,19 +25,12 @@ const Img = ({ src, alt }) => {
 
   return (
     <div className="my-16 transition-all duration-300">
-      {loading && (
-        <div className="w-full h-auto min-h-96 rounded-xl bg-accent/50 flex items-center justify-center animate-pulse">
-          <Loader type="no-notion" word="图片" />
-        </div>
-      )}
-
       <LazyLoadImage
+        {...props}
         effect="blur"
-        src={src}
+        src={imageUrl}
         alt={alt}
-        beforeLoad={() => setLoading(true)}
-        onLoad={() => setLoading(false)}
-        onError={() => setLoading(false)}
+        placeholderSrc={`${site.cdn}/static/family-guy.webp`}
         className="w-full h-auto rounded-xl brightness-100"
       />
 
@@ -282,7 +265,11 @@ const PostPage = () => {
 
   return (
     <Layout
-      title={post?.page.properties.Title.title[0]?.plain_text || "载入中..."}
+      title={
+        !error && post?.page.properties.Title.title[0]?.plain_text || error
+          ? "错误！"
+          : "载入中..."
+      }
     >
       <div className="top-2 sm:top-4 flex flex-row justify-between z-20 mb-8">
         <button

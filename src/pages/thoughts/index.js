@@ -6,6 +6,7 @@ import Error from "@/components/Error";
 import Loader from "@/components/Loader";
 import axios from "axios";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { site } from "@/lib/site.config";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -52,8 +53,9 @@ const Home = () => {
           </div>
           <div className="w-1/3">
             <LazyLoadImage
+              alt="Peter Griffin"
               effect="blur"
-              src="/static/petter-griffin.webp"
+              src={`${site.cdn}/static/peter-griffin.webp`}
               className="rounded-full size-24 sm:size-54 object-cover object-center"
             />
           </div>
