@@ -75,9 +75,10 @@ export default function Layout({ title, children }) {
           </div>
         </div>
         <div className="mt-4 flex flex-row space-x-2">
-          {Nav.map((item) => {
+          {Nav.map((item, index) => {
             return (
               <button
+                key={index}
                 onClick={() => router.push(item.href)}
                 className={cn(
                   "text-xs font-medium rounded-none px-1 py-1 transition-all duration-500",
