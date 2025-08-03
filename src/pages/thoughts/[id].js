@@ -18,14 +18,14 @@ const Img = ({ src, alt, ...props }) => {
   const imageUrl = `${site.cdn}/${src}`;
   const [zoom, setZoom] = useState(false);
   return (
-    <div className="my-16 transition-all duration-300">
+    <div className="my-16 transition-all duration-300 text-xs">
       <LazyLoadImage
         {...props}
         effect="blur"
         src={imageUrl}
         alt={alt}
         onClick={() => setZoom(zoom ? false : true)}
-        placeholderSrc={`${site.cdn}/static/placeholder.webp`}
+        placeholder={<div className="bg-neutral-200 dark:bg-neutral-800 rounded-lg w-auto h-auto" />}
         className={cn(
           "cursor-pointer w-full h-auto brightness-100",
           zoom ? "rounded-xl" : "rounded-xl "
@@ -33,13 +33,13 @@ const Img = ({ src, alt, ...props }) => {
       />
 
       <div className="text-base flex flex-row justify-between items-center mt-1">
-        <span className="opacity-50">{alt}</span>
+        <span className="opacity-50 text-xs">{alt}</span>
         <button
           onClick={() => setZoom(true)}
           className="flex flex-row space-x-0.5 opacity-50 items-center rounded-full px-4 py-2 cursor-pointer bg-accent hover:bg-accent/50 transition-colors duration-300"
         >
-          <ZoomInIcon className="size-6" />
-          <span className="ml-0.5">定睛细看</span>
+          <ZoomInIcon className="size-4" />
+          <span className="ml-0.5 text-xs">定睛细看</span>
         </button>
       </div>
     </div>
@@ -47,23 +47,6 @@ const Img = ({ src, alt, ...props }) => {
 };
 
 const components = {
-  h1: ({ children, id }) => (
-    <h1 id={id} className="text-lg sm:text-3xl opacity-50 my-8">
-      - {children}
-    </h1>
-  ),
-  p: ({ children }) => (
-    <p className="my-8 text-lg sm:text-3xl text-balance">{children}</p>
-  ),
-  a: ({ children, href, target }) => (
-    <a
-      href={href}
-      target={target || "_self"}
-      className="text-primary hover:text-primary/80 transition-colors duration-200 border-b border-primary/30 hover:border-primary/60 serif italic"
-    >
-      {children}
-    </a>
-  ),
   img: Img,
 };
 
@@ -170,7 +153,7 @@ const PostPage = () => {
           onClick={() => router.push("/thoughts")}
           className="cursor-pointer rounded-full"
         >
-          <ArrowLeft className="size-6 sm:size-8 opacity-50" />
+          <ArrowLeft className="size-4 opacity-50" />
         </button>
       </div>
       <motion.div
@@ -187,10 +170,10 @@ const PostPage = () => {
             transition={{ duration: 0.25 }}
           >
             <div className="mt-8">
-              <h1 className="leading-relaxed text-balance text-3xl sm:text-6xl font-semibold serif mb-4">
+              <h1 className="leading-relaxed text-balance mb-2">
                 {post.page.properties.Title.title[0]?.plain_text || "未命名"}
               </h1>
-              <div className="flex items-center text-lg sm:text-3xl mb-8">
+              <div className="flex items-center text-xs mb-8">
                 <span>
                   {moment(post.page.properties.Date?.date?.start).format(
                     "YYYY年MM月DD日"
@@ -208,8 +191,8 @@ const PostPage = () => {
 
               <hr className="my-8 opacity-0" />
 
-              <h1 className="text-lg sm:text-3xl opacity-50 my-4">
-                <span className="invisible">-</span> 所有随想
+              <h1 className="opacity-50 my-4">
+                所有随想
               </h1>
 
               <Post posts={posts} />

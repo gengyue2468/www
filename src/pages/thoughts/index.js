@@ -36,18 +36,10 @@ const Home = () => {
 
   return (
     <Layout title="他的脑洞">
-      <div className="w-full">
-        <h1 className="leading-relaxed text-balance text-3xl sm:text-6xl font-semibold">
-          <span className="serif">他的脑洞非常大</span>
-          <br />
-          <span className="serif">他喜欢在这里倒垃圾</span>
-          <br />
-          <span className="serif">他更喜欢倒脏水在这里</span>
-        </h1>
 
         <div className="flex flex-row space-x-4 justify-between items-center text-balance">
           <div className="w-2/3">
-            <h2 className="text-lg sm:text-3xl mt-4 font-medium">
+            <h2>
               Heeeeeee ~ （Peter Griffin 音）
             </h2>
           </div>
@@ -58,10 +50,11 @@ const Home = () => {
               src={`${site.cdn}/static/peter-griffin.webp`}
               className="rounded-full size-24 sm:size-54 object-cover object-center"
             />
+            <small>这里的思想的愚蠢程度和这位不相上下...</small>
           </div>
         </div>
 
-        {error && !posts && <Error error={error} />}
+        {error || !posts && <Error error={error} />}
         {loading && !error && <Loader />}
         <motion.div
           initial={{ opacity: 0, filter: "blur(5px)" }}
@@ -70,7 +63,6 @@ const Home = () => {
         >
           {!loading && <Post posts={posts} />}{" "}
         </motion.div>
-      </div>
     </Layout>
   );
 };

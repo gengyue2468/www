@@ -4,10 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Helvetica", "FF Hei", sans-serif;
-  @apply bg-neutral-300 dark:bg-neutral-700 selection:bg-neutral-200/50 dark:selection:bg-neutral-800/50;
+  font-family: "Barlow", "Noto Sans SC", sans-serif;
+  @apply bg-neutral-50 dark:bg-neutral-950 selection:bg-neutral-200 dark:selection:bg-neutral-800 antialiased;
 }
 
 p {
@@ -15,9 +13,26 @@ p {
 }
 
 .serif {
-  font-family: "MTR Song", 'Times New Roman', Times, serif;
+  font-family: "MTR Song", "Times New Roman", Times, serif;
 }
 
 .mono {
   font-family: "Jetbrains Mono Variable", monospace;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-medium;
+}
+
+p{
+  @apply font-normal text-sm;
+}
+
+small{
+  @apply text-xs opacity-50;
 }

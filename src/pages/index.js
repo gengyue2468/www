@@ -1,49 +1,99 @@
 import { site } from "@/lib/site.config";
 import Layout from "@/components/Layout";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import Link from "next/link";
+import { NCMIcon } from "@/components/Icon";
 
 export default function Home() {
   return (
-    <Layout title="耿越是一名华中科技大学计算机科学与技术专业的学生">
-      <div>
-        <h1 className="leading-relaxed text-balance text-3xl sm:text-6xl font-semibold">
-          <span className="serif mr-2 transition-all duration-300">
-            耿越 是一名
-            <a
-              className="flex items-center hover:opacity-75 transition-all duration-300"
-              href="https://hust.edu.cn"
+    <Layout title="耿越">
+      <div className="flex flex-row space-x-4 justify-between items-center text-balance">
+        <div className="w-2/3">
+          <h2 className="ml-0 mb-6">嗨！你好啊👋, 我想你想要：</h2>
+          <div className="flex flex-col space-y-2">
+            <Link
+              href="/about"
+              className="-translate-x-2 my-2 py-2 text-sm inline-flex flex-row space-x-1.5 items-center transition-all duration-500 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-2 rounded-lg w-auto"
             >
               <LazyLoadImage
-                src={`${site.cdn}/static/sign/hust.png`}
-                className="h-10 sm:h-18 rounded-full mr-1"
+                effect="blur"
+                alt="Chris Griffin"
+                src={`${site.cdn}/static/chris-griffin.webp`}
+                className="rounded-full size-6 object-cover object-center"
+              />
+              <span>看看我的简介 ➡</span>
+            </Link>
+            <hr className="text-neutral-200 dark:text-neutral-800" />
+            <Link
+              href="/thoughts"
+              className="-translate-x-2 my-2 py-2 text-sm inline-flex flex-row space-x-1.5 items-center transition-all duration-500 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-2 rounded-lg w-auto"
+            >
+              <LazyLoadImage
+                effect="blur"
+                alt="Peter Griffin"
+                src={`${site.cdn}/static/peter-griffin.webp`}
+                className="rounded-full size-6 object-cover object-center"
+              />
+              <span>
+                见识一下<span className="line-through">抽象❌</span>
+                出生✔的头脑风暴 ➡
+              </span>
+            </Link>
+            <hr className="text-neutral-200 dark:text-neutral-800" />
+            <Link
+              href="/thoughts"
+              className="-translate-x-2 my-2 py-2 text-sm inline-flex flex-row space-x-1.5 items-center transition-all duration-500 hover:bg-neutral-200 dark:hover:bg-neutral-800 px-2 rounded-lg w-auto"
+            >
+              <LazyLoadImage
+                effect="blur"
+                alt="Stewie Griffin"
+                src={`${site.cdn}/static/stewie-griffin.webp`}
+                className="rounded-full size-6 object-cover object-center"
+              />
+              <span>领略一下出生的设计风格 ➡</span>
+            </Link>
+          </div>
+          <h2 className="ml-0 mt-12 mb-6">
+            或者，你可能想要了解一下我的近况：
+          </h2>
+
+          <div className="flex flex-col space-y-2">
+            <div className="px-2 -translate-x-2 py-2 transition-all duration-500 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg">
+              <h3>
+                <small>省流版状态总结：状况不坏👌</small>
+              </h3>
+            </div>
+            <hr className="text-neutral-200 dark:text-neutral-800" />
+            <div className="flex flex-row items-center space-x-2 px-2 -translate-x-2 py-2 transition-all duration-500 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg">
+              <LazyLoadImage
                 effect="blur"
                 alt="华中科技大学"
+                src={`${site.cdn}/static/sign/hust.png`}
+                className="rounded-full h-6 w-auto"
               />
-              华中科技大学
-            </a>
-            <a
-              className="flex items-center hover:opacity-75 transition-all duration-300"
-              href="http://www.cs.hust.edu.cn/"
-            >
-              计算机科学与技术专业
-            </a>
-            的大一新生
-          </span>
-        </h1>
-        <div className="flex flex-row space-x-4 justify-between items-center text-balance">
-          <div className="w-2/3">
-            <h2 className="text-lg sm:text-3xl mt-4 font-medium">
-              这是他的个人网站
-            </h2>
+              <small> 录取 😃</small>
+            </div>
+            <hr className="text-neutral-200 dark:text-neutral-800" />
+            <div className="flex flex-row items-center space-x-2 px-2 -translate-x-2 py-2 transition-all duration-500 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg">
+              <NCMIcon className="text-red-600 size-6" />
+              <small>Rage Your Dream 🔥</small>
+            </div>
+            <hr className="text-neutral-200 dark:text-neutral-800" />
+            <div className="px-2 -translate-x-2 py-2 transition-all duration-500 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg">
+              <h3>
+                <small>🐟 摸鱼快乐 哈哈哈哈哈哈哈</small>
+              </h3>
+            </div>
           </div>
-          <div className="w-1/3">
-            <LazyLoadImage
-              alt="logo"
-              effect="blur"
-              src={`${site.cdn}/static/author.webp`}
-              className="rounded-full size-24 sm:size-54 object-cover object-center"
-            />
-          </div>
+        </div>
+        <div className="w-1/3">
+          <LazyLoadImage
+            effect="blur"
+            alt="耿越 头像"
+            src={`${site.cdn}/static/author.webp`}
+            className="rounded-full size-24 sm:size-54 object-cover object-center"
+          />
+          <small>本人于诸多网站使用的头像，AI生成的</small>
         </div>
       </div>
     </Layout>

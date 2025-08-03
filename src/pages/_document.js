@@ -3,30 +3,15 @@ import { site } from "@/lib/site.config";
 
 class MyDocument extends Document {
   render() {
-    const fontStyles = `
-      @font-face {
-        font-family: "Helvetica";
-        src: url(/fonts/helvetica-now-var.woff2) format("woff2");
-        display: swap;
-      }
-      
-      @font-face {
-        font-family: "FF Hei";
-        src: url(/fonts/ff-hei.woff2) format("woff2");
-        display: swap;
-      }
-
-      @font-face {
-        font-family: "MTR Song";
-        src: url(/fonts/MTR-Sung.woff2) format("woff2");
-        display: swap;
-      }
-    `;
-
     return (
       <Html lang="zh">
         <Head>
-          <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Noto+Sans+SC:wght@100..900&display=swap"
+            rel="stylesheet"
+          />
         </Head>
         <body>
           <Main />
