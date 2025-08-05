@@ -6,19 +6,19 @@ export default function Error({ error, type }) {
   const router = useRouter();
   return (
     <div className="my-4">
-      <h1 className="leading-relaxed text-balance">
-        <span className="mr-2 transition-all duration-300">
+      <h1 className="leading-relaxed">
+        <span className="text-balance mr-2 transition-all duration-300 text-3xl sm:text-4xl font-semibold leading-relaxed">
           糟糕！
           <br />
-          <span>我们遇上了点小问题</span>
+          <span>我们遇上了点小问题.</span>
           <br />
-          不必担心，我们能解决的
+          不必担心，我们能解决.
         </span>
       </h1>
       <div className="flex flex-row space-x-4 justify-between items-center text-balance">
         <div className="w-2/3">
           <h2 className="mt-4 font-medium">
-            错误信息：{error}
+            {error}
           </h2>
         </div>
         <div className="w-1/3">

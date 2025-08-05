@@ -7,6 +7,7 @@ import { MDXRemote } from "next-mdx-remote";
 import Post from "@/components/Post";
 import axios from "axios";
 import Header from "@/components/Header";
+import { useRouter } from "next/router";
 import Wrapper from "@/components/Wrapper";
 import Image from "@/components/Image";
 
@@ -38,7 +39,9 @@ const calculateReadingTime = (content) => {
   return Math.ceil(chineseMinutes + englishMinutes) || 1;
 };
 
-const Home = () => {
+const PostPage = () => {
+  const router = useRouter();
+  const { id } = router.query;
   const [posts, setPosts] = useState(null);
   const [post, setPost] = useState(null);
   const [mdxSource, setMdxSource] = useState(null);
@@ -49,22 +52,25 @@ const Home = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
+        if (!id) return;
+
         setPost(null);
         setMdxSource(null);
         setLoading(true);
 
         const resAll = await axios.get(`./api/notion`);
-        const res = resAll.data[0];
+        const res = await axios.get(`../api/notion/${id}`);
         console.log("res:", res);
 
         if (resAll.status < 200 || resAll.status >= 300) {
           throw new Error(`拉取文章失败: ${resAll.statusText}`);
         }
 
-        setPost(res);
+        setPost(res.data);
         setPosts(resAll.data);
 
-        const mdxContent = res.content;
+        const mdxContent =
+          res.data.content;
 
         setReadingTime(calculateReadingTime(mdxContent));
 
@@ -84,10 +90,10 @@ const Home = () => {
     };
 
     fetchPost();
-  }, []);
+  }, [id]);
 
   return (
-    <Layout title="耿越 - 我在想">
+    <Layout title={post?.properties.Title.title[0]?.plain_text || "载入中..."}>
       {loading && !error && <Loader />}
       {error && !mdxSource && <Error error={error} />}
       {!loading && mdxSource && (
@@ -110,11 +116,10 @@ const Home = () => {
           </h1>
 
           <Post posts={posts} />
-          <div className="mb-0" />
         </div>
       )}
     </Layout>
   );
 };
 
-export default Home;
+export default PostPage;

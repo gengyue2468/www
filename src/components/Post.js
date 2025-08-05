@@ -47,8 +47,8 @@ const Post = ({ posts }) => {
             {sortedMonths.length > 0 && (
               <>
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="opacity-50">{year} 年</h3>
-                  <h4 className="font-medium text-xs opacity-50">
+                  <h3 className="font-semibold text-xl">{year} 年</h3>
+                  <h4 className="font-medium text-sm">
                     {months[sortedMonths[0]].name}
                   </h4>
                 </div>
@@ -61,13 +61,13 @@ const Post = ({ posts }) => {
                       className="w-full transition-all duration-300 
                                  group-hover:opacity-50 hover:opacity-100"
                     >
-                      <Link href={`/thoughts/${post.id}`}>
+                      <Link href={`/${post.id}`}>
                         <div className="flex items-center w-full py-4">
-                          <h1 className="text-sm truncate text-foreground! mr-2">
+                          <h1 className="font-medium text-lg truncate text-foreground! mr-2">
                             {post.properties.Title.title[0]?.plain_text || "未命名"}
                           </h1>
                           <div className="h-px flex-grow border-t border-dashed border-neutral-600 dark:border-neutral-400" />
-                          <h2 className="opacity-50 whitespace-nowrap ml-2 text-foreground! text-xs">
+                          <h2 className="whitespace-nowrap ml-2 text-foreground! text-sm">
                             {moment(post.properties.Date?.date?.start).format("Do")}
                           </h2>
                         </div>
@@ -83,7 +83,7 @@ const Post = ({ posts }) => {
                   return (
                     <div key={month} className="mb-8">
                       <div className="flex justify-end items-center mb-2">
-                        <h4 className="opacity-50 text-xs font-medium">{monthName}</h4>
+                        <h4 className="text-sm font-medium">{monthName}</h4>
                       </div>
                       <div className="flex flex-col space-y-0">
                         {monthPosts.map((post) => (
@@ -92,13 +92,13 @@ const Post = ({ posts }) => {
                             className="w-full transition-all duration-300
                                        group-hover:opacity-50 hover:opacity-100 py-4"
                           >
-                            <Link href={`/thoughts/${post.id}`}>
+                            <Link href={`/${post.id}`}>
                               <div className="flex items-center w-full">
-                                <h1 className="text-sm mr-2 truncate">
+                                <h1 className="text-lg font-medium mr-2 truncate">
                                   {post.properties.Title.title[0]?.plain_text || "未命名"}
                                 </h1>
                                 <div className="h-px flex-grow border-t border-dashed border-neutral-600 dark:border-neutral-400" />
-                                <h2 className="opacity-50 whitespace-nowrap text-xs ml-2">
+                                <h2 className="whitespace-nowrap text-sm ml-2">
                                   {moment(post.properties.Date?.date?.start).format("Do")}
                                 </h2>
                               </div>

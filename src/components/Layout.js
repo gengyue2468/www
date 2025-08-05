@@ -11,29 +11,38 @@ import {
   WrenchIcon,
   SunIcon,
   MoonIcon,
+  UserIcon,
+  HomeIcon,
+  BrainIcon,
+  PaintIcon,
 } from "./Icon";
 import { site } from "@/lib/site.config";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { motion } from "motion/react";
 
 export default function Layout({ title, children }) {
-  const { setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const router = useRouter();
   const Nav = [
     {
       name: "主页",
       href: "/",
+      icon: <HomeIcon className="size-4" />,
     },
     {
       name: "简介",
       href: "/about",
+      icon: <UserIcon className="size-4" />,
     },
     {
       name: "脑洞",
       href: "/thoughts",
+      icon: <BrainIcon className="size-4" />,
     },
     {
       name: "设计",
       href: "/design",
+      icon: <PaintIcon className="size-4" />,
     },
   ];
   const [deployTime, setDeployTime] = useState("");
@@ -47,73 +56,38 @@ export default function Layout({ title, children }) {
       <Head>
         <title>{title}</title>
       </Head>
-      <div className="max-w-2xl mx-auto py-32 px-6 z-0">
-        <div className="flex flex-row justify-between items-center">
-          <div className="flex flex-row space-x-2.5">
-            <LazyLoadImage
-              effect="blur"
-              alt="耿越 头像"
-              src={`${site.cdn}/static/author.webp`}
-              className="rounded-full size-10 object-cover object-center"
-            />
-            <div className="flex flex-col -space-y-0">
-              <h1 className="tracking-wider">耿越</h1>
-              <small className="tracking-wide">华中科技大学 · 大一</small>
-            </div>
-          </div>
-          <div className="flex flex-row space-x-2.5">
-            <button
-              className="cursor-pointer rounded-full size-10 bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 flex items-center justify-center"
-              onClick={() =>
-                setTheme(resolvedTheme === "light" ? "dark" : "light")
-              }
-            >
-              {resolvedTheme === "system" && <LaptopIcon className="size-4" />}
-              {resolvedTheme === "light" && <SunIcon className="size-4" />}
-              {resolvedTheme === "dark" && <MoonIcon className="size-4" />}
-            </button>
-          </div>
-        </div>
-        <div className="mt-4 flex flex-row space-x-2">
-          {Nav.map((item, index) => {
-            return (
-              <button
-                key={index}
-                onClick={() => router.push(item.href)}
-                className={cn(
-                  "text-xs font-medium rounded-none px-1 py-1 transition-all duration-500",
-                  (
-                    item.href === "/"
-                      ? router.asPath === item.href
-                      : router.asPath.includes(item.href)
-                  )
-                    ? "opacity-100 border-b-2"
-                    : "opacity-50 border-b-2 border-b-transparent"
-                )}
-              >
-                {item.name}
-              </button>
-            );
-          })}
-        </div>
-        <main className="mt-16">{children}</main>
-        <footer className="mt-32 font-medium">
-          <small className="flex flex-row items-center">
-            <LightningIcon className="size-3 mr-1" /> 网站上次部署于
+      <div className="max-w-2xl mx-auto py-32 px-6 z-0 overflow-visible">
+        <button
+          className="rounded-full p-2 size-12 mb-4 bg-neutral-50 dark:bg-neutral-950 border border-neutral-100 dark:border-neutral-900  cursor-pointer flex  justify-center items-center"
+          onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
+        >
+          {theme === "system" && <LaptopIcon className="size-5" />}
+          {theme === "light" && <SunIcon className="size-5" />}
+          {theme === "dark" && <MoonIcon className="size-5" />}
+        </button>
+        <motion.main
+          initial={{ opacity: 0, y: -20, filter: "blur(2px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ type: "spring", damping: 20, stiffness: 200 }}
+          className="mt-16"
+        >
+          {children}
+        </motion.main>
+        <footer className="mt-64 font-medium opacity-50">
+          <p className="flex flex-row items-center">
+            上次构建时间：
             {moment(deployTime).format("YYYY年MM月DD日HH:mm:ss")}.
-          </small>
-          <small className="flex flex-row items-center">
-            <WrenchIcon className="size-3 mr-1" /> 使用Next.js 和
-            TailwindCSS构建.
-          </small>
-          <small className="flex flex-row items-center">
-            <EarthIcon className="size-3 mr-1" /> 内容托管于Vercel, Netlify 和
-            Notion.
-          </small>
-          <small className="mt-0.5">
+          </p>
+          <p className="flex flex-row items-center">
+            自豪地由 Next.js 和 TailwindCSS 驱动
+          </p>
+          <p className="flex flex-row items-center">
+            云服务由 Vercel，Netlify 和 Notion 提供支持
+          </p>
+          <p className="mt-0.5">
             Copyright © <span className="">{new Date().getFullYear()}</span>{" "}
             保留所有权利.
-          </small>
+          </p>
         </footer>
       </div>
     </div>
