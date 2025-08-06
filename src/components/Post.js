@@ -98,8 +98,8 @@ const Post = ({ posts }) => {
 
                 {/* 首个月份的文章列表 */}
                 <ListContainer>
-                  {months[sortedMonths[0]].posts.map((post) => (
-                    <GroupContainer>
+                  {months[sortedMonths[0]].posts.map((post, index) => (
+                    <GroupContainer key={index}>
                       <Link href={`/thoughts/${post.id}`}>
                         <FlexContainer>
                           <PostTitle>
@@ -128,8 +128,8 @@ const Post = ({ posts }) => {
                         {monthName}
                       </MonthTitle>
                       <ListContainer>
-                        {monthPosts.map((post) => (
-                          <GroupContainer>
+                        {monthPosts.map((post, index) => (
+                          <GroupContainer key={index}>
                             <Link href={`/thoughts/${post.id}`}>
                               <FlexContainer>
                                 <PostTitle>
