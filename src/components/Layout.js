@@ -6,55 +6,45 @@ import Link from "next/link";
 
 export default function Layout({ title, children }) {
   const [deployTime, setDeployTime] = useState("");
+  const LinkStyle =
+    "group-hover:opacity-50 hover:opacity-100 transition-all duration-300 py-1.5 px-3 hover:bg-neutral-100 dark:hover:bg-neutral-900 rounded-xl -translate-x-3";
   useEffect(() => {
     fetch("/deploy-time.json")
       .then((res) => res.json())
       .then((data) => setDeployTime(data.deployTime));
   }, []);
   return (
-    <div className="">
+    <div className="scroll-smooth">
       <Head>
         <title>{title}</title>
       </Head>
-      <div className="max-w-2xl mx-auto py-32 px-6 z-0 overflow-visible">
-        <main className="mt-16">{children}</main>
+      <div className="max-w-2xl mx-auto py-32 px-8 z-0 overflow-visible">
+        <main className="mt-16 scroll-smooth">{children}</main>
 
-        <div className="mt-32 font-medium text-base sm:text-lg flex flex-col space-y-3">
-           <Link
-            href="/"
-            className="opacity-100 hover:opacity-75 transition-all duration-300"
-          >
+        <div className="mt-32 font-medium text-base sm:text-lg inline-flex flex-col group">
+          <Link href="/" className={LinkStyle}>
             主页
           </Link>
-          <Link
-            href="/about"
-            className="opacity-100 hover:opacity-75 transition-all duration-300"
-          >
+          <Link href="/about" className={LinkStyle}>
             关于
           </Link>
-          <Link
-            href="/now"
-            className="opacity-100 hover:opacity-75 transition-all duration-300"
-          >
+          <Link href="/now" className={LinkStyle}>
             现状
           </Link>
-          <Link
-            href="/design"
-            className="opacity-100 hover:opacity-75 transition-all duration-300"
-          >
+          <Link href="/design" className={LinkStyle}>
             设计
           </Link>
         </div>
-        <footer className="mt-32 font-medium text-base flex flex-col space-y-1.5">
+        <footer className="mt-32 font-medium text-sm sm:text-base flex flex-col space-y-1.5">
           <p className="flex flex-row items-center">
             上次构建{" "}
-            {moment(deployTime).format("YYYY 年 MM 月 DD 日 HH : mm : ss")}.
+            {moment(deployTime).format("YYYY 年 MM 月 DD 日 HH:mm:ss")}.
           </p>
           <p className="flex flex-row items-center">
             自豪地由 Next.js 和 TailwindCSS 驱动
           </p>
           <p className="flex flex-row items-center">
-            云服务由 Vercel，Netlify 和 Notion 提供支持
+            云服务由 Vercel，Netlify 和 Notion 支持
           </p>
           <p className="mt-0.5">
             Copyright © <span className="">{new Date().getFullYear()}</span>{" "}

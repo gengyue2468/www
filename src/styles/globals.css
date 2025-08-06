@@ -6,11 +6,11 @@
 
 body {
   font-family: "Inter", "Noto Sans SC", sans-serif;
-  @apply selection:bg-neutral-200 dark:selection:bg-neutral-800 antialiased;
+  @apply selection:bg-neutral-200 dark:selection:bg-neutral-800 antialiased scroll-smooth;
 }
 
 p {
-  @apply leading-relaxed;
+  @apply leading-relaxed text-black dark:text-white;
 }
 
 .serif {

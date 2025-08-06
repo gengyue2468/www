@@ -1,15 +1,16 @@
+import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import Header from "@/components/Header";
 import Layout from "@/components/Layout";
 import Wrapper from "@/components/Wrapper";
 import { MDXRemote } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 
-const aboutMarkdown = `
+const designMarkdown = `
 # 字体
 
-使用[Google Fonts](https://fonts.google.com/)
+使用 [Google Fonts](https://fonts.google.com/) 缓存
 
-- Inter
+- Inter Variable
 - Noto Sans SC
 
 # 标题
@@ -44,13 +45,13 @@ Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidu
 
 `;
 
-export default function Design({ mdxSource }) {
+export default function Design({ mdxSource, readingTime }) {
   return (
     <Layout title="设计">
       <Header
         title="设计"
         date="2025-08-06"
-        readingTime={0}
+        readingTime={readingTime}
         desc="有关这个网站的设计语言与规范"
       />
 
@@ -62,6 +63,7 @@ export default function Design({ mdxSource }) {
 }
 
 export async function getStaticProps() {
-  const mdxSource = await serialize(aboutMarkdown);
-  return { props: { mdxSource } };
+  const mdxSource = await serialize(designMarkdown);
+  const readingTime = calculateReadingTime(designMarkdown);
+  return { props: { mdxSource, readingTime } };
 }

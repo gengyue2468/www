@@ -1,5 +1,6 @@
 import moment from "moment";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 const groupPostsByDate = (posts) => {
   // 保持原有分组逻辑不变
@@ -30,8 +31,50 @@ const groupPostsByDate = (posts) => {
   return grouped;
 };
 
+const MonthTitle = ({ children, className }) => {
+  return <h4 className={cn("font-medium text-sm", className)}>{children}</h4>;
+};
+
+const PostTitle = ({ children }) => {
+  return (
+    <h1 className="font-medium text-base sm:text-lg truncate mr-2">
+      {children}
+    </h1>
+  );
+};
+
+const DayTitle = ({ children }) => {
+  return <h2 className="whitespace-nowrap ml-2 text-sm">{children}</h2>;
+};
+
+const Divider = () => {
+  return (
+    <div className="h-px flex-grow border-t border-dashed border-neutral-300 dark:border-neutral-700" />
+  );
+};
+
+const ListContainer = ({ children }) => {
+  return <div className="mb-8 flex flex-col space-y-0">{children}</div>;
+};
+
+const GroupContainer = ({ children, ...props }) => {
+  return (
+    <div
+      {...props}
+      className="transition-all duration-300 px-6 py-4 -translate-x-6 w-[calc(100%+3rem)]
+                                       group-hover:opacity-50 hover:opacity-100 hover:bg-neutral-100 dark:hover:bg-neutral-900 rounded-xl"
+    >
+      {children}
+    </div>
+  );
+};
+
+const FlexContainer = ({ children }) => {
+  return <div className="flex items-center ">{children}</div>;
+};
+
 const Post = ({ posts }) => {
-  moment.locale('zh-cn');
+  moment.locale("zh-cn");
   const groupedPosts = groupPostsByDate(posts);
   const sortedYears = Object.keys(groupedPosts).sort((a, b) => b - a);
 
@@ -47,34 +90,33 @@ const Post = ({ posts }) => {
             {sortedMonths.length > 0 && (
               <>
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold text-xl">{year} 年</h3>
-                  <h4 className="font-medium text-sm">
-                    {months[sortedMonths[0]].name}
-                  </h4>
+                  <h3 className="font-semibold text-lg sm:text-xl">
+                    {year} 年
+                  </h3>
+                  <MonthTitle>{months[sortedMonths[0]].name}</MonthTitle>
                 </div>
 
                 {/* 首个月份的文章列表 */}
-                <div className="mb-8 flex flex-col space-y-0">
+                <ListContainer>
                   {months[sortedMonths[0]].posts.map((post) => (
-                    <div 
-                      key={post.id} 
-                      className="w-full transition-all duration-300 
-                                 group-hover:opacity-50 hover:opacity-100"
-                    >
+                    <GroupContainer>
                       <Link href={`/thoughts/${post.id}`}>
-                        <div className="flex items-center w-full py-4">
-                          <h1 className="font-medium text-lg truncate text-foreground! mr-2">
-                            {post.properties.Title.title[0]?.plain_text || "未命名"}
-                          </h1>
-                          <div className="h-px flex-grow border-t border-dashed border-neutral-600 dark:border-neutral-400" />
-                          <h2 className="whitespace-nowrap ml-2 text-foreground! text-sm">
-                            {moment(post.properties.Date?.date?.start).format("Do")}
-                          </h2>
-                        </div>
+                        <FlexContainer>
+                          <PostTitle>
+                            {post.properties.Title.title[0]?.plain_text ||
+                              "未命名"}
+                          </PostTitle>
+                          <Divider />
+                          <DayTitle>
+                            {moment(post.properties.Date?.date?.start).format(
+                              "Do"
+                            )}
+                          </DayTitle>
+                        </FlexContainer>
                       </Link>
-                    </div>
+                    </GroupContainer>
                   ))}
-                </div>
+                </ListContainer>
 
                 {/* 其余月份列表 */}
                 {sortedMonths.slice(1).map((month) => {
@@ -82,30 +124,29 @@ const Post = ({ posts }) => {
 
                   return (
                     <div key={month} className="mb-8">
-                      <div className="flex justify-end items-center mb-2">
-                        <h4 className="text-sm font-medium">{monthName}</h4>
-                      </div>
-                      <div className="flex flex-col space-y-0">
+                      <MonthTitle className="flex justify-end">
+                        {monthName}
+                      </MonthTitle>
+                      <ListContainer>
                         {monthPosts.map((post) => (
-                          <div
-                            key={post.id}
-                            className="w-full transition-all duration-300
-                                       group-hover:opacity-50 hover:opacity-100 py-4"
-                          >
+                          <GroupContainer>
                             <Link href={`/thoughts/${post.id}`}>
-                              <div className="flex items-center w-full">
-                                <h1 className="text-lg font-medium mr-2 truncate">
-                                  {post.properties.Title.title[0]?.plain_text || "未命名"}
-                                </h1>
-                                <div className="h-px flex-grow border-t border-dashed border-neutral-600 dark:border-neutral-400" />
-                                <h2 className="whitespace-nowrap text-sm ml-2">
-                                  {moment(post.properties.Date?.date?.start).format("Do")}
-                                </h2>
-                              </div>
+                              <FlexContainer>
+                                <PostTitle>
+                                  {post.properties.Title.title[0]?.plain_text ||
+                                    "未命名"}
+                                </PostTitle>
+                                <Divider />
+                                <DayTitle>
+                                  {moment(
+                                    post.properties.Date?.date?.start
+                                  ).format("Do")}
+                                </DayTitle>
+                              </FlexContainer>
                             </Link>
-                          </div>
+                          </GroupContainer>
                         ))}
-                      </div>
+                      </ListContainer>
                     </div>
                   );
                 })}
@@ -119,4 +160,3 @@ const Post = ({ posts }) => {
 };
 
 export default Post;
-    

@@ -1,10 +1,11 @@
+import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import Header from "@/components/Header";
 import Layout from "@/components/Layout";
 import Wrapper from "@/components/Wrapper";
 import { MDXRemote } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 
-const aboutMarkdown = `
+const nowMarkdown = `
 # Reference
 
 你可以参考这两篇文章： [How and why to make a /now page on your site](https://sive.rs/now2) 和 [About nownownow.com](https://nownownow.com/about)
@@ -28,13 +29,13 @@ const aboutMarkdown = `
 - 荣耀平板 10 配备 Snapdragon 7 Gen 3 处理器 12GB + 12GB 运行内存和 256GB 储存空间
 `;
 
-export default function Now({ mdxSource }) {
+export default function Now({ mdxSource, readingTime }) {
   return (
     <Layout title="现状">
       <Header
         title="现状"
         date="2025-08-06"
-        readingTime={0}
+        readingTime={readingTime}
         desc="我们为啥要保持一个“现状”页面? / Why we need to keep a “Now” page?"
       />
 
@@ -46,6 +47,7 @@ export default function Now({ mdxSource }) {
 }
 
 export async function getStaticProps() {
-  const mdxSource = await serialize(aboutMarkdown);
-  return { props: { mdxSource } };
+  const mdxSource = await serialize(nowMarkdown);
+  const readingTime = calculateReadingTime(nowMarkdown);
+  return { props: { mdxSource,readingTime } };
 }

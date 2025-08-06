@@ -3,6 +3,7 @@ import Layout from "@/components/Layout";
 import Wrapper from "@/components/Wrapper";
 import { MDXRemote } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
+import { calculateReadingTime } from "@/components/CalculateReadingTime";
 
 const aboutMarkdown = `
 # 关于我
@@ -43,13 +44,13 @@ const aboutMarkdown = `
 -  GitHub：[@gengyue2468](https://github.com/gengyue2468)
 `;
 
-export default function About({ mdxSource }) {
+export default function About({ mdxSource, readingTime }) {
   return (
     <Layout title="关于">
       <Header
         title="关于"
         date="2025-08-06"
-        readingTime={0}
+        readingTime={readingTime}
         desc="关于“我”和“这个网站”的一切（似乎并不完全是一切，亦是不可能是一切）"
       />
 
@@ -61,6 +62,13 @@ export default function About({ mdxSource }) {
 }
 
 export async function getStaticProps() {
+  const readingTime = calculateReadingTime(aboutMarkdown);
   const mdxSource = await serialize(aboutMarkdown);
-  return { props: { mdxSource } };
+  
+  return { 
+    props: { 
+      mdxSource,
+      readingTime  // 将阅读时间传递给组件
+    } 
+  };
 }

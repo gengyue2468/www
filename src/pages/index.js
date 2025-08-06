@@ -4,38 +4,15 @@ import Error from "@/components/Error";
 import Loader from "@/components/Loader";
 import { serialize } from "next-mdx-remote/serialize";
 import { MDXRemote } from "next-mdx-remote";
-import Post from "@/components/Post";
+import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import axios from "axios";
 import Header from "@/components/Header";
 import Wrapper from "@/components/Wrapper";
 import Image from "@/components/Image";
+import Footer from "@/components/Footer";
 
 const components = {
   img: Image,
-};
-
-const calculateReadingTime = (content) => {
-  const chineseCharsPerMinute = 200;
-  const englishWordsPerMinute = 200;
-
-  if (!content) return 0;
-
-  const chineseChars = content.match(
-    /[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g
-  );
-  const chineseCount = chineseChars ? chineseChars.length : 0;
-
-  const englishContent = content.replace(
-    /[\u4e00-\u9fa5\u3040-\u30ff\uac00-\ud7af]/g,
-    " "
-  );
-  const englishWords = englishContent.match(/\b[\w']+\b/g);
-  const englishCount = englishWords ? englishWords.length : 0;
-
-  const chineseMinutes = chineseCount / chineseCharsPerMinute;
-  const englishMinutes = englishCount / englishWordsPerMinute;
-
-  return Math.ceil(chineseMinutes + englishMinutes) || 1;
 };
 
 const Home = () => {
@@ -103,14 +80,7 @@ const Home = () => {
             <MDXRemote {...mdxSource} components={components} />
           </Wrapper>
 
-          <hr className="my-8 opacity-0" />
-
-          <h1 className="font-semibold text-xl sm:text-2xl mt-16 mb-4">
-            所有随想
-          </h1>
-
-          <Post posts={posts} />
-          <div className="mb-0" />
+          <Footer posts={posts} />
         </div>
       )}
     </Layout>

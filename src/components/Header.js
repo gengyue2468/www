@@ -14,7 +14,7 @@ export default function Header({ title, date, desc, readingTime }) {
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <div className="font-medium flex flex-col space-y-2 text-base">
+        <div className="font-medium flex flex-col space-y-2 text-sm sm:text-base">
           <span>{formattedDate}</span>
           <span>{readingTimeText}</span>
         </div>
@@ -28,11 +28,11 @@ export default function Header({ title, date, desc, readingTime }) {
         </button>
       </div>
 
-      <h1 className="leading-relaxed text-balance mb-2 font-semibold text-4xl">
+      <h1 className="leading-relaxed text-balance mb-2 font-semibold text-2xl sm:text-3xl">
         {title || "未命名"}
       </h1>
 
-      <h2 className="my-8 text-xl sm:text-2xl font-medium text-balance leading-loose">
+      <h2 className="my-8 text-lg sm:text-xl font-medium text-balance leading-loose">
         {desc}
       </h2>
 
