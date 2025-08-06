@@ -58,7 +58,7 @@ const PostPage = () => {
         setMdxSource(null);
         setLoading(true);
 
-        const resAll = await axios.get(`./api/notion`);
+        const resAll = await axios.get(`../api/notion`);
         const res = await axios.get(`../api/notion/${id}`);
         console.log("res:", res);
 

@@ -24,7 +24,7 @@ export default function Error({ error, type }) {
         <div className="w-1/3">
           <LazyLoadImage
             alt="Brian Griffin"
-            effect="blur"
+            effect="opacity"
             src={`${site.cdn}/static/brian-griffin.webp`}
             className="rounded-full size-24 sm:size-54 object-cover object-center"
           />
