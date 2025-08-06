@@ -4,21 +4,18 @@ import Error from "@/components/Error";
 import Loader from "@/components/Loader";
 import { serialize } from "next-mdx-remote/serialize";
 import { MDXRemote } from "next-mdx-remote";
-import Footer from "@/components/Footer";
+import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import axios from "axios";
 import Header from "@/components/Header";
-import { useRouter } from "next/router";
 import Wrapper from "@/components/Wrapper";
 import Image from "@/components/Image";
-import { calculateReadingTime } from "@/components/CalculateReadingTime";
+import Footer from "@/components/Footer";
 
 const components = {
   img: Image,
 };
 
-const PostPage = () => {
-  const router = useRouter();
-  const { id } = router.query;
+const Thoughts = () => {
   const [posts, setPosts] = useState(null);
   const [post, setPost] = useState(null);
   const [mdxSource, setMdxSource] = useState(null);
@@ -29,24 +26,22 @@ const PostPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        if (!id) return;
-
         setPost(null);
         setMdxSource(null);
         setLoading(true);
 
-        const resAll = await axios.get(`../api/notion`);
-        const res = await axios.get(`../api/notion/${id}`);
+        const resAll = await axios.get(`./api/notion`);
+        const res = resAll.data[0];
         console.log("res:", res);
 
         if (resAll.status < 200 || resAll.status >= 300) {
           throw new Error(`拉取文章失败: ${resAll.statusText}`);
         }
 
-        setPost(res.data);
+        setPost(res);
         setPosts(resAll.data);
 
-        const mdxContent = res.data.content;
+        const mdxContent = res.content;
 
         setReadingTime(calculateReadingTime(mdxContent));
 
@@ -66,10 +61,10 @@ const PostPage = () => {
     };
 
     fetchPost();
-  }, [id]);
+  }, []);
 
   return (
-    <Layout title={post?.properties.Title.title[0]?.plain_text || "载入中..."}>
+    <Layout title="随想">
       {loading && !error && <Loader />}
       {error && !mdxSource && <Error error={error} />}
       {!loading && mdxSource && (
@@ -92,4 +87,4 @@ const PostPage = () => {
   );
 };
 
-export default PostPage;
+export default Thoughts;

@@ -22,8 +22,8 @@ export default function Layout({ title, children }) {
         <main className="mt-16 scroll-smooth">{children}</main>
 
         <div className="mt-32 font-medium text-base sm:text-lg inline-flex flex-col group">
-          <Link href="/" className={LinkStyle}>
-            主页
+          <Link href="/thoughts" className={LinkStyle}>
+            随想
           </Link>
           <Link href="/about" className={LinkStyle}>
             关于

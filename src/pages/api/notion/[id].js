@@ -86,8 +86,18 @@ function blocksToMarkdown(blocks, indentLevel = 0) {
         const url = image.type === "external" ? image.external.url : image.file.url;
         const caption = image.caption.length > 0 
           ? richTextToMarkdown(image.caption) 
-          : "image";
+          : "图片";
         markdown = indent + `![${caption}](${url})\n\n`;
+        break;
+      }
+
+       case "video": {
+        const video = block.video;
+        const url = video.type === "external" ? video.external.url : video.file.url;
+        const caption = video.caption.length > 0 
+          ? richTextToMarkdown(video.caption) 
+          : "视频";
+        markdown = indent + `<video src="${url}" controls title="${caption}"></video>\n\n`;
         break;
       }
       

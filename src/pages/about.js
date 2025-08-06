@@ -53,7 +53,6 @@ export default function About({ mdxSource, readingTime }) {
         readingTime={readingTime}
         desc="关于“我”和“这个网站”的一切（似乎并不完全是一切，亦是不可能是一切）"
       />
-
       <Wrapper>
         <MDXRemote {...mdxSource} />
       </Wrapper>

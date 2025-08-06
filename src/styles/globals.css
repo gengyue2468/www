@@ -20,3 +20,12 @@ p {
 .mono {
   font-family: "Jetbrains Mono Variable", monospace;
 }
+
+.prose > video,
+.prose div video {
+  @apply rounded-none sm:rounded-xl -translate-x-8 my-8;
+  width: calc(100% + 4rem) !important;
+  max-width: calc(100% + 4rem) !important; /* 增加max-width确保宽度生效 */
+  box-sizing: border-box; /* 确保padding和border不影响宽度计算 */
+  display: block; /* 确保视频作为块级元素显示 */
+}
