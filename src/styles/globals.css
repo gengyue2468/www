@@ -5,12 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 body {
-  font-family: "Barlow", "Noto Sans SC", sans-serif;
+  font-family: "Inter", "Noto Sans SC", sans-serif;
   @apply selection:bg-neutral-200 dark:selection:bg-neutral-800 antialiased;
 }
 
 p {
-  @apply leading-loose;
+  @apply leading-relaxed;
 }
 
 .serif {

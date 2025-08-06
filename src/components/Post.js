@@ -61,7 +61,7 @@ const Post = ({ posts }) => {
                       className="w-full transition-all duration-300 
                                  group-hover:opacity-50 hover:opacity-100"
                     >
-                      <Link href={`/${post.id}`}>
+                      <Link href={`/thoughts/${post.id}`}>
                         <div className="flex items-center w-full py-4">
                           <h1 className="font-medium text-lg truncate text-foreground! mr-2">
                             {post.properties.Title.title[0]?.plain_text || "未命名"}
@@ -92,7 +92,7 @@ const Post = ({ posts }) => {
                             className="w-full transition-all duration-300
                                        group-hover:opacity-50 hover:opacity-100 py-4"
                           >
-                            <Link href={`/${post.id}`}>
+                            <Link href={`/thoughts/${post.id}`}>
                               <div className="flex items-center w-full">
                                 <h1 className="text-lg font-medium mr-2 truncate">
                                   {post.properties.Title.title[0]?.plain_text || "未命名"}
