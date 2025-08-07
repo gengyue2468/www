@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 import Wrapper from "@/components/Wrapper";
 import Image from "@/components/Image";
 import Footer from "@/components/Footer";
+import remarkGfm from "remark-gfm";
 
 const components = {
   img: Image,
@@ -77,7 +78,15 @@ const Home = () => {
           />
 
           <Wrapper>
-            <MDXRemote {...mdxSource} components={components} />
+            <MDXRemote
+              {...mdxSource}
+              components={components}
+              options={{
+                mdxOptions: {
+                  remarkPlugins: [remarkGfm],
+                },
+              }}
+            />
           </Wrapper>
 
           <Footer posts={posts} />

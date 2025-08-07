@@ -6,8 +6,24 @@ import Link from "next/link";
 
 export default function Layout({ title, children }) {
   const [deployTime, setDeployTime] = useState("");
-  const LinkStyle =
-    "group-hover:opacity-50 hover:opacity-100 transition-all duration-300 py-1.5 px-3 hover:bg-neutral-100 dark:hover:bg-neutral-900 rounded-xl -translate-x-3";
+  const Nav = [
+    {
+      name: "随想",
+      href: "/thoughts",
+    },
+    {
+      name: "关于",
+      href: "/about",
+    },
+    {
+      name: "现状",
+      href: "/now",
+    },
+    {
+      name: "设计",
+      href: "/design",
+    },
+  ];
   useEffect(() => {
     fetch("/deploy-time.json")
       .then((res) => res.json())
@@ -22,23 +38,22 @@ export default function Layout({ title, children }) {
         <main className="mt-16 scroll-smooth">{children}</main>
 
         <div className="mt-32 font-medium text-base sm:text-lg inline-flex flex-col group">
-          <Link href="/thoughts" className={LinkStyle}>
-            随想
-          </Link>
-          <Link href="/about" className={LinkStyle}>
-            关于
-          </Link>
-          <Link href="/now" className={LinkStyle}>
-            现状
-          </Link>
-          <Link href="/design" className={LinkStyle}>
-            设计
-          </Link>
+          {Nav.map((item) => {
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="ease-out group-hover:opacity-50 hover:opacity-100 transition-all duration-300 py-1.5 px-3 hover:bg-neutral-100 dark:hover:bg-neutral-900 rounded-xl -translate-x-3"
+              >
+                {item.name}
+              </Link>
+            );
+          })}
         </div>
         <footer className="mt-32 font-medium text-sm sm:text-base flex flex-col space-y-1.5">
           <p className="flex flex-row items-center">
-            上次构建{" "}
-            {moment(deployTime).format("YYYY 年 MM 月 DD 日 HH:mm:ss")}.
+            上次构建 {moment(deployTime).format("YYYY 年 MM 月 DD 日 HH:mm:ss")}
+            .
           </p>
           <p className="flex flex-row items-center">
             自豪地由 Next.js 和 TailwindCSS 驱动
