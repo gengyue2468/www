@@ -1,29 +1,10 @@
 import Head from "next/head";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import moment from "moment";
-import Link from "next/link";
+import Nav from "./Nav";
 
 export default function Layout({ title, children }) {
   const [deployTime, setDeployTime] = useState("");
-  const Nav = [
-    {
-      name: "随想",
-      href: "/thoughts",
-    },
-    {
-      name: "关于",
-      href: "/about",
-    },
-    {
-      name: "现状",
-      href: "/now",
-    },
-    {
-      name: "设计",
-      href: "/design",
-    },
-  ];
   useEffect(() => {
     fetch("/deploy-time.json")
       .then((res) => res.json())
@@ -36,20 +17,11 @@ export default function Layout({ title, children }) {
       </Head>
       <div className="max-w-2xl mx-auto py-32 px-8 z-0 overflow-visible">
         <main className="mt-16 scroll-smooth">{children}</main>
-
-        <div className="mt-32 font-medium text-base sm:text-lg inline-flex flex-col group">
-          {Nav.map((item) => {
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="ease-out group-hover:opacity-50 hover:opacity-100 transition-all duration-300 py-1.5 px-3 hover:bg-neutral-100 dark:hover:bg-neutral-900 rounded-xl -translate-x-3"
-              >
-                {item.name}
-              </Link>
-            );
-          })}
+        
+        <div className="mt-32">
+          <Nav />
         </div>
+
         <footer className="mt-32 font-medium text-sm sm:text-base flex flex-col space-y-1.5">
           <p className="flex flex-row items-center">
             上次构建 {moment(deployTime).format("YYYY 年 MM 月 DD 日 HH:mm:ss")}

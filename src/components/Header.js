@@ -12,7 +12,7 @@ export default function Header({ title, date, desc, readingTime }) {
     readingTime && readingTime > 0 ? `${readingTime} 分钟阅读` : null;
 
   return (
-    <div>
+    <div className="">
       <div className="flex justify-between items-center mb-8">
         <div className="font-medium flex flex-col space-y-2 text-sm sm:text-base">
           <span>{formattedDate}</span>
