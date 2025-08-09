@@ -65,7 +65,7 @@ const Home = () => {
   }, []);
 
   return (
-    <Layout title="狗子吃饺子 - 思想中">
+    <Layout title="狗子吃饺子 - I’m thinking">
       {loading && !error && <Loader />}
       {error && !mdxSource && <Error error={error} />}
       {!loading && mdxSource && (

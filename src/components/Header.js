@@ -1,6 +1,6 @@
 import moment from "moment";
 import { useTheme } from "next-themes";
-import { LaptopIcon, SunIcon, MoonIcon } from "./Icon";
+import { SunIcon, MoonIcon, PCIcon } from "./Icon";
 
 export default function Header({ title, date, desc, readingTime }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -22,7 +22,7 @@ export default function Header({ title, date, desc, readingTime }) {
           className="opacity-75 hover:opacity-100 transition-all duration-300 cursor-pointer"
           onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
         >
-          {theme === "system" && <LaptopIcon className="size-5" />}
+          {theme === "system" && <PCIcon className="size-5" />}
           {theme === "light" && <SunIcon className="size-5" />}
           {theme === "dark" && <MoonIcon className="size-5" />}
         </button>
