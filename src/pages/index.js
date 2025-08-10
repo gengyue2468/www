@@ -11,10 +11,7 @@ import Wrapper from "@/components/Wrapper";
 import Image from "@/components/Image";
 import Footer from "@/components/Footer";
 import remarkGfm from "remark-gfm";
-
-const components = {
-  img: Image,
-};
+import { components } from "@/lib/markdown/config";
 
 const Home = () => {
   const [posts, setPosts] = useState(null);

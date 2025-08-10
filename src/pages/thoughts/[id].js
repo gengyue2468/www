@@ -11,10 +11,7 @@ import { useRouter } from "next/router";
 import Wrapper from "@/components/Wrapper";
 import Image from "@/components/Image";
 import { calculateReadingTime } from "@/components/CalculateReadingTime";
-
-const components = {
-  img: Image,
-};
+import { components } from "@/lib/markdown/config";
 
 const PostPage = () => {
   const router = useRouter();

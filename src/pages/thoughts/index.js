@@ -10,10 +10,7 @@ import Header from "@/components/Header";
 import Wrapper from "@/components/Wrapper";
 import Image from "@/components/Image";
 import Footer from "@/components/Footer";
-
-const components = {
-  img: Image,
-};
+import { components } from "@/lib/markdown/config";
 
 const Thoughts = () => {
   const [posts, setPosts] = useState(null);
