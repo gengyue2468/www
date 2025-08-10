@@ -2,6 +2,7 @@ import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import Header from "@/components/Header";
 import Layout from "@/components/Layout";
 import Wrapper from "@/components/Wrapper";
+import { components } from "@/lib/markdown/config";
 import { MDXRemote } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 
@@ -56,7 +57,7 @@ export default function Design({ mdxSource, readingTime }) {
       />
 
       <Wrapper>
-        <MDXRemote {...mdxSource} />
+        <MDXRemote {...mdxSource} components={components} />
       </Wrapper>
     </Layout>
   );
