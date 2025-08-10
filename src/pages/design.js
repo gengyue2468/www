@@ -42,7 +42,17 @@ Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidu
 2. Item 2
 3. Item 3
 
-> 仍在更新...
+# 图片
+
+![等待是长跑，不是短跑 —— 威尔・史密斯。](https://uapis.cn/api/bing.php)
+
+# 代码
+
+\`\`\`js
+console.log('Hello World')
+\`\`\`
+
+> 测试持续中...
 
 `;
 

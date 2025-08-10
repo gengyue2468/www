@@ -74,7 +74,7 @@ const Nav = () => {
     >
       <div
         ref={sliderRef}
-        className="absolute -left-4 right-4 rounded-xl bg-neutral-100 dark:bg-neutral-900 transition-all duration-300 ease-out z-0"
+        className="absolute -left-3 right-3 rounded-lg bg-neutral-100 dark:bg-neutral-900 transition-all duration-300 ease-out z-0"
         style={{ opacity: 0 }}
       />
 
@@ -84,7 +84,7 @@ const Nav = () => {
           href={item.href}
           ref={(el) => (linkRefs.current[index] = el)}
           onMouseEnter={() => handleMouseEnter(index)}
-          className="relative z-10 py-2 px-4 -translate-x-4 rounded-xl transition-all duration-300 ease-out font-medium text-sm sm:text-base
+          className="relative z-10 py-2 px-3 -translate-x-3 rounded-lg transition-all duration-300 ease-out font-medium text-sm sm:text-base
                      group-hover:opacity-50 hover:opacity-100"
         >
           {item.name}
