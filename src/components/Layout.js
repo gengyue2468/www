@@ -17,7 +17,7 @@ export default function Layout({ title, children }) {
       </Head>
       <div className="max-w-2xl mx-auto py-32 px-8 z-0 overflow-visible">
         <main className="mt-16 scroll-smooth">{children}</main>
-        
+
         <div className="mt-32">
           <Nav />
         </div>

@@ -1,7 +1,5 @@
 import "@/styles/globals.css";
 import { ThemeProvider } from "next-themes";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@fontsource-variable/jetbrains-mono";
 import "react-lazy-load-image-component/src/effects/opacity.css";
 import { useState, useEffect } from "react";
@@ -25,8 +23,6 @@ export default function App({ Component, pageProps }) {
           disableTransitionOnChange
         >
           <Component {...pageProps} />
-          <Analytics />
-          <SpeedInsights />
         </ThemeProvider>
       )}
     </>
