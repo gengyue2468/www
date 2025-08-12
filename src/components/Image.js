@@ -1,13 +1,24 @@
-export default function Image({ alt, src, ...props }) {
+import NextImage from "next/image";
+
+export default function Image({ alt, src, aspectRatio = 16/9, ...props }) {
   return (
     <div className="my-12 -translate-x-8 not-prose">
-      <div className="bg-neutral-100 dark:bg-neutral-900 rounded-none sm:rounded-3xl w-[calc(100%+4rem)] h-full overflow-hidden p-0! leading-0 min-h-48 sm:min-h-72 transition-all duration-500">
-        <img
-          alt={alt || "图片内容"}
-          src={src}
-          className="w-full h-full rounded-none sm:rounded-3xl object-cover"
-          {...props}
-        />
+      {/* 使用padding-bottom技巧创建响应式比例容器 */}
+      <div className="relative bg-neutral-100 dark:bg-neutral-900 rounded-none sm:rounded-3xl w-[calc(100%+4rem)] overflow-hidden">
+        {/* 比例容器 - 关键修复 */}
+        <div 
+          className="relative w-full"
+          style={{ paddingBottom: `${100 / aspectRatio}%` }}
+        >
+          <NextImage
+            alt={alt || "图片内容"}
+            src={src}
+            fill 
+            sizes="(max-width: 640px) 100vw, (max-width: 1200px) 80vw, 1200px"
+            className="w-full h-full rounded-none sm:rounded-3xl object-cover"
+            {...props}
+          />
+        </div>
       </div>
 
       {alt && (
