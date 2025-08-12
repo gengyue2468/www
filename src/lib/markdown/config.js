@@ -27,8 +27,6 @@ const CodeBlock = ({ children, className }) => {
 const components = {
   img: Image,
   a: NextLink,
-  pre: ({ children }) => <div className="mono -translate-x-4! w-[calc(100%+2rem)]! mb-4">{children}</div>,
-  code: CodeBlock,
   FileDisplay,
 };
 export { components };
