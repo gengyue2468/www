@@ -60,7 +60,6 @@ const NextLink = ({ href, children, ...props }) => {
           initial={initialState}
           animate={animateTarget}
           transition={transition}
-          leave={exit}
         />
 
         <span className={textStyles}>{children}</span>

@@ -7,7 +7,7 @@ export default function Error({ error, type }) {
   return (
     <div className="my-4">
       <h1 className="leading-relaxed">
-        <span className="text-balance mr-2 transition-all duration-300 text-3xl sm:text-4xl font-semibold leading-relaxed">
+        <span className="leading-relaxed text-balance mb-2 font-semibold text-2xl sm:text-3xl">
           糟糕！
           <br />
           <span>我们遇上了点小问题.</span>
@@ -17,7 +17,7 @@ export default function Error({ error, type }) {
       </h1>
       <div className="flex flex-row space-x-4 justify-between items-center text-balance">
         <div className="w-2/3">
-          <h2 className="mt-4 font-medium">
+          <h2 className="mt-4 text-sm sm:text-base font-medium">
             {error}
           </h2>
         </div>
