@@ -1,23 +1,16 @@
 import Layout from "@/components/Layout";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader";
-import { MDXRemote } from "next-mdx-remote";
 import Header from "@/components/Header";
 import Wrapper from "@/components/Wrapper";
 import Footer from "@/components/Footer";
-import remarkGfm from "remark-gfm";
-import { components } from "@/lib/markdown/config";
 import { useFetchPosts } from "@/lib/hooks/useFetchPosts";
+import MdxContent from "@/components/MdxContent";
+import ViewOnNotion from "@/components/ViewOnNotion";
 
 const Home = () => {
-  const { 
-    posts, 
-    post, 
-    mdxSource, 
-    loading, 
-    error, 
-    readingTime 
-  } = useFetchPosts();
+  const { posts, post, mdxSource, loading, error, readingTime } =
+    useFetchPosts();
 
   return (
     <Layout title="狗子吃饺子 - I’m thinking">
@@ -33,16 +26,10 @@ const Home = () => {
           />
 
           <Wrapper>
-            <MDXRemote
-              {...mdxSource}
-              components={components}
-              options={{
-                mdxOptions: {
-                  remarkPlugins: [remarkGfm],
-                },
-              }}
-            />
+            <MdxContent mdxSource={mdxSource} />
           </Wrapper>
+
+          <ViewOnNotion url={post.public_url} />
 
           <Footer posts={posts} />
         </div>
@@ -52,4 +39,3 @@ const Home = () => {
 };
 
 export default Home;
-

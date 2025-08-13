@@ -2,6 +2,7 @@ import moment from "moment";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useRef, useEffect, useState } from "react";
+import { SegmentContainer, SegmentItem } from "./SegmentControl";
 
 const groupPostsByDate = (posts) => {
   const grouped = {};
@@ -60,7 +61,7 @@ const ListContainer = ({ children }) => {
 const GroupContainer = ({ children, index, refs, onMouseEnter }) => {
   return (
     <div
-      ref={el => refs.current[index] = el}
+      ref={(el) => (refs.current[index] = el)}
       onMouseEnter={() => onMouseEnter(index)}
       className="transition-all duration-300 px-6 py-3 -translate-x-6 w-[calc(100%+3rem)]
                                        group-hover:opacity-50 hover:opacity-100 rounded-xl relative z-10"
@@ -78,7 +79,7 @@ const Post = ({ posts }) => {
   moment.locale("zh-cn");
   const groupedPosts = groupPostsByDate(posts);
   const sortedYears = Object.keys(groupedPosts).sort((a, b) => b - a);
-  
+
   // 用于滑块控制的ref和状态
   const containerRef = useRef(null);
   const sliderRef = useRef(null);
@@ -126,11 +127,11 @@ const Post = ({ posts }) => {
   // 收集所有需要滑块控制的项目
   const getAllItems = () => {
     let items = [];
-    sortedYears.forEach(year => {
+    sortedYears.forEach((year) => {
       const months = groupedPosts[year];
       const sortedMonths = Object.keys(months).sort((a, b) => b - a);
-      
-      sortedMonths.forEach(month => {
+
+      sortedMonths.forEach((month) => {
         items = [...items, ...months[month].posts];
       });
     });
@@ -140,17 +141,7 @@ const Post = ({ posts }) => {
   const allItems = getAllItems();
 
   return (
-    <div 
-      ref={containerRef} 
-      className="group w-full mt-2 mb-8 relative inline-flex flex-col"
-      onMouseLeave={handleMouseLeave}
-    >
-      {/* 滑块元素 */}
-      <div
-        ref={sliderRef}
-        className="absolute -left-6 -right-6 rounded-xl bg-neutral-100 dark:bg-neutral-900 transition-all duration-300 ease-out z-0"
-      />
-
+    <SegmentContainer className="w-full mt-2 mb-8" sliderClassName="-translate-x-6 w-[calc(100%+3rem)]">
       {sortedYears.map((year) => {
         const months = groupedPosts[year];
         const sortedMonths = Object.keys(months).sort((a, b) => b - a);
@@ -170,13 +161,14 @@ const Post = ({ posts }) => {
                 {/* 首个月份的文章列表 */}
                 <ListContainer>
                   {months[sortedMonths[0]].posts.map((post) => {
-                    const index = allItems.findIndex(item => item.id === post.id);
+                    const index = allItems.findIndex(
+                      (item) => item.id === post.id
+                    );
                     return (
-                      <GroupContainer 
-                        key={post.id} 
+                      <SegmentItem
+                        key={post.id}
                         index={index}
-                        refs={itemRefs}
-                        onMouseEnter={handleMouseEnter}
+                        className="transition-all duration-300 px-6 py-3 -translate-x-6! w-[calc(100%+3rem)]! group-hover:opacity-50 hover:opacity-100 rounded-xl relative z-10"
                       >
                         <Link href={`/thoughts/${post.id}`}>
                           <FlexContainer>
@@ -192,7 +184,7 @@ const Post = ({ posts }) => {
                             </DayTitle>
                           </FlexContainer>
                         </Link>
-                      </GroupContainer>
+                      </SegmentItem>
                     );
                   })}
                 </ListContainer>
@@ -208,19 +200,20 @@ const Post = ({ posts }) => {
                       </MonthTitle>
                       <ListContainer>
                         {monthPosts.map((post) => {
-                          const index = allItems.findIndex(item => item.id === post.id);
+                          const index = allItems.findIndex(
+                            (item) => item.id === post.id
+                          );
                           return (
-                            <GroupContainer 
-                              key={post.id} 
+                            <SegmentItem
+                              key={post.id}
                               index={index}
-                              refs={itemRefs}
-                              onMouseEnter={handleMouseEnter}
+                              className="transition-all duration-300 px-6 py-3 -translate-x-6 w-[calc(100%+3rem)] group-hover:opacity-50 hover:opacity-100 rounded-xl relative z-10"
                             >
                               <Link href={`/thoughts/${post.id}`}>
                                 <FlexContainer>
                                   <PostTitle>
-                                    {post.properties.Title.title[0]?.plain_text ||
-                                      "未命名"}
+                                    {post.properties.Title.title[0]
+                                      ?.plain_text || "未命名"}
                                   </PostTitle>
                                   <Divider />
                                   <DayTitle>
@@ -230,7 +223,7 @@ const Post = ({ posts }) => {
                                   </DayTitle>
                                 </FlexContainer>
                               </Link>
-                            </GroupContainer>
+                            </SegmentItem>
                           );
                         })}
                       </ListContainer>
@@ -242,8 +235,8 @@ const Post = ({ posts }) => {
           </div>
         );
       })}
-    </div>
+    </SegmentContainer>
   );
 };
 
-export default Post
+export default Post;

@@ -2,8 +2,7 @@ import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import Header from "@/components/Header";
 import Layout from "@/components/Layout";
 import Wrapper from "@/components/Wrapper";
-import { components } from "@/lib/markdown/config";
-import { MDXRemote } from "next-mdx-remote";
+import MdxContent from "@/components/MdxContent";
 import { serialize } from "next-mdx-remote/serialize";
 
 const designMarkdown = `
@@ -50,6 +49,7 @@ Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidu
 
 \`\`\`js
 console.log('Hello World')
+console.error('An Error Occurred')
 \`\`\`
 
 > 测试持续中...
@@ -67,7 +67,7 @@ export default function Design({ mdxSource, readingTime }) {
       />
 
       <Wrapper>
-        <MDXRemote {...mdxSource} components={components} />
+        <MdxContent mdxSource={mdxSource} />
       </Wrapper>
     </Layout>
   );

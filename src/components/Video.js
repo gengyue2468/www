@@ -21,6 +21,8 @@ const Video = ({ src, alt }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
+  // 添加状态跟踪操作是否正在处理中
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const playerRef = useRef(null);
   const containerRef = useRef(null);
@@ -46,10 +48,28 @@ const Video = ({ src, alt }) => {
     setDuration(duration);
   };
 
+  // 处理视频错误，特别是播放中断错误
+  const handleError = (error) => {
+    // 忽略播放被中断的错误
+    if (error.message.includes('The play() request was interrupted')) {
+      console.log('播放请求被中断，已处理');
+      return;
+    }
+    // 处理其他错误
+    console.error('视频播放错误:', error);
+  };
 
   const togglePlay = () => {
-    setPlaying(!playing);
+    // 如果正在处理中，忽略后续操作
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    // 使用函数式更新确保基于最新状态
+    setPlaying(prev => !prev);
     showControlsTemporarily();
+    
+    // 一段时间后重置处理状态，防止长时间锁定
+    setTimeout(() => setIsProcessing(false), 300);
   };
 
   const handleProgressChange = (value) => {
@@ -65,7 +85,6 @@ const Video = ({ src, alt }) => {
   const handleDragStart = () => {
     setIsDragging(true);
   };
-
 
   const handleDragEnd = () => {
     setIsDragging(false);
@@ -156,7 +175,7 @@ const Video = ({ src, alt }) => {
     >
       <ReactPlayer
         ref={playerRef}
-        url={src}
+        src={src}
         alt={alt}
         playing={playing}
         volume={muted ? 0 : volume / 100}
@@ -164,6 +183,7 @@ const Video = ({ src, alt }) => {
         onDuration={handleDuration}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
+        onError={handleError}
         width="100%"
         height="100%"
         className="object-contain"
@@ -184,13 +204,12 @@ const Video = ({ src, alt }) => {
         </div>
       )}
 
-      {/* 控制栏 */}
+ 
       <div
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0"
         }`}
       >
-        {/* 进度条 */}
         <div className="mb-4" onClick={(e) => e.stopPropagation()}>
           <Slider
             value={[progress]}
@@ -278,3 +297,5 @@ const Video = ({ src, alt }) => {
 };
 
 export default Video;
+
+

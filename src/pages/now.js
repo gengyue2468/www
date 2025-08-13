@@ -1,8 +1,8 @@
 import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import Header from "@/components/Header";
 import Layout from "@/components/Layout";
+import MdxContent from "@/components/MdxContent";
 import Wrapper from "@/components/Wrapper";
-import { components } from "@/lib/markdown/config";
 import { MDXRemote } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 
@@ -41,7 +41,7 @@ export default function Now({ mdxSource, readingTime }) {
       />
 
       <Wrapper>
-        <MDXRemote {...mdxSource} components={components} />
+        <MdxContent mdxSource={mdxSource} />
       </Wrapper>
     </Layout>
   );
@@ -50,5 +50,5 @@ export default function Now({ mdxSource, readingTime }) {
 export async function getStaticProps() {
   const mdxSource = await serialize(nowMarkdown);
   const readingTime = calculateReadingTime(nowMarkdown);
-  return { props: { mdxSource,readingTime } };
+  return { props: { mdxSource, readingTime } };
 }

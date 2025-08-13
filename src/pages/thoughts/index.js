@@ -1,13 +1,12 @@
 import Layout from "@/components/Layout";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader";
-import { MDXRemote } from "next-mdx-remote";
-import axios from "axios";
 import Header from "@/components/Header";
 import Wrapper from "@/components/Wrapper";
 import Footer from "@/components/Footer";
-import { components } from "@/lib/markdown/config";
 import { useFetchPosts } from "@/lib/hooks/useFetchPosts";
+import MdxContent from "@/components/MdxContent";
+import ViewOnNotion from "@/components/ViewOnNotion";
 
 const Thoughts = () => {
   const { posts, post, mdxSource, loading, error, readingTime } =
@@ -27,8 +26,10 @@ const Thoughts = () => {
           />
 
           <Wrapper>
-            <MDXRemote {...mdxSource} components={components} />
+            <MdxContent mdxSource={mdxSource} />
           </Wrapper>
+
+            <ViewOnNotion url={post.public_url} />
 
           <Footer posts={posts} />
         </div>
