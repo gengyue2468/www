@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config) => {
+    config.optimization.splitChunks = {
+      chunks: 'all',
+      maxSize: 200000, // 单个 chunk 最大 200KB
+      minSize: 10000   // 最小 10KB
+    }
+    return config
+  }
   productionBrowserSourceMaps: false,
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production', // 修正为 process.env.NODE_ENV
