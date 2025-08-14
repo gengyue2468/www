@@ -37,9 +37,6 @@ const nextConfig = {
     ];
   },
 
-  experimental: {
-    turbo: false,
-  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // 优化客户端构建的代码分割
