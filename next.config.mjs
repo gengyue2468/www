@@ -1,52 +1,69 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 1. 将webpack配置移到其他配置下方避免干扰
-  // 2. 确保productionBrowserSourceMaps是顶级属性
   productionBrowserSourceMaps: false,
-  
+  compress: true,
+
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: process.env.NODE_ENV === "production",
   },
-  
+
   reactStrictMode: true,
-  
+
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: '**',
+        protocol: "http",
+        hostname: "**",
       },
       {
-        protocol: 'https',
-        hostname: '**',
+        protocol: "https",
+        hostname: "**",
       },
     ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  
+
   async rewrites() {
     return [
       {
-        source: '/fonts/:path*',
-        destination: `${process.env.NEXT_PUBLIC_CDN_URL}/fonts/:path*`
+        source: "/fonts/:path*",
+        destination: `${process.env.NEXT_PUBLIC_CDN_URL}/fonts/:path*`,
       },
       {
-        source: '/static/:path*', 
-        destination: `${process.env.NEXT_PUBLIC_CDN_URL}/static/:path*`
+        source: "/static/:path*",
+        destination: `${process.env.NEXT_PUBLIC_CDN_URL}/static/:path*`,
       },
     ];
   },
-  
-  // 3. 将webpack配置放在最后并修复缺少的逗号
-  webpack: (config) => {
-    config.optimization.splitChunks = {
-      chunks: 'all',
-      maxSize: 200000, // 单个 chunk 最大 200KB
-      minSize: 10000   // 最小 10KB
+
+  experimental: {
+    turbo: false,
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // 优化客户端构建的代码分割
+      config.optimization.splitChunks = {
+        chunks: "all",
+        maxInitialRequests: 25,
+        minSize: 20000, // 20KB
+        maxSize: 200000, // 200KB (关键：限制单个 chunk 的最大尺寸)
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name(module) {
+              const packageName = module.context.match(
+                /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+              )[1];
+              return `vendor_${packageName.replace("@", "")}`;
+            },
+            priority: 10,
+          },
+        },
+      };
     }
-    return config
-  }
+    return config;
+  },
 };
 
 export default nextConfig;
