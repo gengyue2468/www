@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  productionBrowserSourceMaps: false,
+  compiler: {
+   removeConsole: process.environment.NODE_ENVIRONMENT === 'production'
+   }
   reactStrictMode: true,
   images: {
     remotePatterns: [
