@@ -206,7 +206,7 @@ const Video = ({ src, alt }) => {
 
  
       <div
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-500 ${
           showControls ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -226,8 +226,6 @@ const Video = ({ src, alt }) => {
             <span>{formatTime(duration)}</span>
           </div>
         </div>
-
-        {/* 控制按钮组 */}
         <div
           className="flex items-center justify-between"
           onClick={(e) => e.stopPropagation()}

@@ -59,6 +59,8 @@ export default function About({ mdxSource, readingTime }) {
         <MdxContent mdxSource={mdxSource} />
       </Wrapper>
 
+      <Video src="/sample-5s.mp4" />
+
     </Layout>
   );
 }

@@ -1,5 +1,7 @@
 import { getPageMetadata, getPageContentAsMarkdown } from '@/lib/notion/fetcher';
 
+export const runtime = 'edge';
+
 export default async function handler(req, res) {
   const { id } = req.query;
 

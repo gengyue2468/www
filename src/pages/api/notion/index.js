@@ -1,5 +1,7 @@
 import { getDatabasePages, getPageContentAsMarkdown } from '@/lib/notion/fetcher';
 
+export const runtime = 'edge';
+
 export default async function handler(req, res) {
   try {
     const databaseId = process.env.NOTION_DATABASE_ID;
