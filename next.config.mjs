@@ -2,8 +2,8 @@
 const nextConfig = {
   productionBrowserSourceMaps: false,
   compiler: {
-   removeConsole: process.environment.NODE_ENVIRONMENT === 'production'
-   }
+    removeConsole: process.env.NODE_ENV === 'production', // 修正为 process.env.NODE_ENV
+  }, // 这里之前缺少逗号，导致后面的reactStrictMode成为compiler的属性
   reactStrictMode: true,
   images: {
     remotePatterns: [
@@ -34,5 +34,3 @@ const nextConfig = {
 };
 
 export default nextConfig;
-    
-
