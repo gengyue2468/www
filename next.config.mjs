@@ -1,5 +1,44 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // 1. 将webpack配置移到其他配置下方避免干扰
+  // 2. 确保productionBrowserSourceMaps是顶级属性
+  productionBrowserSourceMaps: false,
+  
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  reactStrictMode: true,
+  
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+  
+  async rewrites() {
+    return [
+      {
+        source: '/fonts/:path*',
+        destination: `${process.env.NEXT_PUBLIC_CDN_URL}/fonts/:path*`
+      },
+      {
+        source: '/static/:path*', 
+        destination: `${process.env.NEXT_PUBLIC_CDN_URL}/static/:path*`
+      },
+    ];
+  },
+  
+  // 3. 将webpack配置放在最后并修复缺少的逗号
   webpack: (config) => {
     config.optimization.splitChunks = {
       chunks: 'all',
@@ -7,37 +46,6 @@ const nextConfig = {
       minSize: 10000   // 最小 10KB
     }
     return config
-  }
-  productionBrowserSourceMaps: false,
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production', // 修正为 process.env.NODE_ENV
-  }, // 这里之前缺少逗号，导致后面的reactStrictMode成为compiler的属性
-  reactStrictMode: true,
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'http',
-        hostname: '**', // 匹配所有HTTP域名
-      },
-      {
-        protocol: 'https',
-        hostname: '**', // 匹配所有HTTPS域名
-      },
-    ],
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/fonts/:path*',
-        destination: `${process.env.NEXT_PUBLIC_CDN_URL}/fonts/:path*` // 代理到CDN对应路径
-      },
-      {
-        source: '/static/:path*', 
-        destination: `${process.env.NEXT_PUBLIC_CDN_URL}/static/:path*` // 代理到CDN对应路径
-      },
-    ];
   }
 };
 
