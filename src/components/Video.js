@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import NextVideo from "next-video";
-import ReactPlayer from "react-player";
 import { Slider } from "@radix-ui/react-slider";
 import { cn } from "@/lib/utils";
 import {
@@ -44,22 +42,17 @@ const Video = ({ src, alt }) => {
       .padStart(2, "0")}`;
   };
 
-  // 处理播放进度更新
-  const handleProgress = (state) => {
-    if (!isDragging) {
-      setProgress(state.played * 100);
-      setPlayedSeconds(state.playedSeconds);
-    }
-  };
-
-  // 处理视频时长更新
-  const handleDurationChange = (duration) => {
-    setDuration(duration);
-  };
-
   // 切换播放/暂停状态
   const togglePlay = () => {
-    setPlaying((prev) => !prev);
+    if (playerRef.current) {
+      if (playing) {
+        playerRef.current.pause();
+      } else {
+        playerRef.current.play().catch((err) => {
+          console.error("播放失败:", err);
+        });
+      }
+    }
     showControlsTemporarily();
   };
 
@@ -83,7 +76,9 @@ const Video = ({ src, alt }) => {
   const handleVolumeChange = (value) => {
     const newVolume = value[0];
     setVolume(newVolume);
-    // 如果从静音状态调整音量，自动取消静音
+    if (playerRef.current) {
+      playerRef.current.volume = newVolume / 100;
+    }
     if (newVolume > 0 && muted) {
       setMuted(false);
     }
@@ -98,39 +93,24 @@ const Video = ({ src, alt }) => {
   const handleVolumeMouseLeave = () => {
     volumeTimeout.current = setTimeout(() => {
       setShowVolumeSlider(false);
-    }, 300); // 延迟隐藏，给用户时间移动鼠标
+    }, 300);
   };
 
   // 移动端触摸事件
   const handleVolumeTouchStart = (e) => {
     e.stopPropagation();
-    // 如果已经显示，则隐藏；否则显示
     setShowVolumeSlider((prev) => !prev);
-  };
-
-  const handleVolumeTouchEnd = (e) => {
-    e.stopPropagation();
-    // 移动端点击后3秒自动隐藏
-    if (showVolumeSlider) {
-      volumeTimeout.current = setTimeout(() => {
-        setShowVolumeSlider(false);
-      }, 3000);
-    }
   };
 
   // 快进10秒
   const skipForward = (e) => {
     e?.stopPropagation();
-    if (duration === 0) return;
-
-    const newTime = Math.min(playedSeconds + 10, duration);
-    setPlayedSeconds(newTime);
-    setProgress((newTime / duration) * 100);
-
-    if (playerRef.current) {
-      setIsBuffering(true);
+    if (playerRef.current && duration > 0) {
+      const newTime = Math.min(playerRef.current.currentTime + 10, duration);
       playerRef.current.currentTime = newTime;
-
+      setPlayedSeconds(newTime);
+      setProgress((newTime / duration) * 100);
+      setIsBuffering(true);
       clearTimeout(bufferTimeout.current);
       bufferTimeout.current = setTimeout(() => setIsBuffering(false), 1000);
     }
@@ -139,16 +119,12 @@ const Video = ({ src, alt }) => {
   // 后退10秒
   const skipBack = (e) => {
     e?.stopPropagation();
-    if (duration === 0) return;
-
-    const newTime = Math.max(playedSeconds - 10, 0);
-    setPlayedSeconds(newTime);
-    setProgress((newTime / duration) * 100);
-
-    if (playerRef.current) {
-      setIsBuffering(true);
+    if (playerRef.current && duration > 0) {
+      const newTime = Math.max(playerRef.current.currentTime - 10, 0);
       playerRef.current.currentTime = newTime;
-
+      setPlayedSeconds(newTime);
+      setProgress((newTime / duration) * 100);
+      setIsBuffering(true);
       clearTimeout(bufferTimeout.current);
       bufferTimeout.current = setTimeout(() => setIsBuffering(false), 1000);
     }
@@ -173,12 +149,18 @@ const Video = ({ src, alt }) => {
   const toggleMute = (e) => {
     e?.stopPropagation();
     setMuted(!muted);
+    if (playerRef.current) {
+      playerRef.current.muted = !muted;
+    }
   };
 
   // 增加音量
   const increaseVolume = () => {
     setVolume((prev) => {
       const newVolume = Math.min(prev + 10, 100);
+      if (playerRef.current) {
+        playerRef.current.volume = newVolume / 100;
+      }
       if (muted && newVolume > 0) setMuted(false);
       return newVolume;
     });
@@ -188,6 +170,9 @@ const Video = ({ src, alt }) => {
   const decreaseVolume = () => {
     setVolume((prev) => {
       const newVolume = Math.max(prev - 10, 0);
+      if (playerRef.current) {
+        playerRef.current.volume = newVolume / 100;
+      }
       if (newVolume === 0) setMuted(true);
       return newVolume;
     });
@@ -227,6 +212,7 @@ const Video = ({ src, alt }) => {
     };
   }, []);
 
+  // 清理定时器
   useEffect(() => {
     return () => {
       clearTimeout(controlsTimeout.current);
@@ -247,39 +233,32 @@ const Video = ({ src, alt }) => {
 
       switch (e.key) {
         case " ":
-          // 空格键 - 播放/暂停
           e.preventDefault();
           togglePlay();
           break;
         case "ArrowRight":
-          // 右箭头 - 快进10秒
           e.preventDefault();
           skipForward();
           break;
         case "ArrowLeft":
-          // 左箭头 - 后退10秒
           e.preventDefault();
           skipBack();
           break;
         case "ArrowUp":
-          // 上箭头 - 增加音量
           e.preventDefault();
           increaseVolume();
           break;
         case "ArrowDown":
-          // 下箭头 - 减少音量
           e.preventDefault();
           decreaseVolume();
           break;
         case "m":
         case "M":
-          // M键 - 静音/取消静音
           e.preventDefault();
           toggleMute();
           break;
         case "f":
         case "F":
-          // F键 - 全屏切换
           e.preventDefault();
           toggleFullScreen();
           break;
@@ -293,20 +272,13 @@ const Video = ({ src, alt }) => {
         case "7":
         case "8":
         case "9":
-          // 数字键0-9 - 跳转到视频的百分比位置
-          e.preventDefault();
-          if (duration > 0) {
+          if (playerRef.current && duration > 0) {
+            e.preventDefault();
             const percentage = parseInt(e.key) / 10;
             const seekTime = duration * percentage;
-            setIsBuffering(true);
             playerRef.current.currentTime = seekTime;
             setPlayedSeconds(seekTime);
             setProgress(percentage * 100);
-            clearTimeout(bufferTimeout.current);
-            bufferTimeout.current = setTimeout(
-              () => setIsBuffering(false),
-              1000
-            );
           }
           break;
         default:
@@ -320,14 +292,6 @@ const Video = ({ src, alt }) => {
     };
   }, [playing, duration, muted, volume]);
 
-  // 清理定时器
-  useEffect(() => {
-    return () => {
-      clearTimeout(controlsTimeout.current);
-      clearTimeout(bufferTimeout.current);
-    };
-  }, []);
-
   // 监听全屏状态变化
   useEffect(() => {
     const handleFullScreenChange = () => {
@@ -340,6 +304,14 @@ const Video = ({ src, alt }) => {
     };
   }, []);
 
+  // 初始化视频设置
+  useEffect(() => {
+    if (playerRef.current) {
+      playerRef.current.volume = volume / 100;
+      playerRef.current.muted = muted;
+    }
+  }, [volume, muted]);
+
   const buttonStyle =
     "text-white transition-all duration-300 opacity-80 hover:opacity-100 focus:outline-none";
 
@@ -348,30 +320,23 @@ const Video = ({ src, alt }) => {
       ref={containerRef}
       className={cn(
         "relative bg-black p-0! rounded-none sm:rounded-xl overflow-hidden cursor-pointer transition-all duration-300",
-             isFullScreen
-            ? "h-screen"
-            : "max-w-screen -translate-x-8 sm:-translate-x-48  w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]!"
+        isFullScreen
+          ? "h-screen"
+          : "max-w-screen -translate-x-8 sm:-translate-x-48 w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]!"
       )}
       onMouseMove={handleMouseMove}
       onClick={togglePlay}
-      tabIndex={0} // 使元素可聚焦以接收键盘事件
+      tabIndex={0}
     >
-      <NextVideo
+      <video
         ref={playerRef}
         src={src}
         className={cn(
-          "object-cover",
-          isFullScreen
-            ? "fixed inset-0 sm:top-auto top-1/4 z-40 w-full h-full m-0 p-0 translate-x-0"
-            : "-translate-x-8 sm:-translate-x-48  w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]! scale-75 sm:scale-[70%]"
+          "w-full h-full object-contain object-center aspect-auto",
+          isFullScreen ? "fixed inset-0 z-40 w-full h-full" : ""
         )}
-        theme={null}
         autoPlay={false}
         playsInline
-        as={ReactPlayer}
-        playing={playing}
-        muted={muted}
-        volume={volume / 100}
         onTimeUpdate={(e) => {
           const video = e.target;
           if (!isDragging) {
@@ -379,14 +344,14 @@ const Video = ({ src, alt }) => {
             setProgress((video.currentTime / duration) * 100);
           }
         }}
-        controls={false}
-        onDurationChange={(e) => handleDurationChange(e.target.duration)}
+        onDurationChange={(e) => setDuration(e.target.duration)}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
-        onBuffer={() => setIsBuffering(true)}
-        onBufferEnd={() => setIsBuffering(false)}
         onWaiting={() => setIsBuffering(true)}
+        onCanPlay={() => setIsBuffering(false)}
         onPlaying={() => setIsBuffering(false)}
+        onSeeking={() => setIsBuffering(true)}
+        onSeeked={() => setIsBuffering(false)}
       />
 
       {/* 播放/缓冲按钮覆盖层 */}
@@ -500,7 +465,6 @@ const Video = ({ src, alt }) => {
                 onMouseEnter={handleVolumeMouseEnter}
                 onMouseLeave={handleVolumeMouseLeave}
                 onTouchStart={handleVolumeTouchStart}
-                onTouchEnd={handleVolumeTouchEnd}
               >
                 <div className="relative h-32 w-8 flex items-center justify-center">
                   <div className="absolute h-full w-1.5 bg-neutral-600/50 rounded-full">
@@ -512,7 +476,7 @@ const Video = ({ src, alt }) => {
                     />
                   </div>
 
-                  {/* 实际滑块控件（透明但覆盖整个区域） */}
+                  {/* 实际滑块控件 */}
                   <Slider
                     value={[muted ? 0 : volume]}
                     min={0}
@@ -520,7 +484,6 @@ const Video = ({ src, alt }) => {
                     step={1}
                     orientation="vertical"
                     onValueChange={handleVolumeChange}
-                    onDrag={handleVolumeChange}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
 

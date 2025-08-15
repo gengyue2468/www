@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 
 export default function Image({ alt, src, ...props }) {
   const [aspectRatio, setAspectRatio] = useState(16 / 9);

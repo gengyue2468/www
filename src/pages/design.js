@@ -45,11 +45,18 @@ Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidu
 
 ![等待是长跑，不是短跑 —— 威尔・史密斯。](https://uapis.cn/api/bing.php)
 
+# 视频
+
+<Video src="/sample-5s.mp4" alt="测试视频 5s" />
+
 # 代码
 
 \`\`\`js
-console.log('Hello World')
-console.error('An Error Occurred')
+export default function Home{
+   return(
+   <div> Hello </div>
+   )
+}
 \`\`\`
 
 > 测试持续中...
