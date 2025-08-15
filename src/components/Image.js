@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 export default function Image({ alt, src, ...props }) {
   const [aspectRatio, setAspectRatio] = useState(16 / 9);
@@ -18,7 +19,7 @@ export default function Image({ alt, src, ...props }) {
     }
 
     let intervalId = null;
-    
+
     // 尺寸检查函数
     const checkDimensions = () => {
       if (img.naturalWidth > 0 && img.naturalHeight > 0) {
@@ -45,7 +46,7 @@ export default function Image({ alt, src, ...props }) {
         observerRef.current.disconnect();
       }
     });
-    
+
     observerRef.current.observe(img);
 
     // 设置轮询检查作为后备方案
@@ -53,38 +54,44 @@ export default function Image({ alt, src, ...props }) {
 
     // 添加加载事件监听器
     const handleLoad = () => checkDimensions();
-    img.addEventListener('load', handleLoad);
+    img.addEventListener("load", handleLoad);
 
     return () => {
       clearInterval(intervalId);
       observerRef.current?.disconnect();
-      img.removeEventListener('load', handleLoad);
+      img.removeEventListener("load", handleLoad);
     };
   }, [src]);
 
   return (
     <div className="my-12 not-prose">
-      <div 
+      <div
         className={`
           relative bg-neutral-100 dark:bg-neutral-900 rounded-none min-h-48 sm:min-h-[24rem]
-          ${isPortrait 
-            ? "sm:rounded-3xl w-[calc(100%+4rem)]! -translate-x-8" 
-            : "sm:rounded-3xl w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]! -translate-x-8 sm:-translate-x-48"
+          ${
+            isPortrait
+              ? "sm:rounded-3xl w-[calc(100%+4rem)]! -translate-x-8"
+              : "sm:rounded-3xl w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]! -translate-x-8 sm:-translate-x-48"
           }
           overflow-hidden
           transition-all duration-500
         `}
       >
         <div className="relative">
-          <img
+          <LazyLoadImage
+            effect="blur"
             ref={imgRef}
             alt={alt || "图片内容"}
             src={src}
             className={`
               w-full h-full object-cover 
-              ${isPortrait ? "rounded-none sm:rounded-3xl" : "rounded-none sm:rounded-3xl"}
+              ${
+                isPortrait
+                  ? "rounded-none sm:rounded-3xl"
+                  : "rounded-none sm:rounded-3xl"
+              }
               transition-opacity duration-500
-              ${isLoaded ? 'opacity-100' : 'opacity-0'}
+              ${isLoaded ? "opacity-100" : "opacity-0"}
             `}
             {...props}
           />

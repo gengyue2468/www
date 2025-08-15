@@ -719,6 +719,167 @@ const NotionIcon = ({ ...props }) => {
   );
 };
 
+const PlayIcon = ({ ...props }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" {...props} viewBox="0 0 24 24">
+      <path
+        fill="currentColor"
+        d="M21.409 9.353a2.998 2.998 0 0 1 0 5.294L8.597 21.614C6.534 22.737 4 21.277 4 18.968V5.033c0-2.31 2.534-3.769 4.597-2.648z"
+      ></path>
+    </svg>
+  );
+};
+
+const PauseIcon = ({ ...props }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" {...props} viewBox="0 0 24 24">
+      <path
+        fill="currentColor"
+        d="M2 6c0-1.886 0-2.828.586-3.414S4.114 2 6 2s2.828 0 3.414.586S10 4.114 10 6v12c0 1.886 0 2.828-.586 3.414S7.886 22 6 22s-2.828 0-3.414-.586S2 19.886 2 18zm12 0c0-1.886 0-2.828.586-3.414S16.114 2 18 2s2.828 0 3.414.586S22 4.114 22 6v12c0 1.886 0 2.828-.586 3.414S19.886 22 18 22s-2.828 0-3.414-.586S14 19.886 14 18z"
+      ></path>
+    </svg>
+  );
+};
+
+const RewindIcon = ({ ...props }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" {...props} viewBox="0 0 24 24">
+      <g fill="currentColor" fillRule="evenodd" clipRule="evenodd">
+        <path d="M10.325 7.824a.75.75 0 0 1 .425.676v7a.75.75 0 0 1-1.5 0v-5.44l-1.281 1.026a.75.75 0 0 1-.937-1.172l2.5-2a.75.75 0 0 1 .793-.09M14.25 9.25a1 1 0 0 0-1 1v3.5a1 1 0 1 0 2 0v-3.5a1 1 0 0 0-1-1m-2.5 1a2.5 2.5 0 0 1 5 0v3.5a2.5 2.5 0 0 1-5 0z"></path>
+        <path d="M11.324 1.675A.75.75 0 0 1 12 1.25q1.104.002 2.15.215c4.906.996 8.6 5.333 8.6 10.535c0 5.937-4.813 10.75-10.75 10.75S1.25 17.937 1.25 12c0-4.41 2.655-8.197 6.45-9.855a.75.75 0 1 1 .6 1.374A9.25 9.25 0 1 0 21.25 12a9.255 9.255 0 0 0-6.5-8.834V4.5a.75.75 0 0 1-1.336.469l-2-2.5a.75.75 0 0 1-.09-.794"></path>
+      </g>
+    </svg>
+  );
+};
+
+const ForwardIcon = ({ ...props }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" {...props} viewBox="0 0 24 24">
+      <g fill="currentColor" fillRule="evenodd" clipRule="evenodd">
+        <path d="M10.325 7.824a.75.75 0 0 1 .425.676v7a.75.75 0 0 1-1.5 0v-5.44l-1.281 1.026a.75.75 0 0 1-.937-1.172l2.5-2a.75.75 0 0 1 .793-.09M14.25 9.25a1 1 0 0 0-1 1v3.5a1 1 0 1 0 2 0v-3.5a1 1 0 0 0-1-1m-2.5 1a2.5 2.5 0 0 1 5 0v3.5a2.5 2.5 0 0 1-5 0z"></path>
+        <path d="M12.676 1.675A.75.75 0 0 0 12 1.25q-1.104.002-2.15.215C4.945 2.461 1.25 6.798 1.25 12c0 5.937 4.813 10.75 10.75 10.75S22.75 17.937 22.75 12c0-4.41-2.655-8.197-6.45-9.855a.75.75 0 0 0-.6 1.374A9.25 9.25 0 1 1 2.75 12a9.255 9.255 0 0 1 6.5-8.834V4.5a.75.75 0 0 0 1.336.469l2-2.5a.75.75 0 0 0 .09-.794"></path>
+      </g>
+    </svg>
+  );
+};
+
+const FullscreenIcon = ({ ...props }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" {...props} viewBox="0 0 512 512">
+      <path
+        fill="currentColor"
+        d="M208 48V16H16v192h32V70.627l160.687 160.686l22.626-22.626L70.627 48zm256 256v137.373L299.313 276.687l-22.626 22.626L441.373 464H304v32h192V304z"
+      ></path>
+    </svg>
+  );
+};
+
+const SoundIcon = ({ ...props }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" {...props} viewBox="0 0 512 512">
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="m403.966 426.944l-33.285-26.63c74.193-81.075 74.193-205.015-.001-286.09l33.285-26.628c86.612 96.712 86.61 242.635.001 339.348M319.58 155.105l-33.324 26.659c39.795 42.568 39.794 108.444.001 151.012l33.324 26.658c52.205-58.22 52.205-146.109-.001-204.329m-85.163-69.772l-110.854 87.23H42.667v170.666h81.02l110.73 85.458z"
+      ></path>
+    </svg>
+  );
+};
+
+const MutedIcon = ({ ...props }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" {...props} viewBox="0 0 512 512">
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="m403.375 257.27l59.584 59.584l-30.167 30.166l-59.583-59.583l-59.584 59.583l-30.166-30.166l59.583-59.584l-59.583-59.583l30.166-30.166l59.584 59.583l59.583-59.583l30.167 30.166zM234.417 85.333l-110.854 87.23H42.667v170.666h81.02l110.73 85.458z"
+      ></path>
+    </svg>
+  );
+};
+
+const SpinnerIcon = ({ ...props }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+      viewBox="0 0 24 24"
+    >
+      <g>
+        <rect
+          width={2}
+          height={5}
+          x={11}
+          y={1}
+          fill="currentColor"
+          opacity={0.14}
+        ></rect>
+        <rect
+          width={2}
+          height={5}
+          x={11}
+          y={1}
+          fill="currentColor"
+          opacity={0.29}
+          transform="rotate(30 12 12)"
+        ></rect>
+        <rect
+          width={2}
+          height={5}
+          x={11}
+          y={1}
+          fill="currentColor"
+          opacity={0.43}
+          transform="rotate(60 12 12)"
+        ></rect>
+        <rect
+          width={2}
+          height={5}
+          x={11}
+          y={1}
+          fill="currentColor"
+          opacity={0.57}
+          transform="rotate(90 12 12)"
+        ></rect>
+        <rect
+          width={2}
+          height={5}
+          x={11}
+          y={1}
+          fill="currentColor"
+          opacity={0.71}
+          transform="rotate(120 12 12)"
+        ></rect>
+        <rect
+          width={2}
+          height={5}
+          x={11}
+          y={1}
+          fill="currentColor"
+          opacity={0.86}
+          transform="rotate(150 12 12)"
+        ></rect>
+        <rect
+          width={2}
+          height={5}
+          x={11}
+          y={1}
+          fill="currentColor"
+          transform="rotate(180 12 12)"
+        ></rect>
+        <animateTransform
+          attributeName="transform"
+          calcMode="discrete"
+          dur="0.75s"
+          repeatCount="indefinite"
+          type="rotate"
+          values="0 12 12;30 12 12;60 12 12;90 12 12;120 12 12;150 12 12;180 12 12;210 12 12;240 12 12;270 12 12;300 12 12;330 12 12;360 12 12"
+        ></animateTransform>
+      </g>
+    </svg>
+  );
+};
+
 export {
   CPUIcon,
   RAMIcon,
@@ -752,5 +913,13 @@ export {
   PDFIcon,
   FolderIcon,
   DownloadIcon,
-  NotionIcon
+  NotionIcon,
+  PlayIcon,
+  PauseIcon,
+  FullscreenIcon,
+  ForwardIcon,
+  RewindIcon,
+  MutedIcon,
+  SoundIcon,
+  SpinnerIcon
 };
