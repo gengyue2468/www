@@ -5,7 +5,6 @@ import { serialize } from "next-mdx-remote/serialize";
 import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import MdxContent from "@/components/MdxContent";
 import Video from "@/components/Video";
-import ReactPlayer from 'react-player'
 
 const aboutMarkdown = `
 # 关于我

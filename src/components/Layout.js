@@ -22,16 +22,10 @@ export default function Layout({ title, children }) {
           <Nav />
         </div>
 
-        <footer className="mt-32 font-medium text-sm sm:text-base flex flex-col space-y-1.5">
+        <footer className="mt-32 font-medium text-xs sm:text-sm opacity-50 flex flex-col space-y-1.5">
           <p className="flex flex-row items-center">
-            上次构建 {moment(deployTime).format("YYYY 年 MM 月 DD 日 HH:mm:ss")}
+            上次构建于 {moment(deployTime).format("YYYY 年 MM 月 DD 日 HH:mm:ss")}
             .
-          </p>
-          <p className="flex flex-row items-center">
-            自豪地由 Next.js 和 TailwindCSS 驱动
-          </p>
-          <p className="flex flex-row items-center">
-            云服务由 Vercel，Netlify 和 Notion 支持
           </p>
           <p className="mt-0.5">
             Copyright © <span className="">{new Date().getFullYear()}</span>{" "}

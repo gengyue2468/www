@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
   reactStrictMode: true,
 
   images: {
@@ -22,10 +23,6 @@ const nextConfig = {
       {
         source: "/fonts/:path*",
         destination: `${process.env.NEXT_PUBLIC_CDN_URL}/fonts/:path*`,
-      },
-      {
-        source: "/static/:path*",
-        destination: `${process.env.NEXT_PUBLIC_CDN_URL}/static/:path*`,
       },
     ];
   },

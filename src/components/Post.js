@@ -1,14 +1,13 @@
 import moment from "moment";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useRef, useEffect, useState } from "react";
 import { SegmentContainer, SegmentItem } from "./SegmentControl";
 
 const groupPostsByDate = (posts) => {
   const grouped = {};
 
   posts.forEach((post) => {
-    const date = post.properties.Date?.date?.start;
+    const date = post.frontmatter.date;
     if (!date) return;
 
     const year = moment(date).year();
@@ -58,19 +57,6 @@ const ListContainer = ({ children }) => {
   return <div className="flex flex-col space-y-0">{children}</div>;
 };
 
-const GroupContainer = ({ children, index, refs, onMouseEnter }) => {
-  return (
-    <div
-      ref={(el) => (refs.current[index] = el)}
-      onMouseEnter={() => onMouseEnter(index)}
-      className="transition-all duration-300 px-6 py-3 -translate-x-6 w-[calc(100%+3rem)]
-                                       group-hover:opacity-50 hover:opacity-100 rounded-xl relative z-10"
-    >
-      {children}
-    </div>
-  );
-};
-
 const FlexContainer = ({ children }) => {
   return <div className="flex items-center ">{children}</div>;
 };
@@ -80,68 +66,11 @@ const Post = ({ posts }) => {
   const groupedPosts = groupPostsByDate(posts);
   const sortedYears = Object.keys(groupedPosts).sort((a, b) => b - a);
 
-  // 用于滑块控制的ref和状态
-  const containerRef = useRef(null);
-  const sliderRef = useRef(null);
-  const itemRefs = useRef([]);
-  const [isHovering, setIsHovering] = useState(false);
-
-  // 初始化滑块位置
-  useEffect(() => {
-    if (itemRefs.current[0] && sliderRef.current) {
-      const firstItem = itemRefs.current[0];
-      const { top, height } = firstItem.getBoundingClientRect();
-      const containerTop = containerRef.current.getBoundingClientRect().top;
-
-      sliderRef.current.style.top = `${top - containerTop}px`;
-      sliderRef.current.style.height = `${height}px`;
-      sliderRef.current.style.opacity = "0";
-    }
-  }, [posts]);
-
-  // 处理鼠标悬停，移动滑块
-  const handleMouseEnter = (index) => {
-    setIsHovering(true);
-    if (!sliderRef.current || !itemRefs.current[index]) return;
-
-    const targetItem = itemRefs.current[index];
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const targetRect = targetItem.getBoundingClientRect();
-
-    const top = targetRect.top - containerRect.top;
-    const height = targetRect.height;
-
-    sliderRef.current.style.top = `${top}px`;
-    sliderRef.current.style.height = `${height}px`;
-    sliderRef.current.style.opacity = "1";
-  };
-
-  // 处理鼠标离开，隐藏滑块
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-    if (sliderRef.current) {
-      sliderRef.current.style.opacity = "0";
-    }
-  };
-
-  // 收集所有需要滑块控制的项目
-  const getAllItems = () => {
-    let items = [];
-    sortedYears.forEach((year) => {
-      const months = groupedPosts[year];
-      const sortedMonths = Object.keys(months).sort((a, b) => b - a);
-
-      sortedMonths.forEach((month) => {
-        items = [...items, ...months[month].posts];
-      });
-    });
-    return items;
-  };
-
-  const allItems = getAllItems();
-
   return (
-    <SegmentContainer className="w-full mt-2 mb-8" sliderClassName="-translate-x-6 w-[calc(100%+3rem)]">
+    <SegmentContainer
+      className="w-full mt-2 mb-8"
+      sliderClassName="-translate-x-6 w-[calc(100%+3rem)]"
+    >
       {sortedYears.map((year) => {
         const months = groupedPosts[year];
         const sortedMonths = Object.keys(months).sort((a, b) => b - a);
@@ -160,27 +89,19 @@ const Post = ({ posts }) => {
 
                 {/* 首个月份的文章列表 */}
                 <ListContainer>
-                  {months[sortedMonths[0]].posts.map((post) => {
-                    const index = allItems.findIndex(
-                      (item) => item.id === post.id
-                    );
+                  {months[sortedMonths[0]].posts.map((post, index) => {
                     return (
                       <SegmentItem
-                        key={post.id}
+                        key={post.slug}
                         index={index}
                         className="transition-all duration-300 px-6 py-3 -translate-x-6! w-[calc(100%+3rem)]! group-hover:opacity-50 hover:opacity-100 rounded-xl relative z-10"
                       >
-                        <Link href={`/thoughts/${post.id}`}>
+                        <Link href={`/thoughts/${post.slug}`}>
                           <FlexContainer>
-                            <PostTitle>
-                              {post.properties.Title.title[0]?.plain_text ||
-                                "未命名"}
-                            </PostTitle>
+                            <PostTitle>{post.frontmatter.title || "未命名"}</PostTitle>
                             <Divider />
                             <DayTitle>
-                              {moment(post.properties.Date?.date?.start).format(
-                                "Do"
-                              )}
+                              {moment(post.frontmatter.date).format("Do")}
                             </DayTitle>
                           </FlexContainer>
                         </Link>
@@ -199,27 +120,21 @@ const Post = ({ posts }) => {
                         {monthName}
                       </MonthTitle>
                       <ListContainer>
-                        {monthPosts.map((post) => {
-                          const index = allItems.findIndex(
-                            (item) => item.id === post.id
-                          );
+                        {monthPosts.map((post, index) => {
                           return (
                             <SegmentItem
-                              key={post.id}
+                              key={post.slug}
                               index={index}
                               className="transition-all duration-300 px-6 py-3 -translate-x-6 w-[calc(100%+3rem)] group-hover:opacity-50 hover:opacity-100 rounded-xl relative z-10"
                             >
-                              <Link href={`/thoughts/${post.id}`}>
+                              <Link href={`/thoughts/${post.slug}`}>
                                 <FlexContainer>
                                   <PostTitle>
-                                    {post.properties.Title.title[0]
-                                      ?.plain_text || "未命名"}
+                                    {post.frontmatter.title || "未命名"}
                                   </PostTitle>
                                   <Divider />
                                   <DayTitle>
-                                    {moment(
-                                      post.properties.Date?.date?.start
-                                    ).format("Do")}
+                                    {moment(post.frontmatter.date).format("Do")}
                                   </DayTitle>
                                 </FlexContainer>
                               </Link>

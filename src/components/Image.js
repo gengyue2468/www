@@ -66,7 +66,7 @@ export default function Image({ alt, src, ...props }) {
     <div className="my-12 not-prose">
       <div 
         className={`
-          relative bg-neutral-100 dark:bg-neutral-900 rounded-none min-h-54 sm:min-h-[28rem]
+          relative bg-neutral-100 dark:bg-neutral-900 rounded-none min-h-48 sm:min-h-[24rem]
           ${isPortrait 
             ? "sm:rounded-3xl w-[calc(100%+4rem)]! -translate-x-8" 
             : "sm:rounded-3xl w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]! -translate-x-8 sm:-translate-x-48"

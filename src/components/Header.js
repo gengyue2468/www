@@ -14,7 +14,7 @@ export default function Header({ title, date, desc, readingTime }) {
   return (
     <div className="">
       <div className="flex justify-between items-center mb-8">
-        <div className="font-medium flex flex-col space-y-2 text-sm sm:text-base">
+        <div className="font-medium flex flex-col space-y-2 text-xs sm:text-sm opacity-50">
           <span>{formattedDate}</span>
           <span>{readingTimeText}</span>
         </div>

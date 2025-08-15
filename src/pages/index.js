@@ -1,41 +1,42 @@
 import Layout from "@/components/Layout";
-import Error from "@/components/Error";
-import Loader from "@/components/Loader";
 import Header from "@/components/Header";
 import Wrapper from "@/components/Wrapper";
 import Footer from "@/components/Footer";
-import { useFetchPosts } from "@/lib/hooks/useFetchPosts";
+import { getLatestPost, getAllPosts } from "@/lib/markdown/getPosts";
 import MdxContent from "@/components/MdxContent";
-import ViewOnNotion from "@/components/ViewOnNotion";
 
-const Home = () => {
-  const { posts, post, mdxSource, loading, error, readingTime } =
-    useFetchPosts();
-
+const Home = ({ latestPost, allPosts}) => {
+  const { frontmatter, mdxSource, readingTime } = latestPost;
+  const { title, date, desc } = frontmatter;
   return (
     <Layout title="狗子吃饺子 - I’m thinking">
-      {loading && !error && <Loader />}
-      {error && !mdxSource && <Error error={error} />}
-      {!loading && mdxSource && (
-        <div className="mt-0">
-          <Header
-            title={post.properties.Title.title[0]?.plain_text}
-            date={post.properties.Date?.date?.start}
-            desc={post.properties.Desc?.rich_text[0]?.plain_text}
-            readingTime={readingTime}
-          />
-
-          <Wrapper>
-            <MdxContent mdxSource={mdxSource} />
-          </Wrapper>
-
-          <ViewOnNotion url={post.public_url} />
-
-          <Footer posts={posts} />
-        </div>
-      )}
+      <div className="mt-0">
+        <Header
+          title={title}
+          date={date}
+          desc={desc}
+          readingTime={readingTime}
+        />
+        <Wrapper>
+          <MdxContent mdxSource={mdxSource} />
+        </Wrapper>
+        <Footer posts={allPosts} />
+      </div>
     </Layout>
   );
 };
 
 export default Home;
+
+export async function getStaticProps() {
+  const latestPost = await getLatestPost();
+  const allPosts = await getAllPosts();
+
+  return {
+    props: {
+      latestPost,
+      allPosts,
+    },
+    revalidate: 60 * 60,
+  };
+}
