@@ -31,13 +31,13 @@ export default PostPage;
 
 export async function getStaticPaths() {
   const posts = await getAllPosts();
-  const paths = posts.map(post => ({
-    params: { slug: post.slug }
+  const paths = posts.map((post) => ({
+    params: { slug: post.slug },
   }));
 
   return {
     paths,
-    fallback: true
+    fallback: false,
   };
 }
 export async function getStaticProps({ params }) {
@@ -47,15 +47,13 @@ export async function getStaticProps({ params }) {
   if (!post) {
     return {
       notFound: true,
-      revalidate: 60 * 60
     };
   }
 
   return {
     props: {
       post,
-      allPosts
+      allPosts,
     },
-    revalidate: 60 * 60 
   };
 }
