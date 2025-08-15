@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import "@fontsource-variable/jetbrains-mono";
-import "react-lazy-load-image-component/src/effects/opacity.css";
+import "react-lazy-load-image-component/src/effects/blur.css";
 import { useState, useEffect } from "react";
 import "moment/locale/zh-cn";
 import moment from "moment";

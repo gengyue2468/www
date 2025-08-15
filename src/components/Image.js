@@ -78,8 +78,7 @@ export default function Image({ alt, src, ...props }) {
         `}
       >
         <div className="relative">
-          <LazyLoadImage
-            effect="blur"
+          <img
             ref={imgRef}
             alt={alt || "图片内容"}
             src={src}

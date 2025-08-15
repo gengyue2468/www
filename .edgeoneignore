@@ -1,5 +1,0 @@
-.cache/
-.next/cache/
-node_modules/
-*.log
-*.tmp
