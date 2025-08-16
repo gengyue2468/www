@@ -201,7 +201,7 @@ const Cmdk = () => {
                     >
                       <SegmentItem
                         onClick={() => navigateToItem(item)}
-                        className={`flex justify-between w-full px-4 py-3 rounded-xl text-sm sm:text-base items-center gap-3 transition-all duration-300 cursor-pointer group-data-[state=selected]:${styles.selectedBg}`}
+                        className={`flex justify-between w-full px-4 py-3 rounded-xl text-sm sm:text-base items-center gap-3 transition-all duration-300 cursor-pointer`}
                       >
                         <div className="flex items-center gap-2.5">
                           <div className="size-6 p-0.5 opacity-50 transition-opacity duration-300 group-hover:opacity-75">
