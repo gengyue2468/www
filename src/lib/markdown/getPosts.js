@@ -4,7 +4,7 @@ import matter from "gray-matter";
 import { serialize } from "next-mdx-remote/serialize";
 import { calculateReadingTime } from "@/components/CalculateReadingTime";
 
-const postsDirectory = path.join(process.cwd(), "data", "thoughts");
+const postsDirectory = path.join(process.cwd(), "data", "whims");
 
 /**
  * 获取所有文章的元数据（不包含内容）

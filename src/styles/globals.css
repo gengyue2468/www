@@ -4,6 +4,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+  @apply scroll-smooth;
+}
+
 body {
   font-family: "Inter", "Noto Sans SC", sans-serif;
   @apply selection:bg-neutral-200 dark:selection:bg-neutral-800 bg-white dark:bg-black antialiased scroll-smooth;
@@ -21,6 +25,7 @@ p {
   font-family: "Jetbrains Mono Variable", monospace !important;
 }
 
-.prose pre,code{
+.prose pre,
+code {
   font-family: "Jetbrains Mono Variable", monospace !important;
 }

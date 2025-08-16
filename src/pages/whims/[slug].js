@@ -5,7 +5,7 @@ import Wrapper from "@/components/Wrapper";
 import MdxContent from "@/components/MdxContent";
 import { getPostBySlug, getAllPosts } from "@/lib/markdown/getPosts";
 
-const PostPage = ({ post, allPosts }) => {
+const WhimPage = ({ post, allPosts }) => {
   const { frontmatter, mdxSource, readingTime } = post;
   const { title, date, desc } = frontmatter;
 
@@ -27,7 +27,7 @@ const PostPage = ({ post, allPosts }) => {
   );
 };
 
-export default PostPage;
+export default WhimPage;
 
 export async function getStaticPaths() {
   const posts = await getAllPosts();

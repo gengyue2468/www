@@ -4,7 +4,7 @@ import { site } from "@/lib/site.config";
 class MyDocument extends Document {
   render() {
     return (
-      <Html lang="zh">
+      <Html lang="zh" className="scroll-smooth">
         <Head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

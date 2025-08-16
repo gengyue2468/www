@@ -63,44 +63,44 @@ export default function Image({ alt, src, ...props }) {
   }, [src]);
 
   return (
-    <div className="my-12 not-prose">
-      <div
+    <span className="block my-12 not-prose">
+      <span
         className={`
-          relative bg-neutral-100 dark:bg-neutral-900 rounded-none min-h-48 sm:min-h-[24rem]
-          ${
-            isPortrait
-              ? "sm:rounded-3xl w-[calc(100%+4rem)]! -translate-x-8"
-              : "sm:rounded-3xl w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]! -translate-x-8 sm:-translate-x-48"
-          }
-          overflow-hidden
-          transition-all duration-500
-        `}
+      block relative bg-neutral-100 dark:bg-neutral-900 rounded-none min-h-48 sm:min-h-[24rem]
+      ${
+        isPortrait
+          ? "sm:rounded-3xl w-[calc(100%+4rem)]! -translate-x-8"
+          : "sm:rounded-3xl w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]! -translate-x-8 sm:-translate-x-48"
+      }
+      overflow-hidden
+      transition-all duration-500
+    `}
       >
-        <div className="relative">
+        <span className="block relative">
           <img
             ref={imgRef}
             alt={alt || "图片内容"}
             src={src}
             className={`
-              w-full h-full object-cover 
-              ${
-                isPortrait
-                  ? "rounded-none sm:rounded-3xl"
-                  : "rounded-none sm:rounded-3xl"
-              }
-              transition-opacity duration-500
-              ${isLoaded ? "opacity-100" : "opacity-0"}
-            `}
+          w-full h-full object-cover 
+          ${
+            isPortrait
+              ? "rounded-none sm:rounded-3xl"
+              : "rounded-none sm:rounded-3xl"
+          }
+          transition-opacity duration-500
+          ${isLoaded ? "opacity-100" : "opacity-0"}
+        `}
             {...props}
           />
-        </div>
-      </div>
+        </span>
+      </span>
 
       {alt && (
-        <div className="mt-4 opacity-50 font-medium text-sm transition-all duration-500">
+        <span className="block mt-4 opacity-50 font-medium text-sm transition-all duration-500">
           {alt}
-        </div>
+        </span>
       )}
-    </div>
+    </span>
   );
 }

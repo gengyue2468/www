@@ -18,14 +18,6 @@ export default function Header({ title, date, desc, readingTime }) {
           <span>{formattedDate}</span>
           <span>{readingTimeText}</span>
         </div>
-        <button
-          className="opacity-75 hover:opacity-100 transition-all duration-300 cursor-pointer"
-          onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
-        >
-          {theme === "system" && <PCIcon className="size-5" />}
-          {theme === "light" && <SunIcon className="size-5" />}
-          {theme === "dark" && <MoonIcon className="size-5" />}
-        </button>
       </div>
 
       <h1 className="leading-relaxed text-balance mb-2 font-semibold text-2xl sm:text-3xl">

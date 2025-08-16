@@ -2,7 +2,7 @@ import Layout from "@/components/Layout";
 import Footer from "@/components/Footer";
 import { getAllPosts } from "@/lib/markdown/getPosts";
 
-const Thoughts = ({ allPosts }) => {
+const Whims = ({ allPosts }) => {
   return (
     <Layout title="所有随想">
       <div className="mt-0">
@@ -12,7 +12,7 @@ const Thoughts = ({ allPosts }) => {
   );
 };
 
-export default Thoughts;
+export default Whims;
 
 export async function getStaticProps() {
   const allPosts = await getAllPosts();
