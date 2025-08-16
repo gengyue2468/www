@@ -1,5 +1,10 @@
 export default {
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
-}
+  theme: {
+    extend: {
+      fontFamily: {
+        mono: ["Jetbrains Mono Variable", "monospace"],
+      },
+    },
+  },
+  plugins: [require("@tailwindcss/typography")],
+};

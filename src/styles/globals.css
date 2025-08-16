@@ -4,6 +4,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  --font-mono: 'JetBrains Mono Variable', monospace !important;
+}
+
 html {
   @apply scroll-smooth;
 }
@@ -22,6 +26,10 @@ p {
 }
 
 .mono {
+  font-family: "Jetbrains Mono Variable", monospace !important;
+}
+
+.font-mono{
   font-family: "Jetbrains Mono Variable", monospace !important;
 }
 
