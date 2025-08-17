@@ -1,7 +1,7 @@
 import Layout from "@/components/Layout";
 import Header from "@/components/Header";
 import Wrapper from "@/components/Wrapper";
-import Footer from "@/components/Footer";
+import AllPosts from "@/components/AllPosts";
 import { getLatestPost, getAllPosts } from "@/lib/markdown/getPosts";
 import MdxContent from "@/components/MdxContent";
 
@@ -20,7 +20,8 @@ const Home = ({ latestPost, allPosts}) => {
         <Wrapper>
           <MdxContent mdxSource={mdxSource} />
         </Wrapper>
-        <Footer posts={allPosts} />
+        
+        <AllPosts posts={allPosts} />
       </div>
     </Layout>
   );

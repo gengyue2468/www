@@ -4,7 +4,6 @@ import Wrapper from "@/components/Wrapper";
 import { serialize } from "next-mdx-remote/serialize";
 import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import MdxContent from "@/components/MdxContent";
-import Video from "@/components/Video";
 
 const aboutMarkdown = `
 # 关于我
@@ -25,8 +24,7 @@ const aboutMarkdown = `
 
 - Next.js
 - TailwindCSS
-- Notion API
-- MDX
+- next-mdx-remote
 
 受以下网站启发：
 
@@ -42,7 +40,6 @@ const aboutMarkdown = `
 可以通过以下方式联系我：
 
 - 邮箱：[gengyue2468@outlook.com](mailto:gengyue2468@outlook.com/)
--  GitHub：[@gengyue2468](https://github.com/gengyue2468)
 `;
 
 export default function About({ mdxSource, readingTime }) {

@@ -34,6 +34,7 @@
     "react-dom": "^19.0.0",
     "react-lazy-load-image-component": "^1.6.3",
     "react-player": "^3.3.1",
+    "rehype-highlight": "^7.0.2",
     "rehype-prism-plus": "^2.0.1",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",

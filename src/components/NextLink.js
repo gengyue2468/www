@@ -51,6 +51,7 @@ const NextLink = ({ href, children, ...props }) => {
       <Link
         href={href}
         {...props}
+        scroll={false}
         className={baseStyles}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -79,7 +80,7 @@ const NextLink = ({ href, children, ...props }) => {
     >
       <motion.span
         className={backgroundStyles}
-        initial={initialState} 
+        initial={initialState}
         animate={animateTarget}
         transition={transition}
       />

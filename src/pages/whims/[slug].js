@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout";
-import Footer from "@/components/Footer";
+import AllPosts from "@/components/AllPosts";
 import Header from "@/components/Header";
 import Wrapper from "@/components/Wrapper";
 import MdxContent from "@/components/MdxContent";
@@ -21,7 +21,7 @@ const WhimPage = ({ post, allPosts }) => {
         <Wrapper>
           <MdxContent mdxSource={mdxSource} />
         </Wrapper>
-        <Footer posts={allPosts} />
+        <AllPosts posts={allPosts} />
       </div>
     </Layout>
   );

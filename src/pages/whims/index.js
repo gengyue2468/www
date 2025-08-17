@@ -1,12 +1,12 @@
 import Layout from "@/components/Layout";
-import Footer from "@/components/Footer";
+import AllPosts from "@/components/AllPosts";
 import { getAllPosts } from "@/lib/markdown/getPosts";
 
 const Whims = ({ allPosts }) => {
   return (
     <Layout title="所有随想">
       <div className="mt-0">
-        <Footer posts={allPosts} />
+        <AllPosts posts={allPosts} />
       </div>
     </Layout>
   );
