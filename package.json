@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "postbuild": "next-sitemap",
     "start": "next start",
-    "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "lint": "next lint"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.2.6",
