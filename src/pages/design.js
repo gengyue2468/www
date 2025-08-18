@@ -63,7 +63,7 @@ export default function Home{
 
 `;
 
-desc = "有关这个网站的设计语言与规范";
+const desc = "有关这个网站的设计语言与规范";
 
 export default function Design({ mdxSource, readingTime }) {
   return (
