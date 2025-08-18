@@ -30,14 +30,17 @@ const nowMarkdown = `
 - 荣耀平板 10 配备 Snapdragon 7 Gen 3 处理器 12GB + 12GB 运行内存和 256GB 储存空间
 `;
 
+const desc =
+  "我们为啥要保持一个“现状”页面? / Why we need to keep a “Now” page?";
+
 export default function Now({ mdxSource, readingTime }) {
   return (
-    <Layout title="现状">
+    <Layout title="现状 | 狗子吃饺子" desc={desc}>
       <Header
         title="现状"
         date="2025-08-06"
         readingTime={readingTime}
-        desc="我们为啥要保持一个“现状”页面? / Why we need to keep a “Now” page?"
+        desc={desc}
       />
 
       <Wrapper>

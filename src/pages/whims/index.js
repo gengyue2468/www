@@ -4,7 +4,7 @@ import { getAllPosts } from "@/lib/markdown/getPosts";
 
 const Whims = ({ allPosts }) => {
   return (
-    <Layout title="所有随想">
+    <Layout title="所有随想" desc="这里是狗子吃饺子的所有随想~">
       <div className="mt-0">
         <AllPosts posts={allPosts} />
       </div>

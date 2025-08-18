@@ -319,7 +319,7 @@ const Video = ({ src, alt }) => {
     <div
       ref={containerRef}
       className={cn(
-        "relative bg-black p-0! rounded-none sm:rounded-xl overflow-hidden cursor-pointer transition-all duration-500 min-h-48 sm:min-h-72",
+        "relative bg-black p-0! rounded-none sm:rounded-xl overflow-hidden cursor-pointer transition-all duration-500 min-h-48 sm:min-h-96",
         isFullScreen
           ? "h-screen"
           : "max-w-screen -translate-x-8 sm:-translate-x-48 w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]!"

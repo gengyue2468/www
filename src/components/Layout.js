@@ -1,22 +1,17 @@
-import Head from "next/head";
+import { NextSeo } from "next-seo";
 import Nav from "./Nav";
 import { useRouter } from "next/router";
 import Cmdk from "./Cmdk";
 
-export default function Layout({ title, children }) {
+export default function Layout({ title, desc, children }) {
   const router = useRouter();
   return (
     <div className="">
-      <Head>
-        <title>{title}</title>
-      </Head>
+      <NextSeo title={title} description={desc} />
 
       <div className="max-w-2xl mx-auto py-16 sm:py-32 px-8 z-0 overflow-visible">
         <div className="flex flex-row justify-between items-center">
-          <div
-            onClick={() => router.push("/")}
-            className="cursor-pointer "
-          >
+          <div onClick={() => router.push("/")} className="cursor-pointer ">
             <img
               src="/static/author.webp"
               alt="logo 头像"

@@ -10,7 +10,7 @@ const WhimPage = ({ post, allPosts }) => {
   const { title, date, desc } = frontmatter;
 
   return (
-    <Layout title={title || "载入中..."}>
+    <Layout title={title} desc={desc}>
       <div className="mt-0">
         <Header
           title={title}

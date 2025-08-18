@@ -42,19 +42,21 @@ const aboutMarkdown = `
 - 邮箱：[gengyue2468@outlook.com](mailto:gengyue2468@outlook.com/)
 `;
 
+const desc =
+  "关于“我”和“这个网站”的一切（似乎并不完全是一切，亦是不可能是一切）";
+
 export default function About({ mdxSource, readingTime }) {
   return (
-    <Layout title="关于">
+    <Layout title="关于 | 狗子吃饺子" desc={desc}>
       <Header
         title="关于"
         date="2025-08-06"
         readingTime={readingTime}
-        desc="关于“我”和“这个网站”的一切（似乎并不完全是一切，亦是不可能是一切）"
+        desc={desc}
       />
       <Wrapper>
         <MdxContent mdxSource={mdxSource} />
       </Wrapper>
-
     </Layout>
   );
 }

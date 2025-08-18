@@ -63,14 +63,16 @@ export default function Home{
 
 `;
 
+desc = "有关这个网站的设计语言与规范";
+
 export default function Design({ mdxSource, readingTime }) {
   return (
-    <Layout title="设计">
+    <Layout title="设计 | 狗子吃饺子" desc={desc}>
       <Header
         title="设计"
         date="2025-08-06"
         readingTime={readingTime}
-        desc="有关这个网站的设计语言与规范"
+        desc={desc}
       />
 
       <Wrapper>
