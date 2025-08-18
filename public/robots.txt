@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://ded.huster.fun
+
+# Sitemaps
+Sitemap: https://ded.huster.fun/sitemap.xml
