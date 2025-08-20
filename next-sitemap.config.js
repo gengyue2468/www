@@ -1,5 +1,5 @@
 module.exports = {
-  siteUrl: "https://ded.huster.fun",
+  siteUrl: "https://bg.huster.fun",
   generateRobotsTxt: true,
   sitemapSize: 7000,
   additionalPaths: async (config) => {
