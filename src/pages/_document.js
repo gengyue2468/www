@@ -12,7 +12,8 @@ class MyDocument extends Document {
             href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+SC:wght@100..900&display=swap"
             rel="stylesheet"
           />
-          <meta name="baidu-site-verification" content="codeva-sjff2kkk1s" />
+          <meta name="baidu-site-verification" content="codeva-oEVYBxMiFf" />
+          <meta name="msvalidate.01" content="CDD3780C78E36A5FDE9832782F311A6C" />
         </Head>
         <body>
           <Main />
