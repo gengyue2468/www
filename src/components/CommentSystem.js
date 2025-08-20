@@ -223,9 +223,8 @@ export default function CommentSystem({ slug }) {
         className="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-48 overflow-y-auto pr-1"
       >
         {EMOJI_LIST.map((emoji, index) => (
-          <SegmentItem>
+          <SegmentItem key={index}>
             <button
-              key={index}
               onClick={() => insertEmoji(emoji.code)}
               className="p-2 rounded-full transition-colors flex items-center justify-center"
               title={emoji.code}
@@ -364,17 +363,17 @@ export default function CommentSystem({ slug }) {
                 </div>
               </div>
               <div className="px-0 sm:px-2">
-              <Wrapper>
-                {comment.mdxSource ? (
-                  <div className="break-words overflow-wrap-anywhere">
-                    <MdxContent mdxSource={comment.mdxSource} />
-                  </div>
-                ) : (
-                  <div className="prose dark:prose-invert max-w-none break-words overflow-wrap-anywhere">
-                    {comment.body}
-                  </div>
-                )}
-              </Wrapper>
+                <Wrapper>
+                  {comment.mdxSource ? (
+                    <div className="break-words overflow-wrap-anywhere">
+                      <MdxContent mdxSource={comment.mdxSource} />
+                    </div>
+                  ) : (
+                    <div className="prose dark:prose-invert max-w-none break-words overflow-wrap-anywhere">
+                      {comment.body}
+                    </div>
+                  )}
+                </Wrapper>
               </div>
             </div>
           ))}
