@@ -1,6 +1,8 @@
 import { NowIcon, PaintIcon, UserIcon, WhimIcon } from "@/components/Icon";
 
 const site = {
+  author: "B.G",
+  deployURL: "https://bg.huster.fun",
   NavItems: [
     {
       icon: <WhimIcon />,

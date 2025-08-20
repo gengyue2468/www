@@ -51,7 +51,7 @@ const NextLink = ({ href, children, ...props }) => {
       <Link
         href={href}
         {...props}
-        scroll={false}
+        scroll={true}
         className={baseStyles}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

@@ -4,12 +4,13 @@ import Wrapper from "@/components/Wrapper";
 import AllPosts from "@/components/AllPosts";
 import { getLatestPost, getAllPosts } from "@/lib/markdown/getPosts";
 import MdxContent from "@/components/MdxContent";
+import CommentSystem from "@/components/CommentSystem";
 
 const Home = ({ latestPost, allPosts}) => {
-  const { frontmatter, mdxSource, readingTime } = latestPost;
+  const { frontmatter, mdxSource, readingTime, slug } = latestPost;
   const { title, date, desc } = frontmatter;
   return (
-    <Layout title="狗子吃饺子 - I’m thinking" desc="这里是狗子吃饺子的个人网站~">
+    <Layout title="B.G - I’m thinking" desc="这里是狗子吃饺子的个人网站~">
       <div className="mt-0">
         <Header
           title={title}
@@ -20,7 +21,7 @@ const Home = ({ latestPost, allPosts}) => {
         <Wrapper>
           <MdxContent mdxSource={mdxSource} />
         </Wrapper>
-        
+        <CommentSystem slug={slug} />
         <AllPosts posts={allPosts} />
       </div>
     </Layout>

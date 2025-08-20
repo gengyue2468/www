@@ -2,40 +2,49 @@ import { NextSeo } from "next-seo";
 import Nav from "./Nav";
 import { useRouter } from "next/router";
 import Cmdk from "./Cmdk";
+import { site } from "@/lib/site.config";
+import ThemeAwareCodeHighlight from "./ThemeAwareCodeHighlight";
 
 export default function Layout({ title, desc, children }) {
   const router = useRouter();
   return (
     <div className="">
+    
       <NextSeo
-        title={title}
+        title={router.asPath === "/" ? title : `${title} | ${site.author} 's site`}
         description={desc}
-        canonical={`https://ded.huster.fun/${router.asPath}`} // 规范链接，避免重复内容问题
+        canonical={`${site.deployURL}/${router.asPath}`} // 规范链接，避免重复内容问题
         openGraph={{
           title,
           description: desc,
-          url: `https://ded.huster.fun/${router.asPath}`,
-          siteName: "狗子吃饺子的网站",
+          url: `${site.deployURL}/${router.asPath}`,
+          siteName: `${site.author} 's site`,
           type: "website",
           images: [
             {
               url: "/static/author.webp",
               width: 568,
               height: 568,
-              alt: "狗饺头像",
+              alt: "头像",
             },
           ],
         }}
       />
-
+  <ThemeAwareCodeHighlight />
       <div className="max-w-2xl mx-auto py-16 sm:py-32 px-8 z-0 overflow-visible">
         <div className="flex flex-row justify-between items-center">
-          <div onClick={() => router.push("/")} className="cursor-pointer ">
+          <div
+            onClick={() => router.push("/")}
+            className="cursor-pointer flex flex-row space-x-3 text-xs sm:text-sm items-center font-medium"
+          >
             <img
               src="/static/author.webp"
-              alt="狗饺头像"
+              alt="头像"
               className="object-center rounded-full size-6 sm:size-8 border border-neutral-100 dark:border-neutral-900"
             />
+            <span className="text-neutral-600 dark:text-neutral-400">
+              {site.author}
+            </span>
           </div>
           <div>
             <Cmdk />

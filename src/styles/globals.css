@@ -5,16 +5,16 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-mono: 'JetBrains Mono Variable', monospace !important;
+  --font-mono: "JetBrains Mono Variable", monospace !important;
 }
 
 html {
-  @apply scroll-smooth;
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: "Inter", "Noto Sans SC", sans-serif;
-  @apply selection:bg-neutral-200 dark:selection:bg-neutral-800 bg-white dark:bg-black antialiased scroll-smooth;
+  @apply selection:bg-neutral-200 dark:selection:bg-neutral-800 bg-neutral-50 dark:bg-neutral-950 antialiased scroll-smooth;
 }
 
 p {
@@ -29,11 +29,45 @@ p {
   font-family: "Jetbrains Mono Variable", monospace !important;
 }
 
-.font-mono{
+.font-mono {
   font-family: "Jetbrains Mono Variable", monospace !important;
 }
 
 .prose pre,
 code {
   font-family: "Jetbrains Mono Variable", monospace !important;
+}
+
+li.task-list-item {
+  list-style-type: none;
+}
+
+li.task-list-item input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+/* 脚注样式 */
+.footnotes {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.footnotes-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.footnotes-list {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.footnote-backref {
+  margin-left: 0.25rem;
+}
+
+.hljs {
+  @apply bg-white dark:bg-black!;
 }

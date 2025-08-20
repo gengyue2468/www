@@ -9,7 +9,7 @@ const Nav = () => {
         <SegmentItem className="py-2" key={index}>
           <Link
             href={item.href}
-            scroll={false}
+            scroll={true}
             className="relative z-10 py-2 px-3 rounded-lg transition-all duration-300 ease-out font-medium text-sm sm:text-base
                      group-hover:opacity-50 hover:opacity-100"
           >

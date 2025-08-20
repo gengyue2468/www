@@ -4,9 +4,10 @@ import Header from "@/components/Header";
 import Wrapper from "@/components/Wrapper";
 import MdxContent from "@/components/MdxContent";
 import { getPostBySlug, getAllPosts } from "@/lib/markdown/getPosts";
+import CommentSystem from "@/components/CommentSystem";
 
 const WhimPage = ({ post, allPosts }) => {
-  const { frontmatter, mdxSource, readingTime } = post;
+  const { frontmatter, mdxSource, readingTime, slug } = post;
   const { title, date, desc } = frontmatter;
 
   return (
@@ -21,6 +22,8 @@ const WhimPage = ({ post, allPosts }) => {
         <Wrapper>
           <MdxContent mdxSource={mdxSource} />
         </Wrapper>
+
+        <CommentSystem slug={slug} />
         <AllPosts posts={allPosts} />
       </div>
     </Layout>

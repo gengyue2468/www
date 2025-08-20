@@ -27,17 +27,17 @@ const ANIMATION_CONFIG = {
     initial: { opacity: 0 },
     animate: { opacity: 1 },
     exit: { opacity: 0 },
-    transition: { duration: 0.2, ease: "easeOut" }
+    transition: { duration: 0.2, ease: "easeOut" },
   },
   dialog: {
     initial: { opacity: 0, scale: 0.95, y: 200 },
     animate: { opacity: 1, scale: 1, y: 0 },
     exit: { opacity: 0, scale: 0.95, y: 200 },
-    transition: { 
-      duration: 0.25, 
-      ease: [0.16, 1, 0.3, 1]
-    }
-  }
+    transition: {
+      duration: 0.25,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
 };
 
 const Cmdk = () => {
@@ -54,7 +54,7 @@ const Cmdk = () => {
 
   // 导航函数
   const navigateToItem = (item) => {
-    router.push(item.href, { scroll: false });
+    router.push(item.href, { scroll: true });
     setOpen(false);
   };
 
@@ -85,55 +85,6 @@ const Cmdk = () => {
 
   const hasResults = filteredNavItems.length > 0 || filteredThemes.length > 0;
 
-  // 快捷键处理
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      // Ctrl+K 或 Cmd+K 切换面板
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        togglePanel();
-      }
-
-      // Esc 键关闭面板
-      if (e.key === "Escape" && open) {
-        e.preventDefault();
-        setOpen(false);
-      }
-
-      // 导航快捷键 (1-9)
-      if (open && !e.metaKey && !e.ctrlKey && e.key >= "1" && e.key <= "9") {
-        const index = parseInt(e.key) - 1;
-        if (index < filteredNavItems.length) {
-          e.preventDefault();
-          navigateToItem(filteredNavItems[index]);
-        }
-      }
-
-      // 主题切换快捷键 (Ctrl/Cmd + 1-3)
-      if (open && (e.metaKey || e.ctrlKey) && e.key >= "1" && e.key <= "3") {
-        e.preventDefault();
-        const themes = ["light", "dark", "system"];
-        setTheme(themes[parseInt(e.key) - 1]);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open, filteredNavItems, setTheme]);
-
-  // 点击外部关闭面板
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      const dialog = document.querySelector('[role="dialog"]');
-      if (open && dialog && !dialog.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open]);
-
   // 切换面板状态
   const togglePanel = () => {
     setOpen((prev) => {
@@ -150,15 +101,89 @@ const Cmdk = () => {
     });
   };
 
+  // 快捷键处理
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ctrl+K 或 Cmd+K 切换面板
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        togglePanel();
+        return;
+      }
+
+      // Esc 键关闭面板
+      if (e.key === "Escape" && open) {
+        e.preventDefault();
+        setOpen(false);
+        return;
+      }
+
+      // 只有在面板打开时才处理导航和主题快捷键
+      if (!open) return;
+
+      // 导航快捷键 (1-9)
+      if (!e.metaKey && !e.ctrlKey && e.key >= "1" && e.key <= "9") {
+        const index = parseInt(e.key) - 1;
+        if (index < filteredNavItems.length) {
+          e.preventDefault();
+          navigateToItem(filteredNavItems[index]);
+          return;
+        }
+      }
+
+      // 主题切换快捷键 (基于 filteredNavItems.length)
+      if (!e.metaKey && !e.ctrlKey) {
+        const keyNum = parseInt(e.key);
+        if (!isNaN(keyNum)) {
+          // 计算主题切换的起始数字
+          const themeStartNum = filteredNavItems.length + 1;
+          const themeEndNum = filteredNavItems.length + 3;
+
+          // 检查是否在主题切换范围内
+          if (keyNum >= themeStartNum && keyNum <= themeEndNum) {
+            e.preventDefault();
+            const themes = ["light", "dark", "system"];
+            const themeIndex = keyNum - themeStartNum;
+
+            if (themeIndex < themes.length) {
+              setTheme(themes[themeIndex]);
+
+              // 可选：显示主题切换提示
+              console.log(`切换到主题: ${themes[themeIndex]}`);
+            }
+            return;
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, filteredNavItems, togglePanel, setOpen, navigateToItem, setTheme]);
+
+  // 点击外部关闭面板
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      const dialog = document.querySelector('[role="dialog"]');
+      if (open && dialog && !dialog.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
   return (
     <div>
       {/* 触发按钮 */}
       <button
         onClick={togglePanel}
-        className={`cursor-pointer size-8 sm:size-10 rounded-md sm:rounded-lg ${styles.hoverBg} p-2 transition-all duration-200 hover:${styles.activeBg} active:scale-95 focus:outline-none text-neutral-700 dark:text-neutral-300`}
+        className={`momo font-medium cursor-pointer flex flex-row space-x-1 px-2.5 py-1.5 items-center rounded-xl ${styles.hoverBg} transition-all duration-200 active:scale-95 focus:outline-none text-neutral-700 dark:text-neutral-300`}
         aria-label="打开命令面板"
       >
-        <CommandIcon className="size-auto" />
+        <CommandIcon className="size-3 sm:size-4" />{" "}
+        <span className="text-sm sm:text-base font-mono">K</span>
       </button>
 
       <AnimatePresence>
@@ -168,7 +193,7 @@ const Cmdk = () => {
             onOpenChange={setOpen}
             label="命令面板"
             className={cn(
-              "fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pt-20 transition-all duration-500",
+              "fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pt-20 transition-all duration-500 ",
               open
                 ? "translate-y-0 scale-100 opacity-100"
                 : "translate-y-16 scale-90 opacity-0"
@@ -183,7 +208,7 @@ const Cmdk = () => {
 
             {/* 面板内容 */}
             <motion.div
-              className="relative w-full max-w-2xl z-50 bg-white dark:bg-black rounded-3xl"
+              className="relative w-full max-w-2xl z-50 bg-white dark:bg-black rounded-3xl border border-neutral-200 dark:border-neutral-800"
               {...ANIMATION_CONFIG.dialog}
             >
               <div className="relative">
@@ -203,7 +228,7 @@ const Cmdk = () => {
                     <h1 className="text-xs sm:text-sm font-medium px-4 opacity-50 py-2 transition-all duration-300">
                       导航
                     </h1>
-                    <SegmentContainer className="w-full">
+                    <SegmentContainer className="-translate-x-2 w-[calc(100%+1rem)]">
                       {filteredNavItems.map((item, index) => (
                         <Command.Item
                           key={item.name}
@@ -215,8 +240,8 @@ const Cmdk = () => {
                             onClick={() => navigateToItem(item)}
                             className={`flex justify-between w-full px-4 py-3 rounded-xl text-sm sm:text-base items-center gap-3 transition-all duration-300 cursor-pointer`}
                           >
-                            <div className="flex items-center gap-2.5">
-                              <div className="size-6 p-0.5 opacity-50 transition-opacity duration-300 group-hover:opacity-75">
+                            <div className="flex items-center gap-4">
+                              <div className="size-8 p-2 bg-neutral-200 dark:bg-neutral-800 rounded-full opacity-50 transition-opacity duration-300 group-hover:opacity-75">
                                 {item.icon}
                               </div>
                               <span
@@ -226,7 +251,7 @@ const Cmdk = () => {
                               </span>
                             </div>
                             <kbd
-                              className={`${styles.kbdDefault} rounded-md px-2 py-1 text-xs transition-all duration-300 group-hover:${styles.kbdHover}`}
+                              className={`${styles.kbdDefault} opacity-50 rounded-full size-8 flex justify-center items-center text-xs transition-all duration-300 group-hover:${styles.kbdHover}`}
                             >
                               {index + 1}
                             </kbd>
@@ -239,7 +264,7 @@ const Cmdk = () => {
 
                 {filteredNavItems.length > 0 && filteredThemes.length > 0 && (
                   <Command.Separator
-                    className={`my-2 ${styles.borderColor} h-[1px] transition-all duration-300`}
+                    className={`my-2 border border-neutral-200 dark:border-neutral-800 h-[1px] transition-all duration-300`}
                   />
                 )}
 
@@ -248,7 +273,7 @@ const Cmdk = () => {
                     <h1 className="text-xs sm:text-sm font-medium px-4 opacity-50 py-2 transition-all duration-300">
                       主题
                     </h1>
-                    <SegmentContainer className="w-full">
+                    <SegmentContainer className="-translate-x-2 w-[calc(100%+1rem)]">
                       {filteredThemes.map((item, index) => (
                         <Command.Item
                           key={item.value}
@@ -261,8 +286,8 @@ const Cmdk = () => {
                             className="flex justify-between w-full px-4 py-3 rounded-xl text-sm sm:text-base items-center gap-3 transition-all duration-300 cursor-pointer
                         "
                           >
-                            <div className="flex items-center gap-2.5">
-                              <div className="size-6 p-0.5 opacity-50 transition-opacity duration-300 group-hover:opacity-75">
+                            <div className="flex items-center gap-4">
+                              <div className="size-8 p-2 bg-neutral-200 dark:bg-neutral-800 rounded-full opacity-50 transition-opacity duration-300 group-hover:opacity-75">
                                 {item.icon}
                               </div>
                               <span
@@ -272,10 +297,10 @@ const Cmdk = () => {
                               </span>
                             </div>
                             <kbd
-                              className={`${styles.kbdDefault} rounded-md px-2 py-1 text-xs transition-all duration-300 group-hover:${styles.kbdHover}`}
+                              className={`${styles.kbdDefault} opacity-50 rounded-full size-8 flex justify-center items-center text-xs transition-all duration-300 group-hover:${styles.kbdHover}`}
                             >
                               <span className="flex items-center gap-1">
-                                <CommandIcon className="size-3" />+{index + 1}
+                                {filteredNavItems.length + 1 + index}
                               </span>
                             </kbd>
                           </SegmentItem>

@@ -35,7 +35,7 @@ const desc =
 
 export default function Now({ mdxSource, readingTime }) {
   return (
-    <Layout title="现状 | 狗子吃饺子" desc={desc}>
+    <Layout title="现状" desc={desc}>
       <Header
         title="现状"
         date="2025-08-06"

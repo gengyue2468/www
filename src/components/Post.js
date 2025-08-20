@@ -96,9 +96,11 @@ const Post = ({ posts }) => {
                         index={index}
                         className="transition-all duration-300 px-6 py-3 -translate-x-6! w-[calc(100%+3rem)]! group-hover:opacity-50 hover:opacity-100 rounded-xl relative z-10"
                       >
-                        <Link href={`/whims/${post.slug}`}>
+                        <Link scroll={true} href={`/whims/${post.slug}`}>
                           <FlexContainer>
-                            <PostTitle>{post.frontmatter.title || "未命名"}</PostTitle>
+                            <PostTitle>
+                              {post.frontmatter.title || "未命名"}
+                            </PostTitle>
                             <Divider />
                             <DayTitle>
                               {moment(post.frontmatter.date).format("Do")}
@@ -127,7 +129,7 @@ const Post = ({ posts }) => {
                               index={index}
                               className="transition-all duration-300 px-6 py-3 -translate-x-6 w-[calc(100%+3rem)] group-hover:opacity-50 hover:opacity-100 rounded-xl relative z-10"
                             >
-                              <Link href={`/whims/${post.slug}`}>
+                              <Link scroll={true} href={`/whims/${post.slug}`}>
                                 <FlexContainer>
                                   <PostTitle>
                                     {post.frontmatter.title || "未命名"}

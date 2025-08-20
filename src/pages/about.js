@@ -25,6 +25,7 @@ const aboutMarkdown = `
 - Next.js
 - TailwindCSS
 - next-mdx-remote
+- Cmdk
 
 受以下网站启发：
 
@@ -34,12 +35,6 @@ const aboutMarkdown = `
 - [Rauno Freiberg](https://rauno.me) 
 - [Manuel “Manu” Moreale](https://manuelmoreale.com/)
 
-
-## 联系方式
-
-可以通过以下方式联系我：
-
-- 邮箱：[gengyue2468@outlook.com](mailto:gengyue2468@outlook.com/)
 `;
 
 const desc =
@@ -47,7 +42,7 @@ const desc =
 
 export default function About({ mdxSource, readingTime }) {
   return (
-    <Layout title="关于 | 狗子吃饺子" desc={desc}>
+    <Layout title="关于" desc={desc}>
       <Header
         title="关于"
         date="2025-08-06"
