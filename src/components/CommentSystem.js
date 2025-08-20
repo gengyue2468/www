@@ -16,6 +16,7 @@ import { serialize } from "next-mdx-remote/serialize";
 import { remarkPlugins, rehypePlugins } from "@/lib/markdown/plugins";
 import Wrapper from "./Wrapper";
 import remarkGemoji from "remark-gemoji";
+import { SegmentContainer, SegmentItem } from "./SegmentControl";
 
 const EMOJI_LIST = [
   { code: ":smile:", symbol: "😊" },
@@ -44,9 +45,9 @@ const EMOJI_LIST = [
 const convertEmojis = (text) => {
   if (!text) return text;
   let converted = text;
-  EMOJI_LIST.forEach(emoji => {
+  EMOJI_LIST.forEach((emoji) => {
     // 使用单词边界正则表达式确保只匹配完整的表情代码
-    const regex = new RegExp(`\\b${emoji.code}\\b`, 'g');
+    const regex = new RegExp(`\\b${emoji.code}\\b`, "g");
     converted = converted.replace(regex, emoji.symbol);
   });
   return converted;
@@ -66,9 +67,9 @@ export default function CommentSystem({ slug }) {
   const processComments = async (rawComments) => {
     try {
       // 先转换表情符号
-      const commentsWithEmojis = rawComments.map(comment => ({
+      const commentsWithEmojis = rawComments.map((comment) => ({
         ...comment,
-        body: convertEmojis(comment.body)
+        body: convertEmojis(comment.body),
       }));
 
       // 然后进行MDX序列化
@@ -87,9 +88,9 @@ export default function CommentSystem({ slug }) {
     } catch (err) {
       console.error("处理评论MDX失败：", err);
       // 如果MDX序列化失败，至少确保表情符号被转换
-      return rawComments.map(comment => ({
+      return rawComments.map((comment) => ({
         ...comment,
-        body: convertEmojis(comment.body)
+        body: convertEmojis(comment.body),
       }));
     }
   };
@@ -158,9 +159,9 @@ export default function CommentSystem({ slug }) {
       // 处理新评论的表情符号和MDX序列化
       const commentWithEmoji = {
         ...response.data,
-        body: convertEmojis(response.data.body)
+        body: convertEmojis(response.data.body),
       };
-      
+
       const newCommentWithMdx = {
         ...commentWithEmoji,
         mdxSource: await serialize(commentWithEmoji.body, {
@@ -170,7 +171,7 @@ export default function CommentSystem({ slug }) {
           },
         }),
       };
-      
+
       setComments([newCommentWithMdx, ...comments]);
       setNewComment("");
       setError("");
@@ -217,18 +218,23 @@ export default function CommentSystem({ slug }) {
       id="emoji-picker"
       className="bg-white dark:bg-black p-3 rounded-none sm:rounded-xl mt-2 border border-neutral-200 dark:border-neutral-800 z-10"
     >
-      <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-48 overflow-y-auto pr-1">
+      <SegmentContainer
+        sliderClassName=""
+        className="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-48 overflow-y-auto pr-1"
+      >
         {EMOJI_LIST.map((emoji, index) => (
-          <button
-            key={index}
-            onClick={() => insertEmoji(emoji.code)}
-            className="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center"
-            title={emoji.code}
-          >
-            <span className="text-xl">{emoji.symbol}</span>
-          </button>
+          <SegmentItem>
+            <button
+              key={index}
+              onClick={() => insertEmoji(emoji.code)}
+              className="p-2 rounded-full transition-colors flex items-center justify-center"
+              title={emoji.code}
+            >
+              <span className="text-xl">{emoji.symbol}</span>
+            </button>
+          </SegmentItem>
         ))}
-      </div>
+      </SegmentContainer>
       <p className="text-xs sm:text-sm opacity-50 mt-2 text-center">
         点击表情插入到评论中
       </p>
@@ -253,7 +259,7 @@ export default function CommentSystem({ slug }) {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="在这里写下您的评论..."
               rows={4}
-              className="w-full min-h-48 px-8 py-4 border border-neutral-200 dark:border-neutral-800 rounded-none sm:rounded-xl  bg-white dark:bg-black  placeholder:opacity-50 focus:outline-none"
+              className="w-full min-h-48 px-8 py-4 border border-neutral-200 dark:border-neutral-800 rounded-none sm:rounded-3xl  bg-white dark:bg-black  placeholder:opacity-50 focus:outline-none"
             />
             <div className="absolute right-3 top-3 flex space-x-1">
               <button
@@ -264,10 +270,7 @@ export default function CommentSystem({ slug }) {
               >
                 <SmileIcon className="h-5 w-5" />
               </button>
-              <button
-                className="p-1"
-                aria-label="Markdown 支持"
-              >
+              <button className="p-1" aria-label="Markdown 支持">
                 <MarkdownIcon className="h-5 w-5" />
               </button>
             </div>
@@ -301,7 +304,7 @@ export default function CommentSystem({ slug }) {
             <BanIcon className="size-12 sm:size-16" />
           </div>
           <p className="mb-4 mt-4 font-medium text-lg sm:text-xl">
-            请登录，然后才能发表评论
+            请先登录，然后才能发表评论
           </p>
           <div className="flex justify-center">
             <button
@@ -331,20 +334,16 @@ export default function CommentSystem({ slug }) {
           没有评论
         </p>
       ) : (
-        <div className="space-y-6 mt-8 mb-8 -translate-x-8 w-[calc(100%+4rem)]">
+        <div className="space-y-4 mt-8 mb-8 -translate-x-8 w-[calc(100%+4rem)]">
           {comments.map((comment, index) => (
             <div
               key={comment.id}
-              className={`px-8 py-2 border-neutral-200 dark:border-neutral-800 ${
-                index === 0 ? "border-y" : "border-b"
+              className={`px-8 py-2 bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-none sm:rounded-3xl! ${
+                index === 0 ? "border-y sm:border" : "border-b sm:border"
               }`}
             >
               <div className="flex items-center mb-0 -py-0">
-                <div
-                  className={`flex items-center space-x-2 ${
-                    index === 0 && "mt-4"
-                  }`}
-                >
+                <div className={`flex items-center space-x-2 mt-4`}>
                   <div>
                     <img
                       src={comment.user?.avatar_url}
@@ -364,6 +363,7 @@ export default function CommentSystem({ slug }) {
                   </div>
                 </div>
               </div>
+              <div className="px-0 sm:px-2">
               <Wrapper>
                 {comment.mdxSource ? (
                   <div className="break-words overflow-wrap-anywhere">
@@ -375,6 +375,7 @@ export default function CommentSystem({ slug }) {
                   </div>
                 )}
               </Wrapper>
+              </div>
             </div>
           ))}
         </div>

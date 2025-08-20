@@ -179,7 +179,7 @@ const Cmdk = () => {
       {/* 触发按钮 */}
       <button
         onClick={togglePanel}
-        className={`momo font-medium cursor-pointer flex flex-row space-x-1 px-2.5 py-1.5 items-center rounded-xl ${styles.hoverBg} transition-all duration-200 active:scale-95 focus:outline-none text-neutral-700 dark:text-neutral-300`}
+        className={`momo font-medium cursor-pointer flex flex-row space-x-1 px-2.5 py-1.5 items-center rounded-xl bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 transition-all duration-200 active:scale-95 focus:outline-none`}
         aria-label="打开命令面板"
       >
         <CommandIcon className="size-3 sm:size-4" />{" "}
@@ -263,9 +263,7 @@ const Cmdk = () => {
                 )}
 
                 {filteredNavItems.length > 0 && filteredThemes.length > 0 && (
-                  <Command.Separator
-                    className={`my-2 border border-neutral-200 dark:border-neutral-800 h-[1px] transition-all duration-300`}
-                  />
+                  <hr className="w-[calc(100%+2rem)] text-neutral-200 dark:text-neutral-800 -translate-x-4" />
                 )}
 
                 {filteredThemes.length > 0 && (
