@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL,  // 现在可以读取了
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
   generateRobotsTxt: true,
   sitemapSize: 7000,
   additionalPaths: async (config) => {
