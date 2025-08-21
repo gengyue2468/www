@@ -218,7 +218,7 @@ const Cmdk = () => {
                   value={searchQuery}
                   onValueChange={handleSearchChange}
                   placeholder="输入命令或搜索..."
-                  className={`rounded-t-3xl rounded-b-none focus:outline-none w-full px-12 py-4 border-0 border-b ${styles.borderColor} bg-transparent text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 dark:placeholder:text-neutral-400 text-base transition-colors duration-200`}
+                  className={`rounded-t-3xl bg-neutral-50 dark:bg-neutral-950 rounded-b-none focus:outline-none w-full px-12 py-4 border-0 border-b ${styles.borderColor} bg-transparent text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 dark:placeholder:text-neutral-400 text-base transition-colors duration-200`}
                 />
               </div>
 
@@ -263,7 +263,7 @@ const Cmdk = () => {
                 )}
 
                 {filteredNavItems.length > 0 && filteredThemes.length > 0 && (
-                  <hr className="w-[calc(100%+2rem)] text-neutral-200 dark:text-neutral-800 -translate-x-4" />
+                  <hr className="w-[calc(100%+2rem)] text-neutral-200 dark:text-neutral-800 -translate-x-4 my-4" />
                 )}
 
                 {filteredThemes.length > 0 && (
