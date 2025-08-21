@@ -1,5 +1,7 @@
+require('dotenv').config();
+
 module.exports = {
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL,  // 现在可以读取了
   generateRobotsTxt: true,
   sitemapSize: 7000,
   additionalPaths: async (config) => {
@@ -11,7 +13,6 @@ module.exports = {
         lastmod: new Date().toISOString(),
       });
     });
-    // 动态路由逻辑...
     return paths;
   },
 };
