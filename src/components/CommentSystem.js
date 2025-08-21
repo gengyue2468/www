@@ -219,11 +219,10 @@ export default function CommentSystem({ slug }) {
       className="bg-white dark:bg-black p-3 rounded-none sm:rounded-xl mt-2 border border-neutral-200 dark:border-neutral-800 z-10"
     >
       <SegmentContainer
-        sliderClassName=""
-        className="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-48 overflow-y-auto pr-1"
+        className="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-48 overflow-y-auto pr-1 relative"
       >
         {EMOJI_LIST.map((emoji, index) => (
-          <SegmentItem key={index}>
+          <SegmentItem key={index} className="group w-full">
             <button
               onClick={() => insertEmoji(emoji.code)}
               className="p-2 rounded-full transition-colors flex items-center justify-center"

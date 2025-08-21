@@ -40,18 +40,20 @@ export const SegmentContainer = ({
 
   // 处理鼠标进入项目
   const handleMouseEnter = useCallback((element) => {
-    if (!sliderRef.current || !element) return;
-    
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const targetRect = element.getBoundingClientRect();
-    
-    const top = targetRect.top - containerRect.top;
-    const height = targetRect.height;
+  if (!sliderRef.current || !element) return;
+  
+  const container = containerRef.current;
+  const containerRect = container.getBoundingClientRect();
+  const targetRect = element.getBoundingClientRect();
+  
+  // 关键修正：加上容器的滚动距离（scrollTop），抵消滚动对位置计算的影响
+  const top = (targetRect.top - containerRect.top) + container.scrollTop;
+  const height = targetRect.height;
 
-    sliderRef.current.style.top = `${top}px`;
-    sliderRef.current.style.height = `${height}px`;
-    sliderRef.current.style.opacity = activeOpacity;
-  }, [activeOpacity]);
+  sliderRef.current.style.top = `${top}px`;
+  sliderRef.current.style.height = `${height}px`;
+  sliderRef.current.style.opacity = activeOpacity;
+}, [activeOpacity]);
 
   // 处理鼠标离开容器
   const handleMouseLeave = useCallback(() => {

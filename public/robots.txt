@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://ded.huster.fun
+Host: https://bg.huster.fun
 
 # Sitemaps
-Sitemap: https://ded.huster.fun/sitemap.xml
+Sitemap: https://bg.huster.fun/sitemap.xml

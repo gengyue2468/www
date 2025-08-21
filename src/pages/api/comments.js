@@ -104,8 +104,8 @@ export default async function handler(req, res) {
         const issueResponse = await axios.post(
           `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/issues`,
           {
-            title: `Comments for: ${slug}`,
-            body: `This issue is used to store comments for the blog post with slug: ${slug}`,
+            title: `${slug} 的评论`,
+            body: `这个 Issue 用于储存 ${slug} 的评论`,
             labels: [slug, 'comments'],
           },
           {

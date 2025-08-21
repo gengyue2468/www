@@ -2,7 +2,7 @@ import { NowIcon, PaintIcon, UserIcon, WhimIcon } from "@/components/Icon";
 
 const site = {
   author: "B.G",
-  deployURL: "https://bg.huster.fun",
+  deployURL: process.env.NEXT_PUBLIC_SITE_URL,
   NavItems: [
     {
       icon: <WhimIcon />,
