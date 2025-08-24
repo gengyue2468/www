@@ -97,7 +97,7 @@ export default function Image({ alt, src, ...props }) {
       </span>
 
       {alt && (
-        <span className="block mt-4 opacity-50 font-medium text-sm transition-all duration-500">
+        <span className="block mt-4 opacity-50 font-medium text-xs transition-all duration-500">
           {alt}
         </span>
       )}

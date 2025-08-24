@@ -4,6 +4,28 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'Alibaba';
+  src: url('/static/fonts/AlibabaPuHuiTi-3-55-Regular.woff2') format('woff2');
+  font-weight: 400;
+  display: swap;
+}
+
+@font-face {
+  font-family: 'Alibaba';
+  src: url('/static/fonts/AlibabaPuHuiTi-3-65-Medium.woff2') format('woff2');
+  font-weight: 500;
+  display: swap;
+}
+
+@font-face {
+  font-family: 'Alibaba';
+  src: url('/static/fonts/AlibabaPuHuiTi-3-75-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  display: swap;
+}
+
+
 :root {
   --font-mono: "JetBrains Mono Variable", monospace !important;
 }
@@ -13,7 +35,7 @@ html {
 }
 
 body {
-  font-family: "Inter", "Noto Sans SC", sans-serif;
+  font-family: "Inter", "Alibaba", sans-serif;
   @apply selection:bg-neutral-200 dark:selection:bg-neutral-800 bg-neutral-50 dark:bg-neutral-950 antialiased scroll-smooth;
 }
 
@@ -31,6 +53,10 @@ p {
 
 .font-mono {
   font-family: "Jetbrains Mono Variable", monospace !important;
+}
+
+.prose sub{
+  @apply font-medium text-xs mr-1;
 }
 
 .prose pre,

@@ -35,14 +35,14 @@ export default function Layout({ title, desc, children }) {
         <div className="flex flex-row justify-between items-center">
           <div
             onClick={() => router.push("/")}
-            className="cursor-pointer flex flex-row space-x-4 text-sm sm:text-base  items-center font-medium"
+            className="cursor-pointer flex flex-row space-x-4 text-sm sm:text-base items-center font-medium"
           >
             <img
               src="/static/author.webp"
               alt="头像"
               className="object-center rounded-full size-8 border border-neutral-100 dark:border-neutral-900"
             />
-            <span className="text-neutral-600 dark:text-neutral-400">
+            <span className="">
               {site.author}
             </span>
           </div>

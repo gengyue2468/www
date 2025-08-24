@@ -7,6 +7,9 @@ import { serialize } from "next-mdx-remote/serialize";
 import { remarkPlugins, rehypePlugins } from "@/lib/markdown/plugins";
 
 const designMarkdown = `
+
+![Stewie Griffin](/static/stewie-griffin.webp)
+
 # 字体
 
 使用 [Google Fonts](https://fonts.google.com/) 缓存

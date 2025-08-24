@@ -8,6 +8,8 @@ import MdxContent from "@/components/MdxContent";
 const aboutMarkdown = `
 # 关于我
 
+![Brian Griffin](/static/brian-griffin.webp)
+
 我是[华中科技大学](https://hust.edu.cn/)计算机科学与技术专业的一名大一新生。高中毕业于[山东省烟台第一中学](http://ytyz.net/)。
 
 自2020年起，我便开始接触一些前端知识。各种机缘巧合下接触到了当时还称作 Zeit.co 的 [Vercel](https://vercel.com)，从此对 [Next.js](https://nextjs.org) 产生了浓厚的兴趣。从此开始实践一些简单的项目，由于技术限制，基本上都是对着官方文档照猫画虎。

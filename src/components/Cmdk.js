@@ -179,7 +179,7 @@ const Cmdk = () => {
       {/* 触发按钮 */}
       <button
         onClick={togglePanel}
-        className={`momo font-medium cursor-pointer flex flex-row space-x-1 px-2.5 py-1.5 items-center rounded-xl bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 transition-all duration-200 active:scale-95 focus:outline-none`}
+        className={`momo font-medium cursor-pointer flex flex-row space-x-1 px-4 py-2 items-center rounded-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 transition-all duration-200 active:scale-95 focus:outline-none`}
         aria-label="打开命令面板"
       >
         <CommandIcon className="size-3 sm:size-4" />{" "}
@@ -247,7 +247,7 @@ const Cmdk = () => {
                               <span
                                 className={`font-medium transition-colors duration-300 group-hover:${styles.textHover}`}
                               >
-                                {item.name}
+                                {item.name}<sub className="ml-2.5 text-xs font-semibold opacity-50">{item.href}</sub>
                               </span>
                             </div>
                             <kbd

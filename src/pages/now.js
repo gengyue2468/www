@@ -7,6 +7,9 @@ import { MDXRemote } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 
 const nowMarkdown = `
+
+![Chris Griffin](/static/chris-griffin.webp)
+
 # Reference
 
 你可以参考这两篇文章： [How and why to make a /now page on your site](https://sive.rs/now2) 和 [About nownownow.com](https://nownownow.com/about)
