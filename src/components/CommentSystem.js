@@ -15,7 +15,6 @@ import MdxContent from "./MdxContent";
 import { serialize } from "next-mdx-remote/serialize";
 import { remarkPlugins, rehypePlugins } from "@/lib/markdown/plugins";
 import Wrapper from "./Wrapper";
-import remarkGemoji from "remark-gemoji";
 import { SegmentContainer, SegmentItem } from "./SegmentControl";
 
 const EMOJI_LIST = [
@@ -218,9 +217,7 @@ export default function CommentSystem({ slug }) {
       id="emoji-picker"
       className="bg-white dark:bg-black p-3 rounded-none sm:rounded-xl mt-2 border border-neutral-200 dark:border-neutral-800 z-10"
     >
-      <SegmentContainer
-        className="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-48 overflow-y-auto pr-1 relative"
-      >
+      <SegmentContainer className="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-48 overflow-y-auto pr-1 relative">
         {EMOJI_LIST.map((emoji, index) => (
           <SegmentItem key={index} className="group w-full">
             <button
@@ -241,8 +238,11 @@ export default function CommentSystem({ slug }) {
 
   return (
     <div className="mt-12 pt-8">
-      <div className="flex items-center mb-6 space-x-2">
-        <CommentIcon className="size-6" />
+      <div className="flex items-center mb-6 space-x-2 -translate-x-2">
+        <div className="size-8 bg-neutral-200/50 dark:bg-neutral-800 rounded-full p-1.5">
+          <CommentIcon className="size-auto text-neutral-500" />
+        </div>
+
         <h3 className="text-lg sm:text-xl font-semibold ">
           评论 ({comments.length})
         </h3>
@@ -259,42 +259,42 @@ export default function CommentSystem({ slug }) {
               rows={4}
               className="w-full min-h-48 px-8 py-4 border border-neutral-200 dark:border-neutral-800 rounded-none sm:rounded-3xl  bg-white dark:bg-black  placeholder:opacity-50 focus:outline-none"
             />
-            <div className="absolute right-3 top-3 flex space-x-1">
+            <div className="absolute right-4 top-4 flex space-x-2">
               <button
                 id="emoji-button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="p-1"
+                className="p-1.5 rounded-full size-7 bg-neutral-200/50 dark:bg-neutral-800 text-neutral-500"
                 aria-label="添加表情"
               >
-                <SmileIcon className="h-5 w-5" />
+                <SmileIcon className="" />
               </button>
-              <button className="p-1" aria-label="Markdown 支持">
-                <MarkdownIcon className="h-5 w-5" />
+              <button
+                className="p-1.5 rounded-full size-7 bg-neutral-200/50 dark:bg-neutral-800 text-neutral-500"
+                aria-label="Markdown 支持"
+              >
+                <MarkdownIcon className="" />
+              </button>
+            </div>
+            <div className="absolute right-4 bottom-8 flex justify-center max-w-sm sm:max-w-xs mx-auto mt-4">
+              <button
+                onClick={submitComment}
+                disabled={submitting || !newComment.trim()}
+                className="size-9 p-1.5 rounded-full bg-black dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-900 dark:hover:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    <SendIcon className="fill-black dark:fill-white" />
+                  </>
+                )}
               </button>
             </div>
           </div>
 
           {showEmojiPicker && emojiPicker}
-
-          <div className="flex justify-center max-w-xs mx-auto mt-4">
-            <button
-              onClick={submitComment}
-              disabled={submitting || !newComment.trim()}
-              className="w-full flex items-center justify-center px-4 py-2 bg-black dark:bg-white text-white dark:text-neutral-900 rounded-xl hover:bg-neutral-900 dark:hover:bg-white focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  发送中...
-                </>
-              ) : (
-                <>
-                  <SendIcon className="h-4 w-4 mr-2 fill-black dark:fill-white" />
-                  发送评论
-                </>
-              )}
-            </button>
-          </div>
         </div>
       ) : (
         <div className="p-6 border border-neutral-200 dark:border-neutral-800 rounded-none sm:rounded-xl w-[calc(100%+4rem)] -translate-x-8 text-center">
@@ -350,10 +350,10 @@ export default function CommentSystem({ slug }) {
                     />
                   </div>
                   <div className="flex flex-col space-y-0.5">
-                    <span className="font-medium text-neutral-800 dark:text-neutral-200">
+                    <span className="font-semibold">
                       @{comment.user?.login || "Anonymous"}
                     </span>
-                    <span className="opacity-50 text-xs sm:text-sm">
+                    <span className="opacity-50 text-xs font-medium">
                       {moment(comment.created_at).format(
                         "YYYY 年 MM 月 DD 日 HH:mm:ss"
                       )}

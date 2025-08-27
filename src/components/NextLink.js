@@ -87,8 +87,8 @@ const NextLink = ({ href, children, ...props }) => {
 
       <span className={cn(textStyles, "flex flex-row items-center")}>
         {children}
-        <span className="ml-1 size-4 flex justify-center items-center bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 rounded-sm">
-          <LinkIcon className="size-3" />
+        <span className="ml-2 size-6 flex justify-center items-center bg-neutral-200/50 dark:bg-neutral-800 text-neutral-500 rounded-full p-1">
+          <LinkIcon className="size-auto" />
         </span>
       </span>
     </a>

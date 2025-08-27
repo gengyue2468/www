@@ -9,9 +9,8 @@ export default function Header({ title, date, desc, readingTime }) {
   const [showWeiboTip, setShowWeiboTip] = useState(false);
   const linkRef = useRef(null);
   
-  // 统一样式配置
   const styles = {
-    button: "p-2 rounded-full transition-all duration-300",
+    button: "p-2 rounded-full transition-all duration-300 cursor-pointer",
     buttonHover: "hover:bg-neutral-200 dark:hover:bg-neutral-800",
     tooltip: "absolute -top-8 left-1/2 transform -translate-x-1/2 bg-neutral-200 dark:bg-neutral-800 w-24 text-xs px-2.5 py-1.5 rounded-full  transition-opacity duration-300",
     popup: "fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 transition-opacity duration-300",
@@ -59,18 +58,18 @@ export default function Header({ title, date, desc, readingTime }) {
 
   return (
     <div className="">
-      <div className="text-center font-medium text-sm sm:text-base opacity-75 mb-4">
+      <div className="font-medium text-sm sm:text-base opacity-75 mb-4">
         <span>{formattedDate}</span>
         <span className="mx-2">·</span>
         <span>{readingTimeText}</span>
       </div>
-      <h1 className="text-center leading-relaxed text-balance mb-2 font-semibold text-3xl sm:text-5xl">
+      <h1 className="leading-relaxed text-balance mb-2 font-semibold text-3xl sm:text-4xl">
         {title || "未命名文稿"}
       </h1>
-      <h2 className="text-center my-4 text-base sm:text-lg font-medium text-balance leading-loose">
+      <h2 className="my-4 text-base sm:text-lg font-medium text-balance leading-loose">
         {desc}
       </h2>
-      <div className="max-w-48 mx-auto flex flex-row justify-between space-x-2 mt-8 relative">
+      <div className="max-w-48 -translate-x-1 flex flex-row justify-between space-x-2 mt-8 relative">
         <button 
           onClick={handleWeiboShare}
           className={`${styles.button} ${styles.buttonHover}`}
@@ -114,7 +113,7 @@ export default function Header({ title, date, desc, readingTime }) {
         />
       </div>
       
-      <hr className="text-neutral-300 dark:text-neutral-700 my-16 border-dashed" />
+      <hr className="text-neutral-300 dark:text-neutral-700 my-8" />
       
       <style jsx>{`
         @keyframes scaleIn {

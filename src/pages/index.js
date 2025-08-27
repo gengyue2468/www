@@ -17,7 +17,7 @@ const Home = ({ latestPost, allPosts }) => {
         呼出导航菜单或者直接点击右上角的图标↗。祝您玩的开心😊
       </span>
       <div className="mt-16">
-        <span className="opacity-50 font-medium text-xs text-center flex justify-center mb-4 tracking-widest">
+        <span className="opacity-50 font-medium text-xs mb-8 tracking-widest">
           最新随想
         </span>
         <Header

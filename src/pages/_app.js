@@ -1,4 +1,3 @@
-// pages/_app.js
 import "@/styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import "@fontsource-variable/jetbrains-mono";
@@ -10,8 +9,9 @@ import moment from "moment";
 import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "motion/react";
 import { SessionProvider } from 'next-auth/react';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/inter/wght-italic.css';
 
-// 判断是否是hash变化
 const isHashChange = (currentUrl, newUrl) => {
   try {
     const current = new URL(currentUrl, 'http://localhost');
@@ -22,26 +22,20 @@ const isHashChange = (currentUrl, newUrl) => {
   }
 };
 
-// 生成动画键值 - 结合pathname和query参数
 const generateAnimationKey = (router) => {
-  // 对于动态路由，使用pathname和主要参数
   const pathname = router.pathname;
   
-  // 提取可能的动态路由参数
   const slug = router.query.slug || '';
   const id = router.query.id || '';
   
-  // 如果有slug参数，将其包含在键值中
   if (slug) {
     return `${pathname}-${slug}`;
   }
   
-  // 如果有id参数，将其包含在键值中
   if (id) {
     return `${pathname}-${id}`;
   }
   
-  // 默认情况下，使用pathname
   return pathname;
 };
 
@@ -57,7 +51,6 @@ export default function App({ Component, pageProps: { session, ...pageProps }  }
   useEffect(() => {
     setIsClient(true);
 
-    // 修改所有锚点链接行为
     const handleAnchorClick = (e) => {
       const link = e.target.closest('a[href^="#"]');
       if (link) {
@@ -65,12 +58,10 @@ export default function App({ Component, pageProps: { session, ...pageProps }  }
         const href = link.getAttribute('href');
         if (href === '#') return;
         
-        // 滚动到目标元素
         const targetId = href.substring(1);
         const targetElement = document.getElementById(targetId);
         if (targetElement) {
           targetElement.scrollIntoView({ behavior: 'smooth' });
-          // 更新URL hash但不触发路由变化
           window.history.replaceState(null, null, href);
         }
       }
@@ -79,7 +70,6 @@ export default function App({ Component, pageProps: { session, ...pageProps }  }
     document.addEventListener('click', handleAnchorClick);
 
     const handleRouteChange = (url) => {
-      // 如果是hash变化，不触发动画
       if (isHashChange(router.asPath, url)) {
         return;
       }

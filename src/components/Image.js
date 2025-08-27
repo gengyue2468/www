@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { DownloadIcon } from "./Icon";
 
 export default function Image({ alt, src, ...props }) {
   const [aspectRatio, setAspectRatio] = useState(16 / 9);
@@ -95,12 +96,19 @@ export default function Image({ alt, src, ...props }) {
           />
         </span>
       </span>
-
-      {alt && (
-        <span className="block mt-4 opacity-50 font-medium text-xs transition-all duration-500">
-          {alt}
-        </span>
-      )}
+      <span className="flex flex-row mt-4 justify-between items-center">
+        {alt && (
+          <span className="block opacity-50 font-medium text-xs transition-all duration-500">
+            {alt}
+          </span>
+        )}
+        <button
+          onClick={() => open(src)}
+          className="bg-neutral-200/50 dark:bg-neutral-800 size-6 p-1 flex justify-center items-center text-neutral-500 cursor-pointer rounded-full"
+        >
+          <DownloadIcon className="size-auto" />
+        </button>
+      </span>
     </span>
   );
 }

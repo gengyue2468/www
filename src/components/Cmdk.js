@@ -9,7 +9,6 @@ import { useRouter } from "next/router";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 
-// 统一样式常量 - 便于集中修改
 const styles = {
   hoverBg: "bg-neutral-100 dark:bg-neutral-800",
   activeBg: "bg-neutral-200 dark:bg-neutral-700",
@@ -47,18 +46,15 @@ const Cmdk = () => {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  // 搜索输入处理
   const handleSearchChange = (value) => {
     setSearchQuery(value);
   };
 
-  // 导航函数
   const navigateToItem = (item) => {
     router.push(item.href, { scroll: true });
     setOpen(false);
   };
 
-  // 过滤导航项
   const filteredNavItems = useMemo(
     () =>
       site.NavItems.filter((item) =>
@@ -67,14 +63,12 @@ const Cmdk = () => {
     [searchQuery]
   );
 
-  // 主题选项
   const themeOptions = [
     { value: "light", label: "明亮模式", icon: <SunIcon /> },
     { value: "dark", label: "黑暗模式", icon: <MoonIcon /> },
     { value: "system", label: "跟随系统", icon: <PCIcon /> },
   ];
 
-  // 过滤主题选项
   const filteredThemes = useMemo(
     () =>
       themeOptions.filter((option) =>
@@ -85,12 +79,11 @@ const Cmdk = () => {
 
   const hasResults = filteredNavItems.length > 0 || filteredThemes.length > 0;
 
-  // 切换面板状态
   const togglePanel = () => {
     setOpen((prev) => {
       const newOpen = !prev;
       if (newOpen) {
-        setSearchQuery(""); // 重置搜索查询
+        setSearchQuery(""); 
         setTimeout(() => {
           if (inputRef.current) {
             inputRef.current.focus();
@@ -101,27 +94,22 @@ const Cmdk = () => {
     });
   };
 
-  // 快捷键处理
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Ctrl+K 或 Cmd+K 切换面板
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         togglePanel();
         return;
       }
 
-      // Esc 键关闭面板
       if (e.key === "Escape" && open) {
         e.preventDefault();
         setOpen(false);
         return;
       }
 
-      // 只有在面板打开时才处理导航和主题快捷键
       if (!open) return;
 
-      // 导航快捷键 (1-9)
       if (!e.metaKey && !e.ctrlKey && e.key >= "1" && e.key <= "9") {
         const index = parseInt(e.key) - 1;
         if (index < filteredNavItems.length) {
@@ -131,15 +119,12 @@ const Cmdk = () => {
         }
       }
 
-      // 主题切换快捷键 (基于 filteredNavItems.length)
       if (!e.metaKey && !e.ctrlKey) {
         const keyNum = parseInt(e.key);
         if (!isNaN(keyNum)) {
-          // 计算主题切换的起始数字
           const themeStartNum = filteredNavItems.length + 1;
           const themeEndNum = filteredNavItems.length + 3;
 
-          // 检查是否在主题切换范围内
           if (keyNum >= themeStartNum && keyNum <= themeEndNum) {
             e.preventDefault();
             const themes = ["light", "dark", "system"];
@@ -147,9 +132,6 @@ const Cmdk = () => {
 
             if (themeIndex < themes.length) {
               setTheme(themes[themeIndex]);
-
-              // 可选：显示主题切换提示
-              console.log(`切换到主题: ${themes[themeIndex]}`);
             }
             return;
           }
@@ -161,7 +143,7 @@ const Cmdk = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open, filteredNavItems, togglePanel, setOpen, navigateToItem, setTheme]);
 
-  // 点击外部关闭面板
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       const dialog = document.querySelector('[role="dialog"]');
@@ -176,7 +158,6 @@ const Cmdk = () => {
 
   return (
     <div>
-      {/* 触发按钮 */}
       <button
         onClick={togglePanel}
         className={`momo font-medium cursor-pointer flex flex-row space-x-1 px-4 py-2 items-center rounded-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 transition-all duration-200 active:scale-95 focus:outline-none`}
@@ -199,14 +180,12 @@ const Cmdk = () => {
                 : "translate-y-16 scale-90 opacity-0"
             )}
           >
-            {/* 背景遮罩 */}
             <motion.div
               className="fixed inset-0 z-10 bg-black/50 backdrop-blur-sm"
               onClick={() => setOpen(false)}
               {...ANIMATION_CONFIG.overlay}
             />
 
-            {/* 面板内容 */}
             <motion.div
               className="relative w-full max-w-2xl z-50 bg-white dark:bg-black rounded-3xl border border-neutral-200 dark:border-neutral-800"
               {...ANIMATION_CONFIG.dialog}

@@ -35,7 +35,7 @@ html {
 }
 
 body {
-  font-family: "Inter", "Alibaba", sans-serif;
+  font-family: "Inter Variable", "Alibaba", sans-serif;
   @apply selection:bg-neutral-200 dark:selection:bg-neutral-800 bg-neutral-50 dark:bg-neutral-950 antialiased scroll-smooth;
 }
 
