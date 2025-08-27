@@ -7,7 +7,7 @@ const Whims = ({ allPosts }) => {
   return (
     <Layout title="所有随想" desc="这里是狗子吃饺子的所有随想~">
       <div className="mt-0">
-        <span className="opacity-75 font-semibold text-sm">
+        <span className="opacity-75 font-medium text-sm">
           Peter, I think that you need to poo(pull) again.<sup>1</sup>
         </span>
         <Image src="/static/peter-griffin.webp" alt="Peter Griffin" />{" "}

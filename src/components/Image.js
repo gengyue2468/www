@@ -67,7 +67,7 @@ export default function Image({ alt, src, ...props }) {
     <span className="block my-12 not-prose">
       <span
         className={`
-      block relative bg-neutral-100 dark:bg-neutral-900 rounded-none min-h-48 sm:min-h-[24rem]
+      block relative bg-neutral-100 dark:bg-neutral-900 rounded-none min-h-48 sm:min-h-[24rem] border-y sm:border border-neutral-200 dark:border-neutral-800
       ${
         isPortrait
           ? "sm:rounded-3xl w-[calc(100%+4rem)]! -translate-x-8"

@@ -257,7 +257,7 @@ export default function CommentSystem({ slug }) {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="在这里写下您的评论..."
               rows={4}
-              className="w-full min-h-48 px-8 py-4 border border-neutral-200 dark:border-neutral-800 rounded-none sm:rounded-3xl  bg-white dark:bg-black  placeholder:opacity-50 focus:outline-none"
+              className="w-full min-h-48 px-8 py-4 border-y sm:border border-neutral-200 dark:border-neutral-800 rounded-none sm:rounded-3xl  bg-white dark:bg-black  placeholder:opacity-50 focus:outline-none"
             />
             <div className="absolute right-4 top-4 flex space-x-2">
               <button
@@ -297,7 +297,7 @@ export default function CommentSystem({ slug }) {
           {showEmojiPicker && emojiPicker}
         </div>
       ) : (
-        <div className="p-6 border border-neutral-200 dark:border-neutral-800 rounded-none sm:rounded-xl w-[calc(100%+4rem)] -translate-x-8 text-center">
+        <div className="p-6 border-y sm:border border-neutral-200 dark:border-neutral-800 rounded-none sm:rounded-xl w-[calc(100%+4rem)] -translate-x-8 text-center">
           <div className="flex justify-center">
             <BanIcon className="size-12 sm:size-16" />
           </div>

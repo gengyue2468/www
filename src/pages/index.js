@@ -11,7 +11,7 @@ const Home = ({ latestPost, allPosts }) => {
   const { title, date, desc } = frontmatter;
   return (
     <Layout title="B.G - I’m thinking" desc="这里是B.G的个人网站~">
-      <span className="opacity-75 font-semibold text-sm">
+      <span className="opacity-75 font-medium text-sm">
         你好👋，欢迎访问我的网站，您可以阅读下面的👇最新一篇随想，也可以
         <a>滚动到底部导航栏</a>，或者，按下 Command + K
         呼出导航菜单或者直接点击右上角的图标↗。祝您玩的开心😊

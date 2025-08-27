@@ -30,7 +30,6 @@ export default function Layout({ title, desc, children }) {
           ],
         }}
       />
-  <ThemeAwareCodeHighlight />
       <div className="max-w-2xl mx-auto py-16 sm:py-32 px-8 z-0 overflow-visible">
         <div className="flex flex-row justify-between items-center">
           <div

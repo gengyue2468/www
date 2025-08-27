@@ -13,11 +13,11 @@ const NextLink = ({ href, children, ...props }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const baseStyles =
-    "relative inline-flex items-center font-medium transition-all duration-300 not-prose";
+    "relative inline-flex items-center font-semibold transition-all duration-300 not-prose";
 
   const textStyles = "relative z-10 transition-colors duration-300";
 
-  const backgroundStyles = `absolute z-[-1] inset-0 px-1 py-0.5 -translate-x-2 rounded-lg transform origin-center bg-neutral-100 dark:bg-neutral-900 transition-all duration-300 ease-out`;
+  const backgroundStyles = `absolute z-[-1] inset-0 px-1 py-0.5 -translate-x-2 rounded-lg transform origin-center bg-neutral-200/50 dark:bg-neutral-800 transition-all duration-500 ease-out`;
 
   const initialOffset = 25;
   const initialWidth = "50%";
@@ -87,7 +87,7 @@ const NextLink = ({ href, children, ...props }) => {
 
       <span className={cn(textStyles, "flex flex-row items-center")}>
         {children}
-        <span className="ml-2 size-6 flex justify-center items-center bg-neutral-200/50 dark:bg-neutral-800 text-neutral-500 rounded-full p-1">
+        <span className="ml-1 mr-1 size-6 flex justify-center items-center bg-neutral-200/50 dark:bg-neutral-800 text-neutral-500 rounded-full p-1">
           <LinkIcon className="size-auto" />
         </span>
       </span>

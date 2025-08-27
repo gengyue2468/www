@@ -1,14 +1,11 @@
 import React, { createContext, useContext, useRef, useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 
-// 创建上下文
 const SegmentContext = createContext();
 
-// 滑块容器组件
 export const SegmentContainer = ({ 
   children, 
   className,
-  // 滑块自定义属性
   sliderClassName = "",
   sliderStyle = {},
   initialOpacity = 0,
@@ -20,13 +17,9 @@ export const SegmentContainer = ({
   const [items, setItems] = useState([]);
   const isInitialized = useRef(false);
 
-  // 用useCallback稳定函数引用，避免每次渲染创建新函数
   const registerItem = useCallback((element) => {
     if (!element) return () => {};
-    
-    // 使用函数式更新确保获取最新状态
     setItems(prev => {
-      // 避免重复添加
       if (!prev.includes(element)) {
         return [...prev, element];
       }
@@ -36,9 +29,8 @@ export const SegmentContainer = ({
     return () => {
       setItems(prev => prev.filter(item => item !== element));
     };
-  }, []); // 空依赖数组，确保函数引用稳定
+  }, []);
 
-  // 处理鼠标进入项目
   const handleMouseEnter = useCallback((element) => {
   if (!sliderRef.current || !element) return;
   
@@ -46,7 +38,6 @@ export const SegmentContainer = ({
   const containerRect = container.getBoundingClientRect();
   const targetRect = element.getBoundingClientRect();
   
-  // 关键修正：加上容器的滚动距离（scrollTop），抵消滚动对位置计算的影响
   const top = (targetRect.top - containerRect.top) + container.scrollTop;
   const height = targetRect.height;
 
@@ -55,14 +46,12 @@ export const SegmentContainer = ({
   sliderRef.current.style.opacity = activeOpacity;
 }, [activeOpacity]);
 
-  // 处理鼠标离开容器
   const handleMouseLeave = useCallback(() => {
     if (sliderRef.current) {
       sliderRef.current.style.opacity = initialOpacity;
     }
   }, [initialOpacity]);
 
-  // 初始化滑块位置
   useEffect(() => {
     if (items.length > 0 && sliderRef.current && !isInitialized.current) {
       const firstItem = items[0];
@@ -73,7 +62,6 @@ export const SegmentContainer = ({
       sliderRef.current.style.height = `${firstItemRect.height}px`;
       sliderRef.current.style.opacity = initialOpacity;
       
-      // 设置过渡属性
       sliderRef.current.style.transition = `
         top ${transitionDuration}ms ease-out, 
         height ${transitionDuration}ms ease-out, 
@@ -91,7 +79,6 @@ export const SegmentContainer = ({
         className={cn("group relative inline-flex flex-col", className)}
         onMouseLeave={handleMouseLeave}
       >
-        {/* 滑块元素 */}
         <div
           ref={sliderRef}
           className={cn(
@@ -110,7 +97,6 @@ export const SegmentContainer = ({
   );
 };
 
-// 滑块项目组件
 export const SegmentItem = ({ 
   children, 
   className,
@@ -125,7 +111,7 @@ export const SegmentItem = ({
       const unregister = registerItem(itemRef.current);
       return unregister;
     }
-  }, [registerItem]); // 现在registerItem引用稳定，不会频繁触发
+  }, [registerItem]);
 
   return (
     <Component
@@ -142,7 +128,6 @@ export const SegmentItem = ({
   );
 };
 
-// 辅助组件：用于非数组列表场景
 export const SegmentGroup = ({ children, className }) => {
   return (
     <div className={cn("flex flex-col space-y-0", className)}>

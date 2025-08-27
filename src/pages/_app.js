@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { SessionProvider } from 'next-auth/react';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/inter/wght-italic.css';
+import ThemeAwareCodeHighlight from "@/components/ThemeAwareCodeHighlight";
 
 const isHashChange = (currentUrl, newUrl) => {
   try {
@@ -116,6 +117,7 @@ export default function App({ Component, pageProps: { session, ...pageProps }  }
 
   return (
     <SessionProvider session={session}>
+      <ThemeAwareCodeHighlight />
       {isClient && (
         <ThemeProvider
           attribute="class"
