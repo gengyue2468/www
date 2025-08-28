@@ -75,3 +75,7 @@ li.task-list-item input[type="checkbox"] {
 .hljs {
   @apply bg-white dark:bg-black!;
 }
+
+button{
+  @apply transition-all duration-500 active:scale-95 focus:scale-95;
+}

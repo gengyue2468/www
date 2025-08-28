@@ -16,16 +16,11 @@ const nowMarkdown = `
 
 ## 所以，我最近在做什么？
 
-- 被 [华中科技大学](https://hust.edu.cn/) 录取
-- 玩 电脑,手机和平板
-- 更新 [个人网站](https://gengyue.huster.fun)
-- 没事敲几个代码
-- 监控i9-14900HX的电压
+- 准备军训
+- 摆烂睡觉
 
 
 ## 设备
-
-人们可能会好奇的
 
 - 惠普 暗影精灵11（16 英寸） 配备 Intel Core i9-14900HX 处理器和 NVIDIA Geforce RTX 5070 显卡 32GB 内存和 1TB 硬盘
 - Apple iMac (2021, 24 英寸) 配备 Apple M1 处理器 16GB内存和 512GB 储存空间
