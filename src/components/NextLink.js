@@ -13,7 +13,7 @@ const NextLink = ({ href, children, ...props }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const baseStyles =
-    "relative inline-flex items-center font-semibold transition-all duration-300 not-prose";
+    "relative inline-flex items-center transition-all duration-300 not-prose";
 
   const textStyles = "relative z-10 transition-colors duration-300";
 

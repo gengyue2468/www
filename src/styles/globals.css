@@ -50,32 +50,18 @@ li.task-list-item input[type="checkbox"] {
   margin-right: 0.5rem;
 }
 
-/* 脚注样式 */
-.footnotes {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-.footnotes-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.footnotes-list {
-  font-size: 0.75rem;
-  opacity: 0.75;
-}
-
-.footnote-backref {
-  margin-left: 0.25rem;
-}
-
 .hljs {
   @apply bg-white dark:bg-black!;
 }
 
-button{
+button {
   @apply transition-all duration-500 active:scale-95 focus:scale-95;
+}
+
+[data-footnote-ref]::before {
+  content: '[';
+}
+
+[data-footnote-ref]::after {
+  content: ']';
 }
