@@ -65,3 +65,7 @@ button {
 [data-footnote-ref]::after {
   content: ']';
 }
+
+.prose a{
+  @apply border-b-[1.5px] border-b-neutral-300 dark:border-b-neutral-700 hover:border-b-transparent! transition-all duration-500
+}
