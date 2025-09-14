@@ -1,4 +1,5 @@
 import { calculateReadingTime } from "@/components/CalculateReadingTime";
+import CommentSystem from "@/components/CommentSystem";
 import Header from "@/components/Header";
 import Layout from "@/components/Layout";
 import MdxContent from "@/components/MdxContent";
@@ -16,7 +17,8 @@ const nowMarkdown = `
 
 ## 所以，我最近在做什么？
 
-- 准备军训
+- 正在军训
+- 玩 Grand Theft Auto V
 - 摆烂睡觉
 
 
@@ -44,6 +46,8 @@ export default function Now({ mdxSource, readingTime }) {
       <Wrapper>
         <MdxContent mdxSource={mdxSource} />
       </Wrapper>
+
+      <CommentSystem slug="/now" />
     </Layout>
   );
 }

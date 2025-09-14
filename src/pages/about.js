@@ -4,6 +4,7 @@ import Wrapper from "@/components/Wrapper";
 import { serialize } from "next-mdx-remote/serialize";
 import { calculateReadingTime } from "@/components/CalculateReadingTime";
 import MdxContent from "@/components/MdxContent";
+import CommentSystem from "@/components/CommentSystem";
 
 const aboutMarkdown = `
 # 关于我
@@ -54,6 +55,8 @@ export default function About({ mdxSource, readingTime }) {
       <Wrapper>
         <MdxContent mdxSource={mdxSource} />
       </Wrapper>
+
+      <CommentSystem slug="/about" />
     </Layout>
   );
 }

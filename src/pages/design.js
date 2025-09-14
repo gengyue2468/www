@@ -5,6 +5,7 @@ import Wrapper from "@/components/Wrapper";
 import MdxContent from "@/components/MdxContent";
 import { serialize } from "next-mdx-remote/serialize";
 import { remarkPlugins, rehypePlugins } from "@/lib/markdown/plugins";
+import CommentSystem from "@/components/CommentSystem";
 
 const designMarkdown = `
 
@@ -164,6 +165,8 @@ export default function Design({ mdxSource, readingTime }) {
       <Wrapper>
         <MdxContent mdxSource={mdxSource} />
       </Wrapper>
+
+      <CommentSystem slug="/design" />
     </Layout>
   );
 }
