@@ -62,7 +62,7 @@ export default function Home() {
     },
   ];
   return (
-    <Layout title="Homepage">
+    <Layout title="BriGriff - I'm thinking">
       <h1 className="mt-8 mb-4">关于</h1>
 
       <p>
