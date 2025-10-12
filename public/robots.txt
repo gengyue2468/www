@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://bg.huster.fun
+
+# Sitemaps
+Sitemap: https://bg.huster.fun/sitemap.xml

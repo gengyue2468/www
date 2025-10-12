@@ -1,26 +1,31 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+@custom-variant dark (&:is(.dark *));
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Mona Sans", "AlibabaPuHuiTi-3", sans-serif;
+  @apply bg-white dark:bg-black text-black dark:text-white text-sm;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-semibold text-sm;
+}
+
+p {
+  @apply tracking-wide leading-normal;
+}
+
+a {
+  @apply transition-all duration-500 underline underline-offset-4 decoration-neutral-500 hover:decoration-neutral-700 dark:hover:decoration-neutral-300;
+}
+
+.serif {
+  font-family: "Noto Serif SC", serif;
 }
