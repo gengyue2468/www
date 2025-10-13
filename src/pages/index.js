@@ -60,6 +60,38 @@ export default function Home() {
       ram: "16 GB",
       rom: "512 GB",
     },
+    {
+      brand: "联想",
+      device: "B300",
+      cpu: "酷睿2 E8400",
+      ram: "2 GB",
+      rom: "500 GB",
+      outdate: true,
+    },
+    {
+      brand: "荣耀",
+      device: "V10",
+      cpu: "麒麟 970",
+      ram: "6 GB",
+      rom: "64 GB",
+      outdate: true,
+    },
+    {
+      brand: "荣耀",
+      device: "畅玩 7x",
+      cpu: "麒麟 659",
+      ram: "4 GB",
+      rom: "64 GB",
+      outdate: true,
+    },
+    {
+      brand: "红米",
+      device: "3",
+      cpu: "骁龙 616",
+      ram: "2 GB",
+      rom: "16 GB",
+      outdate: true,
+    },
   ];
   return (
     <Layout title="BriGriff - I'm thinking">
@@ -91,16 +123,29 @@ export default function Home() {
       {device.map((item, index) => (
         <div
           key={index}
-          className="mt-1 flex flex-row items-center justify-between"
+          className={`mt-1 flex flex-row items-center justify-between ${
+            item.outdate && "opacity-50"
+          }`}
         >
           <p className="font-medium">
-            {item.brand} {item.device}
+            {item.brand} {item.device}{" "}
+            {item.outdate && (
+              <span className="text-xs bg-neutral-200 dark:bg-neutral-800 rounded-sm px-1 py-0.5">
+                过时
+              </span>
+            )}
           </p>
           <p className="opacity-50 text-xs">
             {item.cpu} {item.ram} + {item.rom}
           </p>
         </div>
       ))}
+
+      <p className="mt-4">
+        诸如魅族 MX6、MX5、MX2 及 HTC Windows Phone 等更古早产品并未加入到列表中
+      </p>
+
+      <p className="mt-1 text-xs opacity-50">* 红米 3 现在正作为电子钟运行</p>
 
       <h1 className="mt-8 mb-4">网站</h1>
 

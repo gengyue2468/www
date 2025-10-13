@@ -13,6 +13,7 @@ export default function Header({ title, date, desc, readingTime }) {
       <h1 className="leading-relaxed text-balance mt-8 mb-2 font-semibold text-3xl sm:text-4xl">
         {title || "未命名文稿"}
       </h1>
+
       <div className="mt-1 opacity-50 mb-4">
         <span>{formattedDate}</span>
         <span className="mx-2">·</span>

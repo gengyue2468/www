@@ -1,22 +1,35 @@
 import Head from "next/head";
-import Topbar from "./Topbar";
 import ThemeAwareCodeHighlight from "@/lib/ThemeAwareCodeHighlight";
+import moment from "moment";
+import { useEffect, useState } from "react";
 
 export default function Layout({ title, children }) {
+  const [timeNow, setTimeNow] = useState("");
+
+  moment.locale("zh-cn");
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeNow(moment().format("YYYY 年 MM 月 DD 日 dddd HH:mm:ss "));
+    }, 500);
+
+    return () => clearInterval(timer);
+  }, []);
   return (
     <div>
       <Head>
         <title>{title}</title>
       </Head>
-      <div className="bg-neutral-100 dark:bg-neutral-900 text-center py-2">
-        <p className="text-xs opacity-50">新的设计正处于测试中 🔥🔥🔥</p>
-      </div>
-      <Topbar />
       <div className="max-w-3xl mx-auto px-8 py-4">
         <ThemeAwareCodeHighlight />
-        <main>{children}</main>{" "}
+        <main className="smooth-scroll">{children}</main>{" "}
         <footer className="mt-8">
-          <p className="text-xs opacity-50">© 2025 保留所有权利</p>
+          <h1 className="mt-8 mb-4">您知道吗？</h1>
+          <p className="mt-4">
+            <span className="font-medium">您现在的时间是：</span>
+            {timeNow}
+          </p>
+          <p className="mt-4 text-xs opacity-50">© 2025 保留所有权利</p>
         </footer>
       </div>
     </div>

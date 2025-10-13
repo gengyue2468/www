@@ -4,9 +4,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: "Mona Sans", "AlibabaPuHuiTi-3", sans-serif;
-  @apply bg-white dark:bg-black text-black dark:text-white text-sm;
+  @apply bg-white dark:bg-black text-black dark:text-white text-sm selection:bg-neutral-200 dark:selection:bg-neutral-800 scroll-smooth;
 }
 
 h1,
