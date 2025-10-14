@@ -27,9 +27,14 @@ p {
 }
 
 a {
-  @apply transition-all duration-500 underline underline-offset-4 decoration-neutral-500 hover:decoration-neutral-700 dark:hover:decoration-neutral-300;
+  @apply transition-all duration-500 underline decoration-2 underline-offset-4 decoration-neutral-200 dark:decoration-neutral-800 hover:decoration-neutral-300 dark:hover:decoration-neutral-700;
 }
 
 .serif {
   font-family: "Noto Serif SC", serif;
+}
+
+button:active{
+  scale: 0.9;
+  @apply transition-transform duration-300;
 }

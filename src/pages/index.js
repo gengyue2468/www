@@ -1,4 +1,5 @@
 import Layout from "@/components/layouts/Layout";
+import Locker from "@/components/ui/Locker";
 
 export default function Home() {
   const contact = [
@@ -9,8 +10,10 @@ export default function Home() {
     },
     {
       title: "学校电子邮件：",
-      content: "gengyue2468@hust.edu.cn",
-      href: "mailto:gengyue2468@hust.edu.cn",
+      content: process.env.NEXT_PUBLIC_HUST_EDU_EMAIL,
+      href: `mailto:${process.env.NEXT_PUBLIC_HUST_EDU_EMAIL}`,
+      protected: true,
+      password: process.env.NEXT_PUBLIC_HUST_EMAIL_PASSWORD,
     },
     {
       title: "QQ：",
@@ -110,7 +113,12 @@ export default function Home() {
       {contact.map((item, index) => (
         <p key={index} className="mt-1">
           <span className="font-medium">{item.title}</span>
-          {item.href ? (
+          {item.protected ? (
+            <Locker
+              password={item.password}
+              information={<a href={item.href}>{item.content}</a>}
+            />
+          ) : item.href ? (
             <a href={item.href}>{item.content}</a>
           ) : (
             <span>{item.content}</span>

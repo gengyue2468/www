@@ -43,7 +43,7 @@ export default function App({ Component, pageProps }) {
     <ThemeProvider attribute="class" disableTransitionOnChange>
       {ready && (
         <div>
-          <div className="bg-neutral-100 dark:bg-neutral-900 text-center py-2">
+          <div className="bg-neutral-100 dark:bg-neutral-900 text-center px-2 py-2 mb-4">
             <p className="text-xs opacity-50">新的设计正处于测试中 🔥🔥🔥</p>
           </div>
           <Topbar />

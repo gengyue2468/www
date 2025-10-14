@@ -36,14 +36,14 @@ const MonthTitle = ({ children, className }) => {
 
 const PostTitle = ({ children }) => {
   return (
-    <h1 className="font-medium text-base sm:text-lg truncate mr-2 no-underline">
+    <h1 className="font-semibold truncate mr-2 no-underline">
       {children}
     </h1>
   );
 };
 
 const DayTitle = ({ children }) => {
-  return <h2 className="whitespace-nowrap ml-2 text-sm no-underline!">{children}</h2>;
+  return <h2 className="whitespace-nowrap ml-2 text-xs no-underline! font-normal!">{children}</h2>;
 };
 
 const Divider = () => {
