@@ -1,19 +1,37 @@
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider, useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 
 import "@/styles/globals.css";
+import "@/styles/highlight.css";
 import "katex/dist/katex.min.css";
+
 import Topbar from "@/components/layouts/Topbar";
 
 export default function App({ Component, pageProps }) {
   const [ready, setReady] = useState(false);
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     setReady(true);
   }, []);
+
+  useEffect(() => {
+    const handleRouteChange = () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    };
+
+    router.events.on("routeChangeComplete", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router.events]);
 
   const pageVariants = {
     initial: {
@@ -43,7 +61,7 @@ export default function App({ Component, pageProps }) {
     <ThemeProvider attribute="class" disableTransitionOnChange>
       {ready && (
         <div>
-          <div className="bg-neutral-100 dark:bg-neutral-900 text-center px-2 py-2 mb-4">
+          <div className="bg-neutral-100 dark:bg-neutral-900 text-center px-2 py-2">
             <p className="text-xs opacity-50">新的设计正处于测试中 🔥🔥🔥</p>
           </div>
           <Topbar />

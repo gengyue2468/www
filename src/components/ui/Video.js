@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Slider } from "@radix-ui/react-slider";
-import cn from 'classnames'
+import cn from "classnames";
 import {
   ForwardIcon,
   FullscreenIcon,
@@ -8,10 +8,12 @@ import {
   PauseIcon,
   PlayIcon,
   RewindIcon,
- LoaderCircleIcon,
+  LoaderCircleIcon,
   VolumeIcon,
   RotateCcwIcon,
   RotateCwIcon,
+  Volume2Icon,
+  Volume1Icon,
 } from "lucide-react";
 
 const Video = ({ src, alt }) => {
@@ -368,9 +370,9 @@ const Video = ({ src, alt }) => {
         {isBuffering ? (
           <LoaderCircleIcon className="size-8 sm:size-12 text-white animate-spin" />
         ) : playing ? (
-          <PauseIcon className="size-8 sm:size-12 fill-white" />
+          <PauseIcon className="size-8 sm:size-12 text-white fill-white" />
         ) : (
-          <PlayIcon className="size-8 sm:size-12 fill-white" />
+          <PlayIcon className="size-8 sm:size-12 text-white fill-white" />
         )}
       </div>
 
@@ -452,8 +454,10 @@ const Video = ({ src, alt }) => {
               >
                 {muted || volume === 0 ? (
                   <VolumeXIcon className="size-5 fill-white" />
+                ) : volume < 50 ? (
+                  <Volume1Icon className="size-5 fill-white" />
                 ) : (
-                  <VolumeIcon className="size-5 fill-white" />
+                  <Volume2Icon className="size-5 fill-white" />
                 )}
               </button>
 

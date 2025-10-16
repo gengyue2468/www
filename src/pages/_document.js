@@ -13,6 +13,10 @@ export default function Document() {
           rel="stylesheet"
         />
         <link
+          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+          rel="stylesheet"
+        />
+        <link
           href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:ital,wght@0,400..700;1,200..900&display=swap"
           rel="stylesheet"
         />

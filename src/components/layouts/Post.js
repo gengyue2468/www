@@ -91,7 +91,7 @@ const Post = ({ posts }) => {
                         index={index}
                         className="transition-all duration-500 -translate-x-4 w-[calc(100%+2rem)]  hover:bg-neutral-100 dark:hover:bg-neutral-900 px-2 py-2 group-hover:opacity-50 hover:opacity-100 rounded-sm relative"
                       >
-                        <Link scroll={true} href={`/whims/${post.slug}`} className="no-underline! w-full">
+                        <Link scroll={false} href={`/whims/${post.slug}`} className="no-underline! w-full">
                           <FlexContainer>
                             <PostTitle>
                               {post.frontmatter.title || "未命名"}
@@ -123,7 +123,7 @@ const Post = ({ posts }) => {
                               index={index}
                               className="transition-all duration-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 px-2 py-2 -translate-x-4 w-[calc(100%+2rem)] group-hover:opacity-50 hover:opacity-100 rounded-sm relative"
                             >
-                              <Link scroll={true} href={`/whims/${post.slug}`} className="no-underline!">
+                              <Link scroll={false} href={`/whims/${post.slug}`} className="no-underline!">
                                 <FlexContainer>
                                   <PostTitle>
                                     {post.frontmatter.title || "未命名"}

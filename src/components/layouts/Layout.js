@@ -21,7 +21,6 @@ export default function Layout({ title, children }) {
         <title>{title}</title>
       </Head>
       <div className="max-w-3xl mx-auto px-8 py-4">
-        <ThemeAwareCodeHighlight />
         <main className="smooth-scroll">{children}</main>{" "}
         <footer className="mt-8">
           <h1 className="mt-8 mb-4">您知道吗？</h1>
