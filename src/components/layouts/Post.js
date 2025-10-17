@@ -1,6 +1,7 @@
 import moment from "moment";
 import Link from "next/link";
 import cn from "classnames";
+import Wrapper from "./Wrapper";
 
 const groupPostsByDate = (posts) => {
   const grouped = {};
@@ -36,14 +37,16 @@ const MonthTitle = ({ children, className }) => {
 
 const PostTitle = ({ children }) => {
   return (
-    <h1 className="font-semibold truncate mr-2 no-underline">
-      {children}
-    </h1>
+    <h1 className="font-semibold truncate mr-2 no-underline">{children}</h1>
   );
 };
 
 const DayTitle = ({ children }) => {
-  return <h2 className="whitespace-nowrap ml-2 text-xs no-underline! font-normal!">{children}</h2>;
+  return (
+    <h2 className="whitespace-nowrap ml-2 text-xs no-underline! font-normal!">
+      {children}
+    </h2>
+  );
 };
 
 const Divider = () => {
@@ -60,7 +63,31 @@ const FlexContainer = ({ children }) => {
   return <div className="flex items-center ">{children}</div>;
 };
 
-const Post = ({ posts }) => {
+const DisplayContent = ({ content, searchValue }) => {
+  const loweredSearchValue = searchValue.trim().toLowerCase();
+  const loweredContent = content.toLowerCase();
+
+  const firstIndex = loweredContent.indexOf(searchValue);
+
+  const start = Math.max(0, firstIndex);
+  const end = Math.min(content.length, firstIndex + 300);
+
+  const filteredDisplayContent = content.slice(start, end).split("");
+
+  return (
+    <>
+      {filteredDisplayContent.map((char) =>
+        loweredSearchValue.includes(char) ? (
+          <strong key={char}>{char}</strong>
+        ) : (
+          char
+        )
+      )}
+    </>
+  );
+};
+
+const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
   moment.locale("zh-cn");
   const groupedPosts = groupPostsByDate(posts);
   const sortedYears = Object.keys(groupedPosts).sort((a, b) => b - a);
@@ -73,13 +100,14 @@ const Post = ({ posts }) => {
         const isFirstYear = sortedYears.indexOf(year) === 0;
 
         return (
-          <div key={year} className={`${isFirstYear ? "" : "mt-8"} px-2 pb-4 group`}>
+          <div
+            key={year}
+            className={`${isFirstYear ? "" : "mt-8"} px-2 pb-4 group`}
+          >
             {sortedMonths.length > 0 && (
               <>
                 <div className="flex justify-between items-center mb-2 px-2 -translate-x-4 w-[calc(100%+2rem)]">
-                  <h3>
-                    {year} 年
-                  </h3>
+                  <h3>{year} 年</h3>
                   <MonthTitle>{months[sortedMonths[0]].name}</MonthTitle>
                 </div>
 
@@ -91,16 +119,50 @@ const Post = ({ posts }) => {
                         index={index}
                         className="transition-all duration-500 -translate-x-4 w-[calc(100%+2rem)]  hover:bg-neutral-100 dark:hover:bg-neutral-900 px-2 py-2 group-hover:opacity-50 hover:opacity-100 rounded-sm relative"
                       >
-                        <Link scroll={false} href={`/whims/${post.slug}`} className="no-underline! w-full">
+                        <Link
+                          scroll={false}
+                          href={`/whims/${post.slug}`}
+                          className="no-underline! w-full"
+                        >
                           <FlexContainer>
                             <PostTitle>
-                              {post.frontmatter.title || "未命名"}
+                              {(post.frontmatter.title || "未命名")
+                                .split("")
+                                .map((char, index) => {
+                                  if (
+                                    searchValue !== "" &&
+                                    filterBy === "标题"
+                                  ) {
+                                    return searchValue
+                                      .toLowerCase()
+                                      .includes(char.toLowerCase()) ? (
+                                      <strong key={index}>{char}</strong>
+                                    ) : (
+                                      <span key={index}>{char}</span>
+                                    );
+                                  }
+                                  return <span key={index}>{char}</span>;
+                                })}
                             </PostTitle>
                             <Divider />
                             <DayTitle>
                               {moment(post.frontmatter.date).format("Do")}
                             </DayTitle>
                           </FlexContainer>
+                          {type == "search" && (
+                            <Wrapper
+                              className={`!mt-0 line-clamp-3 transition-all duration-500 ${
+                                filterBy == "内容"
+                                  ? "opacity-100 h-18"
+                                  : "h-0 opacity-0"
+                              }`}
+                            >
+                              <DisplayContent
+                                content={post.content}
+                                searchValue={searchValue}
+                              />
+                            </Wrapper>
+                          )}
                         </Link>
                       </div>
                     );
@@ -123,16 +185,50 @@ const Post = ({ posts }) => {
                               index={index}
                               className="transition-all duration-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 px-2 py-2 -translate-x-4 w-[calc(100%+2rem)] group-hover:opacity-50 hover:opacity-100 rounded-sm relative"
                             >
-                              <Link scroll={false} href={`/whims/${post.slug}`} className="no-underline!">
+                              <Link
+                                scroll={false}
+                                href={`/whims/${post.slug}`}
+                                className="no-underline!"
+                              >
                                 <FlexContainer>
                                   <PostTitle>
-                                    {post.frontmatter.title || "未命名"}
+                                    {(post.frontmatter.title || "未命名")
+                                      .split("")
+                                      .map((char, index) => {
+                                        if (
+                                          searchValue !== "" &&
+                                          filterBy === "标题"
+                                        ) {
+                                          return searchValue
+                                            .toLowerCase()
+                                            .includes(char.toLowerCase()) ? (
+                                            <strong key={index}>{char}</strong>
+                                          ) : (
+                                            <span key={index}>{char}</span>
+                                          );
+                                        }
+                                        return <span key={index}>{char}</span>;
+                                      })}
                                   </PostTitle>
                                   <Divider />
                                   <DayTitle>
                                     {moment(post.frontmatter.date).format("Do")}
                                   </DayTitle>
                                 </FlexContainer>
+                                {type == "search" && (
+                                  <Wrapper
+                                    className={`!mt-0 line-clamp-3 transition-all duration-500 ${
+                                      filterBy == "内容"
+                                        ? "opacity-100 h-18"
+                                        : "h-0 opacity-0"
+                                    }`}
+                                  >
+                                    <DisplayContent
+                                      content={post.content}
+                                      searchValue={searchValue}
+                                    />
+                                  </Wrapper>
+                                )}
                               </Link>
                             </div>
                           );

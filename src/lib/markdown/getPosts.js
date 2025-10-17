@@ -3,7 +3,7 @@ import path from "path";
 import matter from "gray-matter";
 import { serialize } from "next-mdx-remote/serialize";
 import { calculateReadingTime } from "@/lib/CalculateReadingTime";
-import { remarkPlugins, rehypePlugins } from "@/lib/markdown/plugins"; 
+import { remarkPlugins, rehypePlugins } from "@/lib/markdown/plugins";
 
 const postsDirectory = path.join(process.cwd(), "data", "whims");
 
@@ -14,12 +14,12 @@ export async function getAllPosts(sortByDate = true, descending = true) {
     const posts = await Promise.all(
       filenames.map(async (filename) => {
         if (!filename.endsWith(".mdx")) return null;
-        
+
         const slug = filename.replace(/\.mdx$/, "");
         const fullPath = path.join(postsDirectory, filename);
         const fileContents = await fs.readFile(fullPath, "utf8");
 
-        const { data: frontmatter } = matter(fileContents);
+        const { data: frontmatter, content } = matter(fileContents);
 
         if (frontmatter.draft && process.env.NODE_ENV === "production") {
           return null;
@@ -28,10 +28,11 @@ export async function getAllPosts(sortByDate = true, descending = true) {
         return {
           slug,
           frontmatter,
+          content,
         };
       })
     );
-    const filteredPosts = posts.filter(post => post !== null);
+    const filteredPosts = posts.filter((post) => post !== null);
 
     if (sortByDate) {
       return filteredPosts.sort((a, b) => {
@@ -93,7 +94,7 @@ export async function getLatestPost() {
 export async function getAllPostPaths() {
   try {
     const filenames = await fs.readdir(postsDirectory);
-    const mdxFiles = filenames.filter(filename => filename.endsWith(".mdx"));
+    const mdxFiles = filenames.filter((filename) => filename.endsWith(".mdx"));
 
     return mdxFiles.map((filename) => ({
       params: {
@@ -109,9 +110,8 @@ export async function getAllPostPaths() {
 export async function getPostsByTag(tag) {
   try {
     const allPosts = await getAllPosts();
-    return allPosts.filter(post => 
-      post.frontmatter.tags && 
-      post.frontmatter.tags.includes(tag)
+    return allPosts.filter(
+      (post) => post.frontmatter.tags && post.frontmatter.tags.includes(tag)
     );
   } catch (error) {
     console.error(`Error getting posts with tag ${tag}:`, error);

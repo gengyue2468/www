@@ -80,7 +80,7 @@ export default function App({ Component, pageProps }) {
           </AnimatePresence>
           <div className="max-w-xl w-full fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15 dark:opacity-5 backdrop-blur-sm z-10 pointer-events-none">
             <motion.img src="/static/brian-griffin.svg" className="w-full" />
-            <h1 className="text-center !text-3xl sm:!text-5xl !font-bold">“你能做的 岂止如此”</h1>
+            <h1 className="text-center !text-3xl sm:!text-5xl !font-bold opacity-25 dark:opacity-75">“你能做的 岂止如此”</h1>
           </div>
         </div>
       )}
