@@ -19,7 +19,16 @@ h3,
 h4,
 h5,
 h6 {
-  @apply font-semibold text-sm;
+  @apply font-bold text-sm;
+}
+
+.prose h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply !font-bold text-black dark:text-white;
 }
 
 p {
@@ -27,28 +36,40 @@ p {
 }
 
 a {
-  @apply transition-all duration-500 underline decoration-2 underline-offset-4 decoration-neutral-200 dark:decoration-neutral-800 hover:decoration-neutral-300 dark:hover:decoration-neutral-700;
+  @apply transition-all duration-500 bg-blue-50 border-b-2 border-blue-100 
+         font-medium 
+         dark:bg-blue-900/25 dark:border-blue-700/25 
+   
+}
+
+strong {
+  @apply bg-yellow-200 border-b-2 border-yellow-400 font-semibold 
+         dark:bg-yellow-800/25 dark:border-yellow-600/25
+        
 }
 
 .serif {
   font-family: "Noto Serif SC", serif;
 }
 
-button:active{
+button:active {
   scale: 0.9;
   @apply transition-transform duration-300;
 }
 
-pre{
+pre {
   @apply px-8;
 }
 
-pre,code{
-    font-family: 'JetBrains Mono', monospace !important;
+pre,
+code {
+  font-family: "JetBrains Mono", monospace !important;
 }
 
-.mono{
-  font-family: 'JetBrains Mono', monospace !important;
+.mono {
+  font-family: "JetBrains Mono", monospace !important;
 }
 
-
+.anchor-link {
+  @apply no-underline font-semibold;
+}

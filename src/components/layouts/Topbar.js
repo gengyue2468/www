@@ -22,7 +22,7 @@ export default function Topbar() {
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
   return (
-    <div className="z-10 sticky top-0 bg-white/75 dark:bg-black/75 backdrop-blur-sm w-full">
+    <div className="z-10 sticky top-0 bg-transparent">
       <div className="max-w-3xl mx-auto py-2 px-8">
         <div className="flex flex-row justify-between items-center">
           <h1
@@ -40,16 +40,17 @@ export default function Topbar() {
                   ? router.asPath == "/"
                   : router.asPath.includes(item.href);
               return (
-                <Link
-                  href={item.href}
+                <button
+                  onClick={() => {
+                    router.push(item.href, undefined, { scroll: false });
+                  }}
                   key={index}
-                  scroll={false}
                   className={`no-underline! cursor-pointer transition-all duration-500 text-xs px-1.5 py-1 rounded-sm hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 focus:ring-2 focus:ring-neutral-500 focus:outline-none ${
                     active ? "font-semibold opacity-100" : "opacity-50"
                   } hover:opacity-100`}
                 >
                   {item.name}
-                </Link>
+                </button>
               );
             })}
             <button

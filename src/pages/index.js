@@ -1,6 +1,8 @@
 import Layout from "@/components/layouts/Layout";
 import Locker from "@/components/ui/Locker";
 
+import { motion } from "motion/react";
+
 export default function Home() {
   const contact = [
     {
@@ -96,17 +98,33 @@ export default function Home() {
       outdate: true,
     },
   ];
+
+  const initial = { opacity: 0, y: 10 };
+  const animate = { opacity: 1, y: 0 };
+  const transition = { type: "tween", ease: "anticipate", duration: 0.5 };
   return (
     <Layout title="BriGriff - I'm thinking">
-      <h1 className="mt-8 mb-4">关于</h1>
+      <motion.h1
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "tween", ease: "anticipate", duration: 0.5 }}
+        className="mt-8 mb-4"
+        ssr={false}
+      >
+        关于
+      </motion.h1>
 
       <p>
         我是<a href="https://hust.edu.cn">华中科技大学</a>{" "}
-        <a href="https://cs.hust.edu.cn">计算机科学与技术学院</a>
-        的一名学生，是大一的小东西。
+        <a href="https://cs.hust.edu.cn">计算机科学与技术学院</a> {" "}
+        的一名本科生，是大一的{" "}<strong>小东西</strong>。
       </p>
       <p className="mt-4">
-        如果你认识我的话，那你就认识我了。如果你不认识我，那你绝对不认识我。
+        如果你认识我的话，<strong>那你就认识我了</strong>。如果你不认识我，
+        <strong>那你绝对不认识我</strong>。
+      </p>
+      <p className="mt-4">
+        华中科技大学{" "}<a href="https://www.bingyan.net">冰岩作坊</a> {" "}前端组成员。
       </p>
 
       <h1 className="mt-8 mb-4">联系我</h1>
@@ -157,8 +175,11 @@ export default function Home() {
 
       <h1 className="mt-8 mb-4">网站</h1>
 
-      <p className="mt-1">页面使用 Next.js + TailwindCSS 建造</p>
-      <p className="mt-1">字体使用 阿里巴巴普惠体、思源宋体和 Mono Sans</p>
+      <p className="mt-1">页面使用 <strong>Next.js + TailwindCSS</strong> 建造</p>
+      <p className="mt-1">
+        字体使用 <strong>阿里巴巴普惠体</strong>、<strong>Mono Sans</strong> 和{" "}
+        <strong>JetBrains Mono</strong>
+      </p>
       <p className="mt-1">所有样式都是手搓的</p>
       <p className="mt-2 opacity-50">
         如果你看不清楚字，请使用 Ctrl +

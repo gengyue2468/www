@@ -20,8 +20,8 @@ export default function Layout({ title, children }) {
       <Head>
         <title>{title}</title>
       </Head>
-      <div className="max-w-3xl mx-auto px-8 py-4">
-        <main className="smooth-scroll">{children}</main>{" "}
+      <div className="max-w-3xl mx-auto px-8 py-4 flex flex-col justify-start min-h-[90vh]">
+        <main className="smooth-scroll flex-1">{children}</main>{" "}
         <footer className="mt-8">
           <h1 className="mt-8 mb-4">您知道吗？</h1>
           <p className="mt-4">
