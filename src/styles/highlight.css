@@ -18,7 +18,7 @@ code.hljs {
 */
 .hljs {
   color: #24292e;
-  background: #ffffff;
+  background: #f5f5f5;
 }
 .hljs-doctag,
 .hljs-keyword,
@@ -137,7 +137,7 @@ code.hljs {
 */
   .hljs {
     color: #c9d1d9;
-    background: #000000;
+    background: #171717;
   }
   .hljs-doctag,
   .hljs-keyword,

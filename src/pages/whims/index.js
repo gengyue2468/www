@@ -40,11 +40,11 @@ const Whims = ({ allPosts }) => {
             onChange={(e) => setSearchValue(e.target.value)}
             value={searchValue}
             placeholder={`按照${filterBy}筛选随想`}
-            className="border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 focus:bg-white dark:focus:bg-black focus:outline-none focus:ring-2 focus:ring-neutral-500 border-sm my-4 w-full pl-8 pr-2 py-2 transition-all duration-500"
+            className="rounded-sm border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 focus:bg-white dark:focus:bg-black focus:outline-none focus:ring-2 focus:ring-neutral-500 border-sm my-4 w-full pl-8 pr-2 py-2 transition-all duration-500"
           />
         </div>
 
-        <div className="flex flex-row -mt-3 space-x-2 items-center px-4 bg-white dark:bg-black w-full border border-neutral-200 dark:border-neutral-800 py-1">
+        <div className="flex flex-row -mt-3 space-x-2 items-center px-4 rounded-sm bg-white dark:bg-black w-full border border-neutral-200 dark:border-neutral-800 py-1">
           <h1 className="!text-xs opacity-50">筛选条件</h1>
           {filter.map((filter, index) => (
             <button

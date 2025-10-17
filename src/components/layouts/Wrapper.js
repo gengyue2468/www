@@ -10,7 +10,7 @@ export default function Wrapper({ children, className }) {
     prose-blockquote:border-l-black dark:prose-blockquote:border-l-white prose-blockquote:-translate-x-5  prose-blockquote:not-italic prose-blockquote:font-medium
     prose-li:text-black dark:prose-li:text-white prose-li:-translate-x-7 prose-li:opacity-100! prose-li:[&::marker]:font-medium 
     prose-strong:font-medium
-    prose-pre:rounded-none sm:prose-pre:rounded-sm prose-pre:bg-white dark:prose-pre:bg-black prose-pre:border prose-pre:border-neutral-200 dark:prose-pre:border-neutral-800 prose-code:text-black! dark:prose-code:text-white! prose-pre:-translate-x-8 prose-code:font-mono prose-pre:w-[calc(100%+4rem)]! prose-pre:overflow-x-auto ${className}`}
+    prose-pre:rounded-none sm:prose-pre:rounded-sm prose-pre:bg-neutral-100 dark:prose-pre:bg-neutral-900 prose-pre:border prose-pre:border-neutral-200 dark:prose-pre:border-neutral-800 prose-code:text-black! dark:prose-code:text-white! prose-pre:-translate-x-8 prose-code:font-mono prose-pre:w-[calc(100%+4rem)]! prose-pre:overflow-x-auto ${className}`}
     >
       {children}
     </div>

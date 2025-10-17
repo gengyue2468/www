@@ -61,6 +61,10 @@ pre {
   @apply px-8;
 }
 
+.prose code{
+  @apply bg-neutral-100 dark:bg-neutral-900 rounded-sm;
+}
+
 pre,
 code {
   font-family: "JetBrains Mono", monospace !important;
