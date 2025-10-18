@@ -51,12 +51,11 @@ export default function Topbar() {
                   ? router.asPath == "/"
                   : router.asPath.includes(item.href);
               return (
-                <Tooltip content={item.href}>
+                <Tooltip key={index} content={item.href}>
                   <button
                     onClick={() => {
                       router.push(item.href, undefined, { scroll: false });
                     }}
-                    key={index}
                     className={`no-underline! cursor-pointer transition-all duration-500 px-3 py-2 rounded-full  focus:ring-2 focus:ring-neutral-500 focus:outline-none ${
                       active
                         ? "font-extrabold opacity-100 bg-black text-white dark:bg-white dark:text-black"

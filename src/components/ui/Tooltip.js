@@ -1,8 +1,8 @@
 import { Tooltip as RadixTooltip } from "radix-ui";
 
-export default function Tooltip({ children, content }) {
+export default function Tooltip({ children, content, ...props }) {
   return (
-    <RadixTooltip.Provider>
+    <RadixTooltip.Provider {...props}>
       <RadixTooltip.Root>
         <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
         <RadixTooltip.Portal>
