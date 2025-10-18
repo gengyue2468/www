@@ -63,8 +63,8 @@ export default function Image({ alt, src, ...props }) {
       block relative bg-neutral-100 dark:bg-neutral-900 rounded-none min-h-48 sm:min-h-[24rem] border-y sm:border border-neutral-200 dark:border-neutral-800
       ${
         isPortrait
-          ? "sm:rounded-sm w-[calc(100%+4rem)]! -translate-x-8"
-          : "sm:rounded-sm w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]! -translate-x-8 sm:-translate-x-48"
+          ? "sm:rounded-3xl w-[calc(100%+4rem)]! -translate-x-8"
+          : "sm:rounded-3xl w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]! -translate-x-8 sm:-translate-x-48"
       }
       overflow-hidden
       transition-all duration-500
@@ -79,8 +79,8 @@ export default function Image({ alt, src, ...props }) {
           w-full h-full object-cover 
           ${
             isPortrait
-              ? "rounded-none sm:rounded-sm"
-              : "rounded-none sm:rounded-sm"
+              ? "rounded-none sm:rounded-3xl"
+              : "rounded-none sm:rounded-3xl"
           }
           transition-opacity duration-500
           ${isLoaded ? "opacity-100" : "opacity-0"}

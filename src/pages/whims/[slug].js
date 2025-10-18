@@ -11,7 +11,7 @@ const WhimPage = ({ post, allPosts }) => {
 
   return (
     <Layout title={title} desc={desc}>
-      <div className="mt-0">
+      <div className="mt-0 max-w-3xl mx-auto">
         <Header
           title={title}
           date={date}

@@ -32,18 +32,20 @@ const groupPostsByDate = (posts) => {
 };
 
 const MonthTitle = ({ children, className }) => {
-  return <h4 className={cn("font-medium text-sm", className)}>{children}</h4>;
+  return <h4 className={cn("font-bold", className)}>{children}</h4>;
 };
 
 const PostTitle = ({ children }) => {
   return (
-    <h1 className="font-semibold truncate mr-2 no-underline">{children}</h1>
+    <h1 className="font-extrabold text-base truncate mr-2 no-underline">
+      {children}
+    </h1>
   );
 };
 
 const DayTitle = ({ children }) => {
   return (
-    <h2 className="whitespace-nowrap ml-2 text-xs no-underline! font-normal!">
+    <h2 className="whitespace-nowrap ml-2 no-underline! font-bold">
       {children}
     </h2>
   );
@@ -56,7 +58,7 @@ const Divider = () => {
 };
 
 const ListContainer = ({ children }) => {
-  return <div className="flex flex-col space-y-0 *:">{children}</div>;
+  return <div className="flex flex-col space-y-0">{children}</div>;
 };
 
 const FlexContainer = ({ children }) => {
@@ -117,7 +119,7 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
                       <div
                         key={post.slug}
                         index={index}
-                        className="transition-all duration-500 -translate-x-4 w-[calc(100%+2rem)]  hover:bg-neutral-100 dark:hover:bg-neutral-900 px-2 py-2 group-hover:opacity-50 hover:opacity-100 rounded-sm relative"
+                        className="transition-all duration-500 -translate-x-6 w-[calc(100%+3rem)]  hover:bg-neutral-100 dark:hover:bg-neutral-900 px-3 py-3 group-hover:opacity-50 hover:opacity-100 rounded-3xl relative"
                       >
                         <Link
                           scroll={false}
@@ -183,7 +185,7 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
                             <div
                               key={post.slug}
                               index={index}
-                              className="transition-all duration-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 px-2 py-2 -translate-x-4 w-[calc(100%+2rem)] group-hover:opacity-50 hover:opacity-100 rounded-sm relative"
+                              className="transition-all duration-500 -translate-x-6 w-[calc(100%+3rem)]  hover:bg-neutral-100 dark:hover:bg-neutral-900 px-3 py-3 group-hover:opacity-50 hover:opacity-100 rounded-3xl relative"
                             >
                               <Link
                                 scroll={false}

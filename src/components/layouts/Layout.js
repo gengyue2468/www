@@ -16,16 +16,14 @@ export default function Layout({ title, children }) {
     return () => clearInterval(timer);
   }, []);
   return (
-    <div>
+    <div className="">
       <Head>
         <title>{title}</title>
       </Head>
-      <div className="max-w-3xl mx-auto px-8 py-4 flex flex-col justify-start min-h-[90vh]">
-        <main className="smooth-scroll flex-1">{children}</main>{" "}
-        <footer className="mt-8">
-          <h1 className="mt-8 mb-4">您知道吗？</h1>
+      <div className="max-w-7xl mx-auto px-8 py-4 flex flex-col justify-start min-h-[90vh]">
+        <main className="smooth-scroll flex-1">{children}</main>
+        <footer className="mt-8 text-center font-bold">
           <p className="mt-4">
-            <span className="font-medium">您现在的时间是：</span>
             {timeNow}
           </p>
           <p className="mt-4 text-xs opacity-50">© 2025 保留所有权利</p>

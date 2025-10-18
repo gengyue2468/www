@@ -2,6 +2,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Tooltip from "../ui/Tooltip";
 
 const NavItems = [
   {
@@ -23,50 +24,63 @@ export default function Topbar() {
   const { resolvedTheme, setTheme } = useTheme();
   return (
     <div className="z-10 sticky top-0 bg-transparent">
-      <div className="max-w-3xl mx-auto py-2 px-8">
+      <div className="max-w-7xl mx-auto py-2 px-4 sm:px-8">
         <div className="flex flex-row justify-between items-center">
-          <h1
-            className="-translate-x-1 font-semibold text-sm transition-all duration-500 px-1.5 py-1 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 rounded-sm cursor-pointer"
-            onClick={() => {
-              router.push("/", undefined, { scroll: false });
-            }}
-          >
-            BriGriff
-          </h1>
-          <div className="flex flex-row items-center space-x-1.5">
+          <Tooltip content="主页">
+            <div className="-translate-x-4 flex flex-row space-x-2 transition-all duration-500 px-3 py-2 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 rounded-full cursor-pointer">
+              <img
+                src="/static/author.webp"
+                className="size-6 rounded-full"
+                alt="头像"
+              />
+              <h1
+                className="font-extrabold"
+                onClick={() => {
+                  router.push("/", undefined, { scroll: false });
+                }}
+              >
+                BriGriff
+              </h1>
+            </div>
+          </Tooltip>
+
+          <div className="flex flex-row items-center space-x-0.5 sm:space-x-1.5">
             {NavItems.map((item, index) => {
               const active =
                 item.href == "/"
                   ? router.asPath == "/"
                   : router.asPath.includes(item.href);
               return (
-                <button
-                  onClick={() => {
-                    router.push(item.href, undefined, { scroll: false });
-                  }}
-                  key={index}
-                  className={`no-underline! cursor-pointer transition-all duration-500 text-xs px-1.5 py-1 rounded-sm hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 focus:ring-2 focus:ring-neutral-500 focus:outline-none ${
-                    active ? "font-semibold opacity-100" : "opacity-50"
-                  } hover:opacity-100`}
-                >
-                  {item.name}
-                </button>
+                <Tooltip content={item.href}>
+                  <button
+                    onClick={() => {
+                      router.push(item.href, undefined, { scroll: false });
+                    }}
+                    key={index}
+                    className={`no-underline! cursor-pointer transition-all duration-500 px-3 py-2 rounded-full  focus:ring-2 focus:ring-neutral-500 focus:outline-none ${
+                      active
+                        ? "font-extrabold opacity-100 bg-black text-white dark:bg-white dark:text-black"
+                        : "hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 font-semibold opacity-50"
+                    } hover:opacity-100`}
+                  >
+                    {item.name}
+                  </button>
+                </Tooltip>
               );
             })}
             <button
               onClick={() =>
                 setTheme(resolvedTheme === "dark" ? "light" : "dark")
               }
-              className="flex items-center space-x-1 cursor-pointer transition-all duration-500 text-xs px-1 py-1 rounded-sm hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 focus:ring-2 focus:ring-neutral-500 focus:outline-none ${
+              className="size-9 flex items-center justify-center cursor-pointer transition-all duration-500 p-2 rounded-full hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 focus:ring-2 focus:ring-neutral-500 focus:outline-none ${
               opacity-50
                  hover:opacity-100"
             >
               {resolvedTheme === "light" ? (
-                <SunIcon size={16} className="fill-black" />
+                <SunIcon className="fill-black" />
               ) : (
-                <MoonIcon size={16} className="fill-white" />
+                <MoonIcon className="fill-white" />
               )}
-              <span>{resolvedTheme == "light" ? "明亮" : "黑暗"}</span>
             </button>
           </div>
         </div>

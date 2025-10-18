@@ -1,190 +1,204 @@
 import Layout from "@/components/layouts/Layout";
-import Locker from "@/components/ui/Locker";
 
 import { motion } from "motion/react";
+import { InView } from "react-intersection-observer";
+
+import { device, contact, webTech } from "@/lib/home.config";
+import { useRouter } from "next/router";
 
 export default function Home() {
-  const contact = [
-    {
-      title: "电子邮件：",
-      content: "gengyue2468@outlook.com",
-      href: "mailto:gengyue2468@outlook.com",
-    },
-    {
-      title: "学校电子邮件：",
-      content: process.env.NEXT_PUBLIC_HUST_EDU_EMAIL,
-      href: `mailto:${process.env.NEXT_PUBLIC_HUST_EDU_EMAIL}`,
-      protected: true,
-      password: process.env.NEXT_PUBLIC_HUST_EMAIL_PASSWORD,
-    },
-    {
-      title: "QQ：",
-      content: "3041299667",
-      href: null,
-    },
-    {
-      title: "GitHub：",
-      content: "@gengyue2468",
-      href: "https://github.com/gengyue2468",
-    },
-  ];
-
-  const device = [
-    {
-      brand: "荣耀",
-      device: "GT Pro",
-      cpu: "骁龙 8 至尊领先版",
-      ram: "12 GB",
-      rom: "256 GB",
-    },
-    {
-      brand: "荣耀",
-      device: "平板 10",
-      cpu: "骁龙 7 Gen 3",
-      ram: "12 GB",
-      rom: "256 GB",
-    },
-    {
-      brand: "荣耀",
-      device: "手表 5",
-      cpu: null,
-      ram: "64 MB",
-      rom: "1 GB",
-    },
-    {
-      brand: "惠普",
-      device: "暗影精灵 11",
-      cpu: "酷睿 i9-14900 HX",
-      ram: "32 GB",
-      rom: "1 TB",
-    },
-    {
-      brand: "Apple",
-      device: "iMac 24' (2021)",
-      cpu: "M1",
-      ram: "16 GB",
-      rom: "512 GB",
-    },
-    {
-      brand: "联想",
-      device: "B300",
-      cpu: "酷睿2 E8400",
-      ram: "2 GB",
-      rom: "500 GB",
-      outdate: true,
-    },
-    {
-      brand: "荣耀",
-      device: "V10",
-      cpu: "麒麟 970",
-      ram: "6 GB",
-      rom: "64 GB",
-      outdate: true,
-    },
-    {
-      brand: "荣耀",
-      device: "畅玩 7x",
-      cpu: "麒麟 659",
-      ram: "4 GB",
-      rom: "64 GB",
-      outdate: true,
-    },
-    {
-      brand: "红米",
-      device: "3",
-      cpu: "骁龙 616",
-      ram: "2 GB",
-      rom: "16 GB",
-      outdate: true,
-    },
-  ];
-
-  const initial = { opacity: 0, y: 10 };
+  const router = useRouter();
+  const initial = { opacity: 0, y: 20 };
   const animate = { opacity: 1, y: 0 };
-  const transition = { type: "tween", ease: "anticipate", duration: 0.5 };
+  const transition = { type: "tween", ease: "easeOut", duration: 0.6 };
+
   return (
     <Layout title="BriGriff - I'm thinking">
-      <motion.h1
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "tween", ease: "anticipate", duration: 0.5 }}
-        className="mt-8 mb-4"
-        ssr={false}
-      >
-        关于
-      </motion.h1>
+      <div className="mt-8 items-center flex flex-col sm:flex-row gap-4 justify-between">
+        <InView triggerOnce={true}>
+          {({ inView, ref }) => (
+            <div ref={ref} className="w-full sm:w-1/2 z-5">
+              <motion.h1
+                initial={initial}
+                animate={inView ? animate : initial}
+                transition={transition}
+                className="my-8 font-extrabold text-4xl w-full leading-relaxed"
+              >
+                华中<strong>柯基大学</strong>，本科生，是<strong>基柯</strong>生
+              </motion.h1>
 
-      <p>
-        我是<a href="https://hust.edu.cn">华中科技大学</a>{" "}
-        <a href="https://cs.hust.edu.cn">计算机科学与技术学院</a> {" "}
-        的一名本科生，是大一的{" "}<strong>小东西</strong>。
-      </p>
-      <p className="mt-4">
-        如果你认识我的话，<strong>那你就认识我了</strong>。如果你不认识我，
-        <strong>那你绝对不认识我</strong>。
-      </p>
-      <p className="mt-4">
-        华中科技大学{" "}<a href="https://www.bingyan.net">冰岩作坊</a> {" "}前端组成员。
-      </p>
+              <motion.h1
+                initial={initial}
+                animate={inView ? animate : initial}
+                transition={{ ...transition, delay: 0.2 }}
+                className="my-8 font-extrabold text-4xl w-full leading-relaxed"
+              >
+                是<strong>大一</strong>，是<strong>小东西</strong>
+              </motion.h1>
 
-      <h1 className="mt-8 mb-4">联系我</h1>
-      {contact.map((item, index) => (
-        <p key={index} className="mt-1">
-          <span className="font-medium">{item.title}</span>
-          {item.protected ? (
-            <Locker
-              password={item.password}
-              information={<a href={item.href}>{item.content}</a>}
-            />
-          ) : item.href ? (
-            <a href={item.href}>{item.content}</a>
-          ) : (
-            <span>{item.content}</span>
+              <motion.h1
+                initial={initial}
+                animate={inView ? animate : initial}
+                transition={{ ...transition, delay: 0.4 }}
+                className="my-8 font-extrabold text-4xl w-full leading-relaxed"
+              >
+                <a href="https://www.bingyan.net">冰岩作坊</a> 前端组
+              </motion.h1>
+            </div>
           )}
-        </p>
-      ))}
+        </InView>
 
-      <h1 className="mt-8 mb-4">设备</h1>
-
-      {device.map((item, index) => (
-        <div
-          key={index}
-          className={`mt-1 flex flex-row items-center justify-between ${
-            item.outdate && "opacity-50"
-          }`}
-        >
-          <p className="font-medium">
-            {item.brand} {item.device}{" "}
-            {item.outdate && (
-              <span className="text-xs bg-neutral-200 dark:bg-neutral-800 rounded-sm px-1 py-0.5">
-                过时
-              </span>
+        <div className="w-full sm:w-1/2 -translate-y-32 sm:translate-y-0 z-0">
+          <InView triggerOnce={true}>
+            {({ ref, inView }) => (
+              <motion.img
+                ref={ref}
+                initial={initial}
+                animate={inView ? animate : initial}
+                transition={{ ...transition, delay: 0.2 }}
+                src="/static/chris-griffin.png"
+                className="w-full"
+              />
             )}
-          </p>
-          <p className="opacity-50 text-xs">
-            {item.cpu} {item.ram} + {item.rom}
-          </p>
+          </InView>
         </div>
-      ))}
+      </div>
+      <div className="">
+        <InView triggerOnce={true}>
+          {({ inView, ref }) => (
+            <div ref={ref} className="w-full sm:w-1/2 z-5 mt-16">
+              <motion.h1
+                initial={initial}
+                animate={inView ? animate : initial}
+                transition={transition}
+                className="my-8 font-extrabold text-2xl sm:text-4xl w-full leading-relaxed"
+              >
+                设备列表
+              </motion.h1>
+            </div>
+          )}
+        </InView>
 
-      <p className="mt-4">
-        诸如魅族 MX6、MX5、MX2 及 HTC Windows Phone 等更古早产品并未加入到列表中
-      </p>
+        <div className="flex flex-row flex-wrap gap-4">
+          {device.map((item, index) => (
+            <InView threshold={0.2} key={index} triggerOnce={true}>
+              {({ inView, ref }) => (
+                <motion.div
+                  ref={ref}
+                  initial={initial}
+                  animate={inView ? animate : initial}
+                  transition={{ ...transition, delay: 0.2 * (index + 1) }}
+                  className={`w-full sm:w-80 bg-neutral-100 dark:bg-neutral-900 rounded-3xl items-center text-center px-12 py-8 flex flex-col justify-between flex-shrink-0 ${
+                    item.outdate && "opacity-50"
+                  }`}
+                >
+                  <div className="flex items-center h-full">
+                    <img src={item.pic} className="rounded-3xl w-auto" />
+                  </div>
 
-      <p className="mt-1 text-xs opacity-50">* 红米 3 现在正作为电子钟运行</p>
+                  <div>
+                    <h1 className="font-bold text-3xl mt-8">
+                      {item.brand} {item.device}
+                    </h1>
 
-      <h1 className="mt-8 mb-4">网站</h1>
+                    <p className="mt-4 font-semibold opacity-50 text-xl">
+                      {item.cpu} <br />
+                      {item.ram} + {item.rom}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </InView>
+          ))}
+        </div>
+      </div>
 
-      <p className="mt-1">页面使用 <strong>Next.js + TailwindCSS</strong> 建造</p>
-      <p className="mt-1">
-        字体使用 <strong>阿里巴巴普惠体</strong>、<strong>Mono Sans</strong> 和{" "}
-        <strong>JetBrains Mono</strong>
-      </p>
-      <p className="mt-1">所有样式都是手搓的</p>
-      <p className="mt-2 opacity-50">
-        如果你看不清楚字，请使用 Ctrl +
-        滚轮缩放页面或者双指捏合屏幕以放大/缩小页面
-      </p>
+      <div className="">
+        <InView triggerOnce={true}>
+          {({ inView, ref }) => (
+            <div ref={ref} className="w-full sm:w-1/2 z-5 mt-16">
+              <motion.h1
+                initial={initial}
+                animate={inView ? animate : initial}
+                transition={transition}
+                className="my-8 font-extrabold text-2xl sm:text-4xl w-full leading-relaxed"
+              >
+                联系我
+              </motion.h1>
+            </div>
+          )}
+        </InView>
+
+        <div className="flex flex-row flex-wrap gap-4">
+          {contact.map((item, index) => (
+            <InView key={index} triggerOnce={true}>
+              {({ inView, ref }) => (
+                <motion.div
+                  ref={ref}
+                  onClick={() => (item.href ? router.push(item.href) : null)}
+                  initial={initial}
+                  animate={inView ? animate : initial}
+                  transition={{ ...transition, delay: 0.2 * (index + 1) }}
+                  className={`w-full sm:w-80 bg-neutral-100 dark:bg-neutral-900 rounded-3xl items-center text-center px-12 py-8 flex flex-col justify-between flex-shrink-0
+                  ${item.outdate && "opacity-50"}}`}
+                >
+                  <div className="flex items-center h-full">{item.icon}</div>
+
+                  <div>
+                    <h1 className="font-bold text-3xl mt-8">{item.title}</h1>
+                    <div className="mt-4 font-semibold opacity-50 text-xl bg-white dark:bg-black rounded-full px-3 py-2">
+                      {item.content}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </InView>
+          ))}
+        </div>
+      </div>
+
+      <div className="">
+        <InView triggerOnce={true}>
+          {({ inView, ref }) => (
+            <div ref={ref} className="w-full sm:w-1/2 z-5 mt-16">
+              <motion.h1
+                initial={initial}
+                animate={inView ? animate : initial}
+                transition={transition}
+                className="my-8 font-extrabold text-2xl sm:text-4xl w-full leading-relaxed"
+              >
+                网站技术
+              </motion.h1>
+            </div>
+          )}
+        </InView>
+
+        <div className="flex flex-row flex-wrap gap-4">
+          {webTech.map((item, index) => (
+            <InView key={index} triggerOnce={true}>
+              {({ inView, ref }) => (
+                <motion.div
+                  ref={ref}
+                  initial={initial}
+                  animate={inView ? animate : initial}
+                  transition={{ ...transition, delay: 0.2 * (index + 1) }}
+                  className={`w-full sm:w-80 bg-neutral-100 dark:bg-neutral-900 rounded-3xl items-center text-center px-12 py-8 flex flex-col justify-between flex-shrink-0
+                  }`}
+                >
+                  <div className="flex items-center h-full">{item.icon}</div>
+
+                  <div>
+                    <h1 className="font-bold text-3xl mt-8">{item.name}</h1>
+                    <div className="mt-4 font-semibold opacity-50 text-xl bg-white dark:bg-black rounded-full px-3 py-2">
+                      {item.type}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </InView>
+          ))}
+        </div>
+      </div>
     </Layout>
   );
 }

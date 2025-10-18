@@ -61,8 +61,8 @@ export default function App({ Component, pageProps }) {
     <ThemeProvider attribute="class" disableTransitionOnChange>
       {ready && (
         <div>
-          <div className="bg-neutral-100 dark:bg-neutral-900 text-center px-2 py-2 z-10 sticky">
-            <p className="text-xs opacity-50">新的设计正处于测试中 🔥🔥🔥</p>
+          <div className="bg-neutral-100 dark:bg-neutral-900 px-2 py-2 z-10 sticky">
+            <h1 className="font-bold text-xs max-w-7xl mx-auto text-neutral-500 px-8">你能做的，岂止如此</h1>
           </div>
           <div className="bg-gradient-to-b from-white dark:from-black to-transparent w-full fixed top-0 h-30 z-[5] pointer-events-none" />
           <Topbar />
@@ -78,10 +78,6 @@ export default function App({ Component, pageProps }) {
               <Component {...pageProps} />
             </motion.div>
           </AnimatePresence>
-          <div className="max-w-xl w-full fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15 dark:opacity-5 backdrop-blur-sm z-10 pointer-events-none">
-            <motion.img src="/static/brian-griffin.svg" className="w-full" />
-            <h1 className="text-center !text-3xl sm:!text-5xl !font-bold opacity-25 dark:opacity-75">“你能做的 岂止如此”</h1>
-          </div>
         </div>
       )}
     </ThemeProvider>

@@ -10,7 +10,7 @@ html {
 
 body {
   font-family: "Mona Sans", "AlibabaPuHuiTi-3", sans-serif;
-  @apply bg-white dark:bg-black text-black dark:text-white text-sm selection:bg-neutral-200 dark:selection:bg-neutral-800 scroll-smooth;
+  @apply bg-white dark:bg-black text-black dark:text-white selection:bg-neutral-200 dark:selection:bg-neutral-800 scroll-smooth;
 }
 
 h1,
@@ -19,7 +19,7 @@ h3,
 h4,
 h5,
 h6 {
-  @apply font-bold text-sm;
+  @apply font-bold;
 }
 
 .prose h1,
@@ -37,7 +37,6 @@ p {
 
 a {
   @apply transition-all duration-500 bg-blue-50 border-b-2 border-blue-100 
-         font-medium 
          dark:bg-blue-900/25 dark:border-blue-700/25 
    
 }
@@ -62,7 +61,7 @@ pre {
 }
 
 .prose code{
-  @apply bg-neutral-100 dark:bg-neutral-900 rounded-sm;
+  @apply bg-neutral-100 dark:bg-neutral-900 rounded-3xl;
 }
 
 pre,
@@ -75,5 +74,5 @@ code {
 }
 
 .anchor-link {
-  @apply no-underline font-semibold;
+  @apply no-underline font-semibold border-0 bg-transparent;
 }
