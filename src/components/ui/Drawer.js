@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Drawer as Vaul } from "vaul";
 
-export default function ({ children, content }) {
+export default function Drawer({ children, content }) {
   const [open, setOpen] = useState(false);
 
   return (
