@@ -19,7 +19,10 @@ const calculateReadingTime = (content) => {
   const chineseMinutes = chineseCount / chineseCharsPerMinute;
   const englishMinutes = englishCount / englishWordsPerMinute;
 
-  return Math.ceil(chineseMinutes + englishMinutes) || 1;
+  return [
+    Math.ceil(chineseMinutes + englishMinutes) || 1,
+    englishCount + chineseCount,
+  ];
 };
 
 export { calculateReadingTime };

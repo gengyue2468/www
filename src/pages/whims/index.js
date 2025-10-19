@@ -2,7 +2,7 @@ import Layout from "@/components/layouts/Layout";
 import AllPosts from "@/components/layouts/AllPosts";
 import { getAllPosts } from "@/lib/markdown/getPosts";
 import { useState } from "react";
-import { SearchIcon } from "lucide-react";
+import { ListFilterIcon, SearchIcon } from "lucide-react";
 
 import { InView } from "react-intersection-observer";
 import { motion } from "motion/react";
@@ -25,6 +25,12 @@ const Whims = ({ allPosts }) => {
           .includes(searchValue?.trim().toLowerCase() || "");
     }
   });
+
+  const wordCount = allPosts.reduce((total, curPost) => {
+    const singlePostWords = curPost.readingTime[1];
+
+    return total + Number(singlePostWords);
+  }, 0);
 
   const initial = { opacity: 0, y: 20 };
   const animate = { opacity: 1, y: 0 };
@@ -50,9 +56,9 @@ const Whims = ({ allPosts }) => {
                   initial={initial}
                   animate={inView ? animate : initial}
                   transition={{ ...transition, delay: 0.2 }}
-                  className="my-8 font-extrabold text-4xl w-full leading-relaxed"
+                  className="my-8 font-extrabold text-4xl w-full leading-relaxed text-balance"
                 >
-                  无穷尽的不成熟想法和无心快语
+                  <strong>{wordCount}字</strong>的无穷尽的不成熟想法和无心快语
                 </motion.h1>
               </div>
             )}
@@ -66,7 +72,7 @@ const Whims = ({ allPosts }) => {
                   initial={initial}
                   animate={inView ? animate : initial}
                   transition={{ ...transition, delay: 0.2 }}
-                  src="/static/peter-griffin.webp"
+                  src="/static/peter-griffin-removebg-preview.png"
                   className="w-full"
                 />
               )}
@@ -74,50 +80,48 @@ const Whims = ({ allPosts }) => {
           </div>
         </div>
 
-        <div className="max-w-3xl mx-auto">
-          <div className="sticky top-8 z-10 -translate-x-4 w-[calc(100%+2rem)]">
-            <div className="relative">
-              <SearchIcon
-                size={16}
-                className="absolute -translate-y-1/2 top-1/2 left-4 text-neutral-800 dark:text-neutral-200"
-              />
-              <input
-                type="search"
-                onChange={(e) => setSearchValue(e.target.value)}
-                value={searchValue}
-                placeholder={`按照${filterBy}筛选随想`}
-                className="rounded-full border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 focus:bg-white dark:focus:bg-black focus:outline-none focus:ring-2 focus:ring-neutral-500 border-sm my-4 w-full pl-10 pr-2 py-2 transition-all duration-500"
-              />
-            </div>
+        <AllPosts
+          posts={filteredPosts}
+          filterBy={filterBy}
+          searchValue={searchValue}
+          type="search"
+        />
 
-            <div className="flex flex-row -mt-3 space-x-2 items-center px-4 rounded-full bg-white dark:bg-black w-full border border-neutral-200 dark:border-neutral-800 py-1">
-              <h1 className="!text-xs opacity-50">筛选条件</h1>
-              {filter.map((filter, index) => (
-                <button
-                  key={index}
-                  onClick={() => setFilterBy(filter)}
-                  className={`rounded-full px-3 py-1.5 border border-neutral-200 dark:border-neutral-800  ${
-                    filterBy == filter
-                      ? "bg-black text-white dark:bg-white dark:text-black font-extrabold"
-                      : "bg-neutral-100 dark:bg-neutral-900 font-bold"
-                  }`}
-                >
-                  按照{filter}筛选
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <AllPosts
-            posts={filteredPosts}
-            filterBy={filterBy}
-            searchValue={searchValue}
-            type="search"
+        {!filteredPosts.length && (
+          <p>没有符合条件的随想，换个关键词再试一次吧</p>
+        )}
+      </div>{" "}
+      <div className="max-w-sm mx-auto rounded-3xl px-4 py-2 bg-neutral-100 dark:bg-neutral-900 sticky bottom-10 z-10 backdrop-blur-lg -translate-x-4 w-[calc(100%+2rem)]">
+        <div className="relative">
+          <SearchIcon
+            size={16}
+            className="absolute -translate-y-1/2 top-1/2 left-4 text-neutral-800 dark:text-neutral-200"
           />
-
-          {!filteredPosts.length && (
-            <p>没有符合条件的随想，换个关键词再试一次吧</p>
-          )}
+          <input
+            type="search"
+            onChange={(e) => setSearchValue(e.target.value)}
+            value={searchValue}
+            placeholder={`按照${filterBy}筛选随想`}
+            className="text-base font-medium rounded-full bg-neutral-200 dark:bg-neutral-800 focus:bg-white dark:focus:bg-black focus:outline-none focus:ring-2 focus:ring-neutral-500 border-sm my-4 w-full pl-10 pr-2 py-3 transition-all duration-500"
+          />
+        </div>{" "}
+        <div className="">
+          <div className="flex flex-row justify-center space-x-2 items-center px-4 rounded-full bg-white/50 dark:bg-black/50 w-full py-2">
+          <ListFilterIcon size={16} />
+            {filter.map((filter, index) => (
+              <button
+                key={index}
+                onClick={() => setFilterBy(filter)}
+                className={`rounded-full px-3 py-2  ${
+                  filterBy == filter
+                    ? "bg-black text-white dark:bg-white dark:text-black font-extrabold"
+                    : "bg-neutral-100 dark:bg-neutral-900 font-bold"
+                }`}
+              >
+                按照{filter}筛选
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </Layout>

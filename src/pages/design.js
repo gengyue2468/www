@@ -222,7 +222,7 @@ export default function Design({ mdxSource, readingTime }) {
         </svg>
 
         <h1 className="font-extrabold text-4xl mb-4">当前无法使用此页面</h1>
-        <p className="font-bold text-xl opacity-50">此页面正在进行重构，请稍后回来</p>
+        <p className="font-bold text-xl opacity-50">此页面正在进行重构，我们马上回来</p>
       </div>
     </Layout>
   );

@@ -4,9 +4,10 @@ export default function Header({ title, date, desc, readingTime }) {
   const formattedDate = date
     ? moment(date).format("YYYY 年 MM 月 DD 日")
     : "日期未设置";
-
+  const wordCount =
+    readingTime && readingTime[1] > 0 ? `约${readingTime[1]}字` : null;
   const readingTimeText =
-    readingTime && readingTime > 0 ? `${readingTime} 分钟阅读` : null;
+    readingTime && readingTime[0] > 0 ? `${readingTime[0]} 分钟阅读` : null;
 
   return (
     <div className="">
@@ -14,8 +15,10 @@ export default function Header({ title, date, desc, readingTime }) {
         {title || "未命名文稿"}
       </h1>
 
-      <div className="mt-1 opacity-50 mb-4">
+      <div className="mt-1 text-lg sm:text-xl font-semibold opacity-50 mb-4">
         <span>{formattedDate}</span>
+        <span className="mx-2">·</span>
+        <span>{wordCount}</span>
         <span className="mx-2">·</span>
         <span>{readingTimeText}</span>
       </div>

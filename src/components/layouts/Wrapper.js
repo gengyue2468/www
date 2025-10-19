@@ -2,7 +2,7 @@ export default function Wrapper({ children, className }) {
   return (
     <div
       className={`scroll-smooth max-w-none mt-8 prose dark:prose-invert *:text-black! dark:*:text-white! 
-    prose-neutral prose-sm sm:prose-base  prose-p:text-black dark:prose-p:text-white prose-p:my-4
+    prose-neutral prose-lg serif prose-p:font-medium prose-p:leading-loose prose-h1:text-2xl prose-h2:text-xl prose-headings:sans prose-p:text-black dark:prose-p:text-white prose-p:my-4
     prose-headings:mt-6 prose-headings:mb-4 prose-headings:!no-underline prose-headings:font-bold 
     prose-pre:px-8 prose-a:underline-offset-4 
     *:transition-all *:duration-300 

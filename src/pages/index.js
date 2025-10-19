@@ -81,13 +81,13 @@ export default function Home() {
 
         <div className="flex flex-row flex-wrap gap-4">
           {device.map((item, index) => (
-            <InView threshold={0.2} key={index} triggerOnce={true}>
+            <InView threshold={0.5} key={index} triggerOnce={true}>
               {({ inView, ref }) => (
                 <motion.div
                   ref={ref}
                   initial={initial}
                   animate={inView ? animate : initial}
-                  transition={{ ...transition, delay: 0.2 * (index + 1) }}
+                  transition={{ ...transition, delay: 0.1 * (index + 1) }}
                   className={`w-full sm:w-80 bg-neutral-100 dark:bg-neutral-900 rounded-3xl items-center text-center px-12 py-8 flex flex-col justify-between flex-shrink-0 ${
                     item.outdate && "opacity-50"
                   }`}
@@ -138,7 +138,7 @@ export default function Home() {
                   onClick={() => (item.href ? router.push(item.href) : null)}
                   initial={initial}
                   animate={inView ? animate : initial}
-                  transition={{ ...transition, delay: 0.2 * (index + 1) }}
+                  transition={{ ...transition, delay: 0.1 * (index + 1) }}
                   className={`w-full sm:w-80 bg-neutral-100 dark:bg-neutral-900 rounded-3xl items-center text-center px-12 py-8 flex flex-col justify-between flex-shrink-0
                   ${item.outdate && "opacity-50"}}`}
                 >
@@ -181,7 +181,7 @@ export default function Home() {
                   ref={ref}
                   initial={initial}
                   animate={inView ? animate : initial}
-                  transition={{ ...transition, delay: 0.2 * (index + 1) }}
+                  transition={{ ...transition, delay: 0.1 * (index + 1) }}
                   className={`w-full sm:w-80 bg-neutral-100 dark:bg-neutral-900 rounded-3xl items-center text-center px-12 py-8 flex flex-col justify-between flex-shrink-0
                   }`}
                 >

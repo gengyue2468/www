@@ -25,10 +25,13 @@ export async function getAllPosts(sortByDate = true, descending = true) {
           return null;
         }
 
+        const readingTime = await calculateReadingTime(content);
+
         return {
           slug,
           frontmatter,
           content,
+          readingTime,
         };
       })
     );

@@ -2,6 +2,7 @@ import moment from "moment";
 import Link from "next/link";
 import cn from "classnames";
 import Wrapper from "./Wrapper";
+import { useRouter } from "next/router";
 
 const groupPostsByDate = (posts) => {
   const grouped = {};
@@ -32,37 +33,29 @@ const groupPostsByDate = (posts) => {
 };
 
 const MonthTitle = ({ children, className }) => {
-  return <h4 className={cn("font-bold", className)}>{children}</h4>;
+  return (
+    <h4 className={cn("font-bold text-2xl my-8", className)}>{children}</h4>
+  );
 };
 
 const PostTitle = ({ children }) => {
-  return (
-    <h1 className="font-extrabold text-base truncate mr-2 no-underline">
-      {children}
-    </h1>
-  );
+  return <h1 className="font-extrabold text-2xl no-underline text-balance">{children}</h1>;
 };
 
 const DayTitle = ({ children }) => {
   return (
-    <h2 className="whitespace-nowrap ml-2 no-underline! font-bold">
+    <h2 className="whitespace-nowrap no-underline! font-bold opacity-50 text-lg">
       {children}
     </h2>
   );
 };
 
-const Divider = () => {
-  return (
-    <div className="h-px flex-grow border-t border-dashed border-neutral-300 dark:border-neutral-700" />
-  );
-};
-
 const ListContainer = ({ children }) => {
-  return <div className="flex flex-col space-y-0">{children}</div>;
+  return <div className="flex flex-row flex-wrap gap-4">{children}</div>;
 };
 
 const FlexContainer = ({ children }) => {
-  return <div className="flex items-center ">{children}</div>;
+  return <div className="flex flex-row justify-between items-center">{children}</div>;
 };
 
 const DisplayContent = ({ content, searchValue }) => {
@@ -90,6 +83,7 @@ const DisplayContent = ({ content, searchValue }) => {
 };
 
 const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
+  const router = useRouter();
   moment.locale("zh-cn");
   const groupedPosts = groupPostsByDate(posts);
   const sortedYears = Object.keys(groupedPosts).sort((a, b) => b - a);
@@ -104,134 +98,74 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
         return (
           <div
             key={year}
-            className={`${isFirstYear ? "" : "mt-8"} px-2 pb-4 group`}
+            className={`${
+              isFirstYear ? "" : "mt-8"
+            } px-2 pb-4 group -translate-x-4 w-[calc(100%+2rem)]`}
           >
             {sortedMonths.length > 0 && (
               <>
-                <div className="flex justify-between items-center mb-2 px-2 -translate-x-4 w-[calc(100%+2rem)]">
-                  <h3>{year} 年</h3>
-                  <MonthTitle>{months[sortedMonths[0]].name}</MonthTitle>
+                <div className="flex justify-between items-center mb-2 px-4 -translate-x-4 w-[calc(100%+2rem)]">
+                  <h3 className="text-4xl font-extrabold my-16">{year} 年.</h3>
                 </div>
+                
 
-                <ListContainer>
-                  {months[sortedMonths[0]].posts.map((post, index) => {
-                    return (
-                      <div
-                        key={post.slug}
-                        index={index}
-                        className="transition-all duration-500 -translate-x-6 w-[calc(100%+3rem)]  hover:bg-neutral-100 dark:hover:bg-neutral-900 px-3 py-3 group-hover:opacity-50 hover:opacity-100 rounded-3xl relative"
-                      >
-                        <Link
-                          scroll={false}
-                          href={`/whims/${post.slug}`}
-                          className="no-underline! w-full"
-                        >
-                          <FlexContainer>
-                            <PostTitle>
-                              {(post.frontmatter.title || "未命名")
-                                .split("")
-                                .map((char, index) => {
-                                  if (
-                                    searchValue !== "" &&
-                                    filterBy === "标题"
-                                  ) {
-                                    return searchValue
-                                      .toLowerCase()
-                                      .includes(char.toLowerCase()) ? (
-                                      <strong key={index}>{char}</strong>
-                                    ) : (
-                                      <span key={index}>{char}</span>
-                                    );
-                                  }
-                                  return <span key={index}>{char}</span>;
-                                })}
-                            </PostTitle>
-                            <Divider />
-                            <DayTitle>
-                              {moment(post.frontmatter.date).format("Do")}
-                            </DayTitle>
-                          </FlexContainer>
-                          {type == "search" && (
-                            <Wrapper
-                              className={`!mt-0 line-clamp-3 transition-all duration-500 ${
-                                filterBy == "内容"
-                                  ? "opacity-100 h-18"
-                                  : "h-0 opacity-0"
-                              }`}
-                            >
-                              <DisplayContent
-                                content={post.content}
-                                searchValue={searchValue}
-                              />
-                            </Wrapper>
-                          )}
-                        </Link>
-                      </div>
-                    );
-                  })}
-                </ListContainer>
-
-                {sortedMonths.slice(1).map((month) => {
+                {sortedMonths.map((month) => {
                   const { name: monthName, posts: monthPosts } = months[month];
 
                   return (
-                    <div key={month} className="mb-8">
-                      <MonthTitle className="flex justify-end px-2 -translate-x-4 w-[calc(100%+2rem)] mt-8 mb-2">
-                        {monthName}
-                      </MonthTitle>
+                    <div key={month} className="mb-8 px-2 -translate-x-4 w-[calc(100%+2rem)]">
+                      <MonthTitle className="flex px-2">{monthName}</MonthTitle>
                       <ListContainer>
                         {monthPosts.map((post, index) => {
                           return (
                             <div
                               key={post.slug}
                               index={index}
-                              className="transition-all duration-500 -translate-x-6 w-[calc(100%+3rem)]  hover:bg-neutral-100 dark:hover:bg-neutral-900 px-3 py-3 group-hover:opacity-50 hover:opacity-100 rounded-3xl relative"
+                              onClick={() =>
+                                router.push(`/whims/${post.slug}`, undefined, {
+                                  scroll: false,
+                                })
+                              }
+                              className="cursor-pointer w-full sm:w-96 transition-all duration-500 bg-neutral-100 dark:bg-neutral-900 p-6 group-hover:opacity-50 hover:opacity-100 rounded-3xl relative"
                             >
-                              <Link
-                                scroll={false}
-                                href={`/whims/${post.slug}`}
-                                className="no-underline!"
-                              >
-                                <FlexContainer>
-                                  <PostTitle>
-                                    {(post.frontmatter.title || "未命名")
-                                      .split("")
-                                      .map((char, index) => {
-                                        if (
-                                          searchValue !== "" &&
-                                          filterBy === "标题"
-                                        ) {
-                                          return searchValue
-                                            .toLowerCase()
-                                            .includes(char.toLowerCase()) ? (
-                                            <strong key={index}>{char}</strong>
-                                          ) : (
-                                            <span key={index}>{char}</span>
-                                          );
-                                        }
-                                        return <span key={index}>{char}</span>;
-                                      })}
-                                  </PostTitle>
-                                  <Divider />
-                                  <DayTitle>
-                                    {moment(post.frontmatter.date).format("Do")}
-                                  </DayTitle>
-                                </FlexContainer>
-                                {type == "search" && (
-                                  <Wrapper
-                                    className={`!mt-0 line-clamp-3 transition-all duration-500 ${
-                                      filterBy == "内容"
-                                        ? "opacity-100 h-18"
-                                        : "h-0 opacity-0"
-                                    }`}
-                                  >
-                                    <DisplayContent
-                                      content={post.content}
-                                      searchValue={searchValue}
-                                    />
-                                  </Wrapper>
-                                )}
-                              </Link>
+                              <FlexContainer>
+                                <PostTitle>
+                                  {(post.frontmatter.title || "未命名")
+                                    .split("")
+                                    .map((char, index) => {
+                                      if (
+                                        searchValue !== "" &&
+                                        filterBy === "标题"
+                                      ) {
+                                        return searchValue
+                                          .toLowerCase()
+                                          .includes(char.toLowerCase()) ? (
+                                          <strong key={index}>{char}</strong>
+                                        ) : (
+                                          <span key={index}>{char}</span>
+                                        );
+                                      }
+                                      return <span key={index}>{char}</span>;
+                                    })}
+                                </PostTitle>
+                                <DayTitle>
+                                  {moment(post.frontmatter.date).format("Do")}
+                                </DayTitle>
+                              </FlexContainer>
+                              {type == "search" && (
+                                <Wrapper
+                                  className={`!mt-0 line-clamp-3 transition-all duration-500 ${
+                                    filterBy == "内容"
+                                      ? "opacity-100 h-18"
+                                      : "h-0 opacity-0"
+                                  }`}
+                                >
+                                  <DisplayContent
+                                    content={post.content}
+                                    searchValue={searchValue}
+                                  />
+                                </Wrapper>
+                              )}
                             </div>
                           );
                         })}
