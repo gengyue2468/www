@@ -20,7 +20,6 @@ const WhimPage = ({ post, allPosts }) => {
   const router = useRouter();
 
   const mdxRef = useRef(null);
-
   const initial = { opacity: 0, y: 20 };
   const animate = { opacity: 1, y: 0 };
   const transition = { type: "tween", ease: "easeOut", duration: 0.6 };
@@ -107,6 +106,7 @@ const WhimPage = ({ post, allPosts }) => {
             </motion.div>
           )}
         </InView>
+        
 
         <div className="flex flex-row justify-between gap-8">
           <InView triggerOnce={true}>
