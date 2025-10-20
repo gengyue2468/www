@@ -1,6 +1,7 @@
-export default function Wrapper({ children, className }) {
+export default function Wrapper({ children, className, ...props }) {
   return (
     <div
+      {...props}
       className={`scroll-smooth max-w-none mt-8 prose dark:prose-invert *:text-black! dark:*:text-white! 
     prose-neutral prose-lg serif prose-p:font-medium prose-p:leading-loose prose-h1:text-2xl prose-h2:text-xl prose-headings:sans prose-p:text-black dark:prose-p:text-white prose-p:my-4
     prose-headings:mt-6 prose-headings:mb-4 prose-headings:!no-underline prose-headings:font-bold 

@@ -60,12 +60,7 @@ export default function Image({ alt, src, ...props }) {
     <span className="block my-12 not-prose">
       <span
         className={`
-      block relative bg-neutral-100 dark:bg-neutral-900 rounded-none min-h-48 sm:min-h-[24rem] border-y sm:border border-neutral-200 dark:border-neutral-800
-      ${
-        isPortrait
-          ? "sm:rounded-3xl w-[calc(100%+4rem)]! -translate-x-8"
-          : "sm:rounded-3xl w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]! -translate-x-8 sm:-translate-x-48"
-      }
+      block relative bg-neutral-100 dark:bg-neutral-900 rounded-none sm:rounded-3xl min-h-48 sm:min-h-[24rem] border-y sm:border border-neutral-200 dark:border-neutral-800
       overflow-hidden
       transition-all duration-500
     `}
@@ -76,12 +71,7 @@ export default function Image({ alt, src, ...props }) {
             alt={alt || "图片内容"}
             src={src}
             className={`
-          w-full h-full object-cover 
-          ${
-            isPortrait
-              ? "rounded-none sm:rounded-3xl"
-              : "rounded-none sm:rounded-3xl"
-          }
+          w-full h-full object-cover rounded-none sm:rounded-3xl
           transition-opacity duration-500
           ${isLoaded ? "opacity-100" : "opacity-0"}
         `}

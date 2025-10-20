@@ -323,10 +323,10 @@ const Video = ({ src, alt }) => {
     <div
       ref={containerRef}
       className={cn(
-        "relative bg-black p-0! rounded-none sm:rounded-xl overflow-hidden cursor-pointer transition-all duration-500 min-h-48 sm:min-h-96",
+        "sans relative bg-black p-0! rounded-none sm:rounded-xl overflow-hidden cursor-pointer transition-all duration-500 min-h-48 sm:min-h-96",
         isFullScreen
           ? "h-screen"
-          : "max-w-screen -translate-x-8 sm:-translate-x-48 w-[calc(100%+4rem)]! sm:w-[calc(100%+24rem)]!"
+          : ""
       )}
       onMouseMove={handleMouseMove}
       onClick={togglePlay}
@@ -404,7 +404,7 @@ const Video = ({ src, alt }) => {
             </button>
 
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-xs text-white whitespace-nowrap">
+              <span className="sans text-xs text-white whitespace-nowrap">
                 {formatTime(playedSeconds)}
               </span>
 
@@ -430,7 +430,7 @@ const Video = ({ src, alt }) => {
                 />
               </div>
 
-              <span className="text-xs text-white whitespace-nowrap">
+              <span className="sans text-xs text-white whitespace-nowrap">
                 {formatTime(duration)}
               </span>
             </div>

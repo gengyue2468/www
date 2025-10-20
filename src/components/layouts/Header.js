@@ -15,9 +15,9 @@ export default function Header({ title, date, desc, readingTime }) {
         {title || "未命名文稿"}
       </h1>
 
-      <div className="mt-1 text-lg sm:text-xl font-semibold opacity-50 mb-4">
+      <div className="text-balance mt-1 text-lg sm:text-xl font-semibold opacity-50 mb-4">
         <span>{formattedDate}</span>
-        <span className="mx-2">·</span>
+        <br />
         <span>{wordCount}</span>
         <span className="mx-2">·</span>
         <span>{readingTimeText}</span>

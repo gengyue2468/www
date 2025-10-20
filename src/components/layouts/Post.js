@@ -1,8 +1,9 @@
 import moment from "moment";
-import Link from "next/link";
+import { motion } from "motion/react";
 import cn from "classnames";
 import Wrapper from "./Wrapper";
 import { useRouter } from "next/router";
+import classNames from "classnames";
 
 const groupPostsByDate = (posts) => {
   const grouped = {};
@@ -34,12 +35,21 @@ const groupPostsByDate = (posts) => {
 
 const MonthTitle = ({ children, className }) => {
   return (
-    <h4 className={cn("font-bold text-2xl my-8", className)}>{children}</h4>
+    <h4 className={cn("font-bold text-xl xl:text-2xl my-4 xl:my-8", className)}>{children}</h4>
   );
 };
 
-const PostTitle = ({ children }) => {
-  return <h1 className="font-extrabold text-2xl no-underline text-balance">{children}</h1>;
+const PostTitle = ({ children, className }) => {
+  return (
+    <h1
+      className={classNames(
+        "font-extrabold text-xl no-underline text-balance",
+        className
+      )}
+    >
+      {children}
+    </h1>
+  );
 };
 
 const DayTitle = ({ children }) => {
@@ -51,11 +61,15 @@ const DayTitle = ({ children }) => {
 };
 
 const ListContainer = ({ children }) => {
-  return <div className="flex flex-row flex-wrap gap-4">{children}</div>;
+  return <div className="flex flex-col w-full gap-4">{children}</div>;
 };
 
 const FlexContainer = ({ children }) => {
-  return <div className="flex flex-row justify-between items-center">{children}</div>;
+  return (
+    <div className="flex flex-row justify-between items-center w-full">
+      {children}
+    </div>
+  );
 };
 
 const DisplayContent = ({ content, searchValue }) => {
@@ -64,7 +78,7 @@ const DisplayContent = ({ content, searchValue }) => {
 
   const firstIndex = loweredContent.indexOf(searchValue);
 
-  const start = Math.max(0, firstIndex);
+  const start = Math.max(0, firstIndex -10);
   const end = Math.min(content.length, firstIndex + 300);
 
   const filteredDisplayContent = content.slice(start, end).split("");
@@ -98,23 +112,40 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
         return (
           <div
             key={year}
-            className={`${
-              isFirstYear ? "" : "mt-8"
-            } px-2 pb-4 group -translate-x-4 w-[calc(100%+2rem)]`}
+            className={`${isFirstYear ? "" : "mt-8"} px-2 pb-4 group`}
           >
             {sortedMonths.length > 0 && (
               <>
                 <div className="flex justify-between items-center mb-2 px-4 -translate-x-4 w-[calc(100%+2rem)]">
-                  <h3 className="text-4xl font-extrabold my-16">{year} 年.</h3>
+                  <h3
+                    className={classNames(
+                      "font-extrabold",
+                      type === "search"
+                        ? "-translate-x-2 text-2xl my-2"
+                        : "text-2xl my-4"
+                    )}
+                  >
+                    {year} 年.
+                  </h3>
                 </div>
-                
 
                 {sortedMonths.map((month) => {
                   const { name: monthName, posts: monthPosts } = months[month];
 
                   return (
-                    <div key={month} className="mb-8 px-2 -translate-x-4 w-[calc(100%+2rem)]">
-                      <MonthTitle className="flex px-2">{monthName}</MonthTitle>
+                    <div
+                      key={month}
+                      className="mb-8 px-2 -translate-x-4 w-[calc(100%+2rem)]"
+                    >
+                      <MonthTitle
+                        className={classNames(
+                          "flex px-2",
+                          type == "search" &&
+                            "text-xl !mt-2 -translate-x-2 mb-4"
+                        )}
+                      >
+                        {monthName}
+                      </MonthTitle>
                       <ListContainer>
                         {monthPosts.map((post, index) => {
                           return (
@@ -126,10 +157,12 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
                                   scroll: false,
                                 })
                               }
-                              className="cursor-pointer w-full sm:w-96 transition-all duration-500 bg-neutral-100 dark:bg-neutral-900 p-6 group-hover:opacity-50 hover:opacity-100 rounded-3xl relative"
+                              className="cursor-pointer w-full transition-all duration-500 bg-neutral-100 dark:bg-neutral-900 p-6 group-hover:opacity-50 hover:opacity-100 rounded-3xl relative"
                             >
                               <FlexContainer>
-                                <PostTitle>
+                                <PostTitle
+                                  className={type === "search" && "!text-xl"}
+                                >
                                   {(post.frontmatter.title || "未命名")
                                     .split("")
                                     .map((char, index) => {
@@ -153,18 +186,25 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
                                 </DayTitle>
                               </FlexContainer>
                               {type == "search" && (
-                                <Wrapper
-                                  className={`!mt-0 line-clamp-3 transition-all duration-500 ${
-                                    filterBy == "内容"
-                                      ? "opacity-100 h-18"
-                                      : "h-0 opacity-0"
-                                  }`}
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{
+                                    opacity: filterBy === "内容" ? 1 : 0,
+                                    height: filterBy === "内容" ? "auto" : 0,
+                                  }}
+                                  transition={{ duration: 0.5 }}
+                                  layout
+                                  className="overflow-hidden"
                                 >
-                                  <DisplayContent
-                                    content={post.content}
-                                    searchValue={searchValue}
-                                  />
-                                </Wrapper>
+                                  <Wrapper
+                                    className={`!mt-0 line-clamp-3 transition-all duration-500`}
+                                  >
+                                    <DisplayContent
+                                      content={post.content}
+                                      searchValue={searchValue}
+                                    />
+                                  </Wrapper>
+                                </motion.div>
                               )}
                             </div>
                           );

@@ -13,7 +13,7 @@ export default function Toc({ toc }) {
       <>
         <button
           onClick={() => router.push(toc.href)}
-          className="rounded-full px-3 py-2 -translate-x-3 w-[calc(100%+1.5rem)] hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-500 cursor-pointer"
+          className="text-left text-balance rounded-full px-3 py-2 -translate-x-3 w-[calc(100%+1.5rem)] hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-500 cursor-pointer"
         >
           <div className="flex justify-between items-center">
             <h2 className="text-lg">{toc.title}</h2>
@@ -50,7 +50,14 @@ export default function Toc({ toc }) {
               onClick={() => router.push(sub.href)}
               className="rounded-full px-3 py-3 -translate-x-3 w-[calc(100%+1.5rem)] hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
             >
-              <h2 className="text-base !font-semibold">{sub.title}</h2>
+              <motion.h2
+                className="text-base !font-semibold"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: detail ? 1 : 0, y: detail ? 0 : -10 }}
+                transition={{ delay: 0.1 * (index + 1) }}
+              >
+                {sub.title}
+              </motion.h2>
             </div>
           ))}
         </motion.div>
@@ -71,7 +78,7 @@ export default function Toc({ toc }) {
         <h1 className="text-xl">文章目录</h1>
       </div>
 
-      <div className="flex flex-col space-y-1 px-8 pb-6">
+      <div className="flex flex-col space-y-1 px-8">
         {toc.map((toc, index) => {
           return (
             <div key={index}>

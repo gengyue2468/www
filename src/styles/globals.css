@@ -50,6 +50,10 @@ strong {
          dark:bg-yellow-800/25 dark:border-yellow-600/25;
 }
 
+.sans {
+  font-family: "Mona Sans", "AlibabaPuHuiTi-3", sans-serif;
+}
+
 .serif {
   font-family: "Times New Roman", "Noto Serif SC", serif;
 }
