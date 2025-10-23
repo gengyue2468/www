@@ -4,29 +4,28 @@ import Header from "@/components/layouts/Header";
 import Wrapper from "@/components/layouts/Wrapper";
 import MdxContent from "@/components/layouts/MdxContent";
 import { getPostBySlug, getAllPosts } from "@/lib/markdown/getPosts";
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import Toc from "@/components/ui/Toc";
 import { MenuIcon, SquarePenIcon } from "lucide-react";
 import Share from "@/components/ui/Share";
 import Drawer from "@/components/ui/Drawer";
 import { InView } from "react-intersection-observer";
 import { motion } from "motion/react";
+import { useRouter } from "next/router";
 
 const WhimPage = ({ post, allPosts }) => {
   const [toc, setToc] = useState([]);
   const { frontmatter, mdxSource, readingTime, slug } = post;
   const { title, date, desc } = frontmatter;
-  const router = useRouter();
 
-  const mdxRef = useRef(null);
   const initial = { opacity: 0, y: 20 };
   const animate = { opacity: 1, y: 0 };
   const transition = { type: "tween", ease: "easeOut", duration: 0.6 };
 
+  const router = useRouter();
+
   const generateToc = () => {
-    if (!mdxRef.current) return;
-    const allTitles = mdxRef.current.getElementsByClassName("anchor-link");
+    const allTitles = document.getElementsByClassName("anchor-link");
     const titleData = [];
     let currentH1 = null;
 
@@ -51,13 +50,17 @@ const WhimPage = ({ post, allPosts }) => {
       }
     });
 
-    setToc(titleData);
+    const hasNewData = JSON.stringify(titleData) !== JSON.stringify(toc);
+    if (hasNewData) {
+      setToc(titleData);
+    }
   };
 
+  console.log(router.pathname);
+
   useEffect(() => {
-    const timer = setTimeout(generateToc, 100);
-    return () => clearTimeout(timer);
-  }, [router.asPath, mdxRef.current]);
+    generateToc();
+  }, [router.asPath]);
 
   const Sidebar = () => {
     return (
@@ -106,7 +109,6 @@ const WhimPage = ({ post, allPosts }) => {
             </motion.div>
           )}
         </InView>
-        
 
         <div className="flex flex-row justify-between gap-8">
           <InView triggerOnce={true}>
@@ -118,7 +120,7 @@ const WhimPage = ({ post, allPosts }) => {
                 transition={{ ...transition, delay: 0.2 }}
                 className="lg:max-w-xl xl:max-w-3xl w-full px-0 md:px-2 lg:px-0"
               >
-                <Wrapper ref={mdxRef}>
+                <Wrapper>
                   <MdxContent mdxSource={mdxSource} />
                 </Wrapper>
 

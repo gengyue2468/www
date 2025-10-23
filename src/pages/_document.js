@@ -20,6 +20,10 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:ital,wght@0,400..700;1,200..900&display=swap"
           rel="stylesheet"
         />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+          rel="stylesheet"
+        />
       </Head>
       <body className="antialiased">
         <Main />

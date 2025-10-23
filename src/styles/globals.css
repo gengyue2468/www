@@ -5,11 +5,17 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  text-autospace: normal;
+  -ms-text-autospace: normal;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+@layer base {
+  html {
+    font-size: 14px;
+  }
 }
 
 body {
@@ -55,12 +61,12 @@ strong {
 }
 
 .serif {
-  font-family: "Times New Roman", "Noto Serif SC", serif;
+  font-family: "Playfair Display", "Noto Serif SC", serif;
 }
 
 button:active {
-  scale: 0.9;
-  @apply transition-transform duration-300;
+  scale: 0.95;
+  @apply transition-all duration-400;
 }
 
 pre {

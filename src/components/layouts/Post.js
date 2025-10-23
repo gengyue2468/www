@@ -4,6 +4,7 @@ import cn from "classnames";
 import Wrapper from "./Wrapper";
 import { useRouter } from "next/router";
 import classNames from "classnames";
+import { CalculatorIcon, Calendar1Icon } from "lucide-react";
 
 const groupPostsByDate = (posts) => {
   const grouped = {};
@@ -35,7 +36,9 @@ const groupPostsByDate = (posts) => {
 
 const MonthTitle = ({ children, className }) => {
   return (
-    <h4 className={cn("font-bold text-xl xl:text-2xl my-4 xl:my-8", className)}>{children}</h4>
+    <h4 className={cn("font-bold text-xl xl:text-2xl my-4 xl:my-8", className)}>
+      {children}
+    </h4>
   );
 };
 
@@ -54,19 +57,26 @@ const PostTitle = ({ children, className }) => {
 
 const DayTitle = ({ children }) => {
   return (
-    <h2 className="whitespace-nowrap no-underline! font-bold opacity-50 text-lg">
-      {children}
-    </h2>
+    <div className="rounded-full bg-neutral-200 dark:bg-neutral-800 px-3 py-2 flex flex-row gap-2 items-center">
+      <Calendar1Icon className="size-5 opacity-50" />
+      <h2 className="whitespace-nowrap no-underline! font-bold opacity-50 text-lg">
+        {children}
+      </h2>
+    </div>
   );
 };
 
 const ListContainer = ({ children }) => {
-  return <div className="flex flex-col w-full gap-4">{children}</div>;
+  return (
+    <div className="flex flex-col w-full gap-4 bg-neutral-100 dark:bg-neutral-900 rounded-3xl p-3">
+      {children}
+    </div>
+  );
 };
 
 const FlexContainer = ({ children }) => {
   return (
-    <div className="flex flex-row justify-between items-center w-full">
+    <div className="flex flex-row justify-between items-center gap-4 w-full px-6 py-2 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 rounded-3xl transition-all duration-500">
       {children}
     </div>
   );
@@ -78,7 +88,7 @@ const DisplayContent = ({ content, searchValue }) => {
 
   const firstIndex = loweredContent.indexOf(searchValue);
 
-  const start = Math.max(0, firstIndex -10);
+  const start = Math.max(0, firstIndex - 10);
   const end = Math.min(content.length, firstIndex + 300);
 
   const filteredDisplayContent = content.slice(start, end).split("");
@@ -157,7 +167,7 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
                                   scroll: false,
                                 })
                               }
-                              className="cursor-pointer w-full transition-all duration-500 bg-neutral-100 dark:bg-neutral-900 p-6 group-hover:opacity-50 hover:opacity-100 rounded-3xl relative"
+                              className="cursor-pointer w-full transition-all duration-500 group-hover:opacity-50 hover:opacity-100 relative"
                             >
                               <FlexContainer>
                                 <PostTitle
@@ -194,7 +204,7 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
                                   }}
                                   transition={{ duration: 0.5 }}
                                   layout
-                                  className="overflow-hidden"
+                                  className="overflow-hidden mt-1 bg-neutral-200/50 dark:bg-neutral-800/50 rounded-3xl px-4 py-2"
                                 >
                                   <Wrapper
                                     className={`!mt-0 line-clamp-3 transition-all duration-500`}

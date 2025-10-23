@@ -24,7 +24,7 @@ export default function Topbar() {
   const { resolvedTheme, setTheme } = useTheme();
   return (
     <div className="z-10 sticky top-0 bg-transparent">
-      <div className="max-w-7xl mx-auto py-2 px-4 sm:px-8">
+      <div className="max-w-7xl mx-auto py-2 px-8">
         <div className="flex flex-row justify-between items-center">
           <Tooltip content="主页">
             <div className="-translate-x-4 flex flex-row space-x-2 transition-all duration-500 px-3 py-2 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 rounded-full cursor-pointer">

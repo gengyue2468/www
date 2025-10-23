@@ -42,13 +42,13 @@ export default function Toc({ toc }) {
             duration: 0.5,
             ease: [0.25, 0.1, 0.25, 1.0],
           }}
-          className="flex flex-col space-y-1"
+          className="flex flex-col space-y-1 overflow-y-hidden -translate-x-3 w-[calc(100%+1.5rem)] mb-1"
         >
           {toc.subdomains?.map((sub, index) => (
             <div
               key={index}
               onClick={() => router.push(sub.href)}
-              className="rounded-full px-3 py-3 -translate-x-3 w-[calc(100%+1.5rem)] hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
+              className="rounded-full px-3 py-3 w-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
             >
               <motion.h2
                 className="text-base !font-semibold"
