@@ -38,6 +38,7 @@ const WhimPage = ({ post, allPosts }) => {
         const h1Item = {
           title: title.innerText,
           href: title.href,
+          offsetTop: title.offsetTop,
           subdomains: [],
         };
         titleData.push(h1Item);
@@ -46,6 +47,7 @@ const WhimPage = ({ post, allPosts }) => {
         currentH1.subdomains.push({
           title: title.innerText,
           href: title.href,
+          offsetTop: title.offsetTop,
         });
       }
     });
@@ -55,9 +57,7 @@ const WhimPage = ({ post, allPosts }) => {
       setToc(titleData);
     }
   };
-
-  console.log(router.pathname);
-
+  
   useEffect(() => {
     generateToc();
   }, [router.asPath]);
@@ -145,7 +145,7 @@ const WhimPage = ({ post, allPosts }) => {
                         initial={initial}
                         animate={btnInView ? animate : initial}
                         transition={{ ...transition, delay: 0.4 }}
-                        className="flex lg:hidden sticky bottom-4 w-32 mx-auto backdrop-blur-3xl bg-neutral-200 dark:bg-neutral-800 rounded-3xl py-3 flex-row justify-center space-x-2 items-center"
+                        className="flex lg:hidden sticky bottom-4 w-32 mx-auto backdrop-blur-3xl bg-neutral-200 dark:bg-neutral-800 rounded-3xl py-4 flex-row justify-center space-x-2 items-center"
                       >
                         <MenuIcon className="size-4" />
                         <span className="font-semibold text-base">

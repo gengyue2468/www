@@ -60,7 +60,7 @@ export default function Image({ alt, src, ...props }) {
     <span className="block my-12 not-prose">
       <span
         className={`
-      block relative bg-neutral-100 dark:bg-neutral-900 rounded-none sm:rounded-3xl min-h-48 sm:min-h-[24rem] border-y sm:border border-neutral-200 dark:border-neutral-800
+      block -translate-x-8 w-[calc(100%+4rem)] relative bg-neutral-100 dark:bg-neutral-900 rounded-none sm:rounded-3xl min-h-48 sm:min-h-[24rem] border-y sm:border border-neutral-200 dark:border-neutral-800
       overflow-hidden
       transition-all duration-500
     `}

@@ -57,7 +57,7 @@ const PostTitle = ({ children, className }) => {
 
 const DayTitle = ({ children }) => {
   return (
-    <div className="rounded-full bg-neutral-200 dark:bg-neutral-800 px-3 py-2 flex flex-row gap-2 items-center">
+    <div className="rounded-full bg-neutral-200 dark:bg-neutral-800 px-3 py-2 flex flex-row gap-2 items-center translate-x-4">
       <Calendar1Icon className="size-5 opacity-50" />
       <h2 className="whitespace-nowrap no-underline! font-bold opacity-50 text-lg">
         {children}
@@ -68,7 +68,7 @@ const DayTitle = ({ children }) => {
 
 const ListContainer = ({ children }) => {
   return (
-    <div className="flex flex-col w-full gap-4 bg-neutral-100 dark:bg-neutral-900 rounded-3xl p-3">
+    <div className="flex flex-col w-full gap-4 bg-neutral-100 dark:bg-neutral-900 rounded-3xl p-2">
       {children}
     </div>
   );

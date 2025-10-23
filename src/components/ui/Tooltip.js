@@ -7,11 +7,11 @@ export default function Tooltip({ children, content, ...props }) {
         <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
         <RadixTooltip.Portal>
           <RadixTooltip.Content
-            className="select-none rounded-full bg-neutral-100 dark:bg-neutral-900 font-semibold px-3 py-3 text-[15px] leading-none will-change-[transform,opacity] data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade"
+            className="z-50 select-none rounded-full bg-neutral-950 dark:bg-neutral-50 text-white dark:text-black font-semibold px-3 py-4 text-base leading-none will-change-[transform,opacity] data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade"
             sideOffset={5}
           >
             {content}
-            <RadixTooltip.Arrow className="fill-neutral-100 dark:fill-neutral-900" />
+            <RadixTooltip.Arrow className="fill-neutral-950 dark:fill-neutral-50" />
           </RadixTooltip.Content>
         </RadixTooltip.Portal>
       </RadixTooltip.Root>

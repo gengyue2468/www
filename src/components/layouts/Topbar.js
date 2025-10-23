@@ -8,14 +8,17 @@ const NavItems = [
   {
     name: "关于",
     href: "/",
+    tooltip: "查看个人介绍",
   },
   {
     name: "随想",
     href: "/whims",
+    tooltip: "查看所有随想",
   },
   {
     name: "设计",
     href: "/design",
+    tooltip: "查看设计和项目",
   },
 ];
 
@@ -26,7 +29,7 @@ export default function Topbar() {
     <div className="z-10 sticky top-0 bg-transparent">
       <div className="max-w-7xl mx-auto py-2 px-8">
         <div className="flex flex-row justify-between items-center">
-          <Tooltip content="主页">
+          <Tooltip content="回到主页">
             <div className="-translate-x-4 flex flex-row space-x-2 transition-all duration-500 px-3 py-2 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 rounded-full cursor-pointer">
               <img
                 src="/static/author.webp"
@@ -51,8 +54,9 @@ export default function Topbar() {
                   ? router.asPath == "/"
                   : router.asPath.includes(item.href);
               return (
-                <Tooltip key={index} content={item.href}>
+                <Tooltip key={index} content={item.tooltip}>
                   <button
+                    aria-label={item.tooltip}
                     onClick={() => {
                       router.push(item.href, undefined, { scroll: false });
                     }}

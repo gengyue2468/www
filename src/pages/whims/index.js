@@ -7,6 +7,7 @@ import { InView } from "react-intersection-observer";
 import { motion } from "motion/react";
 import FilterPost from "@/components/ui/FilterPost";
 import Drawer from "@/components/ui/Drawer";
+import Tooltip from "@/components/ui/Tooltip";
 
 const Whims = ({ allPosts }) => {
   const wordCount = allPosts.reduce((total, curPost) => {
@@ -73,7 +74,7 @@ const Whims = ({ allPosts }) => {
                 className="lg:max-w-xl xl:max-w-3xl w-full px-0 md:px-2 lg:px-0"
               >
                 <AllPosts posts={allPosts} type="display" />
-                
+
                 <InView triggerOnce={true}>
                   {({ inView: btnInView, ref: btnRef }) => (
                     <Drawer content={<FilterPost allPosts={allPosts} />}>
@@ -82,10 +83,15 @@ const Whims = ({ allPosts }) => {
                         initial={initial}
                         animate={btnInView ? animate : initial}
                         transition={{ ...transition, delay: 0.4 }}
-                        className="flex lg:hidden sticky bottom-4 w-32 mx-auto backdrop-blur-3xl bg-neutral-200 dark:bg-neutral-800 rounded-3xl py-3 flex-row justify-center space-x-2 items-center"
+                        className="flex lg:hidden sticky bottom-4 w-32 mx-auto backdrop-blur-3xl bg-neutral-200 dark:bg-neutral-800 rounded-3xl py-4 flex-row justify-center space-x-2 items-center"
                       >
-                        <ListFilterIcon className="size-4" />
-                        <span className="font-semibold text-base">筛选文章</span>
+                        <Tooltip content="筛选依据">
+                          <ListFilterIcon className="size-4" />
+                        </Tooltip>
+
+                        <span className="font-semibold text-base">
+                          筛选文章
+                        </span>
                       </motion.button>
                     </Drawer>
                   )}
