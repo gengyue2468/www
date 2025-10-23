@@ -57,7 +57,7 @@ const WhimPage = ({ post, allPosts }) => {
       setToc(titleData);
     }
   };
-  
+
   useEffect(() => {
     generateToc();
   }, [router.asPath]);
@@ -110,7 +110,7 @@ const WhimPage = ({ post, allPosts }) => {
           )}
         </InView>
 
-        <div className="flex flex-row justify-between gap-8">
+        <div className="flex flex-row justify-between gap-8 mt-8">
           <InView triggerOnce={true}>
             {({ inView, ref }) => (
               <motion.div

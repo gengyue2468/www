@@ -57,7 +57,7 @@ const PostTitle = ({ children, className }) => {
 
 const DayTitle = ({ children }) => {
   return (
-    <div className="rounded-full bg-neutral-200 dark:bg-neutral-800 px-3 py-2 flex flex-row gap-2 items-center translate-x-4">
+    <div className="rounded-full bg-neutral-200 dark:bg-neutral-800 px-3 py-2 flex flex-row gap-2 items-center translate-x-2">
       <Calendar1Icon className="size-5 opacity-50" />
       <h2 className="whitespace-nowrap no-underline! font-bold opacity-50 text-lg">
         {children}
@@ -76,7 +76,7 @@ const ListContainer = ({ children }) => {
 
 const FlexContainer = ({ children }) => {
   return (
-    <div className="flex flex-row justify-between items-center gap-4 w-full px-6 py-2 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 rounded-3xl transition-all duration-500">
+    <div className="flex flex-row justify-between items-center gap-4 w-full px-4 py-2 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 rounded-3xl transition-all duration-500">
       {children}
     </div>
   );
@@ -122,11 +122,11 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
         return (
           <div
             key={year}
-            className={`${isFirstYear ? "" : "mt-8"} px-2 pb-4 group`}
+            className={`${isFirstYear ? "" : "mt-8"} px-2 pb-4 group -translate-x-4 w-[calc(100%+2rem)]`}
           >
             {sortedMonths.length > 0 && (
               <>
-                <div className="flex justify-between items-center mb-2 px-4 -translate-x-4 w-[calc(100%+2rem)]">
+                <div className="flex justify-between items-center mb-2 px-4 ">
                   <h3
                     className={classNames(
                       "font-extrabold",
@@ -149,7 +149,7 @@ const Post = ({ posts, filterBy, searchValue, type = "display" }) => {
                     >
                       <MonthTitle
                         className={classNames(
-                          "flex px-2",
+                          "flex px-6",
                           type == "search" &&
                             "text-xl !mt-2 -translate-x-2 mb-4"
                         )}

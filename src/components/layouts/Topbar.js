@@ -47,11 +47,11 @@ export default function Topbar() {
             </div>
           </Tooltip>
 
-          <div className="flex flex-row items-center space-x-0.5 sm:space-x-1.5">
+          <div className="flex flex-row items-center gap-1.5">
             {NavItems.map((item, index) => {
               const active =
                 item.href == "/"
-                  ? router.asPath == "/"
+                  ? router.asPath == "/" || router.asPath == "/about"
                   : router.asPath.includes(item.href);
               return (
                 <Tooltip key={index} content={item.tooltip}>

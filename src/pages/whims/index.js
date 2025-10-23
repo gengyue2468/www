@@ -25,7 +25,7 @@ const Whims = ({ allPosts }) => {
         <div className="my-8 items-center flex flex-col sm:flex-row gap-4 justify-between">
           <InView triggerOnce={true}>
             {({ inView, ref }) => (
-              <div ref={ref} className="w-full sm:w-1/2 z-5">
+              <div ref={ref} className="w-full sm:w-1/2 z-1">
                 <motion.h1
                   initial={initial}
                   animate={inView ? animate : initial}
