@@ -12,7 +12,7 @@ export default function Header({ title, date, desc, readingTime }) {
 
   return (
     <div className=""> 
-    <h1 className="leading-relaxed text-balance my-8 font-extrabold text-5xl sm:text-6xl">
+    <h1 className="leading-relaxed text-balance my-8 font-extrabold text-5xl sm:text-6xl w-full md:w-3/4">
         {title || "未命名文稿"}
       </h1>
       <div className="text-balance text-sm font-semibold opacity-50 flex flex-row flex-wrap gap-4">

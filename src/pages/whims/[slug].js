@@ -130,6 +130,7 @@ const WhimPage = ({ post, allPosts }) => {
                   <MdxContent mdxSource={mdxSource} />
                 </Wrapper>
 
+                <div className="mt-32" />
                 <InView triggerOnce={true}>
                   {({ inView: postsInView, ref: postsRef }) => (
                     <motion.div

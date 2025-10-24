@@ -50,7 +50,7 @@ h6 {
 }
 
 p {
-  @apply tracking-wide leading-normal;
+  @apply leading-relaxed;
 }
 
 a {
@@ -59,7 +59,7 @@ a {
 }
 
 strong {
-  @apply bg-yellow-200 border-b-2 border-yellow-400 font-extrabold 
+  @apply bg-yellow-200 border-b-2 border-yellow-400 font-bold
          dark:bg-yellow-800/25 dark:border-yellow-600/25;
 }
 

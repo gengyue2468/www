@@ -3,8 +3,8 @@ export default function Wrapper({ children, className, ...props }) {
     <div
       {...props}
       className={`scroll-smooth max-w-none mt-8 prose dark:prose-invert *:text-black! dark:*:text-white! 
-    prose-neutral prose-lg xl:prose-xl serif prose-p:leading-loose prose-h1:text-2xl prose-h2:text-xl prose-headings:sans prose-p:text-black dark:prose-p:text-white prose-p:my-8
-    prose-headings:mt-8 prose-headings:mb-4 prose-headings:!no-underline prose-headings:font-bold 
+    prose-neutral prose-lg xl:prose-xl prose-p:leading-loose prose-h1:text-3xl prose-h2:text-2xl prose-headings:sans prose-p:text-black dark:prose-p:text-white prose-p:my-8
+    prose-h1:mt-16 prose-headings:mb-4 prose-headings:!no-underline prose-headings:font-bold 
     prose-pre:px-8 prose-a:underline-offset-4 
     *:transition-all *:duration-300 
     prose-li:pl-0 prose-li:[&::marker]:pl-0.5 prose-li:[&::marker]:text-black dark:prose-li:[&::marker]:text-white 
