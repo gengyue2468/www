@@ -12,6 +12,8 @@ import Drawer from "@/components/ui/Drawer";
 import { InView } from "react-intersection-observer";
 import { motion } from "motion/react";
 import { useRouter } from "next/router";
+import Tooltip from "@/components/ui/Tooltip";
+import Comment from "@/components/ui/Comments/Comment";
 
 const WhimPage = ({ post, allPosts }) => {
   const [toc, setToc] = useState([]);
@@ -75,15 +77,19 @@ const WhimPage = ({ post, allPosts }) => {
           <Share slug={slug} title={title} />
         </div>
         <div className="my-4 rounded-3xl bg-neutral-100 dark:bg-neutral-900 px-4 py-3 w-full">
-          <button
-            disabled={true}
-            className="disabled:opacity-50 cursor-not-allowed w-full flex flex-row space-x-2 px-4 py-3 items-center hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 rounded-3xl transition-all duration-500"
-          >
-            <div className="rounded-full bg-neutral-200 dark:bg-neutral-800 p-2">
-              <SquarePenIcon className="size-6" />{" "}
-            </div>
-            <span className="font-bold text-xl">撰写评论</span>
-          </button>
+          <Tooltip content="撰写并发表评论">
+            <Drawer content={<Comment />}>
+              <button
+                aria-label="撰写并发表评论"
+                className="disabled:opacity-50 cursor-not-allowed w-full flex flex-row space-x-2 px-4 py-3 items-center hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 rounded-3xl transition-all duration-500"
+              >
+                <div className="rounded-full bg-neutral-200 dark:bg-neutral-800 p-2">
+                  <SquarePenIcon className="size-6" />{" "}
+                </div>
+                <span className="font-bold text-xl">撰写评论</span>
+              </button>
+            </Drawer>
+          </Tooltip>
         </div>
       </motion.div>
     );

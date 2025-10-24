@@ -6,7 +6,7 @@ export default function OOTFDAY() {
   return (
     <>
       <div className="flex flex-col justify-center items-center h-[75vh]">
-        <pre className="scale-40 md:scale-100">
+        <pre className="scale-50 md:scale-100">
           {`
         ——————————           —————————————          ————————————          ————      ————
        /        /           /            /         /   ————    /         /   /     /   /   
