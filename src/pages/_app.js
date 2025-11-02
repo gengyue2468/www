@@ -1,34 +1,66 @@
-import '../styles/globals.css'
-import { useState, createContext, useContext } from 'react'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import "../styles/globals.css";
+import "../styles/highlight.css";
+import { ThemeProvider } from "next-themes";
+import Loader from "@/components/ui/Loader";
+import PostLayout from "@/components/layouts/PostLayout";
 
-// 创建音乐播放状态上下文
-const PlayerContext = createContext()
+function MyApp({ Component, pageProps }) {
+  const [isMounted, setIsMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-export default function App({ Component, pageProps }) {
-  // 播放器状态管理
-  const [currentSong, setCurrentSong] = useState(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [duration, setDuration] = useState(0)
-  
-  // 提供上下文值
-  const playerValue = {
-    currentSong,
-    setCurrentSong,
-    isPlaying,
-    setIsPlaying,
-    progress,
-    setProgress,
-    duration,
-    setDuration,
-  }
-  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleStart = () => setIsLoading(true);
+    const handleComplete = () => setIsLoading(false);
+
+    router.events.on("routeChangeStart", handleStart);
+    router.events.on("routeChangeComplete", handleComplete);
+    router.events.on("routeChangeError", handleComplete);
+
+    return () => {
+      router.events.off("routeChangeStart", handleStart);
+      router.events.off("routeChangeComplete", handleComplete);
+      router.events.off("routeChangeError", handleComplete);
+    };
+  }, [router]);
+
+  const shouldShowLoader = !isMounted || isLoading;
+  const { title, allPosts, allContents } = pageProps;
+
   return (
-    <PlayerContext.Provider value={playerValue}>
-      <Component {...pageProps} />
-    </PlayerContext.Provider>
-  )
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+   
+        <>
+          {router.asPath == "/" ? (
+            <Component {...pageProps} />
+          ) : (
+            <PostLayout
+              title={title}
+              allPosts={allPosts}
+              allContents={allContents}
+            >
+              <Component {...pageProps} />
+            </PostLayout>
+          )}
+          {shouldShowLoader && (
+            <div className="fixed inset-0 z-[1145] bg-neutral-100 dark:bg-neutral-900">
+              <Loader />
+            </div>
+          )}
+        </>
+    </ThemeProvider>
+  );
 }
 
-// 自定义Hook方便使用上下文
-export const usePlayer = () => useContext(PlayerContext)
+export default MyApp;

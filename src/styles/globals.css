@@ -1,26 +1,61 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@media screen and (max-width: 768px) {
+  html {
+    font-size: 13px;
   }
 }
 
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+}
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Bricolage Grotesque", "Noto Sans SC", sans-serif;
+  @apply bg-neutral-100 dark:bg-neutral-900;
+}
+
+.anchor-link {
+  @apply no-underline !text-black dark:!text-white;
+}
+
+.anchor-link:hover::before {
+  content: "#";
+  position: absolute;
+  @apply -translate-x-8 opacity-50;
+}
+
+pre,
+code {
+  @apply bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white rounded-lg;
+}
+
+.prose {
+  @apply !text-black dark:!text-white;
+}
+
+.prose h1 {
+  @apply font-semibold text-3xl mt-12 !mb-4;
+}
+
+.prose h2 {
+  @apply font-medium text-2xl mt-4 mb-4;
+}
+
+.prose a {
+  @apply no-underline text-blue-500;
 }

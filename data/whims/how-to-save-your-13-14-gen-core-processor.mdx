@@ -1,0 +1,114 @@
+---
+title: 如何”拯救“你的13/14代酷睿i7/i9
+date: 2025-8-9
+desc: 解决传奇耐电王 i9-14900 HX 缩肛风险的真实历程以及一些数据的备忘。
+---
+
+![Intel Core (TM) i9 13th/14th Gen](/static/i9.webp)
+
+众所不周知，我搞了台配备传奇耐电王 —— 英特尔 酷睿 i9-14900 HX 的传奇黑屏精灵 11。这个抽象笔记本 CPU 就是桌面端传奇耐电缩肛王 i9-14900 K 的换壳版。虽然说在笔记本的长期低功耗使用下缩肛应该会进行的比较缓慢，但是以防万一，我还是参考了大佬们的一些教程对这台可怜的精灵进行了降压锁频操作，以期它能够撑过这几年本科生活。
+
+为了对暗影精灵 11 进行降压操作，我们首先要克服惠普官方对我们进行的限制 —— 即我们要进入到高级 BIOS 中，不过我们首先要关闭一部分系统功能，否则会出现一系列问题：
+
+- 关闭磁盘加密，否则开机会要求解锁 BitLocker
+- 关闭内核隔离
+- 退出微软账户（非必要，无所谓）
+- 关闭 安全启动（官方 BIOS 中操作）
+- 关闭 Windows 基于虚拟化的安全性功能（Windows 沙盒、Windows Linux 子系统等功能都会受限）
+
+如果使用 24H2 或者更高版本的 Windows 11，仅在控制面板的 Windows 功能中操作是不够的，我们还需要用脚本关闭 vbs （或者直接下个雷电模拟器，可以直接按照操作指引关闭 vbs）
+
+完成上述工作之后，参考上述第 3 条关闭安全启动功能。随后重启回到 Windows 中（注意此时只能输密码登录， PIN 码等 Windows Hello 登录途径均不可用，可以回头重新设置（如果你没退账号的话，退了的话回头直接重新登陆就行了））
+
+随后你将有两个选择：
+
+- 一是准备一个大于 100 MB 的 U 盘并格式化为 FAT 32 格式
+- 二是通过 Windows 自带的磁盘压缩功能创建一个 大于 100 MB 的分区（不需要太大）并且格式化为 FAT 32 格式
+
+完成上述步骤后，将高级 BIOS 文件直接解压缩丢进 U 盘或者新分区就行了，随后重启电脑。至此，我们的准备工作就此完成。
+
+# BIOS 中操作
+
+重新启动系统后，想办法进入“系统启动”菜单（暗影精灵是按 F9），选择你的 U 盘或者那个分区，回车进入，选择“从 EFI 文件引导”然后找到 BOOTX64.efi 回车，电脑应该会黑屏一下然后回到引导界面，随后你就可以按 F10 进入高级 BIOS 了，恭喜 🎉，你已经成功了一半了。
+
+然后在高级 BIOS 中找到 ”Power & Performance”，进入“CPU-PowerManagementControl”，然后找到 “CPUVRSettings”，点击后进入“Core/lAVRSettings”，修改 ACLoadline ，推荐 110 （90 ~ 130 均可，按照需求修改）
+
+回到“Power & Performance”，进入“CPU-PowerManagementControl”，找到“CPULockConfiguration”，修改 OverclockingLock 为 “Disabled” ，CFGLock 为 “Enabled” 或 “Disabled” 均可。（推荐 Disabled )。
+
+回到高级 BIOS 初始界面，找到并进入“OverclockingPerformanceMenu”，找到“WDTEnable”，改为“Enabled”
+
+下面操作还是刚才那个界面，将“OverclockingFeature”（超频）修改“Enabled”，“UnderVolt
+Protection”（低电压保护）修改为“Disabled”。
+
+还是刚才那个界面，找到下方的 “CEPDisable” 并进入。
+
+> 部分资料参考需要将 “IACEPEnabled” 改为 “Disabled” ，将“GTCEPEnabled” 改为 “Disabled” ，也有大佬说这里改不改无所谓，推荐双 Disabled
+
+下面还是在刚才那个界面， 将 “Thermalvelocityboost” 改为“Disabled”，此举可以关闭 TVB 功能，防止特定情况下过度 Boost。
+
+下面回到初始界面，进入 “ThermalConfiguration”，
+
+进入“CPUThermalConfiguration”，修改“Bi-DirectionalProcessorHot”为 “Disabled”。
+
+OK，现在 BIOS 内的设置业已全部完成，按 F10 保存，等待电脑重启。
+
+# 在 ThrottleStop 中操作
+
+现在打开 ThrottleStop 软件（图吧工具箱里头有），我们可以看到左侧有一系列参数调整，我们主要进行这两个方面的调整：
+
+- 关闭 C1E
+- 按需调整 Speed Shift EPP：最高性能为 0， 平衡为 128， 最差性能为 255
+
+然后点击 FIVR 进行降压锁频的操作：
+
+在上方的 FIVR Control 中选择你需要调整的项目，我们主要调整：
+
+- CPU Core
+- CPU P Cache
+- CPU E Cache
+
+我们首先调整 CPU Core 的电压偏离（ Offset Voltage），推荐 - 100mv 左右，不要过低，一般按照＋/－ 5mv 的原则上下调整。按需选择自己需要的电压降。
+
+同样的方式调整 CPU P Cache，参数同上。对于 CPU E Cache，一般不需要降低那么多，-70 mv 左右为宜。
+
+调整完后，不要忘记点击右下角的 Apply 应用调整，注意观察 Apply 后右上角的电压数值是否发生变化，如果未发生变化可能是前面步骤执行存在问题，请检查。如果没有问题，可以进行下面的操作：
+
+- 锁定 P（大核）频率：全核 4.8 ~ 5.2 均可以，看你自己的 CPU 体质
+- 锁定 E（小核）频率：全核 3.4 左右吧，看你个人需求，比如玩的比较多 FPS 游戏的就调低些（3.2 左右），玩 3A 多些的话调高些 （3.4 左右）
+
+操作完成后 Apply 应用，按 Save （此时把保存选项调整到第 3 个，immediately）
+
+之后回到软件主页面，按 Turn On，启动服务。
+
+# 设置 ThrottleStop 软件开机自启动
+
+搜索栏中搜索“控制面板”，回车进入控制面板，搜索“Windows 工具”，进入选择“任务计划程序”，进入之后选择“创建基本任务”，名字随便输一个，选择下一步，然后选择“当前用户登录时”，下一步，在”启动程序“这一步找到 Throttle Stop 的软件位置（一般是在你的图吧工具箱目录下的 CPU 工具中），然后继续下一步，到“完成”页面不要忘记勾选左下角的“当单击”完成“时，显示此任务属性的对话框”。
+
+随后在打开的“属性”对话框中，选择左下角的“使用最高权限运行”，然后转到“设置”栏目中，将第二个和第三个对勾取消勾选，然后完成就行了。
+
+> 注意 ⚠：如果你单击完成之后弹出错误信息：“一个或多个指定的参数无效”，那么请回到“常规”对话框下，选择“更改用户或组”，在打开的对话框中输入你的用户名，然后点击确定之后应该就可以了。
+
+然后你可以右键刚才创建的任务运行它，也可以重新启动计算机看看是否能正常开机自动启动。
+
+回到 ThrottleStop 软件中，进入“Options”，勾选”Start Minimized” 和 “Minimized on Close”，随后按 OK 退出。此时，大功基本告成。
+
+# 稳定性测试
+
+- AIDA 64 CPU 烤鸡
+- CPU-Z 稳定性测试
+- Cinebench R15/23 稳定性测试（推荐用 R15）
+
+如果你的 CPU 能经受住这些稳定性测试，那么恭喜你，你的降电压操作是成功的！您可以继续使用您的计算机或者坐和放宽。
+
+# 已知存在的小 Bug
+
+- 任务管理器主频显示异常（一直是 2.42 Ghz），但 CPU-Z 等软件频率显示正常，原因未知
+- 跑分可能会比较低，这里可以参考使用 ThrottleStop 软件，将 Speed Shift Epp 改为 0，性能就正常了
+
+# 参考文献及工具
+
+- [2503 暗影精灵系列调教全教程%20(1).pdf](<https://cdn.huster.fun/static/documents/2503暗影精灵系列调教全教程%20(1).pdf>)
+- [vbs开启.7z](https://cdn.huster.fun/static/tools/vbs开启.7z)
+- [vbs关闭.7z](https://cdn.huster.fun/static/tools/vbs关闭.7z)
+- [暗影11解锁bios](https://cdn.huster.fun/static/tools/暗影11解锁bios.zip)
+- [ThrottleStop_9.7](https://techpowerup.com/download/techpowerup-throttlestop/)
