@@ -1,65 +1,151 @@
-import Image from "next/image";
+"use client";
+
+import Music from "@/components/music/music";
+import Clock from "@/components/clock/clock";
+import { homeStyles, profile } from "./home.config";
+import classNames from "classnames";
+import Weather from "@/components/weather/weather";
+import { useTranslation } from "react-i18next";
+import { useHash } from "@/hooks/use-hash";
+import { useTheme } from "next-themes";
 
 export default function Home() {
+  const { t } = useTranslation();
+  const hash = useHash();
+  const { resolvedTheme } = useTheme();
+  
+  // 当 hash 匹配时，根据当前主题设置 data-color
+  // invert 后：light -> dark, dark -> light
+  const getInvertDataColor = () => {
+    if (!hash) return null;
+    const actualTheme = resolvedTheme || "light";
+    return actualTheme === "dark" ? "light" : "dark";
+  };
+  
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <div className={homeStyles.gridContainer}>
+        <div className={homeStyles.gridItem}>
+          <h1 className={homeStyles.title}>{t("home.baseInfo")}</h1>
+          <div className={homeStyles.listContainer}>
+            <div className={homeStyles.rowContainer}>
+              <div className={homeStyles.subtitle}>{t("home.name")}</div>
+              <div className={homeStyles.rowText}>{profile.name}</div>
+            </div>
+            <div className={homeStyles.rowContainer}>
+              <div className={homeStyles.subtitle}>{t("home.age")}</div>
+              <div className={homeStyles.rowText}>{profile.age}</div>
+            </div>
+            <div className={homeStyles.rowContainer}>
+              <div className={homeStyles.subtitle}>{t("home.university")}</div>
+              <div className={homeStyles.rowText}>{profile.university}</div>
+            </div>
+            <div className={homeStyles.rowContainer}>
+              <div className={homeStyles.subtitle}>{t("home.major")}</div>
+              <div className={homeStyles.rowText}>{profile.major}</div>
+            </div>
+            <div className={homeStyles.rowContainer}>
+              <div className={homeStyles.subtitle}>{t("home.club")}</div>
+              <div className={homeStyles.rowText}>{profile.club}</div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div 
+          id="tags"
+          data-color={hash === "tags" ? getInvertDataColor() : undefined}
+          className={classNames(
+            homeStyles.gridItem,
+            hash === "tags" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+          )}
+        >
+          <h1 className={homeStyles.title}>{t("home.tags")}</h1>
+          <div className={homeStyles.listContainer}>
+            {profile.tags.map((tag, index) => (
+              <div key={index} className={homeStyles.rowContainer}>
+                <div className={homeStyles.subtitle}>{t("home.tag")} {index + 1}.</div>
+                <div className={homeStyles.rowText}>{tag}</div>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+        <div 
+          id="tech-stacks"
+          data-color={hash === "tech-stacks" ? getInvertDataColor() : undefined}
+          className={classNames(
+            homeStyles.gridItem,
+            hash === "tech-stacks" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+          )}
+        >
+          <h1 className={homeStyles.title}>{t("home.techStacks")}</h1>
+          <div className={homeStyles.listContainer}>
+            {profile.stacks.map((stack, index) => (
+              <div key={index} className={homeStyles.rowContainer}>
+                <div className={homeStyles.subtitle}>{index + 1}.</div>
+                <div className={homeStyles.listContainer}>
+                  <div className={homeStyles.rowText}>{stack.lan}</div>
+                  <div className={classNames(homeStyles.rowText, "opacity-80")}>
+                    {stack.description}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div 
+          id="projects"
+          data-color={hash === "projects" ? getInvertDataColor() : undefined}
+          className={classNames(
+            homeStyles.gridItem,
+            hash === "projects" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+          )}
+        >
+          <h1 className={homeStyles.title}>{t("home.projects")}</h1>
+          <div className={homeStyles.listContainer}>
+            {profile.projects.map((project, index) => (
+              <div key={index} className={homeStyles.rowContainer}>
+                <div className={homeStyles.subtitle}>{index + 1}.</div>
+                <div className={homeStyles.listContainer}>
+                  <div
+                    className={classNames(
+                      homeStyles.rowText,
+                      "hover:opacity-50 cursor-pointer"
+                    )}
+                    onClick={() => open(project.url)}
+                  >
+                    {project.name}
+                  </div>
+                  <div className={classNames(homeStyles.rowText, "opacity-80")}>
+                    {project.description}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div 
+          id="games"
+          data-color={hash === "games" ? getInvertDataColor() : undefined}
+          className={classNames(
+            homeStyles.gridItem,
+            hash === "games" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+          )}
+        >
+          <h1 className={homeStyles.title}>{t("home.games")}</h1>
+          <div className={homeStyles.listContainer}>
+            {profile.games.map((game, index) => (
+              <div key={index} className={homeStyles.rowContainer}>
+                <div className={homeStyles.subtitle}>{index + 1}.</div>
+                <div className={homeStyles.listContainer}>
+                  <div className={homeStyles.rowText}>{game}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <Music />
+        <Weather />
+        <Clock />
+      </div>
+    </>
   );
 }

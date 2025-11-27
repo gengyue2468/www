@@ -2,7 +2,8 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  --primary: oklch(97% 0 0);
 }
 
 @theme inline {
@@ -14,8 +15,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #ffffff;
+    --primary: oklch(20.5% 0 0);
   }
 }
 
@@ -24,3 +26,89 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 基础 selection 样式 */
+::selection {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+/* 根据 data-color 属性应用不同的 selection 样式 */
+/* 使用更具体的选择器提高优先级 */
+[data-color="light"] *::selection,
+[data-color="light"]::selection {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+[data-color="dark"] *::selection,
+[data-color="dark"]::selection {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Blue 配色 */
+[data-color="blue-light"] *::selection,
+[data-color="blue-light"]::selection {
+  background: #1e40af !important;
+  color: #eff6ff !important;
+}
+
+[data-color="blue-dark"] *::selection,
+[data-color="blue-dark"]::selection {
+  background: #dbeafe !important;
+  color: #1e3a8a !important;
+}
+
+/* Emerald 配色 */
+[data-color="emerald-light"] *::selection,
+[data-color="emerald-light"]::selection {
+  background: #065f46 !important;
+  color: #ecfdf5 !important;
+}
+
+[data-color="emerald-dark"] *::selection,
+[data-color="emerald-dark"]::selection {
+  background: #d1fae5 !important;
+  color: #064e3b !important;
+}
+
+/* Pink 配色 */
+[data-color="pink-light"] *::selection,
+[data-color="pink-light"]::selection {
+  background: #9f1239 !important;
+  color: #fdf2f8 !important;
+}
+
+[data-color="pink-dark"] *::selection,
+[data-color="pink-dark"]::selection {
+  background: #fce7f3 !important;
+  color: #831843 !important;
+}
+
+/* Orange 配色 */
+[data-color="orange-light"] *::selection,
+[data-color="orange-light"]::selection {
+  background: #9a3412 !important;
+  color: #fff7ed !important;
+}
+
+[data-color="orange-dark"] *::selection,
+[data-color="orange-dark"]::selection {
+  background: #ffedd5 !important;
+  color: #7c2d12 !important;
+}
+
+/* Lime 配色 */
+[data-color="lime-light"] *::selection,
+[data-color="lime-light"]::selection {
+  background: #365314 !important;
+  color: #f7fee7 !important;
+}
+
+[data-color="lime-dark"] *::selection,
+[data-color="lime-dark"]::selection {
+  background: #ecfccb !important;
+  color: #1a2e05 !important;
+}
+

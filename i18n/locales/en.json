@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "menu": "Menu"
+  },
+  "home": {
+    "baseInfo": "BaseInfo",
+    "name": "Name",
+    "age": "Age",
+    "university": "University",
+    "major": "Major",
+    "club": "Club",
+    "tags": "Tags",
+    "tag": "Tag",
+    "techStacks": "Tech Stacks",
+    "projects": "Projects",
+    "games": "Games",
+    "music": "Music"
+  },
+  "music": {
+    "title": "Music",
+    "loading": "Loading playlist...",
+    "error": "Error fetching playlist",
+    "noTracks": "No tracks found in the playlist."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error"
+  }
+}
+

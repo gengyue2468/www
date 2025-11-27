@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "menu": "選單"
+  },
+  "home": {
+    "baseInfo": "基本資訊",
+    "name": "姓名",
+    "age": "年齡",
+    "university": "大學",
+    "major": "專業",
+    "club": "社團",
+    "tags": "標籤",
+    "tag": "標籤",
+    "techStacks": "技術棧",
+    "projects": "專案",
+    "games": "遊戲",
+    "music": "音樂"
+  },
+  "music": {
+    "title": "音樂",
+    "loading": "載入中...",
+    "error": "取得歌單失敗",
+    "noTracks": "歌單中沒有找到歌曲"
+  },
+  "common": {
+    "loading": "載入中...",
+    "error": "錯誤"
+  }
+}
+
