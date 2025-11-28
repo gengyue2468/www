@@ -12,16 +12,21 @@ import { useTheme } from "next-themes";
 export default function Music() {
   const hash = useHash();
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   
   // 当 hash 匹配时，根据当前主题设置 data-color
   const getInvertDataColor = () => {
-    if (hash !== "music") return undefined;
+    if (!mounted || hash !== "music") return undefined;
     const actualTheme = resolvedTheme || "light";
     return actualTheme === "dark" ? "light" : "dark";
   };
   const [playlist, setPlaylist] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -51,7 +56,7 @@ export default function Music() {
       data-color={getInvertDataColor()}
       className={classNames(
         homeStyles.gridItem,
-        hash === "music" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+        mounted && hash === "music" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
       )}
     >
       <h1 className={homeStyles.title}>Music</h1>

@@ -12,16 +12,21 @@ import { useTheme } from "next-themes";
 export default function Weather() {
   const hash = useHash();
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   
   // 当 hash 匹配时，根据当前主题设置 data-color
   const getInvertDataColor = () => {
-    if (hash !== "weather") return undefined;
+    if (!mounted || hash !== "weather") return undefined;
     const actualTheme = resolvedTheme || "light";
     return actualTheme === "dark" ? "light" : "dark";
   };
   const [weatherData, setWeatherData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -46,7 +51,7 @@ export default function Weather() {
       data-color={getInvertDataColor()}
       className={classNames(
         homeStyles.gridItem,
-        hash === "weather" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+        mounted && hash === "weather" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
       )}
     >
       <h1 className={homeStyles.title}>Weather</h1>

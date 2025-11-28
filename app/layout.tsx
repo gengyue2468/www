@@ -5,6 +5,7 @@ import Nav from "@/components/nav/nav";
 import Footer from "@/components/footer/footer";
 import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/next";
+import AuthSessionProvider from "@/components/auth/session-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,9 +41,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Nav />
-          <main className="px-0">{children}</main>
-          <Footer />
+          <AuthSessionProvider>
+            <Nav />
+            <main className="px-0">{children}</main>
+            <Footer />
+          </AuthSessionProvider>
         </ThemeProvider>
         <Analytics />
       </body>

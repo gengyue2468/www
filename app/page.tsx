@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import Music from "@/components/music/music";
@@ -5,21 +6,26 @@ import Clock from "@/components/clock/clock";
 import { homeStyles, profile } from "./home.config";
 import classNames from "classnames";
 import Weather from "@/components/weather/weather";
+import Guestbook from "@/components/guestbook/guestbook";
 import { useHash } from "@/hooks/use-hash";
 import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const hash = useHash();
   const { resolvedTheme } = useTheme();
-  
-  // 当 hash 匹配时，根据当前主题设置 data-color
-  // invert 后：light -> dark, dark -> light
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const getInvertDataColor = () => {
-    if (!hash) return null;
+    if (!mounted || !hash) return null;
     const actualTheme = resolvedTheme || "light";
     return actualTheme === "dark" ? "light" : "dark";
   };
-  
+
   return (
     <>
       <div className={homeStyles.gridContainer}>
@@ -46,18 +52,20 @@ export default function Home() {
               <div className={homeStyles.subtitle}>Club</div>
               <div className={homeStyles.rowText}>{profile.club}</div>
             </div>
-             <div className={homeStyles.rowContainer}>
+            <div className={homeStyles.rowContainer}>
               <div className={homeStyles.subtitle}>Group</div>
               <div className={homeStyles.rowText}>{profile.group}</div>
             </div>
           </div>
         </div>
-        <div 
+        <div
           id="tags"
           data-color={hash === "tags" ? getInvertDataColor() : undefined}
           className={classNames(
             homeStyles.gridItem,
-            hash === "tags" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+            mounted && hash === "tags"
+              ? "bg-foreground text-background"
+              : ""
           )}
         >
           <h1 className={homeStyles.title}>Tags</h1>
@@ -70,12 +78,14 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div 
+        <div
           id="tech-stacks"
           data-color={hash === "tech-stacks" ? getInvertDataColor() : undefined}
           className={classNames(
             homeStyles.gridItem,
-            hash === "tech-stacks" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+            mounted && hash === "tech-stacks"
+              ? "bg-foreground text-background"
+              : ""
           )}
         >
           <h1 className={homeStyles.title}>Tech Stacks</h1>
@@ -93,12 +103,14 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div 
+        <div
           id="projects"
           data-color={hash === "projects" ? getInvertDataColor() : undefined}
           className={classNames(
             homeStyles.gridItem,
-            hash === "projects" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+            mounted && hash === "projects"
+              ? "bg-foreground text-background"
+              : ""
           )}
         >
           <h1 className={homeStyles.title}>Projects</h1>
@@ -124,12 +136,14 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div 
+        <div
           id="games"
           data-color={hash === "games" ? getInvertDataColor() : undefined}
           className={classNames(
             homeStyles.gridItem,
-            hash === "games" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
+            mounted && hash === "games"
+              ? "bg-foreground text-background"
+              : ""
           )}
         >
           <h1 className={homeStyles.title}>Games</h1>
@@ -147,6 +161,8 @@ export default function Home() {
         <Music />
         <Weather />
         <Clock />
+        <div className="hidden xl:block" />
+        <Guestbook />
       </div>
     </>
   );

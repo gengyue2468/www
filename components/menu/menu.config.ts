@@ -6,6 +6,7 @@ export const menuItems = [
   { name: "Music", href: "/#music" },
   { name: "Weather", href: "/#weather" },
   { name: "Clock", href: "/#clock" },
+  { name: "Guestbook", href: "/#guestbook" },
 ];
 
 export const socialLinks = [
