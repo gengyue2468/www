@@ -6,12 +6,10 @@ import { getPlaylist } from "@/actions/getPlaylist";
 import { useState, useEffect } from "react";
 import { homeStyles } from "@/app/home.config";
 import classNames from "classnames";
-import { useTranslation } from "react-i18next";
 import { useHash } from "@/hooks/use-hash";
 import { useTheme } from "next-themes";
 
 export default function Music() {
-  const { t } = useTranslation();
   const hash = useHash();
   const { resolvedTheme } = useTheme();
   
@@ -36,13 +34,13 @@ export default function Music() {
         } else if (data && data.playlist && data.playlist.tracks) {
           setPlaylist(data.playlist.tracks);
         } else {
-          setError(t("music.noTracks"));
+          setError("No tracks found in the playlist.");
         }
         setLoading(false);
       })
       .catch((err: any) => {
         console.error("Error fetching playlist:", err);
-        setError(t("music.error") + ": " + (err?.message || String(err)));
+        setError("Error fetching playlist: " + (err?.message || String(err)));
         setLoading(false);
       });
   }, []);
@@ -56,9 +54,9 @@ export default function Music() {
         hash === "music" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
       )}
     >
-      <h1 className={homeStyles.title}>{t("music.title")}</h1>
+      <h1 className={homeStyles.title}>Music</h1>
       <div className={homeStyles.listContainer}>
-        {loading && <div>{t("music.loading")}</div>}
+        {loading && <div>Loading playlist...</div>}
         {error && <div className="text-red-500">{error}</div>}
         {playlist &&
           playlist.slice(0, 10).map((song, index) => (

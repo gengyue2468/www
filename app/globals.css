@@ -24,17 +24,13 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
-
-/* 基础 selection 样式 */
 ::selection {
   background: var(--foreground);
   color: var(--background);
 }
 
-/* 根据 data-color 属性应用不同的 selection 样式 */
-/* 使用更具体的选择器提高优先级 */
 [data-color="light"] *::selection,
 [data-color="light"]::selection {
   background: #000000 !important;
@@ -47,7 +43,6 @@ body {
   color: #000000 !important;
 }
 
-/* Blue 配色 */
 [data-color="blue-light"] *::selection,
 [data-color="blue-light"]::selection {
   background: #1e40af !important;
@@ -60,7 +55,6 @@ body {
   color: #1e3a8a !important;
 }
 
-/* Emerald 配色 */
 [data-color="emerald-light"] *::selection,
 [data-color="emerald-light"]::selection {
   background: #065f46 !important;
@@ -73,7 +67,6 @@ body {
   color: #064e3b !important;
 }
 
-/* Pink 配色 */
 [data-color="pink-light"] *::selection,
 [data-color="pink-light"]::selection {
   background: #9f1239 !important;
@@ -86,7 +79,6 @@ body {
   color: #831843 !important;
 }
 
-/* Orange 配色 */
 [data-color="orange-light"] *::selection,
 [data-color="orange-light"]::selection {
   background: #9a3412 !important;
@@ -99,7 +91,6 @@ body {
   color: #7c2d12 !important;
 }
 
-/* Lime 配色 */
 [data-color="lime-light"] *::selection,
 [data-color="lime-light"]::selection {
   background: #365314 !important;

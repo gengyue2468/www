@@ -1,3 +1,3 @@
 export const navList = [
-  { name: "Ciallo～ (∠・ω< )", href: "mailto:hi@huster.fun" },
+  { name: "Ciallo～ (∠・ω< )", href: "mailto:ciallo@gengyue.site" },
 ];

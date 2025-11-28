@@ -9,18 +9,14 @@ import { navList } from "./nav.config";
 import Menu from "../menu/menu";
 import { getButtonStyles, type ThemeConfig } from "./theme.config";
 import { useThemeColor } from "./use-theme-color";
-import { useTranslation } from "react-i18next";
 import { useHash } from "@/hooks/use-hash";
 
 export default function Nav() {
-  const { t } = useTranslation();
   const hash = useHash();
   const [currentColor, setCurrentColor] = useState<string | null>(null);
   const theme = useThemeColor(currentColor);
   const [openMenu, setOpenMenu] = useState(false);
   const navRef = React.useRef<HTMLDivElement>(null);
-
-  // 计算当前应该使用的主题配色
   const calculateColor = React.useCallback(() => {
     const navElement = navRef.current;
     if (!navElement) return;
@@ -103,7 +99,7 @@ export default function Nav() {
   const btnStyles = getButtonStyles(theme);
 
   return (
-    <div ref={navRef} className="fixed top-3 w-full z-50">
+    <div ref={navRef} className="fixed top-2 w-full z-50">
       <div className="flex flex-row justify-between items-center px-4 w-full">
         <div className="flex flex-row items-center gap-2">
           <Link
@@ -132,7 +128,7 @@ export default function Nav() {
             )}
           >
             <MenuIcon className="w-5 h-5" />
-            <span>{t("nav.menu")}</span>
+            <span>Menu</span>
           </button>
         </Menu>
 

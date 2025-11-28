@@ -4,7 +4,6 @@ import "./globals.css";
 import Nav from "@/components/nav/nav";
 import Footer from "@/components/footer/footer";
 import { ThemeProvider } from "next-themes";
-import I18nProvider from "@/components/i18n/i18n-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,11 +39,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <I18nProvider>
-            <Nav />
-            <main className="px-0">{children}</main>
-            <Footer />
-          </I18nProvider>
+          <Nav />
+          <main className="px-0">{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

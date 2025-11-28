@@ -9,7 +9,7 @@ export const menuItems = [
 ];
 
 export const socialLinks = [
-  { name: "Email", href: "mailto:hi@huster.fun" },
+  { name: "Email", href: "mailto:ciallo@gengyue.site" },
   { name: "GitHub", href: "https://github.com/gengyue2468" },
   { name: "X(Twitter)", href: "https://x.com/gengyue2468" },
 ];

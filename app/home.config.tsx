@@ -11,8 +11,9 @@ export const homeStyles = {
   stack:
     "text-2xl md:text-3xl lg:text-4xl py-8 font-medium leading-relaxed w-full text-left px-8",
   gridContainer:
-    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0 w-full grid-flow-row-dense grid-flow-col-dense grid-dense py-12",
-  gridItem: "border border-neutral-200 dark:border-neutral-800 p-6",
+    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0 w-full grid-flow-row-dense grid-flow-col-dense grid-dense",
+  gridItem:
+    "border border-neutral-200 dark:border-neutral-800 py-12 md:py-10 px-6",
   title: "font-medium",
   subtitle: "opacity-80",
   listContainer: "flex flex-col gap-1 mt-2",
@@ -26,6 +27,7 @@ export const profile = {
   university: "Huazhong University of Science and Technology",
   major: "Computer Science",
   club: "Bingyan Studio",
+  group: "Frontend Group",
   tags: [
     "Poop Master 💩",
     "Abstract Being 🌀",
@@ -81,7 +83,7 @@ export const profile = {
       time: "2025.11 - Present",
     },
     {
-      name: "Let’s see sexual photos together",
+      name: "Let's see sexual photos together",
       tags: ["Inactive", "Public", "Next.js", "JavaScript", "Internship"],
       url: "https://github.com/gengyue2468/bingyan-internship-project",
       description: "",

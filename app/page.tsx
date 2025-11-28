@@ -5,12 +5,10 @@ import Clock from "@/components/clock/clock";
 import { homeStyles, profile } from "./home.config";
 import classNames from "classnames";
 import Weather from "@/components/weather/weather";
-import { useTranslation } from "react-i18next";
 import { useHash } from "@/hooks/use-hash";
 import { useTheme } from "next-themes";
 
 export default function Home() {
-  const { t } = useTranslation();
   const hash = useHash();
   const { resolvedTheme } = useTheme();
   
@@ -26,27 +24,31 @@ export default function Home() {
     <>
       <div className={homeStyles.gridContainer}>
         <div className={homeStyles.gridItem}>
-          <h1 className={homeStyles.title}>{t("home.baseInfo")}</h1>
+          <h1 className={homeStyles.title}>Basic Info</h1>
           <div className={homeStyles.listContainer}>
             <div className={homeStyles.rowContainer}>
-              <div className={homeStyles.subtitle}>{t("home.name")}</div>
+              <div className={homeStyles.subtitle}>Name</div>
               <div className={homeStyles.rowText}>{profile.name}</div>
             </div>
             <div className={homeStyles.rowContainer}>
-              <div className={homeStyles.subtitle}>{t("home.age")}</div>
+              <div className={homeStyles.subtitle}>Age</div>
               <div className={homeStyles.rowText}>{profile.age}</div>
             </div>
             <div className={homeStyles.rowContainer}>
-              <div className={homeStyles.subtitle}>{t("home.university")}</div>
+              <div className={homeStyles.subtitle}>University</div>
               <div className={homeStyles.rowText}>{profile.university}</div>
             </div>
             <div className={homeStyles.rowContainer}>
-              <div className={homeStyles.subtitle}>{t("home.major")}</div>
+              <div className={homeStyles.subtitle}>Major</div>
               <div className={homeStyles.rowText}>{profile.major}</div>
             </div>
             <div className={homeStyles.rowContainer}>
-              <div className={homeStyles.subtitle}>{t("home.club")}</div>
+              <div className={homeStyles.subtitle}>Club</div>
               <div className={homeStyles.rowText}>{profile.club}</div>
+            </div>
+             <div className={homeStyles.rowContainer}>
+              <div className={homeStyles.subtitle}>Group</div>
+              <div className={homeStyles.rowText}>{profile.group}</div>
             </div>
           </div>
         </div>
@@ -58,11 +60,11 @@ export default function Home() {
             hash === "tags" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
           )}
         >
-          <h1 className={homeStyles.title}>{t("home.tags")}</h1>
+          <h1 className={homeStyles.title}>Tags</h1>
           <div className={homeStyles.listContainer}>
             {profile.tags.map((tag, index) => (
               <div key={index} className={homeStyles.rowContainer}>
-                <div className={homeStyles.subtitle}>{t("home.tag")} {index + 1}.</div>
+                <div className={homeStyles.subtitle}>Tag {index + 1}.</div>
                 <div className={homeStyles.rowText}>{tag}</div>
               </div>
             ))}
@@ -76,7 +78,7 @@ export default function Home() {
             hash === "tech-stacks" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
           )}
         >
-          <h1 className={homeStyles.title}>{t("home.techStacks")}</h1>
+          <h1 className={homeStyles.title}>Tech Stacks</h1>
           <div className={homeStyles.listContainer}>
             {profile.stacks.map((stack, index) => (
               <div key={index} className={homeStyles.rowContainer}>
@@ -99,7 +101,7 @@ export default function Home() {
             hash === "projects" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
           )}
         >
-          <h1 className={homeStyles.title}>{t("home.projects")}</h1>
+          <h1 className={homeStyles.title}>Projects</h1>
           <div className={homeStyles.listContainer}>
             {profile.projects.map((project, index) => (
               <div key={index} className={homeStyles.rowContainer}>
@@ -130,7 +132,7 @@ export default function Home() {
             hash === "games" ? "bg-[var(--foreground)] text-[var(--background)]" : ""
           )}
         >
-          <h1 className={homeStyles.title}>{t("home.games")}</h1>
+          <h1 className={homeStyles.title}>Games</h1>
           <div className={homeStyles.listContainer}>
             {profile.games.map((game, index) => (
               <div key={index} className={homeStyles.rowContainer}>
