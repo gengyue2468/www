@@ -1,15 +1,47 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+  --font-sans:
+    "Google Sans", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 selection:bg-neutral-900 selection:text-neutral-100 dark:selection:bg-neutral-100 dark:selection:text-neutral-900 leading-relaxed;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+
+a {
+  @apply underline underline-offset-4 decoration-neutral-600 dark:decoration-neutral-400 hover:decoration-neutral-500 hover:opacity-75;
+}
+
+.prose img{
+  @apply block w-[calc(100%+4rem)] -mx-8 max-w-none;
+}
+
+.prose pre {
+  @apply bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-lg px-4 py-3 overflow-x-auto;
+}
+
+
+.prose :not(pre) > code {
+  @apply rounded px-1 py-0.5 bg-neutral-200/70 dark:bg-neutral-800/70;
+}
+
+.dark .prose :not(pre) > code {
+  @apply text-neutral-100;
+}
+
+.prose :not(.katex-display) > .katex,
+.prose p .katex {
+  display: inline-block;
+}
+
+.prose .katex-display {
+  @apply my-4;
 }
