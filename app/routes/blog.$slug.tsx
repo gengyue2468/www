@@ -80,7 +80,7 @@ export default function BlogPost() {
       </article>
       <div className="mt-8 flex flex-row items-center justify-between *:no-underline!">
         <Link
-          to={`https://github.com/gengyue2468/www/edit/main/app/blog/${post.file}`}
+          to={`https://github.com/gengyue2468/www/edit/master/app/blog/${post.file}`}
           className="font-medium"
         >
           在 GitHub 上编辑 →
