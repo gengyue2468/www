@@ -4,6 +4,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { allPosts, type Post } from "../blog/posts";
+import { useState } from "react";
 
 dayjs.extend(duration);
 
@@ -12,7 +13,7 @@ type Canteen = {
   remaining: string;
 };
 
-export async function loader({}: Route.LoaderArgs) {
+export async function loader({ }: Route.LoaderArgs) {
   try {
     const canteenResponse = await axios.get(
       "https://chifan.huster.fun/api/open-now"
@@ -27,7 +28,7 @@ export async function loader({}: Route.LoaderArgs) {
   }
 }
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: "Geng Yue" },
     {
@@ -35,12 +36,113 @@ export function meta({}: Route.MetaArgs) {
       content:
         "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
     },
+    {
+      name: "keywords",
+      content: "Geng Yue, 耿越, 华中科技大学, 计算机科学与技术, 前端开发, 互联网技术, 冰岩作坊, BuddyUp",
+    },
+    {
+      name: "author",
+      content: "Geng Yue",
+    },
+    {
+      name: "robots",
+      content: "index, follow",
+    },
+    {
+      name: "og:title",
+      content: "Geng Yue",
+    },
+    {
+      name: "og:description",
+      content: "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
+    },
+    {
+      name: "og:image",
+      content: "https://gengyue.site/og-image.png",
+    },
+    {
+      name: "og:url",
+      content: "https://gengyue.site",
+    },
+    {
+      name: "og:type",
+      content: "website",
+    },
+    {
+      name: "og:locale",
+      content: "zh-CN",
+    },
+    {
+      name: "og:site_name",
+      content: "Geng Yue",
+    },
+    {
+      name: "og:locale:alternate",
+      content: "en-US",
+    },
+    {
+      name: "twitter:card",
+      content: "summary_large_image",
+    },
+    {
+      name: "twitter:title",
+      content: "Geng Yue",
+    },
+    {
+      name: "twitter:description",
+      content: "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
+    },
+    {
+      name: "twitter:image",
+      content: "https://gengyue.site/og-image.png",
+    },
+    {
+      name: "twitter:url",
+      content: "https://gengyue.site",
+    },
+    {
+      name: "twitter:site",
+      content: "@gengyue2468",
+    },
+    {
+      name: "twitter:creator",
+      content: "@gengyue2468",
+    },
+    {
+      name: "twitter:image:alt",
+      content: "Geng Yue 的博客",
+    },
+    {
+      name: "twitter:image:width",
+      content: "1200",
+    },
+    {
+      name: "twitter:image:height",
+      content: "630",
+    },
+    {
+      name: "twitter:image:alt",
+      content: "Geng Yue 的博客",
+    },
+    {
+      name: "twitter:image:width",
+      content: "1200",
+    },
+    {
+      name: "twitter:image:height",
+      content: "630",
+    },
   ];
 }
 
 export default function Home() {
   const { openedCanteen } = useLoaderData();
   const latestPosts: Post[] = allPosts.slice(0, 3);
+  const [showMoreCanteens, setShowMoreCanteens] = useState(false);
+
+  const displayedCanteens = showMoreCanteens
+    ? openedCanteen
+    : openedCanteen.slice(0, 3);
   return (
     <>
       <header className="flex flex-row justify-between items-center">
@@ -76,7 +178,7 @@ export default function Home() {
         </h3>
         {openedCanteen.length > 0 ? (
           <ul className="">
-            {openedCanteen.map((canteen: Canteen) => {
+            {displayedCanteens.map((canteen: Canteen) => {
               const d = dayjs.duration(canteen.remaining);
 
               const hours = Math.floor(d.asHours());
@@ -84,7 +186,7 @@ export default function Home() {
               return (
                 <div
                   key={canteen.name}
-                  className="flex flex-row items-center justify-between"
+                  className="flex flex-row items-center justify-between py-0.5"
                 >
                   <span className="font-medium">{canteen.name}</span>
                   <span className="text-neutral-600 dark:text-neutral-400">
@@ -96,6 +198,14 @@ export default function Home() {
                 </div>
               );
             })}
+            {openedCanteen.length > 3 && (
+              <button
+                className="mt-2 font-medium underline cursor-pointer"
+                onClick={() => setShowMoreCanteens(!showMoreCanteens)}
+              >
+                {showMoreCanteens ? "收起" : `+ ${openedCanteen.length - 3} 个食堂`}
+              </button>
+            )}
           </ul>
         ) : (
           <p className="font-medium text-neutral-600 dark:text-neutral-400">

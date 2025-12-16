@@ -27,7 +27,7 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -37,8 +37,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <div className="pt-16 p-8 max-w-prose mx-auto flex flex-col min-h-screen">
           <main className="flex-1">{children}</main>
-          <div className="mt-16 text-sm text-neutral-600 dark:text-neutral-400">
-            © {new Date().getFullYear()} Geng Yue. All rights reserved.
+          <div className="mt-16 text-neutral-600 dark:text-neutral-400">
+            {new Date().getFullYear()}
           </div>
         </div>
         <ScrollRestoration />

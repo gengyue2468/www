@@ -9,25 +9,48 @@
 
 html,
 body {
-  @apply bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 selection:bg-neutral-900 selection:text-neutral-100 dark:selection:bg-neutral-100 dark:selection:text-neutral-900 leading-relaxed;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+  text-spacing: ideograph-alpha ideograph-numeric;
+  @apply tracking-wide bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 selection:bg-neutral-900 selection:text-neutral-100 dark:selection:bg-neutral-100 dark:selection:text-neutral-900 leading-relaxed;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
 }
 
-a {
-  @apply underline underline-offset-4 decoration-neutral-600 dark:decoration-neutral-400 hover:decoration-neutral-500 hover:opacity-75;
+p{
+  @apply leading-relaxed;
 }
 
-.prose img{
+a {
+  @apply mx-px underline underline-offset-4 decoration-neutral-600 dark:decoration-neutral-400 hover:decoration-neutral-500 hover:opacity-75;
+}
+
+.prose{
+  @apply text-neutral-900 dark:text-neutral-100;
+}
+
+.prose img {
   @apply block w-[calc(100%+4rem)] -mx-8 max-w-none;
 }
 
 .prose pre {
-  @apply bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-lg px-4 py-3 overflow-x-auto;
+  @apply bg-neutral-800 text-neutral-100 rounded-lg px-4 py-3 overflow-x-auto;
 }
 
+
+.prose pre[data-theme="dark"] {
+  display: none;
+}
+
+.dark .prose pre[data-theme="dark"] {
+  display: block;
+}
+
+.dark .prose pre[data-theme="light"] {
+  display: none;
+}
 
 .prose :not(pre) > code {
   @apply rounded px-1 py-0.5 bg-neutral-200/70 dark:bg-neutral-800/70;

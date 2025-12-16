@@ -14,7 +14,12 @@ export default defineConfig({
   plugins: [
     mdx({
       providerImportSource: "@mdx-js/react",
-      remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: "frontmatter" }], remarkGfm, remarkMath],
+      remarkPlugins: [
+        remarkFrontmatter,
+        [remarkMdxFrontmatter, { name: "frontmatter" }],
+        remarkGfm,
+        remarkMath,
+      ],
       rehypePlugins: [
         [
           rehypePrettyCode,
@@ -30,4 +35,7 @@ export default defineConfig({
     reactRouter(),
     tsconfigPaths(),
   ],
+  build: {
+    sourcemap: false,
+  },
 });

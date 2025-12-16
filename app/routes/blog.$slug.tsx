@@ -34,14 +34,10 @@ export function meta({ data }: Route.MetaArgs) {
   const post = loaderData?.post;
 
   if (!post) {
-    return [
-      { title: "Geng Yue 的博客" },
-    ];
+    return [{ title: "Geng Yue 的博客" }];
   }
 
-  return [
-    { title: `${post.title} - Geng Yue 的博客` },
-  ];
+  return [{ title: `${post.title} - Geng Yue 的博客` }];
 }
 
 export default function BlogPost() {
@@ -82,6 +78,23 @@ export default function BlogPost() {
           <MDXContent />
         </MDXProvider>
       </article>
+      <div className="mt-8 flex flex-row items-center justify-between *:no-underline!">
+        <Link
+          to={`https://github.com/gengyue2468/www/edit/main/app/blog/${post.file}`}
+          className="font-medium"
+        >
+          在 GitHub 上编辑 →
+        </Link>
+        <button
+          type="button"
+          className="font-medium cursor-pointer hover:opacity-75"
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          顶部 ↑
+        </button>
+      </div>
       <nav className="mt-8 flex flex-col md:flex-row gap-4 justify-between not-prose">
         {previous ? (
           <Link
@@ -97,7 +110,10 @@ export default function BlogPost() {
           <span />
         )}
         {next ? (
-          <Link to={`/blog/${next.slug}`} className="no-underline! flex flex-col gap-1">
+          <Link
+            to={`/blog/${next.slug}`}
+            className="no-underline! flex flex-col gap-1"
+          >
             <span className="text-xs text-neutral-600 dark:text-neutral-400">
               下一篇
             </span>
