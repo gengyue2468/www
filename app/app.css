@@ -32,7 +32,7 @@ a {
 }
 
 .prose img {
-  @apply block w-[calc(100%+4rem)] -mx-8 max-w-none;
+  @apply block w-[calc(100%+4rem)] md:w-full md:mx-0 -mx-8 max-w-none;
 }
 
 .prose pre {

@@ -11,6 +11,8 @@ import type { Route } from "./+types/root";
 import "katex/dist/katex.min.css";
 import "./app.css";
 import { Analytics } from "@vercel/analytics/react";
+import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -26,8 +28,17 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const [time, setTime] = useState(dayjs());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(dayjs());
+    }, 60);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" className="scroll-smooth">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -37,8 +48,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <div className="pt-16 p-8 max-w-prose mx-auto flex flex-col min-h-screen">
           <main className="flex-1">{children}</main>
-          <div className="mt-16 text-neutral-600 dark:text-neutral-400">
-            {new Date().getFullYear()}
+          <div className="mt-16 text-sm text-neutral-600 dark:text-neutral-400 flex flex-row items-center justify-between">
+            <span>{new Date().getFullYear()}</span>
+            <span>{time.format("HH:mm:ss")}</span>
           </div>
         </div>
         <ScrollRestoration />

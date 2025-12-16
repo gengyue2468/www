@@ -18,11 +18,11 @@ export default function BlogIndex() {
 
   return (
     <>
-      <div className="static md:absolute mx-0 md:-mx-32 mb-6 md:mb-0">
-        <Link to="/" className="no-underline! font-medium text-sm">
-          ↖ 返回
-        </Link>
-      </div>
+      <div className="static md:fixed md:left-[max(2rem,calc(50%-28rem))] md:top-16 mb-6 md:mb-0">
+           <Link to="/" className="text-sm no-underline! font-medium">
+             ↖ 返回
+           </Link>
+         </div>
       <header className="flex flex-row justify-between items-center mb-6">
         <div className="flex flex-col">
           <h1 className="font-semibold">博客</h1>

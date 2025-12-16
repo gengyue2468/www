@@ -13,7 +13,7 @@ type Canteen = {
   remaining: string;
 };
 
-export async function loader({ }: Route.LoaderArgs) {
+export async function loader({}: Route.LoaderArgs) {
   try {
     const canteenResponse = await axios.get(
       "https://chifan.huster.fun/api/open-now"
@@ -28,7 +28,7 @@ export async function loader({ }: Route.LoaderArgs) {
   }
 }
 
-export function meta({ }: Route.MetaArgs) {
+export function meta({}: Route.MetaArgs) {
   return [
     { title: "Geng Yue" },
     {
@@ -38,7 +38,8 @@ export function meta({ }: Route.MetaArgs) {
     },
     {
       name: "keywords",
-      content: "Geng Yue, 耿越, 华中科技大学, 计算机科学与技术, 前端开发, 互联网技术, 冰岩作坊, BuddyUp",
+      content:
+        "Geng Yue, 耿越, 华中科技大学, 计算机科学与技术, 前端开发, 互联网技术, 冰岩作坊, BuddyUp",
     },
     {
       name: "author",
@@ -54,7 +55,8 @@ export function meta({ }: Route.MetaArgs) {
     },
     {
       name: "og:description",
-      content: "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
+      content:
+        "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
     },
     {
       name: "og:image",
@@ -90,7 +92,8 @@ export function meta({ }: Route.MetaArgs) {
     },
     {
       name: "twitter:description",
-      content: "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
+      content:
+        "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
     },
     {
       name: "twitter:image",
@@ -124,14 +127,6 @@ export function meta({ }: Route.MetaArgs) {
       name: "twitter:image:alt",
       content: "Geng Yue 的博客",
     },
-    {
-      name: "twitter:image:width",
-      content: "1200",
-    },
-    {
-      name: "twitter:image:height",
-      content: "630",
-    },
   ];
 }
 
@@ -154,6 +149,16 @@ export default function Home() {
         </div>
         <h2 className="font-medium ">中国 · 武汉</h2>
       </header>
+
+      <section className="mt-8">
+        <iframe
+          height="250"
+          frameBorder="0"
+          scrolling="no"
+          className="-mx-8 md:mx-0 w-[calc(100%+4rem)] md:w-full"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=114.39775943756105%2C30.508340177825232%2C114.41330552101135%2C30.516474104613035&layer=mapnik&marker=30.5124,114.4055"
+        ></iframe>
+      </section>
 
       <section className="mt-8 space-y-4">
         <p>
@@ -203,7 +208,9 @@ export default function Home() {
                 className="mt-2 font-medium underline cursor-pointer"
                 onClick={() => setShowMoreCanteens(!showMoreCanteens)}
               >
-                {showMoreCanteens ? "收起" : `+ ${openedCanteen.length - 3} 个食堂`}
+                {showMoreCanteens
+                  ? "收起"
+                  : `+ ${openedCanteen.length - 3} 个食堂`}
               </button>
             )}
           </ul>

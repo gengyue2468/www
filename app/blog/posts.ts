@@ -21,7 +21,10 @@ export type Post = {
 
 const normalizePosts = (): Post[] => {
   return Object.entries(modules).map(([path, mod]) => {
-    const slug = path.split("/").pop()!.replace(/\.mdx$/, "");
+    const slug = path
+      .split("/")
+      .pop()!
+      .replace(/\.mdx$/, "");
     const fm = mod.frontmatter ?? {};
     return {
       slug,
@@ -33,12 +36,15 @@ const normalizePosts = (): Post[] => {
 };
 
 export const allPosts: Post[] = normalizePosts().sort((a, b) => {
-  if (!a.date && !b.date) return 0;
-  if (!a.date) return 1;
-  if (!b.date) return -1;
-  return a.date < b.date ? 1 : -1;
+  if (a.date && b.date) {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  } else if (a.date) {
+    return -1;
+  } else if (b.date) {
+    return 1;
+  }
+  return 0;
 });
 
 export const findPostBySlug = (slug: string): Post | undefined =>
   allPosts.find((p) => p.slug === slug);
-
