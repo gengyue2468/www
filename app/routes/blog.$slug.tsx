@@ -1,10 +1,11 @@
 import type { ComponentType } from "react";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import type { Route } from "./+types/blog.$slug";
 import { MDXProvider } from "@mdx-js/react";
 import { Link, useLoaderData } from "react-router";
 import { allPosts, findPostBySlug } from "../blog/posts";
 import dayjs from "dayjs";
+import { OptimizedImage } from "../components/OptimizedImage";
 
 const mdxModules = import.meta.glob("../blog/*.mdx", {
   eager: true,
@@ -34,10 +35,8 @@ type TocItem = {
   level: number;
 };
 
-// 自定义标题组件，自动添加 id
 const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
   return function Heading({ children, ...props }: any) {
-    // 提取文本内容用于生成 id
     const getText = (node: any): string => {
       if (typeof node === "string") return node;
       if (typeof node === "number") return String(node);
@@ -57,14 +56,22 @@ const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
   };
 };
 
-const components: Parameters<typeof MDXProvider>[0]["components"] = {
+const createComponents = (): Parameters<typeof MDXProvider>[0]["components"] => ({
   h1: createHeading(1),
   h2: createHeading(2),
   h3: createHeading(3),
   h4: createHeading(4),
   h5: createHeading(5),
   h6: createHeading(6),
-};
+  img: (props: any) => (
+    <OptimizedImage
+      src={props.src || props.href}
+      alt={props.alt || ""}
+      loading="lazy"
+      className="prose-img"
+    />
+  ),
+});
 
 export function meta({ data }: Route.MetaArgs) {
   const loaderData = data as LoaderData | undefined;
@@ -79,6 +86,9 @@ export function meta({ data }: Route.MetaArgs) {
 
 export default function BlogPost() {
   const { post, previous, next } = useLoaderData() as LoaderData;
+  
+  const components = useMemo(() => createComponents(), []);
+
   const mod = mdxModules[post.file] as
     | { default?: ComponentType<any> }
     | undefined;

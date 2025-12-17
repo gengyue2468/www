@@ -31,7 +31,11 @@ a {
   @apply text-neutral-900 dark:text-neutral-100;
 }
 
-.prose img {
+img {
+  @apply block w-[calc(100%+4rem)] md:w-full md:mx-0 -mx-8 max-w-none;
+}
+
+.prose-img {
   @apply block w-[calc(100%+4rem)] md:w-full md:mx-0 -mx-8 max-w-none;
 }
 
@@ -67,4 +71,25 @@ a {
 
 .prose .katex-display {
   @apply my-4;
+}
+
+/* 骨架屏闪烁动画 */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+  background-size: 1000px 100%;
+  background-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
 }

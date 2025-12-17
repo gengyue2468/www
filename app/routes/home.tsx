@@ -4,7 +4,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { allPosts, type Post } from "../blog/posts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 dayjs.extend(duration);
 
@@ -24,7 +24,7 @@ export async function loader({}: Route.LoaderArgs) {
     return { openedCanteen };
   } catch (error) {
     console.error("Error fetching canteen status:", error);
-    return { openedCanteen: [] as Canteen[], posts: allPosts };
+    return { openedCanteen: [] as Canteen[] };
   }
 }
 
@@ -111,30 +111,13 @@ export function meta({}: Route.MetaArgs) {
       name: "twitter:creator",
       content: "@gengyue2468",
     },
-    {
-      name: "twitter:image:alt",
-      content: "Geng Yue 的博客",
-    },
-    {
-      name: "twitter:image:width",
-      content: "1200",
-    },
-    {
-      name: "twitter:image:height",
-      content: "630",
-    },
-    {
-      name: "twitter:image:alt",
-      content: "Geng Yue 的博客",
-    },
   ];
 }
 
 export default function Home() {
-  const { openedCanteen } = useLoaderData();
+  const { openedCanteen } = useLoaderData<typeof loader>();
   const latestPosts: Post[] = allPosts.slice(0, 3);
   const [showMoreCanteens, setShowMoreCanteens] = useState(false);
-
   const displayedCanteens = showMoreCanteens
     ? openedCanteen
     : openedCanteen.slice(0, 3);
@@ -150,17 +133,19 @@ export default function Home() {
         <h2 className="font-medium ">中国 · 武汉</h2>
       </header>
 
-      <section className="mt-8">
-        <iframe
-          height="250"
-          frameBorder="0"
-          scrolling="no"
-          className="-mx-8 md:mx-0 w-[calc(100%+4rem)] md:w-full"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=114.39775943756105%2C30.508340177825232%2C114.41330552101135%2C30.516474104613035&layer=mapnik&marker=30.5124,114.4055"
-        ></iframe>
+      <section className="mt-4 relative">
+        <Link className="my-0 no-underline! hover:opacity-100!" to="https://www.google.com/maps/place/%E5%8D%8E%E4%B8%AD%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6/@30.6260532,114.214542,11.25z/data=!4m6!3m5!1s0x342ea4a4f8a230e9:0xf42f097ec953d0b1!8m2!3d30.5130043!4d114.4202756!16zL20vMDQ4bjRt?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D">
+          <img 
+            src="/static/cover/map.png" 
+            alt="我的位置" 
+            width={800}
+            height={600}
+            loading="lazy"
+          />
+        </Link>
       </section>
 
-      <section className="mt-8 space-y-4">
+      <section className="mt-4 space-y-4">
         <p>
           你好啊! 再次感谢您访问我的网站，如你所见，我现在在
           <Link to="https://hust.edu.cn">华中科技大学 (HUST)</Link>

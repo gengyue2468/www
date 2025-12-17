@@ -31,9 +31,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [time, setTime] = useState(dayjs());
 
   useEffect(() => {
+    // 优化：改为每秒更新一次，减少不必要的重渲染
     const interval = setInterval(() => {
       setTime(dayjs());
-    }, 60);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
