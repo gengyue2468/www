@@ -2,10 +2,12 @@ import type { ComponentType } from "react";
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import type { Route } from "./+types/blog.$slug";
 import { MDXProvider } from "@mdx-js/react";
-import { Link, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 import { allPosts, findPostBySlug } from "../blog/posts";
-import dayjs from "dayjs";
-import { OptimizedImage } from "../components/OptimizedImage";
+import { Image } from "../components/public/image";
+import RouterBack from "~/components/public/route-back";
+import type { TocItem } from "~/types/post";
+import { Toc, Header, Article, PrevNextPosts } from "~/components/blog/post";
 
 const mdxModules = import.meta.glob("../blog/*.mdx", {
   eager: true,
@@ -28,12 +30,6 @@ export function loader({ params }: Route.LoaderArgs) {
 }
 
 type LoaderData = Awaited<ReturnType<typeof loader>>;
-
-type TocItem = {
-  id: string;
-  text: string;
-  level: number;
-};
 
 const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
   return function Heading({ children, ...props }: any) {
@@ -66,7 +62,7 @@ const createComponents = (): Parameters<
   h5: createHeading(5),
   h6: createHeading(6),
   img: (props: any) => (
-    <OptimizedImage
+    <Image
       src={props.src || props.href}
       alt={props.alt || ""}
       loading="lazy"
@@ -162,100 +158,17 @@ export default function BlogPost() {
 
   return (
     <section className="relative">
-      <div className="static md:fixed md:left-[max(2rem,calc(50%-28rem))] md:top-16 mb-6 md:mb-0">
-        <Link
-          to="/blog"
-          className="text-sm no-underline! font-medium"
-          prefetch="intent"
-        >
-          ↖ 返回
-        </Link>
-      </div>
-
-      {toc.length > 0 && (
-        <div className="text-sm hidden md:block md:fixed md:right-[max(2rem,calc(50%-36rem))] md:top-16 w-48">
-          <div className="font-medium mb-2 text-neutral-600 dark:text-neutral-400">
-            目录
-          </div>
-          <nav className="space-y-1">
-            {toc.map((item, index) => (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                className="no-underline! block"
-              >
-                {index + 1}.{item.text}
-              </a>
-            ))}
-          </nav>
-        </div>
-      )}
-
+      <RouterBack to="/blog" />
+      <Toc toc={toc} />
+      <Header post={post} />
       <div>
-        <header className="flex flex-row justify-between items-center mb-6">
-          <div className="flex flex-col">
-            <h1 className="font-semibold">{post.title}</h1>
-            <p className="font-medium text-neutral-600 dark:text-neutral-400">
-              {dayjs(post.date).format("YYYY/MM/DD")}
-            </p>
-          </div>
-        </header>
-        <article
-          ref={articleRef}
-          className="prose prose-neutral dark:prose-invert prose-headings:font-semibold prose-headings:text-base
-        prose-li:-mx-6  max-w-none"
-        >
-          <MDXProvider components={components}>
-            <MDXContent />
-          </MDXProvider>
-        </article>
-        <div className="text-sm mt-8 flex flex-row items-center justify-between *:no-underline!">
-          <Link
-            to={`https://github.com/gengyue2468/www/edit/master/app/blog/${post.file}`}
-            className="font-medium"
-          >
-            在 GitHub 上编辑 →
-          </Link>
-          <button
-            type="button"
-            className="font-medium cursor-pointer hover:opacity-75"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-          >
-            顶部 ↑
-          </button>
-        </div>
-        <nav className="mt-8 flex flex-col md:flex-row gap-4 justify-between not-prose">
-          {previous ? (
-            <Link
-              to={`/blog/${previous.slug}`}
-              prefetch="intent"
-              className="no-underline! flex flex-col gap-1"
-            >
-              <span className="text-xs text-neutral-600 dark:text-neutral-400">
-                上一篇
-              </span>
-              <span className="font-semibold">{previous.title}</span>
-            </Link>
-          ) : (
-            <span />
-          )}
-          {next ? (
-            <Link
-              to={`/blog/${next.slug}`}
-              prefetch="intent"
-              className="no-underline! flex flex-col gap-1"
-            >
-              <span className="text-xs text-neutral-600 dark:text-neutral-400">
-                下一篇
-              </span>
-              <span className="font-semibold">{next.title}</span>
-            </Link>
-          ) : (
-            <span />
-          )}
-        </nav>
+        <Article
+          MDXContent={MDXContent}
+          post={post}
+          articleRef={articleRef}
+          components={components}
+        />
+        <PrevNextPosts previous={previous} next={next} />
       </div>
     </section>
   );

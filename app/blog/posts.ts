@@ -1,7 +1,4 @@
-export type PostFrontmatter = {
-  title?: string;
-  date?: string;
-};
+import type { Post, PostFrontmatter } from "../../types/post";
 
 type PostModule = {
   default: unknown;
@@ -11,13 +8,6 @@ type PostModule = {
 const modules = import.meta.glob<PostModule>("./*.mdx", {
   eager: true,
 });
-
-export type Post = {
-  slug: string;
-  title: string;
-  date?: string;
-  file: string;
-};
 
 const normalizePosts = (): Post[] => {
   return Object.entries(modules).map(([path, mod]) => {
