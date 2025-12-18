@@ -56,7 +56,9 @@ const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
   };
 };
 
-const createComponents = (): Parameters<typeof MDXProvider>[0]["components"] => ({
+const createComponents = (): Parameters<
+  typeof MDXProvider
+>[0]["components"] => ({
   h1: createHeading(1),
   h2: createHeading(2),
   h3: createHeading(3),
@@ -86,7 +88,7 @@ export function meta({ data }: Route.MetaArgs) {
 
 export default function BlogPost() {
   const { post, previous, next } = useLoaderData() as LoaderData;
-  
+
   const components = useMemo(() => createComponents(), []);
 
   const mod = mdxModules[post.file] as
@@ -161,7 +163,11 @@ export default function BlogPost() {
   return (
     <section className="relative">
       <div className="static md:fixed md:left-[max(2rem,calc(50%-28rem))] md:top-16 mb-6 md:mb-0">
-        <Link to="/blog" className="text-sm no-underline! font-medium">
+        <Link
+          to="/blog"
+          className="text-sm no-underline! font-medium"
+          prefetch="intent"
+        >
           ↖ 返回
         </Link>
       </div>
@@ -224,6 +230,7 @@ export default function BlogPost() {
           {previous ? (
             <Link
               to={`/blog/${previous.slug}`}
+              prefetch="intent"
               className="no-underline! flex flex-col gap-1"
             >
               <span className="text-xs text-neutral-600 dark:text-neutral-400">
@@ -237,6 +244,7 @@ export default function BlogPost() {
           {next ? (
             <Link
               to={`/blog/${next.slug}`}
+              prefetch="intent"
               className="no-underline! flex flex-col gap-1"
             >
               <span className="text-xs text-neutral-600 dark:text-neutral-400">

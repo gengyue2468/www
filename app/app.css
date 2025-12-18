@@ -19,7 +19,7 @@ body {
   }
 }
 
-p{
+p {
   @apply leading-relaxed;
 }
 
@@ -27,7 +27,7 @@ a {
   @apply mx-px underline underline-offset-4 decoration-neutral-600 dark:decoration-neutral-400 hover:decoration-neutral-500 hover:opacity-75;
 }
 
-.prose{
+.prose {
   @apply text-neutral-900 dark:text-neutral-100;
 }
 
@@ -35,14 +35,18 @@ img {
   @apply block w-[calc(100%+4rem)] md:w-full md:mx-0 -mx-8 max-w-none;
 }
 
+pre,
+code {
+  font-family: "Google Sans Code", monospace;
+}
+
 .prose-img {
   @apply block w-[calc(100%+4rem)] md:w-full md:mx-0 -mx-8 max-w-none;
 }
 
 .prose pre {
-  @apply bg-neutral-800 text-neutral-100 rounded-lg px-4 py-3 overflow-x-auto;
+  @apply rounded-none bg-neutral-800 text-neutral-100 px-4 py-3 overflow-x-auto w-[calc(100%+4rem)] md:w-full md:mx-0 -mx-8 max-w-none;
 }
-
 
 .prose pre[data-theme="dark"] {
   display: none;
@@ -57,7 +61,7 @@ img {
 }
 
 .prose :not(pre) > code {
-  @apply rounded px-1 py-0.5 bg-neutral-200/70 dark:bg-neutral-800/70;
+  @apply px-1 py-0.5 bg-neutral-200/70 dark:bg-neutral-800/70;
 }
 
 .dark .prose :not(pre) > code {
@@ -71,25 +75,4 @@ img {
 
 .prose .katex-display {
   @apply my-4;
-}
-
-/* 骨架屏闪烁动画 */
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite;
-  background-size: 1000px 100%;
-  background-image: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 100%
-  );
 }

@@ -25,13 +25,16 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Noto+Sans+SC:wght@100..900&display=swap",
   },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap",
+  },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [time, setTime] = useState(dayjs());
 
   useEffect(() => {
-    // 优化：改为每秒更新一次，减少不必要的重渲染
     const interval = setInterval(() => {
       setTime(dayjs());
     }, 1000);

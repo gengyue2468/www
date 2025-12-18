@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { allPosts, type Post } from "../blog/posts";
 import { useState, useEffect } from "react";
+import { OptimizedImage } from "~/components/OptimizedImage";
 
 dayjs.extend(duration);
 
@@ -134,12 +135,13 @@ export default function Home() {
       </header>
 
       <section className="mt-4 relative">
-        <Link className="my-0 no-underline! hover:opacity-100!" to="https://www.google.com/maps/place/%E5%8D%8E%E4%B8%AD%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6/@30.6260532,114.214542,11.25z/data=!4m6!3m5!1s0x342ea4a4f8a230e9:0xf42f097ec953d0b1!8m2!3d30.5130043!4d114.4202756!16zL20vMDQ4bjRt?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D">
-          <img 
-            src="/static/cover/map.png" 
-            alt="我的位置" 
-            width={800}
-            height={600}
+        <Link
+          className="my-0 no-underline! hover:opacity-100!"
+          to="https://www.google.com/maps/place/%E5%8D%8E%E4%B8%AD%E7%A7%91%E6%8A%80%E5%A4%A7%E5%AD%A6/@30.6260532,114.214542,11.25z/data=!4m6!3m5!1s0x342ea4a4f8a230e9:0xf42f097ec953d0b1!8m2!3d30.5130043!4d114.4202756!16zL20vMDQ4bjRt?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D"
+        >
+          <OptimizedImage
+            src="/static/cover/map.png"
+            alt="我的位置"
             loading="lazy"
           />
         </Link>
@@ -213,7 +215,10 @@ export default function Home() {
         </p>
 
         <p>
-          你也可以阅读<Link to="/blog/hust-chifan">我写的这篇文章</Link>
+          你也可以阅读
+          <Link to="/blog/hust-chifan" prefetch="intent">
+            我写的这篇文章
+          </Link>
           了解更多！
         </p>
       </section>
@@ -227,6 +232,7 @@ export default function Home() {
             {latestPosts.map((post: Post) => (
               <Link
                 to={`/blog/${post.slug}`}
+                prefetch="intent"
                 className="py-1 no-underline! flex flex-row items-center gap-4 justify-between group-hover:opacity-30 hover:opacity-100 transition-opacity"
                 key={post.slug}
               >
@@ -242,11 +248,14 @@ export default function Home() {
         ) : null}
 
         <p>
-          这些文章大多是一些奇怪的/有用的/没用的想法。如果你有兴趣，可以访问我的
-          <Link to="/blog">博客页面</Link>查看更多内容。
+          这些文章大多是一些奇怪的/有用的/没用的想法。如果你有兴趣，可以访问我的{" "}
+          <Link to="/blog" prefetch="intent">
+            博客页面
+          </Link>
+          查看更多内容。
         </p>
 
-        <Link to="/blog" className="font-medium">
+        <Link to="/blog" prefetch="intent" className="font-medium">
           查看所有文章 →
         </Link>
       </section>
