@@ -28,7 +28,34 @@ a {
 }
 
 .prose {
-  @apply text-neutral-900 dark:text-neutral-100;
+  font-feature-settings: "kern", "liga", "clig", "calt";
+  text-spacing: ideograph-alpha ideograph-numeric;
+  hanging-punctuation: first last;
+  @apply text-neutral-900 dark:text-neutral-100 leading-[1.9];
+}
+
+.prose,
+.prose blockquote {
+  quotes: "「" "」" "『" "』";
+}
+
+/* 隐藏原始引号，用CSS生成新引号 */
+.prose p {
+  text-rendering: optimizeLegibility;
+}
+
+.prose q::before {
+  content: open-quote;
+  @apply text-neutral-400 dark:text-neutral-500;
+}
+
+.prose q::after {
+  content: close-quote;
+  @apply text-neutral-400 dark:text-neutral-500;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-neutral-300 dark:border-neutral-700 pl-4 italic text-neutral-700 dark:text-neutral-300;
 }
 
 img {
@@ -45,7 +72,32 @@ code {
 }
 
 .prose pre {
-  @apply rounded-none bg-neutral-800 text-neutral-100 px-4 py-3 overflow-x-auto w-[calc(100%+4rem)] md:w-full md:mx-0 -mx-8 max-w-none;
+  @apply rounded-none bg-neutral-800 text-neutral-100 px-0 py-3 overflow-x-auto -mx-8 md:mx-0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.prose pre code {
+  counter-reset: line;
+  @apply block px-4 md:px-6;
+}
+
+.prose pre code .line {
+  counter-increment: line;
+  @apply block pl-8 -mx-5 md:-mx-6 pr-2 relative border-l-4 border-transparent;
+}
+
+.prose pre code .line::before {
+  content: counter(line);
+  @apply absolute left-0 w-8 text-right text-neutral-500 select-none pr-2;
+}
+
+.prose pre code .highlight-line {
+  @apply bg-neutral-700 border-l-neutral-600 border-l-4;
+}
+
+.prose pre code .highlight-word {
+  @apply bg-yellow-500/30 rounded px-0.5;
 }
 
 .prose pre[data-theme="dark"] {
@@ -75,4 +127,9 @@ code {
 
 .prose .katex-display {
   @apply my-4;
+}
+
+[data-rehype-pretty-code-title] {
+  font-family: "Google Sans Code", monospace;
+  @apply bg-neutral-700 text-neutral-300 px-8 md:px-4 py-2 text-xs -mx-8 md:mx-0;
 }

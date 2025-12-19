@@ -9,18 +9,58 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { visit } from "unist-util-visit";
+
+function remarkSmartQuotes() {
+  return (tree: any) => {
+    visit(tree, "text", (node: any) => {
+      if (node.value && typeof node.value === "string") {
+        node.value = node.value
+          .replace(/\u201c/g, "「")
+          .replace(/\u201d/g, "」");
+        
+        let quoteCount = 0;
+        node.value = node.value.replace(/"/g, () => {
+          quoteCount++;
+          return quoteCount % 2 === 1 ? "「" : "」";
+        });
+      }
+    });
+  };
+}
 
 export default defineConfig({
   plugins: [
     mdx({
       providerImportSource: "@mdx-js/react",
-      remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: "frontmatter" }], remarkGfm, remarkMath],
+      remarkPlugins: [
+        remarkFrontmatter, 
+        [remarkMdxFrontmatter, { name: "frontmatter" }], 
+        remarkGfm, 
+        remarkMath,
+        remarkSmartQuotes,
+      ],
       rehypePlugins: [
         [
           rehypePrettyCode,
           {
             theme: "github-dark-default",
             keepBackground: false,
+            showLineNumbers: true,
+            onVisitLine(node: any) {
+              if (node.children.length === 0) {
+                node.children = [{ type: "text", value: " " }];
+              }
+              node.properties.className ||= [];
+              node.properties.className.push("line");
+            },
+            onVisitHighlightedLine(node: any) {
+              node.properties.className ||= [];
+              node.properties.className.push("highlight-line");
+            },
+            onVisitHighlightedWord(node: any) {
+              node.properties.className = ["highlight-word"];
+            },
           },
         ],
         rehypeKatex,
@@ -30,14 +70,12 @@ export default defineConfig({
     reactRouter(),
     tsconfigPaths(),
   ],
-  // 关闭所有 sourceMap（开发和生产环境）
   build: {
     sourcemap: false,
   },
   css: {
     devSourcemap: false,
   },
-  // 确保开发模式也不生成 sourceMap
   esbuild: {
     sourcemap: false,
   },

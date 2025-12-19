@@ -8,6 +8,33 @@ interface OptimizedImageProps {
   loading?: "lazy" | "eager";
 }
 
+function getImageFormats(src: string): { avif?: string; webp?: string; fallback: string } {
+  const extension = src.match(/\.(webp|avif|jpe?g|png)$/i)?.[1]?.toLowerCase();
+  const basePath = src.replace(/\.(webp|avif|jpe?g|png)$/i, "");
+  
+  // 如果原图已经是现代格式，不生成额外的source
+  if (extension === 'webp') {
+    return {
+      webp: src,
+      fallback: src,
+    };
+  }
+  
+  if (extension === 'avif') {
+    return {
+      avif: src,
+      fallback: src,
+    };
+  }
+  
+  // 对于jpg/png等传统格式，生成现代格式的路径
+  return {
+    avif: `${basePath}.avif`,
+    webp: `${basePath}.webp`,
+    fallback: src,
+  };
+}
+
 export function Image({
   src,
   alt = "",
@@ -24,91 +51,51 @@ export function Image({
   const imgRef = useRef<HTMLImageElement>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const layoutId = `image-${src}`;
+  const formats = getImageFormats(src);
 
+  // 单一的加载处理函数
+  const handleImageLoad = () => {
+    const img = imgRef.current;
+    if (!img || img.naturalWidth === 0) return;
+
+    setDimensions({
+      width: img.naturalWidth,
+      height: img.naturalHeight,
+      aspectRatio: img.naturalWidth / img.naturalHeight,
+    });
+    setIsLoaded(true);
+    setHasError(false);
+  };
+
+  const handleImageError = () => {
+    // picture标签会自动降级：avif失败→webp→fallback
+    // 只有所有格式都失败时才会触发img的onError
+    setHasError(true);
+  };
+
+  // 监听 src 变化时重置状态
   useEffect(() => {
     if (!src) {
       setHasError(true);
       return;
     }
-
-    setDimensions(null);
     setIsLoaded(false);
+    setDimensions(null);
     setHasError(false);
-
-    const img = new window.Image();
-
-    const handleLoad = () => {
-      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-        const aspectRatio = img.naturalWidth / img.naturalHeight;
-        setDimensions({
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-          aspectRatio,
-        });
-      }
-    };
-
-    const handleError = () => {
-      setHasError(true);
-    };
-
-    img.onload = handleLoad;
-    img.onerror = handleError;
-    img.src = src;
-
-    if (img.complete && img.naturalWidth > 0) {
-      handleLoad();
-    }
-
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-    };
   }, [src]);
 
+  // 检查图片是否已经从缓存加载完成
   useEffect(() => {
     const img = imgRef.current;
     if (!img) return;
 
-    const checkLoaded = () => {
-      if (img.complete && img.naturalWidth > 0) {
-        setIsLoaded(true);
-        if (!dimensions) {
-          setDimensions({
-            width: img.naturalWidth,
-            height: img.naturalHeight,
-            aspectRatio: img.naturalWidth / img.naturalHeight,
-          });
-        }
-      }
-    };
-
-    checkLoaded();
-
-    const timeoutId = setTimeout(checkLoaded, 100);
-
-    img.addEventListener("load", checkLoaded);
-
-    return () => {
-      clearTimeout(timeoutId);
-      img.removeEventListener("load", checkLoaded);
-    };
-  }, [src, dimensions]);
-
-  const handleLoad = () => {
-    const img = imgRef.current;
-    if (img && img.naturalWidth > 0) {
-      setIsLoaded(true);
-      if (!dimensions) {
-        setDimensions({
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-          aspectRatio: img.naturalWidth / img.naturalHeight,
-        });
-      }
+    // 如果图片已经加载完成（从缓存），onLoad可能不会触发
+    if (img.complete && img.naturalWidth > 0) {
+      handleImageLoad();
     }
-  };
+  }, [src]);
 
+  // 处理全屏模式下的 Escape 键
   useEffect(() => {
     if (!fullscreen) return;
 
@@ -159,10 +146,13 @@ export function Image({
           >
             <motion.img
               layoutId={layoutId}
-              src={src}
+              src={imgRef.current?.currentSrc || formats.fallback}
               alt={alt}
               className="max-w-full max-h-full object-contain cursor-zoom-out shadow-2xl rounded-lg"
-              onClick={()=> setFullscreen(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setFullscreen(false);
+              }}
               transition={{
                 type: "spring",
                 stiffness: 300,
@@ -192,26 +182,35 @@ export function Image({
           </span>
         )}
 
-        <motion.img
-          ref={imgRef}
-          layoutId={layoutId}
-          src={src}
-          alt={alt}
-          loading={loading}
-          onLoad={handleLoad}
-          className={`h-full object-cover ${
-            isLoaded ? "opacity-100" : "opacity-0"
-          } ${fullscreen ? "cursor-zoom-out" : "cursor-zoom-in"} ${className}`}
-          onClick={() => setFullscreen(!fullscreen)}
-          style={{
-            aspectRatio: dimensions?.aspectRatio || undefined,
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 30,
-          }}
-        />
+        <picture className="contents">
+          {formats.avif && (
+            <source srcSet={formats.avif} type="image/avif" />
+          )}
+          {formats.webp && (
+            <source srcSet={formats.webp} type="image/webp" />
+          )}
+          <motion.img
+            ref={imgRef}
+            layoutId={layoutId}
+            src={formats.fallback}
+            alt={alt}
+            loading={loading}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            className={`h-full object-cover w-full ${
+              isLoaded ? "opacity-100" : "opacity-0"
+            } ${fullscreen ? "cursor-zoom-out" : "cursor-zoom-in"} ${className}`}
+            onClick={() => setFullscreen(!fullscreen)}
+            style={{
+              aspectRatio: dimensions?.aspectRatio || undefined,
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
+            }}
+          />
+        </picture>
       </span>
     </>
   );

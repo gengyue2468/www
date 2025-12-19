@@ -13,9 +13,7 @@ https://github.com/jyi2ya/HUST-Chifan
 
 ## 开发
 
-`/api/canteen`
-
-```typescript
+```typescript title="/api/canteen/route.ts"
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { parseCanteenTd } from "@/lib/parseCanteen";
@@ -41,9 +39,7 @@ export async function GET() {
 
 嘻嘻，由你所见，我们只是`fetch`了一下静态的html页面，然后利用cheerio加载，找到匹配的`td[valign='top']`元素，然后对其进行一些处理：
 
-`/lib/parseCanteen`
-
-```typescript
+```typescript title="/lib/parseCanteen/route.ts"
 import * as cheerio from "cheerio";
 
 export function parseCanteenTd(tdHtml: string) {
@@ -86,7 +82,7 @@ export function parseCanteenTd(tdHtml: string) {
 
 同样地，对于`/api/open-now`，我们进行一些处理：
 
-```typescript
+```typescript title="/api/open-now/route.ts"
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 
@@ -149,6 +145,10 @@ export async function GET() {
 `/api/canteen/open-now`
 
 **Method:GET** 获取目前能吃的食堂的数据
+
+`/api/kaifan`
+
+**Method:GET** 获取所有食堂目前的开饭状态
 
 ## 与你的 bot 集成
 
