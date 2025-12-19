@@ -32,18 +32,18 @@ export default function Posts() {
           ))}
         </ul>
       ) : null}
-
-      <p>
-        这些文章大多是一些奇怪的/有用的/没用的想法。如果你有兴趣，可以访问我的{" "}
+      {allPosts.length > 3 && (
+        <Link to="/blog" prefetch="intent" className="font-medium">
+          + {allPosts.length - 3} 篇文章
+        </Link>
+      )}
+      <p className="mt-4">
+        这些文章大多是一些奇怪的/有用的/没用的想法。如果你有兴趣，可以访问我的
         <Link to="/blog" prefetch="intent">
           博客页面
         </Link>
         查看更多内容。
       </p>
-
-      <Link to="/blog" prefetch="intent" className="font-medium">
-        查看所有文章 →
-      </Link>
     </section>
   );
 }

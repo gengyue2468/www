@@ -11,11 +11,11 @@ export default function Intro() {
       <p>
         我主要进行前端开发，并且对互联网技术感兴趣。一般来说，我的技术栈包括
         React、TypeScript、 Next.js 和 Tailwind CSS。现在我是
-        <Link to="https://bingyan.net">冰岩作坊</Link>前端组的一员。
+        <Link to="https://www.bingyan.net">冰岩作坊</Link>前端组的一员。
       </p>
       <p>
         你可以随意向<Link to="mailto:ciallo@gengyue.site">我的邮箱</Link>
-        投递垃圾。
+        投递垃圾。对了，这是<Link to="https://github.com/gengyue2468">我的GitHub</Link>。
       </p>
     </section>
   );

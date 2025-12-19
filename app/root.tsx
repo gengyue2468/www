@@ -11,6 +11,7 @@ import type { Route } from "./+types/root";
 import "katex/dist/katex.min.css";
 import "./app.css";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
@@ -21,7 +22,6 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.gstatic.com",
     crossOrigin: "anonymous",
   },
-  // 预加载关键字体：Google Sans 常规和 Noto Sans SC 中文
   {
     rel: "preload",
     as: "font",
@@ -84,6 +84,7 @@ export default function App() {
     <>
       <Outlet />
       <Analytics />
+      <SpeedInsights />
     </>
   );
 }
