@@ -1,8 +1,8 @@
 import { Link } from "react-router";
 import dayjs from "dayjs";
 
-import { allPosts } from "../../blog/posts";
-import type { Post } from "../../../types/post";
+import { allPosts } from "@/blog/posts";
+import type { Post } from "@/types/post";
 
 const latestPosts = allPosts.slice(0, 3);
 

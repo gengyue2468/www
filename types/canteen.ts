@@ -3,4 +3,10 @@ type Canteen = {
   remaining: string;
 };
 
-export type { Canteen };
+type kaifanStatus = {
+  name: string;
+  isOpen: boolean;
+  status: string;
+};
+
+export type { Canteen, kaifanStatus };

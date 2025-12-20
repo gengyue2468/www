@@ -97,7 +97,7 @@ code {
 }
 
 .prose pre code .highlight-word {
-  @apply bg-yellow-500/30 rounded px-0.5;
+  @apply bg-neutral-500 rounded px-0.5;
 }
 
 .prose pre[data-theme="dark"] {
@@ -132,4 +132,12 @@ code {
 [data-rehype-pretty-code-title] {
   font-family: "Google Sans Code", monospace;
   @apply bg-neutral-700 text-neutral-300 px-8 md:px-4 py-2 text-xs -mx-8 md:mx-0;
+}
+
+.prose blockquote {
+  @apply not-italic bg-neutral-200/50 dark:bg-neutral-800 py-3 px-4 -mx-8 md:mx-0 md:px-2;
+}
+
+.prose blockquote p {
+  @apply my-0;
 }

@@ -1,8 +1,8 @@
 import { useLoaderData } from "react-router";
 import type { Route } from "./+types/blog._index";
-import { allPosts } from "../blog/posts";
-import RouterBack from "~/components/public/route-back";
-import { Header, AllPosts } from "~/components/blog";
+import { allPosts } from "@/blog/posts";
+import RouterBack from "@/components/public/route/route-back";
+import { Header, AllPosts } from "@/components/blog";
 
 export function loader({}: Route.LoaderArgs) {
   return { posts: allPosts };

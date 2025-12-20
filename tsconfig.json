@@ -15,6 +15,12 @@
     "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
+      "@/*": ["./app/*"],
+      "@/components/*": ["./app/components/*"],
+      "@/routes/*": ["./app/routes/*"],
+      "@/blog/*": ["./app/blog/*"],
+      "@/types/*": ["./types/*"],
+      "@/utils/*": ["./app/utils/*"],
       "~/*": ["./app/*"]
     },
     "esModuleInterop": true,

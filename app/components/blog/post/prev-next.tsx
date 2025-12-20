@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import type { Post } from "../../../../types/post";
+import type { Post } from "@/types/post";
 
 interface PrevNextPostsProps {
   previous?: Post | null;

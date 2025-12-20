@@ -1,4 +1,4 @@
-import type { Post, PostFrontmatter } from "../../types/post";
+import type { Post, PostFrontmatter } from "@/types/post";
 
 type PostModule = {
   default: unknown;
@@ -20,7 +20,7 @@ const normalizePosts = (): Post[] => {
       slug,
       title: fm.title ?? slug,
       date: fm.date,
-      file: `../blog/${slug}.mdx`,
+      file: path,
     };
   });
 };

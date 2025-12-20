@@ -15,7 +15,7 @@ export default function Article({ MDXContent, post, articleRef, components }: Ar
     <>
       <article
         ref={articleRef}
-        className="prose prose-neutral dark:prose-invert prose-headings:font-semibold prose-headings:text-base
+        className="mt-6 prose prose-neutral dark:prose-invert prose-headings:font-semibold prose-headings:text-base
         prose-li:-mx-6  max-w-none"
       >
         <MDXProvider components={components}>

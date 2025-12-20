@@ -1,11 +1,11 @@
 import { Link } from "react-router";
 import dayjs from "dayjs";
 
-import type { Post } from "../../../types/post";
+import type { Post } from "@/types/post";
 
 export default function AllPosts({ posts }: { posts: Post[] }) {
   return (
-    <ul className="space-y-0 mt-2 group">
+    <ul className="space-y-0 mt-6 group">
       {posts.map((post: Post) => (
         <Link
           to={`/blog/${post.slug}`}

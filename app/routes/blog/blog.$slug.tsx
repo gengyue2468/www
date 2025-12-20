@@ -3,15 +3,16 @@ import React, { useEffect, useState, useRef, useMemo } from "react";
 import type { Route } from "./+types/blog.$slug";
 import { MDXProvider } from "@mdx-js/react";
 import { useLoaderData } from "react-router";
-import { allPosts, findPostBySlug } from "../blog/posts";
-import { Image } from "../components/public/image";
-import RouterBack from "~/components/public/route-back";
-import type { TocItem } from "~/types/post";
-import { Toc, Header, Article, PrevNextPosts } from "~/components/blog/post";
+import { allPosts, findPostBySlug } from "@/blog/posts";
+import { Image } from "@/components/public/img/image";
+import RouterBack from "@/components/public/route/route-back";
+import type { TocItem } from "@/types/post";
+import { Toc, Header, Article, PrevNextPosts } from "@/components/blog/post";
 
-const mdxModules = import.meta.glob("../blog/*.mdx", {
-  eager: true,
-});
+const mdxModules = import.meta.glob<{ default: any }>(
+  "../../blog/*.mdx",
+  { eager: true }
+);
 
 export function loader({ params }: Route.LoaderArgs) {
   const slug = params.slug;
@@ -87,7 +88,10 @@ export default function BlogPost() {
 
   const components = useMemo(() => createComponents(), []);
 
-  const mod = mdxModules[post.file] as
+  // post.file 现在是 glob 返回的相对于 app/blog/ 的完整路径
+  // 但在 blog.$slug 中需要调整为相对于该文件的路径
+  const mdxKey = `../../blog/${post.slug}.mdx`;
+  const mod = mdxModules[mdxKey] as
     | { default?: ComponentType<any> }
     | undefined;
   const MDXContent = mod?.default;
@@ -150,9 +154,11 @@ export default function BlogPost() {
 
   if (!MDXContent) {
     return (
-      <p className="text-sm text-red-500">
-        文章内容加载失败：没有找到对应的 MDX 组件。
-      </p>
+      <>
+      <RouterBack to="/blog" />
+      <h1 className="font-semibold">坏事了！</h1>
+      <p>文章内容加载失败：没有找到对应的 MDX 组件。</p>
+      </>
     );
   }
 

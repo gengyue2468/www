@@ -8,6 +8,7 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { defineConfig } from "vite";
+import path from "path";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { visit } from "unist-util-visit";
 
@@ -30,6 +31,16 @@ function remarkSmartQuotes() {
 }
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./app"),
+      "@/components": path.resolve(__dirname, "./app/components"),
+      "@/routes": path.resolve(__dirname, "./app/routes"),
+      "@/blog": path.resolve(__dirname, "./app/blog"),
+      "@/types": path.resolve(__dirname, "./types"),
+      "@/utils": path.resolve(__dirname, "./app/utils"),
+    },
+  },
   plugins: [
     mdx({
       providerImportSource: "@mdx-js/react",

@@ -1,7 +1,7 @@
 import { Suspense, useState } from "react";
 import { Link } from "react-router";
 import { Await } from "react-router";
-import type { Canteen } from "../../../../types/canteen";
+import type { Canteen } from "@/types/canteen";
 import CanteenList from "./list";
 
 interface CanteenDisplayProps {

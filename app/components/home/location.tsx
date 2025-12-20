@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Image } from "~/components/public/image";
+import { Image } from "@/components/public/img/image";
 
 export default function Location() {
   return (

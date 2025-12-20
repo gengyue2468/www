@@ -1,31 +1,15 @@
 import { useLoaderData } from "react-router";
 import type { Route } from "./+types/home";
-import axios from "axios";
-import type { Canteen } from "../../types/canteen";
-import { Header, Intro, Location, Posts, Supplements } from "~/components/home";
-import CanteenDisplay from "~/components/home/canteen";
+import type { Canteen } from "@/types/canteen";
+import { Header, Intro, Location, Posts, Supplements } from "@/components/home";
+import CanteenDisplay from "@/components/home/canteen";
+import { loadCanteenData } from "@/loaders/canteen";
 
 export async function loader({}: Route.LoaderArgs) {
-  try {
-    const canteenPromise = axios
-      .get("https://chifan.huster.fun/api/open-now")
-      .then((response) => {
-        const openedCanteen: Canteen[] = Array.isArray(response.data)
-          ? response.data
-          : [];
-        return openedCanteen;
-      })
-      .catch((error) => {
-        console.error("Error fetching canteen status:", error);
-        return [] as Canteen[];
-      });
-    return {
-      openedCanteen: canteenPromise,
-    };
-  } catch (error) {
-    console.error("Loader error:", error);
-    return { openedCanteen: Promise.resolve([] as Canteen[]) };
-  }
+  const openedCanteen = loadCanteenData();
+  return {
+    openedCanteen,
+  };
 }
 
 export function meta({}: Route.MetaArgs) {
@@ -80,7 +64,7 @@ export function meta({}: Route.MetaArgs) {
     },
     {
       name: "og:locale:alternate",
-      content: "en-US",
+      content: "zh-CN",
     },
     {
       name: "twitter:card",
