@@ -37,7 +37,7 @@ export default function CanteenList({ canteens }: { canteens: Canteen[] }) {
       >
         {canteens.length > 3
           ? `+ ${canteens.length - 3} 个食堂`
-          : "查看开饭信息"}
+          : "看看什么时候开饭"}
       </Link>
     </ul>
   );

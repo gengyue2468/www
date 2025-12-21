@@ -9,7 +9,7 @@ import RouterBack from "@/components/public/route/route-back";
 import type { TocItem } from "@/types/post";
 import { Toc, Header, Article, PrevNextPosts } from "@/components/blog/post";
 
-const mdxModules = import.meta.glob<{ default: any }>(
+const mdxModules = import.meta.glob<{ default: any; toc?: any }>(
   "../../blog/*.mdx",
   { eager: true }
 );
@@ -34,22 +34,8 @@ type LoaderData = Awaited<ReturnType<typeof loader>>;
 
 const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
   return function Heading({ children, ...props }: any) {
-    const getText = (node: any): string => {
-      if (typeof node === "string") return node;
-      if (typeof node === "number") return String(node);
-      if (Array.isArray(node)) return node.map(getText).join("");
-      if (node?.props?.children) return getText(node.props.children);
-      return "";
-    };
-    const text = getText(children);
-    const id = text
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w\u4e00-\u9fa5-]/g, "")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
     const Tag = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-    return React.createElement(Tag, { id, ...props }, children);
+    return React.createElement(Tag, { ...props }, children);
   };
 };
 
@@ -88,11 +74,9 @@ export default function BlogPost() {
 
   const components = useMemo(() => createComponents(), []);
 
-  // post.file 现在是 glob 返回的相对于 app/blog/ 的完整路径
-  // 但在 blog.$slug 中需要调整为相对于该文件的路径
   const mdxKey = `../../blog/${post.slug}.mdx`;
   const mod = mdxModules[mdxKey] as
-    | { default?: ComponentType<any> }
+    | { default?: ComponentType<any>; toc?: any }
     | undefined;
   const MDXContent = mod?.default;
   const articleRef = useRef<HTMLElement>(null);
@@ -100,30 +84,11 @@ export default function BlogPost() {
   const [activeId, setActiveId] = useState<string>("");
 
   useEffect(() => {
-    if (!articleRef.current) return;
-
-    const headings = articleRef.current.querySelectorAll(
-      "h1, h2, h3, h4, h5, h6"
-    );
-    const tocItems: TocItem[] = [];
-
-    headings.forEach((heading) => {
-      const id =
-        heading.id ||
-        heading.textContent?.toLowerCase().replace(/\s+/g, "-") ||
-        "";
-      if (!heading.id && id) {
-        heading.id = id;
-      }
-      tocItems.push({
-        id,
-        text: heading.textContent || "",
-        level: parseInt(heading.tagName.charAt(1)),
-      });
-    });
-
-    setToc(tocItems);
-  }, [post.slug]);
+    // 使用插件生成的 TOC 数据
+    if (mod?.toc) {
+      setToc(mod.toc);
+    }
+  }, [mod?.toc]);
 
   useEffect(() => {
     if (toc.length === 0) return;

@@ -72,7 +72,7 @@ code {
 }
 
 .prose pre {
-  @apply rounded-none bg-neutral-800 text-neutral-100 px-0 py-3 overflow-x-auto -mx-8 md:mx-0;
+  @apply rounded-none bg-neutral-200/50 dark:bg-neutral-800 px-0 py-3 overflow-x-auto -mx-8 md:mx-0;
   padding-left: 0;
   padding-right: 0;
 }
@@ -82,6 +82,20 @@ code {
   @apply block px-4 md:px-6;
 }
 
+.prose pre code span {
+  color: var(--shiki-light);
+}
+
+.dark .prose pre code span {
+  color: var(--shiki-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  .prose pre code span {
+    color: var(--shiki-dark);
+  }
+}
+
 .prose pre code .line {
   counter-increment: line;
   @apply block pl-8 -mx-5 md:-mx-6 pr-2 relative border-l-4 border-transparent;
@@ -89,27 +103,15 @@ code {
 
 .prose pre code .line::before {
   content: counter(line);
-  @apply absolute left-0 w-8 text-right text-neutral-500 select-none pr-2;
+  @apply absolute left-0 w-8 text-right text-neutral-400 dark:text-neutral-500 select-none pr-2;
 }
 
 .prose pre code .highlight-line {
-  @apply bg-neutral-700 border-l-neutral-600 border-l-4;
+  @apply bg-neutral-200 dark:bg-neutral-700 border-l-neutral-400 dark:border-l-neutral-600 border-l-4;
 }
 
 .prose pre code .highlight-word {
-  @apply bg-neutral-500 rounded px-0.5;
-}
-
-.prose pre[data-theme="dark"] {
-  display: none;
-}
-
-.dark .prose pre[data-theme="dark"] {
-  display: block;
-}
-
-.dark .prose pre[data-theme="light"] {
-  display: none;
+  @apply bg-neutral-300 dark:bg-neutral-500 rounded px-0.5;
 }
 
 .prose :not(pre) > code {
@@ -140,4 +142,8 @@ code {
 
 .prose blockquote p {
   @apply my-0;
+}
+
+.heading-link a {
+  @apply no-underline!;
 }

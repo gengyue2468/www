@@ -9,7 +9,6 @@ interface CanteenDisplayProps {
 }
 
 export default function CanteenDisplay({ openedCanteen }: CanteenDisplayProps) {
-  const [showMoreCanteens, setShowMoreCanteens] = useState(false);
   return (
     <section className="mt-8 space-y-4">
       <h3 className="font-semibold">
@@ -33,15 +32,14 @@ export default function CanteenDisplay({ openedCanteen }: CanteenDisplayProps) {
         <Await resolve={openedCanteen}>
           {(canteens) =>
             canteens.length > 0 ? (
-              <CanteenList
-                canteens={canteens}
-                showMore={showMoreCanteens}
-                onToggle={() => setShowMoreCanteens(!showMoreCanteens)}
-              />
+              <CanteenList canteens={canteens} />
             ) : (
-              <p className="font-medium text-neutral-600 dark:text-neutral-400">
-                坏了，现在没有吃的了.
-              </p>
+              <>
+                <p className="font-medium text-neutral-600 dark:text-neutral-400">
+                  坏了，现在没有吃的了.
+                </p>
+                <CanteenList canteens={canteens} />
+              </>
             )
           }
         </Await>
