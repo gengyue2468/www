@@ -39,7 +39,6 @@ a {
   quotes: "「" "」" "『" "』";
 }
 
-/* 隐藏原始引号，用CSS生成新引号 */
 .prose p {
   text-rendering: optimizeLegibility;
 }
@@ -55,11 +54,12 @@ a {
 }
 
 .prose blockquote {
-  @apply border-l-4 border-neutral-300 dark:border-neutral-700 pl-4 italic text-neutral-700 dark:text-neutral-300;
+  font-family: 'Noto Serif SC', serif;
+  @apply not-italic rounded-md border-none px-4! text-neutral-800 dark:text-neutral-200 bg-neutral-200/50 dark:bg-neutral-800 py-3 -mx-4 md:mx-0;
 }
 
 img {
-  @apply block w-[calc(100%+4rem)] md:w-full md:mx-0 -mx-8 max-w-none;
+  @apply rounded-md block w-[calc(100%+2rem)] md:w-full md:mx-0 -mx-4 max-w-none;
 }
 
 pre,
@@ -67,14 +67,14 @@ code {
   font-family: "Google Sans Code", monospace;
 }
 
-.prose-img {
-  @apply block w-[calc(100%+4rem)] md:w-full md:mx-0 -mx-8 max-w-none;
-}
-
 .prose pre {
-  @apply rounded-none bg-neutral-200/50 dark:bg-neutral-800 px-0 py-3 overflow-x-auto -mx-8 md:mx-0;
+  @apply bg-neutral-200/50 dark:bg-neutral-800 px-0 py-3 overflow-x-auto -mx-4 md:mx-0 rounded-md;
   padding-left: 0;
   padding-right: 0;
+}
+
+[data-rehype-pretty-code-title] + pre {
+  @apply rounded-t-none!;
 }
 
 .prose pre code {
@@ -115,7 +115,7 @@ code {
 }
 
 .prose :not(pre) > code {
-  @apply px-1 py-0.5 bg-neutral-200/70 dark:bg-neutral-800/70;
+  @apply rounded-md px-1 py-0.5 bg-neutral-200/70 dark:bg-neutral-800/70;
 }
 
 .dark .prose :not(pre) > code {
@@ -133,12 +133,9 @@ code {
 
 [data-rehype-pretty-code-title] {
   font-family: "Google Sans Code", monospace;
-  @apply bg-neutral-700 text-neutral-300 px-8 md:px-4 py-2 text-xs -mx-8 md:mx-0;
+  @apply bg-neutral-700 text-neutral-300 px-8 md:px-4 py-2 text-xs -mx-4 md:mx-0 rounded-t-md;
 }
 
-.prose blockquote {
-  @apply not-italic bg-neutral-200/50 dark:bg-neutral-800 py-3 px-4 -mx-8 md:mx-0 md:px-2;
-}
 
 .prose blockquote p {
   @apply my-0;

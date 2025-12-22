@@ -38,6 +38,10 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+SC:wght@200..900&display=swap",
+  },
+  {
+    rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Noto+Sans+SC:wght@100..900&display=swap",
   },
   {

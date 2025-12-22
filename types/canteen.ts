@@ -1,6 +1,7 @@
 type Canteen = {
   name: string;
   remaining: string;
+  imgUrl?: string;
 };
 
 type kaifanStatus = {

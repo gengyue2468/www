@@ -164,7 +164,7 @@ export function Image({
       </AnimatePresence>
 
       <span
-        className="relative overflow-hidden -mx-8 md:mx-0 w-[calc(100%+4rem)] md:w-full block"
+        className="relative overflow-hidden rounded-md -mx-4 w-[calc(100%+2rem)] md:w-full md:mx-0 block"
         style={{
           aspectRatio: dimensions?.aspectRatio || undefined,
           minHeight: dimensions ? undefined : "200px",
@@ -197,6 +197,9 @@ export function Image({
             loading={loading}
             onLoad={handleImageLoad}
             onError={handleImageError}
+            whileHover={{
+              scale: 1.05,
+            }}
             className={`h-full object-cover w-full ${
               isLoaded ? "opacity-100" : "opacity-0"
             } ${fullscreen ? "cursor-zoom-out" : "cursor-zoom-in"} ${className}`}

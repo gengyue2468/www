@@ -20,7 +20,7 @@ export default function CanteenDisplay({ openedCanteen }: CanteenDisplayProps) {
             {Array.from({ length: 3 }).map((_, index) => (
               <div
                 key={index}
-                className="h-7.5 w-full flex items-center justify-between *:animate-pulse"
+                className="h-7.5 w-full flex items-center justify-between *:rounded-md *:animate-pulse"
               >
                 <div className="h-6 w-25 bg-neutral-200 dark:bg-neutral-800" />
                 <div className="h-6 w-30 bg-neutral-200 dark:bg-neutral-800" />
