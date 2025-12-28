@@ -88,8 +88,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="max-w-prose mx-auto">
-      <h1 className="font-semibold">{message}</h1>
+    <main className="">
+      <h1 className="font-semibold text-3xl">{message}</h1>
       <p className="font-medium text-neutral-600 dark:text-neutral-400">
         {details}
       </p>

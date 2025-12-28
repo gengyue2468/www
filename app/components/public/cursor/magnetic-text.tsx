@@ -1,11 +1,14 @@
 import { useRef, useEffect, useState } from "react";
 
 interface MagneticTextProps {
-  text: string | React.ReactNode;
+  children: React.ReactNode;
   className?: string;
 }
 
-export default function MagneticText({ text, className }: MagneticTextProps) {
+export default function MagneticText({
+  children,
+  className,
+}: MagneticTextProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const [hovered, setHovered] = useState(false);
 
@@ -31,7 +34,6 @@ export default function MagneticText({ text, className }: MagneticTextProps) {
 
     el.addEventListener("mouseenter", handleEnter);
     el.addEventListener("mouseleave", handleLeave);
-
     return () => {
       el.removeEventListener("mouseenter", handleEnter);
       el.removeEventListener("mouseleave", handleLeave);
@@ -41,11 +43,11 @@ export default function MagneticText({ text, className }: MagneticTextProps) {
   return (
     <span
       ref={ref}
-      className={`relative inline-block cursor-none ${
-        hovered ? "text-white dark:text-black" : ""
-      } ${className}`}
+      className={`relative inline-block items-center cursor-none will-change-transform ${
+        hovered ? "text-neutral-950 dark:text-neutral-900" : ""
+      } ${className ?? ""}`}
     >
-      {text}
+      {children}
     </span>
   );
 }

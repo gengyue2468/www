@@ -20,7 +20,11 @@ export default function BlogIndex() {
 
   return (
     <>
-      <LayoutTemplate left={<Intro wordCount={0} />} right={<AllPosts posts={posts} />} />
+      <h1 className="font-extrabold text-8xl">Under Construction...</h1>
+      <LayoutTemplate
+        left={<Intro wordCount={0} />}
+        right={<AllPosts posts={posts} />}
+      />
     </>
   );
 }

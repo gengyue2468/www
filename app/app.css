@@ -63,10 +63,6 @@ a {
   @apply not-italic rounded-md border-none px-4! text-neutral-800 dark:text-neutral-200 bg-neutral-200/50 dark:bg-neutral-800 py-3 -mx-4 md:mx-0;
 }
 
-img {
-  @apply rounded-md block w-[calc(100%+2rem)] md:w-full md:mx-0 -mx-4 max-w-none;
-}
-
 pre,
 code {
   font-family: "Google Sans Code", monospace;

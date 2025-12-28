@@ -8,6 +8,7 @@ type Post = {
   title: string;
   date?: string;
   file: string;
+  wordCount?: number;
 };
 
 type TocItem = {

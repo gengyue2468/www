@@ -4,11 +4,13 @@ import { Intro } from "@/components/home";
 import { loadCanteenData } from "@/loaders/canteen";
 import { Image } from "@/components/public/img/image";
 import LayoutTemplate from "@/components/public/template/layout-template";
+import { allPosts } from "@/blog/posts";
 
 export async function loader({}: Route.LoaderArgs) {
   const openedCanteen = loadCanteenData();
   return {
     openedCanteen,
+    post: allPosts,
   };
 }
 
@@ -100,16 +102,17 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   const { openedCanteen } = useLoaderData<typeof loader>();
+  const wordCount = allPosts.reduce((sum, post) => sum + (post.wordCount || 0), 0);
 
   return (
     <>
       <LayoutTemplate
-        left={<Intro openedCanteen={openedCanteen} />}
+        left={<Intro openedCanteen={openedCanteen} wordCount={wordCount} />}
         right={
           <Image
             src="/static/cover/map.webp"
             alt="Map"
-            className="rounded-md shadow-md w-full filter grayscale brightness-75 hover:grayscale-0 transition-all duration-300"
+            className="rounded-md shadow-md w-full filter opacity-60 hover:opacity-100 transition-all duration-300"
           />
         }
       />

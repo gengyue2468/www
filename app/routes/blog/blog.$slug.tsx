@@ -85,7 +85,6 @@ export default function BlogPost() {
   const [activeId, setActiveId] = useState<string>("");
 
   useEffect(() => {
-    // 使用插件生成的 TOC 数据
     if (mod?.toc) {
       setToc(mod.toc);
     }
