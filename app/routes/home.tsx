@@ -1,9 +1,9 @@
 import { useLoaderData } from "react-router";
 import type { Route } from "./+types/home";
-import type { Canteen } from "@/types/canteen";
-import { Header, Intro, Location, Posts, Supplements } from "@/components/home";
-import CanteenDisplay from "@/components/home/canteen";
+import { Intro } from "@/components/home";
 import { loadCanteenData } from "@/loaders/canteen";
+import { Image } from "@/components/public/img/image";
+import LayoutTemplate from "@/components/public/template/layout-template";
 
 export async function loader({}: Route.LoaderArgs) {
   const openedCanteen = loadCanteenData();
@@ -103,12 +103,16 @@ export default function Home() {
 
   return (
     <>
-      <Header />
-      <Location />
-      <Intro />
-      <CanteenDisplay openedCanteen={openedCanteen} />
-      <Posts />
-      <Supplements />
+      <LayoutTemplate
+        left={<Intro openedCanteen={openedCanteen} />}
+        right={
+          <Image
+            src="/static/cover/map.webp"
+            alt="Map"
+            className="rounded-md shadow-md w-full filter grayscale brightness-75 hover:grayscale-0 transition-all duration-300"
+          />
+        }
+      />
     </>
   );
 }

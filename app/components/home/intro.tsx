@@ -1,22 +1,77 @@
 import { Link } from "react-router";
+import { Await } from "react-router";
+import type { Canteen } from "@/types/canteen";
+import { Suspense } from "react";
 
-export default function Intro() {
+export default function Intro({ openedCanteen }: { openedCanteen: Promise<Canteen[]> }) {
   return (
-    <section className="mt-4 space-y-4">
-      <p>
-        你好啊! 再次感谢您访问我的网站，如你所见，我现在在
-        <Link to="https://hust.edu.cn">华中科技大学 (HUST)</Link>
-        念计算机科学与技术专业，目前是大一的xdx.
-      </p>
-      <p>
-        我主要进行前端开发，并且对互联网技术感兴趣。一般来说，我的技术栈包括
-        React、TypeScript、 Next.js 和 Tailwind CSS。现在我是
-        <Link to="https://www.bingyan.net">冰岩作坊</Link>前端组的一员。
-      </p>
-      <p>
-        你可以随意向<Link to="mailto:ciallo@gengyue.site">我的邮箱</Link>
-        投递垃圾。对了，这是<Link to="https://github.com/gengyue2468">我的GitHub</Link>。
-      </p>
+    <section className="">
+      <div>
+        <img
+          src="/static/logo.webp"
+          alt="Logo"
+          className="w-16! rounded-full! mx-0!"
+        />
+      </div>
+      <div className="mt-8">
+        <h1 className="">
+          <span className="font-bold bg-neutral-900 dark:bg-neutral-100 text-neutral-100 dark:text-neutral-900">
+            Geng Yue
+          </span>
+          在写代码.
+        </h1>
+        <h2 className="text-neutral-600 dark:text-neutral-400">
+          在华中大念计算机.
+        </h2>
+
+        <h1 className="mt-4">遗憾，这里并无什么有趣的服务.</h1>
+
+        <h2 className="text-neutral-600 dark:text-neutral-400">
+          <Suspense fallback={<>emm</>}>
+            <Await resolve={openedCanteen}>
+              {(canteens) => (canteens.length == 0 ? "坏耶" : "好耶")}
+            </Await>
+          </Suspense>
+          ，现在还有{" "}
+          <span className="italic!">
+            <Suspense fallback={<>NaN</>}>
+              <Await resolve={openedCanteen}>
+                {(canteens) => canteens.length}
+              </Await>
+            </Suspense>
+          </span>{" "}
+          个食堂可以吃！
+        </h2>
+      </div>
+      {/*}
+      <div className="mt-16">
+        <h2 className="text-neutral-600 dark:text-neutral-400">导航.</h2>
+        <div className="flex flex-row items-center gap-4">
+          <Link to="/blog" className="no-underline!">
+            博客 ↗
+          </Link>
+          <Link to="https://chifan.huster.fun/" className="no-underline!">
+            吃饭 ↗
+          </Link>
+        </div>
+      </div>
+      */}
+      <div className="mt-8">
+        <h2 className="text-neutral-600 dark:text-neutral-400">链接</h2>
+        <div className="flex flex-row items-center gap-4">
+          <Link to="mailto:gengyue2468@outlook.com" className="no-underline!">
+            邮箱 ↗
+          </Link>
+          <Link to="https://github.com/gengyue2468" className="no-underline!">
+            GitHub ↗
+          </Link>
+        </div>
+      </div>
+      <div className="mt-16">
+        <h2 className="text-neutral-600 dark:text-neutral-400">
+          <span className="font-bold">{`${new Date().getFullYear()}`}</span> 在 中国武汉.
+        </h2>
+      </div>
     </section>
   );
 }

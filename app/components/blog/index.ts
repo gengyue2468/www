@@ -1,4 +1,4 @@
-import Header from "./header";
 import AllPosts from "./allPosts";
+import Intro from "./intro";
 
-export { Header, AllPosts };
+export { AllPosts, Intro };

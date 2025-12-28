@@ -23,26 +23,8 @@ export const links: Route.LinksFunction = () => [
     crossOrigin: "anonymous",
   },
   {
-    rel: "preload",
-    as: "font",
-    href: "https://fonts.gstatic.com/s/googlesans/v26/4UabrENHsxJlGDuGo1OIlL3awWxQeX5XO3v.woff2",
-    crossOrigin: "anonymous",
-    type: "font/woff2",
-  },
-  {
-    rel: "preload",
-    as: "font",
-    href: "https://fonts.gstatic.com/s/notosanssc/v42/k3kIo84gM5wpBmNqHVVaFeVNVuM-e-2xVn0d-os.0.woff2",
-    crossOrigin: "anonymous",
-    type: "font/woff2",
-  },
-  {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+SC:wght@200..900&display=swap",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Noto+Sans+SC:wght@100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Noto+Serif+SC:wght@200..900&display=swap",
   },
   {
     rel: "stylesheet",
@@ -69,12 +51,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <div className="pt-16 p-8 max-w-prose mx-auto flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen">
           <main className="flex-1">{children}</main>
-          <div className="mt-16 text-sm text-neutral-600 dark:text-neutral-400 flex flex-row items-center justify-between">
-            <span>{new Date().getFullYear()}</span>
-            <span>{time.format("HH:mm:ss")}</span>
-          </div>
         </div>
         <ScrollRestoration />
         <Scripts />

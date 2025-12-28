@@ -2,7 +2,8 @@ import { useLoaderData } from "react-router";
 import type { Route } from "./+types/blog._index";
 import { allPosts } from "@/blog/posts";
 import RouterBack from "@/components/public/route/route-back";
-import { Header, AllPosts } from "@/components/blog";
+import { Intro, AllPosts } from "@/components/blog";
+import LayoutTemplate from "@/components/public/template/layout-template";
 
 export function loader({}: Route.LoaderArgs) {
   return { posts: allPosts };
@@ -19,9 +20,7 @@ export default function BlogIndex() {
 
   return (
     <>
-      <RouterBack to="/" />
-      <Header />
-      <AllPosts posts={posts} />
+      <LayoutTemplate left={<Intro wordCount={0} />} right={<AllPosts posts={posts} />} />
     </>
   );
 }

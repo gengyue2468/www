@@ -12,7 +12,8 @@ body {
   font-feature-settings: "kern" 1;
   font-kerning: normal;
   text-spacing: ideograph-alpha ideograph-numeric;
-  @apply tracking-wide bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 selection:bg-neutral-900 selection:text-neutral-100 dark:selection:bg-neutral-100 dark:selection:text-neutral-900 leading-relaxed;
+  font-family: 'Lora', 'Noto Serif SC', 'Georgia', serif;
+  @apply bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 antialiased leading-relaxed selection:bg-neutral-200 dark:selection:bg-neutral-800;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;

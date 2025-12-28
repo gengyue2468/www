@@ -8,6 +8,7 @@ import { Image } from "@/components/public/img/image";
 import RouterBack from "@/components/public/route/route-back";
 import type { TocItem } from "@/types/post";
 import { Toc, Header, Article, PrevNextPosts } from "@/components/blog/post";
+import LayoutTemplate from "@/components/public/template/layout-template";
 
 const mdxModules = import.meta.glob<{ default: any; toc?: any }>(
   "../../blog/*.mdx",
@@ -120,27 +121,28 @@ export default function BlogPost() {
   if (!MDXContent) {
     return (
       <>
-      <RouterBack to="/blog" />
-      <h1 className="font-semibold">坏事了！</h1>
-      <p>文章内容加载失败：没有找到对应的 MDX 组件。</p>
+        <RouterBack to="/blog" />
+        <h1 className="font-semibold">坏事了！</h1>
+        <p>文章内容加载失败：没有找到对应的 MDX 组件。</p>
       </>
     );
   }
 
   return (
-    <section className="relative">
-      <RouterBack to="/blog" />
-      <Toc toc={toc} />
-      <Header post={post} />
-      <div>
-        <Article
-          MDXContent={MDXContent}
-          post={post}
-          articleRef={articleRef}
-          components={components}
-        />
-        <PrevNextPosts previous={previous} next={next} />
-      </div>
-    </section>
+    <LayoutTemplate
+      left={
+        <>
+          <Header post={post} />
+          <Article
+            MDXContent={MDXContent}
+            post={post}
+            articleRef={articleRef}
+            components={components}
+          />
+          <PrevNextPosts previous={previous} next={next} />
+        </>
+      }
+      right={null}
+    />
   );
 }
