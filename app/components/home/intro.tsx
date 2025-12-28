@@ -1,9 +1,14 @@
-import { Link } from "react-router";
+import Link from "../public/link";
 import { Await } from "react-router";
 import type { Canteen } from "@/types/canteen";
 import { Suspense } from "react";
+import { MagneticText } from "@/components/public/cursor";
 
-export default function Intro({ openedCanteen }: { openedCanteen: Promise<Canteen[]> }) {
+export default function Intro({
+  openedCanteen,
+}: {
+  openedCanteen: Promise<Canteen[]>;
+}) {
   return (
     <section className="">
       <div>
@@ -21,7 +26,8 @@ export default function Intro({ openedCanteen }: { openedCanteen: Promise<Cantee
           在写代码.
         </h1>
         <h2 className="text-neutral-600 dark:text-neutral-400">
-          在华中大念计算机.
+          在<MagneticText text="华中大" />
+          念计算机.
         </h2>
 
         <h1 className="mt-4">遗憾，这里并无什么有趣的服务.</h1>
@@ -32,14 +38,19 @@ export default function Intro({ openedCanteen }: { openedCanteen: Promise<Cantee
               {(canteens) => (canteens.length == 0 ? "坏耶" : "好耶")}
             </Await>
           </Suspense>
-          ，现在还有{" "}
-          <span className="italic!">
-            <Suspense fallback={<>NaN</>}>
-              <Await resolve={openedCanteen}>
-                {(canteens) => canteens.length}
-              </Await>
-            </Suspense>
-          </span>{" "}
+          ，现在还有
+          <MagneticText
+            className="italic! mx-px"
+            text={
+              <Suspense fallback={<> NaN </>}>
+                <> </>
+                <Await resolve={openedCanteen}>
+                  {(canteens) => canteens.length}
+                </Await>
+                <> </>
+              </Suspense>
+            }
+          />
           个食堂可以吃！
         </h2>
       </div>
@@ -69,7 +80,8 @@ export default function Intro({ openedCanteen }: { openedCanteen: Promise<Cantee
       </div>
       <div className="mt-16">
         <h2 className="text-neutral-600 dark:text-neutral-400">
-          <span className="font-bold">{`${new Date().getFullYear()}`}</span> 在 中国武汉.
+          <span className="font-bold">{`${new Date().getFullYear()}`}</span> 在
+          中国<MagneticText text="武汉" />.
         </h2>
       </div>
     </section>
