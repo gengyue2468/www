@@ -1,121 +1,49 @@
-import { useLoaderData } from "react-router";
+import { useLoaderData, Link } from "react-router";
 import type { Route } from "./+types/home";
-import { Intro } from "@/components/home";
-import { loadCanteenData } from "@/loaders/canteen";
-import { Image } from "@/components/public/img/image";
-import LayoutTemplate from "@/components/public/template/layout-template";
 import { allPosts } from "@/blog/posts";
+import React from "react";
+import dayjs from "dayjs";
+import PostsList from "@/components/PostsList";
+import PostLayout from "@/components/PostLayout";
 
 export async function loader({}: Route.LoaderArgs) {
-  const openedCanteen = loadCanteenData();
-  return {
-    openedCanteen,
-    post: allPosts,
-  };
+  return { posts: allPosts };
 }
 
 export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "Geng Yue" },
-    {
-      name: "description",
-      content:
-        "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
-    },
-    {
-      name: "keywords",
-      content:
-        "Geng Yue, 耿越, 华中科技大学, 计算机科学与技术, 前端开发, 互联网技术, 冰岩作坊, BuddyUp",
-    },
-    {
-      name: "author",
-      content: "Geng Yue",
-    },
-    {
-      name: "robots",
-      content: "index, follow",
-    },
-    {
-      name: "og:title",
-      content: "Geng Yue",
-    },
-    {
-      name: "og:description",
-      content:
-        "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
-    },
-    {
-      name: "og:image",
-      content: "https://gengyue.site/og-image.png",
-    },
-    {
-      name: "og:url",
-      content: "https://gengyue.site",
-    },
-    {
-      name: "og:type",
-      content: "website",
-    },
-    {
-      name: "og:locale",
-      content: "zh-CN",
-    },
-    {
-      name: "og:site_name",
-      content: "Geng Yue",
-    },
-    {
-      name: "og:locale:alternate",
-      content: "zh-CN",
-    },
-    {
-      name: "twitter:card",
-      content: "summary_large_image",
-    },
-    {
-      name: "twitter:title",
-      content: "Geng Yue",
-    },
-    {
-      name: "twitter:description",
-      content:
-        "你好，我是 Geng Yue，一名来自华中科技大学的计算机科学与技术专业学生。关注前端开发和互联网技术。",
-    },
-    {
-      name: "twitter:image",
-      content: "https://gengyue.site/og-image.png",
-    },
-    {
-      name: "twitter:url",
-      content: "https://gengyue.site",
-    },
-    {
-      name: "twitter:site",
-      content: "@gengyue2468",
-    },
-    {
-      name: "twitter:creator",
-      content: "@gengyue2468",
-    },
-  ];
+  return [{ title: "Geng Yue" }, { name: "robots", content: "index, follow" }];
 }
 
+const mdxModules = import.meta.glob<{ default: any }>("../blog/*.mdx", {
+  eager: true,
+});
+
 export default function Home() {
-  const { openedCanteen } = useLoaderData<typeof loader>();
-  const wordCount = allPosts.reduce((sum, post) => sum + (post.wordCount || 0), 0);
+  const { posts } = useLoaderData<typeof loader>();
+  const latest = posts && posts.length > 0 ? posts[0] : null;
+
+  const LatestContent = latest
+    ? (mdxModules[`../blog/${latest.slug}.mdx`] as any)?.default
+    : null;
 
   return (
     <>
-      <LayoutTemplate
-        left={<Intro openedCanteen={openedCanteen} wordCount={wordCount} />}
-        right={
-          <Image
-            src="/static/cover/map.webp"
-            alt="Map"
-            className="rounded-md shadow-md w-full filter opacity-60 hover:opacity-100 transition-all duration-300"
-          />
-        }
-      />
+      <PostLayout
+        title={latest ? latest.title : undefined}
+        date={latest?.date}
+        summary={latest?.summary}
+        headerCentered
+        showSummary={true}
+      >
+        {LatestContent ? <LatestContent /> : null}
+      </PostLayout>
+
+      <div className="mt-8 mb-8 tracking-widest flex justify-center">* * *</div>
+
+      <section className="max-w-2xl mx-auto px-6 pb-16">
+        <h2 className="text-3xl font-semibold mb-4 text-center">全部文章</h2>
+        <PostsList posts={posts} />
+      </section>
     </>
   );
 }

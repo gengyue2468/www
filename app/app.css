@@ -1,27 +1,22 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* --- 主题变量 --- */
 @theme {
   --font-sans:
     "Google Sans", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-*{
-  cursor: none;
-}
-
+/* --- 全局样式 --- */
 html,
 body {
   font-feature-settings: "kern" 1;
   font-kerning: normal;
   text-spacing: ideograph-alpha ideograph-numeric;
   font-family: 'Lora', 'Noto Serif SC', 'Georgia', serif;
-  @apply bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 antialiased leading-relaxed selection:bg-neutral-200 dark:selection:bg-neutral-800;
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+  @apply bg-stone-50 selection:bg-stone-200 text-stone-900;
+  color-scheme: light;
 }
 
 p {
@@ -29,38 +24,7 @@ p {
 }
 
 a {
-  @apply mx-px underline underline-offset-4 decoration-neutral-600 dark:decoration-neutral-400 hover:decoration-neutral-500 hover:opacity-75;
-}
-
-.prose {
-  font-feature-settings: "kern", "liga", "clig", "calt";
-  text-spacing: ideograph-alpha ideograph-numeric;
-  hanging-punctuation: first last;
-  @apply text-neutral-900 dark:text-neutral-100 leading-[1.9];
-}
-
-.prose,
-.prose blockquote {
-  quotes: "「" "」" "『" "』";
-}
-
-.prose p {
-  text-rendering: optimizeLegibility;
-}
-
-.prose q::before {
-  content: open-quote;
-  @apply text-neutral-400 dark:text-neutral-500;
-}
-
-.prose q::after {
-  content: close-quote;
-  @apply text-neutral-400 dark:text-neutral-500;
-}
-
-.prose blockquote {
-  font-family: 'Noto Serif SC', serif;
-  @apply not-italic rounded-md border-none px-4! text-neutral-800 dark:text-neutral-200 bg-neutral-200/50 dark:bg-neutral-800 py-3 -mx-4 md:mx-0;
+  @apply mx-px underline underline-offset-4 decoration-stone-400 hover:decoration-stone-500 transition decoration-1;
 }
 
 pre,
@@ -68,61 +32,66 @@ code {
   font-family: "Google Sans Code", monospace;
 }
 
-.prose pre {
-  @apply bg-neutral-200/50 dark:bg-neutral-800 px-0 py-3 overflow-x-auto -mx-4 md:mx-0 rounded-md;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-[data-rehype-pretty-code-title] + pre {
-  @apply rounded-t-none!;
-}
-
-.prose pre code {
-  counter-reset: line;
-  @apply block px-4 md:px-6;
-}
-
 .prose pre code span {
-  color: var(--shiki-light);
+  color: var(--shiki-default);
 }
 
-.dark .prose pre code span {
-  color: var(--shiki-dark);
+.highlight-line { 
+  background-color: var(--shiki-highlighted-line-bg, #f3f2f1); 
 }
-
-@media (prefers-color-scheme: dark) {
-  .prose pre code span {
-    color: var(--shiki-dark);
-  }
+.highlight-word { 
+  background-color: var(--shiki-highlighted-word-bg, #eae6df); 
 }
-
-.prose pre code .line {
-  counter-increment: line;
-  @apply block pl-8 -mx-5 md:-mx-6 pr-2 relative border-l-4 border-transparent;
-}
-
 .prose pre code .line::before {
   content: counter(line);
-  @apply absolute left-0 w-8 text-right text-neutral-400 dark:text-neutral-500 select-none pr-2;
+  @apply absolute left-0 w-8 text-right select-none pr-2 text-stone-400!;
+  color: var(--shiki-line-number, #b0aca3);
 }
 
-.prose pre code .highlight-line {
-  @apply bg-neutral-200 dark:bg-neutral-700 border-l-neutral-400 dark:border-l-neutral-600 border-l-4;
+/* --- 标题 --- */
+
+.prose h2{
+  @apply font-semibold text-2xl;
 }
 
-.prose pre code .highlight-word {
-  @apply bg-neutral-300 dark:bg-neutral-500 rounded px-0.5;
+.prose h3{
+  @apply font-semibold text-xl;
 }
 
+.prose h4{
+  @apply font-semibold text-lg;
+}
+
+/* --- 图片 --- */
+.prose img {
+  @apply rounded;
+}
+
+/* --- Prose 基础排版 --- */
+.prose {
+  font-feature-settings: "kern", "liga", "clig", "calt";
+  text-spacing: ideograph-alpha ideograph-numeric;
+  hanging-punctuation: first last;
+  @apply text-stone-900 leading-[1.8];
+  quotes: "「" "」" "『" "』";
+}
+
+/* --- 行内代码 --- */
 .prose :not(pre) > code {
-  @apply rounded-md px-1 py-0.5 bg-neutral-200/70 dark:bg-neutral-800/70;
+  @apply rounded px-1 py-0.5 bg-stone-100/75 text-stone-800;
 }
 
-.dark .prose :not(pre) > code {
-  @apply text-neutral-100;
+/* --- blockquote --- */
+.prose blockquote {
+  font-family: 'Lora','Noto Serif SC', serif;
+  @apply border-l-2 border-stone-300 px-4 text-stone-700 bg-stone-100 py-3 -mx-4 md:mx-0;
 }
 
+.prose blockquote p {
+  @apply my-0;
+}
+
+/* --- KaTeX --- */
 .prose :not(.katex-display) > .katex,
 .prose p .katex {
   display: inline-block;
@@ -132,16 +101,47 @@ code {
   @apply my-4;
 }
 
+/* --- rehype-pretty-code --- */
+.prose pre {
+  /* 默认行号颜色回退，若 rehype-pretty-code 未注入变量则使用此值 */
+  --shiki-line-number: #6b7280;
+
+  @apply bg-stone-100/80 px-0 py-3 overflow-x-auto -mx-4 md:mx-0 rounded-md;
+}
+
+[data-rehype-pretty-code-title] + pre {
+  @apply rounded-t-none!;
+}
+
+.prose pre code {
+  counter-reset: line;
+  @apply block px-4 md:px-6 text-stone-900;
+}
+
+.prose pre code .line {
+  counter-increment: line;
+  @apply block pl-8 -mx-5 md:-mx-6 pr-2 relative border-l-4 border-transparent;
+}
+
+.prose pre code .line::before {
+  content: counter(line);
+  @apply absolute left-0 w-8 text-right select-none pr-2 text-stone-400;
+}
+
+.prose pre code .highlight-line {
+  @apply bg-stone-200/50 border-l-stone-400 border-l-4;
+}
+
+.prose pre code .highlight-word {
+  @apply bg-stone-200/60 rounded px-0.5;
+}
+
 [data-rehype-pretty-code-title] {
   font-family: "Google Sans Code", monospace;
-  @apply bg-neutral-700 text-neutral-300 px-8 md:px-4 py-2 text-xs -mx-4 md:mx-0 rounded-t-md;
+  @apply bg-stone-200 text-stone-700 px-8 md:px-4 py-2 text-xs -mx-4 md:mx-0 rounded-t-md;
 }
 
-
-.prose blockquote p {
-  @apply my-0;
-}
-
+/* --- heading 链接 --- */
 .heading-link a {
   @apply no-underline!;
 }

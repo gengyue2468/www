@@ -44,6 +44,7 @@ const normalizePosts = (): Post[] => {
       slug,
       title: fm.title ?? slug,
       date: fm.date,
+      summary: fm.summary ?? "",
       file: path,
       wordCount,
     };

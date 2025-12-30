@@ -14,7 +14,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { Cursor } from "./components/public/cursor";
+import { Link } from "react-router";
+// Cursor component removed per refactor
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -52,9 +53,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Cursor />
         <div className="flex flex-col min-h-screen">
           <main className="flex-1">{children}</main>
+          <footer className="flex justify-center items-center py-4 mt-16 gap-8">
+            <Link to="/about" className="text-lg no-underline!">
+              关于我 ↗
+            </Link>
+              <Link to="/contact" className="text-lg no-underline!">
+              联系我 ↗
+            </Link>
+          </footer>
         </div>
         <ScrollRestoration />
         <Scripts />
@@ -88,7 +96,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="">
+    <main className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
       <h1 className="font-semibold text-3xl">{message}</h1>
       <p className="font-medium text-neutral-600 dark:text-neutral-400">
         {details}

@@ -146,10 +146,7 @@ export default defineConfig({
         [
           rehypePrettyCode,
           {
-            theme: {
-              light: "github-light",
-              dark: "github-dark-default",
-            },
+            theme: "github-light",
             keepBackground: false,
             showLineNumbers: true,
             onVisitLine(node: any) {

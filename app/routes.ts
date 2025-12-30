@@ -6,7 +6,4 @@ export default [
     index("routes/blog/blog._index.tsx"),
     route(":slug", "routes/blog/blog.$slug.tsx"),
   ]),
-  route("chifan", "routes/chifan/chifan.tsx",[
-    index("routes/chifan/chifan._index.tsx"),
-  ]),
 ] satisfies RouteConfig;
