@@ -1,11 +1,12 @@
 import { Link } from "react-router";
 
 export default function PostsList({ posts }: { posts: any[] }) {
-  if (!posts || posts.length === 0) {
+  const filteredPosts = (posts || []).filter((p) => p.slug !== "about");
+  if (!filteredPosts || filteredPosts.length === 0) {
     return <p className="px-4 py-8">还没有文章。</p>;
   }
 
-  const groupedPosts = posts.reduce<Record<string, any[]>>((acc, post) => {
+  const groupedPosts = filteredPosts.reduce<Record<string, any[]>>((acc, post) => {
     if (!post.date) return acc;
     const dateObj = new Date(post.date);
     const yearMonth = `${dateObj.getFullYear()} 年 ${dateObj.getMonth() + 1} 月`;

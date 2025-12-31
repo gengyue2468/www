@@ -38,8 +38,6 @@ export default function Home() {
         {LatestContent ? <LatestContent /> : null}
       </PostLayout>
 
-      <div className="mt-8 mb-8 tracking-widest flex justify-center">* * *</div>
-
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <h2 className="text-3xl font-semibold mb-4 text-center">全部文章</h2>
         <PostsList posts={posts} />

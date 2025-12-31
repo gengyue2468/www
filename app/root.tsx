@@ -59,9 +59,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link to="/about" className="text-lg no-underline!">
               关于我 ↗
             </Link>
-              <Link to="/contact" className="text-lg no-underline!">
-              联系我 ↗
-            </Link>
           </footer>
         </div>
         <ScrollRestoration />

@@ -1,5 +1,5 @@
 import type { Route } from "./+types/blog.$slug";
-import { useLoaderData } from "react-router";
+import { useLoaderData, redirect } from "react-router";
 import { allPosts, findPostBySlug } from "@/blog/posts";
 import PostLayout from "@/components/PostLayout";
 import PostsList from "@/components/PostsList";
@@ -11,12 +11,19 @@ const mdxModules = import.meta.glob<{ default: any }>("../../blog/*.mdx", {
 export function loader({ params }: Route.LoaderArgs) {
   const slug = params.slug;
   if (!slug) throw new Response("Not Found", { status: 404 });
+
+  // Redirect /blog/about to /about
+  if (slug === "about") return redirect("/about");
+
   const post = findPostBySlug(slug);
   if (!post) throw new Response("Not Found", { status: 404 });
-  const index = allPosts.findIndex((p) => p.slug === slug);
+
+  // Exclude the about page from previous/next navigation
+  const blogPosts = allPosts.filter((p) => p.slug !== "about");
+  const index = blogPosts.findIndex((p) => p.slug === slug);
   const previous =
-    index >= 0 && index < allPosts.length - 1 ? allPosts[index + 1] : null;
-  const next = index > 0 ? allPosts[index - 1] : null;
+    index >= 0 && index < blogPosts.length - 1 ? blogPosts[index + 1] : null;
+  const next = index > 0 ? blogPosts[index - 1] : null;
   return { slug, post, previous, next };
 }
 
