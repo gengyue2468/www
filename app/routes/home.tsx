@@ -1,10 +1,7 @@
 import { useLoaderData, Link } from "react-router";
 import type { Route } from "./+types/home";
 import { allPosts } from "@/blog/posts";
-import React from "react";
-import dayjs from "dayjs";
-import PostsList from "@/components/PostsList";
-import PostLayout from "@/components/PostLayout";
+import { PostLayout, PostsList } from "@/components/blog";
 
 export async function loader({}: Route.LoaderArgs) {
   return { posts: allPosts };
@@ -38,8 +35,8 @@ export default function Home() {
         {LatestContent ? <LatestContent /> : null}
       </PostLayout>
 
-      <section className="max-w-2xl mx-auto px-6 pb-16">
-        <h2 className="text-3xl font-semibold mb-4 text-center">全部文章</h2>
+      <section className="max-w-2xl mx-auto px-6 pb-24 pt-8">
+        <h2 className="text-2xl font-bold mb-8 text-center tracking-tight">全部文章</h2>
         <PostsList posts={posts} />
       </section>
     </>

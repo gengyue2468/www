@@ -33,17 +33,17 @@ export default function PostLayout({
     ? dayjs(date).format("YYYY 年 MM 月 DD 日")
     : undefined;
   const titleClass = headerCentered
-    ? "text-3xl font-semibold text-balance max-w-md mx-auto leading-relaxed"
-    : "text-2xl font-semibold";
+    ? "text-4xl font-bold text-balance max-w-2xl mx-auto leading-tight tracking-tight"
+    : "text-3xl font-bold tracking-tight";
   const dateClass = headerCentered
-    ? "text-xl my-4 text-neutral-500 font-medium"
-    : "text-sm text-neutral-500";
+    ? "text-lg mt-4 mb-2 text-stone-500 font-normal"
+    : "text-sm text-stone-500 mt-3";
   const location = useLocation();
 
   return (
     <div className={containerClassName}>
       {!hideHeader && (title || date || (showSummary && summary)) && (
-        <header className={headerCentered ? "mb-8 text-center" : "mb-6"}>
+        <header className={headerCentered ? "mb-12 text-center" : "mb-10"}>
           {title && (
             <Link to={location.pathname} className="no-underline!">
               <h1 className={titleClass}>{title}</h1>
@@ -53,13 +53,9 @@ export default function PostLayout({
 
           {showSummary && (
             <>
-              <div className="mt-8 mb-6 tracking-widest">* * *</div>
+              <div className="mt-10 mb-8 tracking-[0.3em] text-stone-400 text-sm">* * *</div>
               <span
-                className={
-                  headerCentered
-                    ? "text-sm my-2 font-medium opacity-50"
-                    : "text-sm my-2 font-medium opacity-50"
-                }
+                className="text-xs tracking-wider uppercase text-stone-400 font-medium"
               >
                 {summaryLabel}
               </span>
@@ -67,8 +63,8 @@ export default function PostLayout({
                 <div
                   className={
                     headerCentered
-                      ? "max-w-md mx-auto text-center text-lg italic"
-                      : "text-lg italic mt-2"
+                      ? "max-w-xl mx-auto text-center text-lg leading-relaxed italic mt-3 text-stone-600"
+                      : "text-lg leading-relaxed italic mt-3 text-stone-600"
                   }
                 >
                   {summary}
@@ -77,14 +73,14 @@ export default function PostLayout({
                 <div
                   className={
                     headerCentered
-                      ? "max-w-md mx-auto text-center text-lg italic"
-                      : "text-lg italic mt-2"
+                      ? "max-w-xl mx-auto text-center text-lg leading-relaxed italic mt-3 text-stone-600"
+                      : "text-lg leading-relaxed italic mt-3 text-stone-600"
                   }
                 >
                   暂无摘要内容。
                 </div>
               )}
-              <div className="mt-8 mb-8 tracking-widest">* * *</div>
+              <div className="mt-10 mb-12 tracking-[0.3em] text-stone-400 text-sm">* * *</div>
             </>
           )}
         </header>
@@ -96,14 +92,14 @@ export default function PostLayout({
 
       {(previous || next) && (
         <>
-          <div className="mt-8 mb-8 tracking-widest flex justify-center">
+          <div className="mt-16 mb-10 tracking-[0.3em] text-stone-400 text-sm flex justify-center">
             * * *
           </div>
-          <nav className="my-8 flex flex-wrap gap-4 justify-between *:no-underline! text-lg">
+          <nav className="my-10 flex flex-wrap gap-6 justify-between items-center *:no-underline! text-lg">
             {previous ? (
               <Link
                 to={`/blog/${previous.slug}`}
-                className=""
+                className="text-stone-600 hover:text-stone-900 transition-colors font-medium"
                 prefetch="intent"
               >
                 ← {previous.title}
@@ -113,7 +109,7 @@ export default function PostLayout({
             )}
 
             {next ? (
-              <Link to={`/blog/${next.slug}`} className="" prefetch="intent">
+              <Link to={`/blog/${next.slug}`} className="text-stone-600 hover:text-stone-900 transition-colors font-medium" prefetch="intent">
                 {next.title} →
               </Link>
             ) : (
@@ -123,7 +119,7 @@ export default function PostLayout({
         </>
       )}
 
-      <div className="mt-8 mb-8 tracking-widest flex justify-center">* * *</div>
+      <div className="mt-12 mb-16 tracking-[0.3em] text-stone-400 text-sm flex justify-center">* * *</div>
     </div>
   );
 }

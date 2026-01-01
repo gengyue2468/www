@@ -1,10 +1,9 @@
 import type { Route } from "./+types/blog.$slug";
 import { useLoaderData, redirect } from "react-router";
 import { allPosts, findPostBySlug } from "@/blog/posts";
-import PostLayout from "@/components/PostLayout";
-import PostsList from "@/components/PostsList";
+import { PostLayout, PostsList, Toc } from "@/components/blog";
 
-const mdxModules = import.meta.glob<{ default: any }>("../../blog/*.mdx", {
+const mdxModules = import.meta.glob<{ default: any; toc?: any }>("../../blog/*.mdx", {
   eager: true,
 });
 
@@ -38,9 +37,11 @@ export default function BlogPost() {
   const mdxKey = `../../blog/${post.slug}.mdx`;
   const mod = mdxModules[mdxKey] as any | undefined;
   const MDXContent = mod?.default;
+  const toc = mod?.toc;
 
   return (
     <>
+      <Toc toc={toc} />
       <PostLayout
         title={post.title}
         date={post.date}

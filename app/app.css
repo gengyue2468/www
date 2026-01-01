@@ -20,11 +20,16 @@ body {
 }
 
 p {
-  @apply leading-relaxed;
+  @apply leading-relaxed my-6;
 }
 
 a {
   @apply mx-px font-normal underline underline-offset-4 decoration-stone-400 hover:decoration-stone-500 transition decoration-1;
+}
+
+.italic {
+  font-style: italic;
+  font-synthesis: none;
 }
 
 pre,
@@ -51,15 +56,27 @@ code {
 /* --- 标题 --- */
 
 .prose h2 {
-  @apply font-semibold! text-2xl;
+  @apply font-semibold! text-2xl mt-12 mb-6 tracking-tight;
+}
+
+.prose h2 a {
+  @apply font-semibold!;
 }
 
 .prose h3 {
-  @apply font-semibold! text-xl;
+  @apply font-semibold! text-xl mt-10 mb-4 tracking-tight;
+}
+
+.prose h3 a {
+  @apply font-semibold!;
 }
 
 .prose h4 {
-  @apply font-medium! text-lg;
+  @apply font-medium! text-lg mt-8 mb-3;
+}
+
+.prose h4 a {
+  @apply font-medium!;
 }
 
 /* --- 图片 --- */
@@ -76,13 +93,23 @@ code {
   font-feature-settings: "kern", "liga", "clig", "calt";
   text-spacing: ideograph-alpha ideograph-numeric;
   hanging-punctuation: first last;
-  @apply text-stone-900 leading-[1.8];
+  @apply text-stone-900 text-lg leading-[1.85];
   quotes: "「" "」" "『" "』";
+}
+
+.prose > * + * {
+  @apply mt-6;
+}
+
+.prose > h2 + *,
+.prose > h3 + *,
+.prose > h4 + * {
+  @apply mt-4;
 }
 
 /* --- 行内代码 --- */
 .prose :not(pre) > code {
-  @apply rounded px-1 py-0.5 bg-stone-100/75 text-stone-800 font-normal;
+  @apply rounded px-1.5 py-0.5 bg-stone-100 text-stone-800 font-normal text-[0.92em] border border-stone-200/80;
 }
 
 .prose pre {
@@ -93,7 +120,9 @@ code {
 /* --- blockquote --- */
 .prose blockquote {
   font-family: "Lora", "Noto Serif SC", serif;
-  @apply border-l-2 border-stone-300 px-4 text-stone-700 bg-stone-100 py-3 -mx-4 md:mx-0;
+  font-style: italic;
+  font-synthesis: none;
+  @apply border-l-3 font-normal border-stone-400/60 pl-6 pr-5 text-stone-700 bg-stone-50/80 py-4 my-6 -mx-4 md:mx-0 rounded-r-sm;
 }
 
 .prose blockquote p {
@@ -115,11 +144,11 @@ code {
   /* 默认行号颜色回退，若 rehype-pretty-code 未注入变量则使用此值 */
   --shiki-line-number: #6b7280;
 
-  @apply bg-stone-100/80 px-0 py-3 overflow-x-auto -mx-4 md:mx-0 rounded-md;
+  @apply bg-stone-100/90 px-0 py-4 overflow-x-auto -mx-4 md:mx-0 rounded-lg my-8 border border-stone-200/50;
 }
 
 [data-rehype-pretty-code-title] + pre {
-  @apply rounded-t-none!;
+  @apply rounded-t-none! mt-0! border-t-0!;
 }
 
 .prose pre code {
@@ -147,7 +176,7 @@ code {
 
 [data-rehype-pretty-code-title] {
   font-family: "Google Sans Code", monospace;
-  @apply bg-stone-200 text-stone-700 px-8 md:px-4 py-2 text-xs -mx-4 md:mx-0 rounded-t-md;
+  @apply bg-stone-200/80 text-stone-700 px-4 md:px-6 py-3 text-sm font-medium -mx-4 md:mx-0 rounded-t-lg border border-b-0 border-stone-200/50;
 }
 
 /* --- heading 链接 --- */

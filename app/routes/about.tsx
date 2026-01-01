@@ -1,8 +1,7 @@
 import type { Route } from "./+types/about";
 import { useLoaderData } from "react-router";
 import { allPosts, findPostBySlug } from "@/blog/posts";
-import PostLayout from "@/components/PostLayout";
-import PostsList from "@/components/PostsList";
+import { PostLayout, PostsList } from "@/components/blog";
 
 const mdxModules = import.meta.glob<{ default: any }>("../pages/*.mdx", {
   eager: true,
