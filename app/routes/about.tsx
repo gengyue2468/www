@@ -1,9 +1,11 @@
 import type { Route } from "./+types/about";
 import { useLoaderData } from "react-router";
 import { allPosts, findPostBySlug } from "@/blog/posts";
-import { PostLayout, PostsList } from "@/components/blog";
+import { PostLayout, PostsList, Toc, ReadingAside } from "@/components/blog";
+import { useTocSetter } from "@/contexts/toc-context";
+import { useEffect, useState } from "react";
 
-const mdxModules = import.meta.glob<{ default: any }>("../pages/*.mdx", {
+const mdxModules = import.meta.glob<{ default: any; toc?: any }>("../pages/*.mdx", {
   eager: true,
 });
 
@@ -40,9 +42,54 @@ export default function About() {
   const mdxKey = `../pages/${post.slug}.mdx`;
   const mod = mdxModules[mdxKey] as any | undefined;
   const MDXContent = mod?.default;
+  const toc = mod?.toc;
+  const setToc = useTocSetter();
+
+  const [wordCount, setWordCount] = useState(0);
+
+  useEffect(() => {
+    setToc(toc);
+    return () => setToc(undefined);
+  }, [toc, setToc]);
+
+  useEffect(() => {
+    const article = document.querySelector("article");
+    if (article) {
+      const text = article.innerText || "";
+      const count = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+      setWordCount(count);
+    }
+  }, []);
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: post.title,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log("分享取消");
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("链接已复制到剪贴板！");
+      } catch (err) {
+        console.error("复制失败:", err);
+      }
+    }
+  };
 
   return (
     <>
+      <Toc toc={toc} />
+      <ReadingAside
+        date={post.date}
+        readingTime={8}
+        wordCount={wordCount}
+        onShare={handleShare}
+      />
       <PostLayout
         title={post.title}
         date={post.date}

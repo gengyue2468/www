@@ -14,7 +14,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { Link } from "react-router";
+import { MobileToolbar } from "@/components/blog";
+import { TocProvider } from "@/contexts/toc-context";
 // Cursor component removed per refactor
 
 export const links: Route.LinksFunction = () => [
@@ -32,7 +33,19 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap",
   },
+  { rel: "icon", href: "/favicon.ico", sizes: "any" },
+  { rel: "apple-touch-icon", href: "/favicon.ico" },
 ];
+
+export function meta() {
+  return [
+    { property: "og:type", content: "website" },
+    { property: "og:site_name", content: "Geng Yue 的博客" },
+    { property: "og:image", content: "/og-image.png" },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:image", content: "/og-image.png" },
+  ];
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [time, setTime] = useState(dayjs());
@@ -53,14 +66,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <div className="flex flex-col min-h-screen">
-          <main className="flex-1">{children}</main>
-          <footer className="flex justify-center items-center py-4 mt-16 gap-8">
-            <Link to="/about" className="text-lg no-underline!">
-              关于我 ↗
-            </Link>
-          </footer>
-        </div>
+        <TocProvider>
+          <div className="flex flex-col min-h-screen bg-stone-50" data-vaul-drawer-wrapper="">
+            <main className="flex-1 pb-20 xl:pb-0">{children}</main>
+          </div>
+          <MobileToolbar />
+        </TocProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
