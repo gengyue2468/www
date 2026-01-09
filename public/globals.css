@@ -1,0 +1,203 @@
+:root {
+  --bg-color: #fffff8;
+  --text-color: #111;
+  --bg-color-dark: #151515;
+  --text-color-dark: #ddd;
+  --border-color: #ccc;
+  --danger-color: red;
+  --accent: rgba(0, 0, 0, 0.05);
+
+  --font-base-size: 15px;
+  --font-serif: et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, ui-serif, serif;
+  --font-sans: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+  --font-sans-alt: "Trebuchet MS", "Gill Sans", "Gill Sans MT", sans-serif;
+  --font-mono: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  --font-numeral: et-book-roman-old-style;
+
+  --font-size-h1: 3.2rem;
+  --font-size-h2: 2.2rem;
+  --font-size-h3: 1.7rem;
+  --font-size-subtitle: 1.8rem;
+  --font-size-body: 1.4rem;
+  --font-size-sidenote: 1.1rem;
+  --font-size-code: 1.4rem;
+  --font-size-code-sans: 1.2rem;
+  --font-size-code-small: 1.2rem;
+  --font-size-code-heading: 0.80em;
+  --font-size-newthought: 1.2em;
+
+  --line-height-base: 1;
+  --line-height-body: 2rem;
+  --line-height-sidenote: 1.3;
+  --line-height-code: 1.42;
+  --line-height-caption: 1.6;
+
+  --spacing-h1-top: 4rem;
+  --spacing-h1-bottom: 1.5rem;
+  --spacing-h2-top: 2.1rem;
+  --spacing-h2-bottom: 1.4rem;
+  --spacing-h3-top: 2rem;
+  --spacing-h3-bottom: 1.4rem;
+  --spacing-p-top: 1.4rem;
+  --spacing-p-bottom: 1.4rem;
+  --spacing-section: 1rem;
+  --spacing-article: 5rem;
+  --spacing-epigraph: 5em;
+  --spacing-epigraph-quote: 3em;
+  --spacing-sidenote-top: 0.3rem;
+  --spacing-list-item: 0.25rem;
+  --spacing-figure-bottom: 3em;
+  --spacing-blockquote-left: 1.5em;
+
+  --width-body: 87.5%;
+  --width-body-mobile: 84%;
+  --width-padding-left: 12.5%;
+  --width-padding-left-mobile: 8%;
+  --width-content: 55%;
+  --width-list: 50%;
+  --width-list-padding: 5%;
+  --width-figcaption: 40%;
+  --width-figcaption-fullwidth: 24%;
+  --width-code: 52.5%;
+  --width-code-margin: 2.5%;
+  --width-fullwidth: 90%;
+  --width-fullwidth-mobile: 97%;
+  --width-list-mobile: 90%;
+  --width-figure-mobile: 90%;
+  --width-table-mobile: 85%;
+  --width-sidenote: 50%;
+  --width-sidenote-mobile: 95%;
+  --width-sidenote-margin: -60%;
+  --width-sidenote-blockquote-margin: -82%;
+  --width-sidenote-blockquote-min: 59%;
+  --max-width-body: 1400px;
+
+  --letter-spacing-sans: 0.03em;
+  --text-underline-offset: 0.1em;
+  --text-decoration-thickness: 0.05em;
+  --sidenote-number-top: -0.5rem;
+  --sidenote-number-left: 0.1rem;
+  --iframe-padding-bottom: 56.25%;
+  --iframe-padding-top: 25px;
+  --breakpoint-mobile: 760px;
+}
+
+nav {
+  margin-bottom: 2rem;
+  padding-top: 2rem;
+}
+
+nav a {
+  margin-right: 1rem;
+  text-decoration: none;
+  padding: 0.2rem 0.5rem;
+  font-size: 1.4rem;
+}
+
+nav a:hover {
+  background-color: var(--accent) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: oklch(26.9% 0 0);
+  }
+}
+
+/* Font display optimization - override CDN fonts with font-display: swap */
+/* This overrides the et-book.css from CDN to add font-display: swap for better performance */
+@font-face {
+  font-family: "et-book";
+  src: url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-roman-line-figures/et-book-roman-line-figures.eot");
+  src: url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-roman-line-figures/et-book-roman-line-figures.eot?#iefix") format("embedded-opentype"),
+       url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff") format("woff"),
+       url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-roman-line-figures/et-book-roman-line-figures.ttf") format("truetype"),
+       url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-roman-line-figures/et-book-roman-line-figures.svg#etbookromanosf") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "et-book";
+  src: url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.eot");
+  src: url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.eot?#iefix") format("embedded-opentype"),
+       url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff") format("woff"),
+       url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.ttf") format("truetype"),
+       url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.svg#etbookromanosf") format("svg");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "et-book";
+  src: url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-bold-line-figures/et-book-bold-line-figures.eot");
+  src: url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-bold-line-figures/et-book-bold-line-figures.eot?#iefix") format("embedded-opentype"),
+       url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-bold-line-figures/et-book-bold-line-figures.woff") format("woff"),
+       url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-bold-line-figures/et-book-bold-line-figures.ttf") format("truetype"),
+       url("https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-bold-line-figures/et-book-bold-line-figures.svg#etbookromanosf") format("svg");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Main landmark styling */
+main {
+  display: block;
+}
+
+/* Blog post date styling */
+.post-date {
+  font-style: italic;
+  color: #666;
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+}
+
+.post-date.hidden {
+  display: none;
+}
+
+/* Code block styling */
+pre {
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 1rem;
+  margin: 1.4rem 0;
+  max-width: var(--width-content);
+  overflow-wrap: break-word;
+}
+
+pre>code {
+  width: 100% !important;
+  margin-left: 0 !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 760px) {
+  pre {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: var(--width-padding-left-mobile);
+    padding-right: var(--width-padding-left-mobile);
+    border-radius: 0;
+    box-sizing: border-box;
+  }
+
+  pre>code {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 0;
+  }
+
+  details {
+    width: 100% !important;
+  }
+
+  nav a {
+    font-size: 1.2rem;
+  }
+}
