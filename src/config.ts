@@ -19,6 +19,7 @@ const config: Config = {
   routes: {
     "/": "index.md",
     "/about": "about.md",
+    "/now": "now.md",
     "/blog": "blog.md",
   },
 

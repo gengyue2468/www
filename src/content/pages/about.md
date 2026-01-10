@@ -2,7 +2,7 @@
 title: About
 ---
 
-哈喽啊，我现在在 [华中科技大学 (HUST)](https://hust.edu.cn)[^ ![](/static/hust/hust.webp)] 念大一，是 xdx，~~臭学计算机的~~。目前是 [冰岩作坊](https://www.bingyan.net/) 前端组的成员。
+哈喽啊，我现在在 [华中科技大学 (HUST)](https://hust.edu.cn)[^ <img src="/static/hust/hust.webp" style="width:96px" /> ]念大一，是 xdx，~~臭学计算机的~~。目前是 [冰岩作坊](https://www.bingyan.net/) 前端组的成员。
 
 技术方面，就写了一点点 [C语言](https://www.iso-9899.info/)，没写过 C++。前端技术方面，我写过一点点 [React](https://react.dev/) / [Next.js](https://nextjs.org/) / [React Router v7 (former Remix)](https://reactrouter.com/)，一般用 [TailwindCSS](https://tailwindcss.com/) 组织样式，[Framer Motion](https://www.framer.com/motion/) 作为动画库。
 
@@ -15,6 +15,8 @@ title: About
 - ...
 
 你可能会在我的 [GitHub](https://github.com/gengyue2468) 上找到更多，不过也说不准...
+
+如果你追求一些更加有时效性的消息，可以试试去 [Now Page](/now) 看看。不过我估计那里的内容比这里的时效性还差...[note:懒]
 
 本页面由人类 撰写 :)
 
