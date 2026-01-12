@@ -1,12 +1,13 @@
 import { join } from "path";
 import { readFile, writeFile, rm, stat } from "fs/promises";
 import { ensureDir, loadLayout, copyPublicFiles } from "./utils/fs.js";
-import { buildPage } from "./builders/page.js";
+import { buildPage, getInlinedCss } from "./builders/page.js";
 import { buildBlogIndex, buildBlogPosts } from "./builders/blog.js";
 import { generateRSS } from "./generators/rss.js";
 import { generateSitemap } from "./generators/sitemap.js";
 import { generateRobotsTxt } from "./generators/robots.js";
 import { createCacheManager, hasFileChanged } from "./utils/cache.js";
+import { compressHtmlFiles } from "./utils/compress.js";
 import config from "./config.js";
 
 // Parse CLI arguments
@@ -49,6 +50,9 @@ async function build(): Promise<void> {
 // Get current year for templates
 const currentYear = new Date().getFullYear();
 
+// Pre-load inlined CSS for critical rendering path
+const inlinedCss = await getInlinedCss();
+
 // Build static pages
   let pagesChanged = false;
   for (const [route, file] of Object.entries(config.routes)) {
@@ -86,7 +90,8 @@ const currentYear = new Date().getFullYear();
     blogIndexLayout,
     cacheManager,
     force || configChanged || layoutsChanged.base || layoutsChanged["blog-index"],
-    currentYear
+    currentYear,
+    inlinedCss
   );
   await buildBlogPosts(
     posts,
@@ -94,7 +99,8 @@ const currentYear = new Date().getFullYear();
     blogPostLayout,
     cacheManager,
     force || configChanged || layoutsChanged.base || layoutsChanged["blog-post"],
-    currentYear
+    currentYear,
+    inlinedCss
   );
 
   // Generate feeds (always regenerate as they depend on posts)
@@ -123,6 +129,10 @@ const currentYear = new Date().getFullYear();
   }
 
   await copyPublicFiles(config.dirs);
+
+  // Compress HTML files (CSS is inlined)
+  console.log("\n🗜 Compressing static assets...");
+  await compressHtmlFiles(config.dirs);
 
   // Save cache
   cacheManager.save();

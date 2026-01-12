@@ -26,8 +26,12 @@
     "sitemap": "^9.0.0"
   },
   "devDependencies": {
+    "@types/clean-css": "^4.2.11",
+    "@types/html-minifier": "^4.0.6",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^20.11.0",
+    "clean-css": "^5.3.3",
+    "html-minifier": "^4.0.0",
     "serve": "^14.2.1",
     "typescript": "^5.3.3"
   }

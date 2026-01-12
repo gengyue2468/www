@@ -41,7 +41,8 @@ export async function buildBlogIndex(
   blogIndexLayout: string,
   cacheManager?: BuildCacheManager,
   force?: boolean,
-  year?: number
+  year?: number,
+  css?: string
 ): Promise<{ posts: Post[]; indexChanged: boolean; postsChanged: boolean }> {
   const blogDir = config.dirs.blog;
   const posts: Post[] = [];
@@ -101,6 +102,7 @@ export async function buildBlogIndex(
     author: config.site.author,
     year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
+    css: css || "",
   };
   const output = renderTemplate(baseLayout, baseData);
 
@@ -148,7 +150,8 @@ export async function buildBlogPosts(
   blogPostLayout: string,
   cacheManager?: BuildCacheManager,
   force?: boolean,
-  year?: number
+  year?: number,
+  css?: string
 ): Promise<void> {
   const blogDir = config.dirs.blog;
 
@@ -199,6 +202,7 @@ export async function buildBlogPosts(
       author: config.site.author,
       year: year?.toString() || new Date().getFullYear().toString(),
       content: renderedContent,
+      css: css || "",
     };
     const output = renderTemplate(baseLayout, baseData);
 
