@@ -3,15 +3,11 @@ import { writeFile } from "fs/promises";
 import generateRobotstxt from "generate-robotstxt";
 import config from "../config.js";
 
-/**
- * Generate robots.txt using generate-robotstxt library
- */
 export async function generateRobotsTxt(): Promise<void> {
   if (!config.robots.enabled) return;
 
   const siteUrl = config.site.url;
 
-  // Prepare robots configuration
   const robotsConfig = {
     policy: [
       {
@@ -23,7 +19,6 @@ export async function generateRobotsTxt(): Promise<void> {
     sitemap: config.sitemap.enabled ? `${siteUrl.replace(/\/$/, "")}/sitemap.xml` : undefined,
   };
 
-  // Generate robots.txt content
   const robotsTxt = await generateRobotstxt(robotsConfig);
 
   const robotsPath = join(config.dirs.dist, "robots.txt");

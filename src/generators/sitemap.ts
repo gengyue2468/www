@@ -4,21 +4,14 @@ import { SitemapStream, streamToPromise } from "sitemap";
 import config from "../config.js";
 import type { Post } from "../types.js";
 
-/**
- * Generate sitemap.xml using sitemap library
- */
 export async function generateSitemap(posts: Post[]): Promise<void> {
   if (!config.sitemap.enabled) return;
 
   const siteUrl = config.site.url;
   const now = new Date();
 
-  // Create sitemap stream
-  const sitemap = new SitemapStream({
-    hostname: siteUrl,
-  });
+  const sitemap = new SitemapStream({ hostname: siteUrl });
 
-  // Add home page
   sitemap.write({
     url: "/",
     changefreq: config.sitemap.changefreq as any,
@@ -26,7 +19,6 @@ export async function generateSitemap(posts: Post[]): Promise<void> {
     lastmod: now,
   });
 
-  // Add static pages
   for (const [route] of Object.entries(config.routes)) {
     if (route === "/blog") continue;
     sitemap.write({
@@ -37,7 +29,6 @@ export async function generateSitemap(posts: Post[]): Promise<void> {
     });
   }
 
-  // Add blog index
   sitemap.write({
     url: "/blog",
     changefreq: config.sitemap.changefreq as any,
@@ -45,7 +36,6 @@ export async function generateSitemap(posts: Post[]): Promise<void> {
     lastmod: now,
   });
 
-  // Add blog posts
   for (const post of posts) {
     const postDate = post.date ? new Date(post.date) : now;
     sitemap.write({
@@ -56,12 +46,9 @@ export async function generateSitemap(posts: Post[]): Promise<void> {
     });
   }
 
-  // End the stream
   sitemap.end();
 
-  // Convert stream to promise and get XML
   const sitemapXml = await streamToPromise(sitemap);
-
   const sitemapPath = join(config.dirs.dist, "sitemap.xml");
   await writeFile(sitemapPath, sitemapXml.toString(), "utf-8");
   console.log(`✓ Generated sitemap -> ${sitemapPath}`);

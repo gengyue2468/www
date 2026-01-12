@@ -4,20 +4,18 @@ import matter from "gray-matter";
 import { readFile } from "fs/promises";
 import type { Note, RenderedContent, FrontMatter } from "../types.js";
 import config from "../config.js";
+import { getMarkdownProcessors, getNoteProcessors } from "../extensions/plugin.js";
 
-// Initialize markdown-it
 const md = new MarkdownIt({
   html: true,
-  breaks: config.markdown.breaks,
+  breaks: true,
   linkify: true,
 });
 
-// Add fold container plugin
+// Register fold container plugin
 md.use(container, "fold", {
-  validate: function (params: string) {
-    return params.trim().match(/^fold\s+(.*)$/);
-  },
-  render: function (tokens: any[], idx: number) {
+  validate: (params: string) => params.trim().match(/^fold\s+(.*)$/),
+  render: (tokens: any[], idx: number) => {
     const m = tokens[idx].info.trim().match(/^fold\s+(.*)$/);
     if (tokens[idx].nesting === 1) {
       const title = m ? md.utils.escapeHtml(m[1]) : "";
@@ -28,187 +26,184 @@ md.use(container, "fold", {
   },
 });
 
-/**
- * Extract note content with balanced brackets, supporting multiline
- */
+// Register fullwidth container plugin
+md.use(container, "fullwidth", {
+  validate: (params: string) => params.trim().match(/^fullwidth$/i),
+  render: (tokens: any[], idx: number) => {
+    if (tokens[idx].nesting === 1) {
+      return `<div class="fullwidth-content">\n`;
+    } else {
+      return "</div>\n";
+    }
+  },
+});
+
+// Extract note content - finds the last closing bracket on the same line
 function extractNoteContent(
   text: string,
   startIndex: number,
   prefix: string
 ): { content: string; endIndex: number } | null {
-  let i = startIndex + prefix.length;
-  let bracketCount = 1;
-  const start = i;
+  const contentStart = startIndex + prefix.length;
+  // Find line end
+  const lineEnd = text.indexOf("\n", contentStart);
+  const searchEnd = lineEnd === -1 ? text.length : lineEnd;
 
-  while (i < text.length && bracketCount > 0) {
-    if (text[i] === "[") bracketCount++;
-    else if (text[i] === "]") bracketCount--;
-    i++;
-  }
+  // Find the last closing bracket on the same line (before line end)
+  const closeIndex = text.lastIndexOf("]", searchEnd);
+  if (closeIndex === -1 || closeIndex < contentStart) return null;
 
-  if (bracketCount === 0) {
-    return {
-      content: text.substring(start, i - 1),
-      endIndex: i,
-    };
-  }
-  return null;
+  const content = text.substring(contentStart, closeIndex);
+  return { content, endIndex: closeIndex + 1 };
 }
 
-/**
- * Process custom note syntax - extract notes and render their markdown content
- * Supports [^content] for sidenotes and [note:content] for marginnotes
- */
-export function processNoteSyntax(markdown: string): {
-  processed: string;
-  notes: Note[];
-} {
+// Find the matching closing bracket, skipping over markdown links and images
+function findNoteEnd(text: string, startPos: number): number {
+  let i = startPos;
+  while (i < text.length) {
+    const remaining = text.substring(i);
+    // Skip markdown links [text](url) and images ![alt](url)
+    const linkMatch = remaining.match(/^\[[^\]]*\]\([^)]*\)/);
+    if (linkMatch) {
+      i += linkMatch[0].length;
+      continue;
+    }
+    // Found the closing bracket
+    if (text[i] === ']') {
+      return i;
+    }
+    i++;
+  }
+  return -1;
+}
+
+// Process note syntax
+function processNoteSyntax(markdown: string): { processed: string; notes: Note[] } {
   const notes: Note[] = [];
   let processed = markdown;
   let noteIndex = 0;
 
-  // Extract sidenote: [^内容] - 带编号的侧边栏注释
+  const sidenotePrefix = `<!-- ${config.placeholders.sidenote}_`;
+  const marginnotePrefix = `<!-- ${config.placeholders.marginnote}_`;
+
+  // Process sidenotes [^content] - content can contain links/images
   let sidenoteIndex = 0;
   while (true) {
-    const matchIndex = processed.indexOf("[^", sidenoteIndex);
-    if (matchIndex === -1) break;
+    const startPos = processed.indexOf('[^', sidenoteIndex);
+    if (startPos === -1) break;
 
-    const result = extractNoteContent(processed, matchIndex, "[^");
-    if (result) {
-      const placeholder = `<!-- ${config.placeholders.sidenote}_${noteIndex} -->`;
-      notes.push({
-        type: "sidenote",
-        content: result.content,
-        placeholder: placeholder,
-      });
-      processed =
-        processed.substring(0, matchIndex) +
-        placeholder +
-        processed.substring(result.endIndex);
-      sidenoteIndex = matchIndex + placeholder.length;
-      noteIndex++;
-    } else {
-      sidenoteIndex = matchIndex + 2;
+    const contentStart = startPos + 2; // Skip [^
+    const endPos = findNoteEnd(processed, contentStart);
+
+    if (endPos === -1) {
+      sidenoteIndex = startPos + 2;
+      continue;
     }
+
+    const content = processed.substring(contentStart, endPos);
+    const placeholder = `${sidenotePrefix}${noteIndex} -->`;
+
+    notes.push({
+      type: 'sidenote',
+      content,
+      placeholder,
+    });
+
+    processed = processed.substring(0, startPos) + placeholder + processed.substring(endPos + 1);
+    sidenoteIndex = startPos + placeholder.length;
+    noteIndex++;
   }
 
-  // Extract marginnote: [note:内容] - 不带编号的侧边栏注释
+  // Process marginnotes [note:content]
   let marginnoteIndex = 0;
   while (true) {
-    const matchIndex = processed.indexOf("[note:", marginnoteIndex);
-    if (matchIndex === -1) break;
+    const startPos = processed.indexOf('[note:', marginnoteIndex);
+    if (startPos === -1) break;
 
-    const result = extractNoteContent(processed, matchIndex, "[note:");
-    if (result) {
-      const placeholder = `<!-- ${config.placeholders.marginnote}_${noteIndex} -->`;
-      notes.push({
-        type: "marginnote",
-        content: result.content,
-        placeholder: placeholder,
-      });
-      processed =
-        processed.substring(0, matchIndex) +
-        placeholder +
-        processed.substring(result.endIndex);
-      marginnoteIndex = matchIndex + placeholder.length;
-      noteIndex++;
-    } else {
-      marginnoteIndex = matchIndex + 6;
+    const contentStart = startPos + 6; // Skip [note:
+    const endPos = findNoteEnd(processed, contentStart);
+
+    if (endPos === -1) {
+      marginnoteIndex = startPos + 6;
+      continue;
     }
+
+    const content = processed.substring(contentStart, endPos);
+    const placeholder = `${marginnotePrefix}${noteIndex} -->`;
+
+    notes.push({
+      type: 'marginnote',
+      content,
+      placeholder,
+    });
+
+    processed = processed.substring(0, startPos) + placeholder + processed.substring(endPos + 1);
+    marginnoteIndex = startPos + placeholder.length;
+    noteIndex++;
   }
 
   return { processed, notes };
 }
 
-/**
- * Process custom fold syntax - convert [fold:title]...[/fold] to markdown-it container syntax
- */
-export function processFoldSyntax(markdown: string): string {
-  let processed = markdown;
-  let searchIndex = 0;
-
-  // Find [fold:title]...[/fold] blocks and convert to ::: fold title format
-  while (true) {
-    const openIndex = processed.indexOf("[fold:", searchIndex);
-    if (openIndex === -1) break;
-
-    const titleStart = openIndex + 6;
-    const titleEnd = processed.indexOf("]", titleStart);
-    if (titleEnd === -1) {
-      searchIndex = openIndex + 6;
-      continue;
-    }
-
-    const title = processed.substring(titleStart, titleEnd).trim();
-    const closeIndex = processed.indexOf("[/fold]", titleEnd);
-    if (closeIndex === -1) {
-      searchIndex = openIndex + 6;
-      continue;
-    }
-
-    const content = processed.substring(titleEnd + 1, closeIndex).trim();
-
-    // Replace with markdown-it container syntax
-    const replacement = `::: fold ${title}\n${content}\n:::`;
-    processed =
-      processed.substring(0, openIndex) +
-      replacement +
-      processed.substring(closeIndex + 7);
-
-    searchIndex = openIndex + replacement.length;
-  }
-
-  return processed;
-}
-
-/**
- * Render markdown file to HTML with frontmatter
- */
 export async function renderMarkdown(filePath: string): Promise<RenderedContent> {
   const content = await readFile(filePath, "utf-8");
   const { data: frontmatter, content: markdown } = matter(content);
 
-  // Process custom note syntax - extract notes and get placeholders
-  const { processed: processedMarkdown1, notes } = processNoteSyntax(markdown);
+  // Apply markdown processors from plugin system
+  const processors = getMarkdownProcessors();
+  let processedMarkdown = markdown;
+  for (const processor of processors) {
+    if (processor.process) {
+      processedMarkdown = processor.process(processedMarkdown);
+    }
+  }
 
-  // Process custom fold syntax - convert to markdown-it container format
-  const processedMarkdown = processFoldSyntax(processedMarkdown1);
+  // Process notes
+  const { processed: markdownWithNotes, notes } = processNoteSyntax(processedMarkdown);
 
-  // Render the main markdown using markdown-it
-  let html = md.render(processedMarkdown);
+  // Render markdown
+  let html = md.render(markdownWithNotes);
 
-  // Replace placeholders with rendered note HTML
+  // Apply post-processors
+  for (const processor of processors) {
+    if (processor.postProcess) {
+      html = processor.postProcess(html);
+    }
+  }
+
+  // Image optimization: add lazy loading and async decoding
+  html = html.replace(
+    /<img\s+(?![^>]*\bloading=)([^>]*?)>/gi,
+    '<img loading="lazy" decoding="async" $1>'
+  );
+
+  // Replace note placeholders with rendered HTML (before link optimization)
   for (const note of notes) {
-    // Render the note content as markdown
     let renderedContent = md.render(note.content);
+    renderedContent = renderedContent.trim().replace(/^<p>(.*)<\/p>$/s, "$1").trim();
 
-    // Clean up: remove wrapping <p> tags if content is just an image or single element
-    renderedContent = renderedContent.trim();
-    // Remove <p> tags that wrap the entire content
-    renderedContent = renderedContent.replace(/^<p>(.*)<\/p>$/s, "$1");
-    // Remove leading/trailing whitespace
-    renderedContent = renderedContent.trim();
-
-    // Generate unique ID
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 11);
-    const id =
+    const id = `sn-${notes.indexOf(note)}-${timestamp}-${random}`;
+
+    const noteHtml =
       note.type === "sidenote"
-        ? `sn-${notes.indexOf(note)}-${timestamp}-${random}`
-        : `mn-${notes.indexOf(note)}-${timestamp}-${random}`;
+        ? `<label for="${id}" class="margin-toggle sidenote-number"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote">${renderedContent}</span>`
+        : `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
 
-    // Create note HTML
-    let noteHtml = "";
-    if (note.type === "sidenote") {
-      noteHtml = `<label for="${id}" class="margin-toggle sidenote-number"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote">${renderedContent}</span>`;
-    } else {
-      noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
-    }
-
-    // Replace placeholder
     html = html.replace(note.placeholder, noteHtml);
   }
+
+  // Link optimization: add rel and target for external links
+  html = html.replace(
+    /<a\s+(?![^>]*\brel=)(?![^>]*\btarget=)href="(https?:\/\/[^"]+)">/gi,
+    '<a rel="noopener noreferrer" target="_blank" href="$1">'
+  );
 
   return { frontmatter: frontmatter as FrontMatter, html };
 }
 
+// Get the markdown-it instance for plugins that need it
+export function getMarkdownIt(): MarkdownIt {
+  return md;
+}

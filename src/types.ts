@@ -13,11 +13,6 @@ export interface DirsConfig {
   layouts: string;
 }
 
-export interface MarkdownConfig {
-  breaks: boolean;
-  gfm: boolean;
-}
-
 export interface DateConfig {
   locale: string;
   options: Intl.DateTimeFormatOptions;
@@ -36,8 +31,16 @@ export interface PlaceholdersConfig {
   fold: string;
 }
 
-export interface RSSItemsConfig {
-  limit: number;
+export interface Config {
+  site: SiteConfig;
+  dirs: DirsConfig;
+  routes: Record<string, string>;
+  date: DateConfig;
+  styles: StylesConfig;
+  placeholders: PlaceholdersConfig;
+  rss: RSSConfig;
+  sitemap: SitemapConfig;
+  robots: RobotsConfig;
 }
 
 export interface RSSConfig {
@@ -46,20 +49,13 @@ export interface RSSConfig {
   description: string;
   language: string;
   copyright: string;
-  items: RSSItemsConfig;
-}
-
-export interface SitemapPriorityConfig {
-  home: number;
-  pages: number;
-  blog: number;
-  posts: number;
+  items: { limit: number };
 }
 
 export interface SitemapConfig {
   enabled: boolean;
   changefreq: string;
-  priority: SitemapPriorityConfig;
+  priority: Record<string, number>;
 }
 
 export interface RobotsConfig {
@@ -67,19 +63,6 @@ export interface RobotsConfig {
   userAgent: string;
   allow: string[];
   disallow: string[];
-}
-
-export interface Config {
-  site: SiteConfig;
-  dirs: DirsConfig;
-  routes: Record<string, string>;
-  markdown: MarkdownConfig;
-  date: DateConfig;
-  styles: StylesConfig;
-  placeholders: PlaceholdersConfig;
-  rss: RSSConfig;
-  sitemap: SitemapConfig;
-  robots: RobotsConfig;
 }
 
 export interface FrontMatter {

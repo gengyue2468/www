@@ -23,11 +23,6 @@ const config: Config = {
     "/blog": "blog.md",
   },
 
-  markdown: {
-    breaks: true,
-    gfm: true,
-  },
-
   date: {
     locale: "zh-CN",
     options: {
@@ -39,8 +34,7 @@ const config: Config = {
 
   styles: {
     date: "font-style: italic; color: #666; margin-top: -1rem; margin-bottom: 2rem;",
-    dateInline:
-      "font-style: italic; color: #666; font-size: 0.9em; white-space: nowrap;",
+    dateInline: "font-style: italic; color: #666; font-size: 0.9em; white-space: nowrap;",
     nav: "margin-top: 3rem; font-size: 1.4rem;",
     navLink: "white-space: nowrap;",
   },
@@ -57,20 +51,13 @@ const config: Config = {
     description: "The personal blog of gengyue.",
     language: "zh-CN",
     copyright: "Copyright © 2026 gengyue",
-    items: {
-      limit: 200,
-    },
+    items: { limit: 200 },
   },
 
   sitemap: {
     enabled: true,
     changefreq: "weekly",
-    priority: {
-      home: 1.0,
-      pages: 0.8,
-      blog: 0.9,
-      posts: 0.7,
-    },
+    priority: { home: 1.0, pages: 0.8, blog: 0.9, posts: 0.7 },
   },
 
   robots: {

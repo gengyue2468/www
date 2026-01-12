@@ -543,3 +543,25 @@ details > *:not(summary) {
     color: var(--text-color-dark);
   }
 }
+
+/* Fullwidth content container - breaks out of sidenote width constraints */
+.fullwidth-content {
+  width: 100%;
+  max-width: var(--width-fullwidth);
+  margin: 1.4rem 0;
+  clear: both;
+}
+
+.fullwidth-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+}
+
+.fullwidth-content p,
+.fullwidth-content pre,
+.fullwidth-content figure {
+  max-width: 100%;
+  width: 100%;
+}

@@ -1,6 +1,3 @@
-/**
- * Render a template by replacing {{variable}} placeholders with values
- */
 export function renderTemplate(
   template: string,
   data: Record<string, string>

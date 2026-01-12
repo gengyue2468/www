@@ -5,36 +5,29 @@ import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
 import config from "../config.js";
 
-/**
- * Build a single page from a markdown file
- */
 export async function buildPage(
   route: string,
   filePath: string,
   baseLayout: string,
-  contentLayout: string
+  contentLayout: string,
+  year?: number
 ): Promise<void> {
   const { frontmatter, html } = await renderMarkdown(filePath);
   const title = frontmatter.title || "Untitled";
 
-  // First render the content layout
-  const contentData = {
-    title,
-    content: html,
-  };
+  const contentData = { title, content: html };
   const renderedContent = renderTemplate(contentLayout, contentData);
 
-  // Then render the base layout with the content
   const baseData = {
     title,
     siteTitle: config.site.title,
     description: config.site.description,
     author: config.site.author,
+    year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
   };
   const output = renderTemplate(baseLayout, baseData);
 
-  // Determine output path
   let outputPath: string;
   if (route === "/") {
     outputPath = join(config.dirs.dist, "index.html");
