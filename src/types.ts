@@ -47,7 +47,7 @@ export interface Config {
   rss: RSSConfig;
   sitemap: SitemapConfig;
   robots: RobotsConfig;
-  cdn?: string;
+  cdn: string;
   nav: NavItem[];
 }
 
