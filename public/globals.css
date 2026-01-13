@@ -104,13 +104,12 @@ nav a:hover {
   }
 }
 
-/* Font display optimization - local fonts with 1 year cache (woff2 format) */
 @font-face {
   font-family: "et-book";
   src: url("/fonts/et-book-roman-line-figures.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
 }
 
 @font-face {
@@ -118,7 +117,7 @@ nav a:hover {
   src: url("/fonts/et-book-display-italic-old-style-figures.woff2") format("woff2");
   font-weight: normal;
   font-style: italic;
-  font-display: optional;
+  font-display: swap;
 }
 
 @font-face {
@@ -126,7 +125,7 @@ nav a:hover {
   src: url("/fonts/et-book-bold-line-figures.woff2") format("woff2");
   font-weight: bold;
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
 }
 
 /* Main landmark styling */
