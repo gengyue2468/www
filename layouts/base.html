@@ -11,12 +11,7 @@
     {{css}}
   </head>
   <body>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/about">About</a>
-      <a href="/now">Now</a>
-      <a href="/blog">Blog</a>
-    </nav>
+    <nav>{{nav}}</nav>
 
     <main>
       <article>
@@ -25,7 +20,10 @@
     </main>
 
     <footer>
-      <p>&copy; {{year}} {{author}}. <a href="/rss.xml">RSS</a> | <a href="/sitemap.xml">Sitemap</a></p>
+      <p>
+        &copy; {{year}} {{author}}. <a href="/rss.xml">RSS</a> |
+        <a href="/sitemap.xml">Sitemap</a>
+      </p>
     </footer>
   </body>
 </html>

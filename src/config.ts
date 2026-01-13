@@ -66,6 +66,16 @@ const config: Config = {
     allow: ["/"],
     disallow: [],
   },
+
+  cdn: "https://cdn.gengyue.site",
+
+  nav: [
+    { name: "Home", path: "/", show: true },
+    { name: "About", path: "/about", show: true },
+    { name: "Now", path: "/now", show: true },
+    { name: "Blog", path: "/blog", show: true },
+  ],
+
 };
 
 export default config;

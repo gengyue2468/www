@@ -10,3 +10,10 @@ export function renderTemplate(
   return result;
 }
 
+export function renderNav(navItems: { name: string; path: string; show: boolean }[]): string {
+  return navItems
+    .filter((item) => item.show)
+    .map((item) => `<a href="${item.path}">${item.name}</a>`)
+    .join("\n      ");
+}
+

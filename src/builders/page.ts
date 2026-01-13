@@ -2,7 +2,7 @@ import { join, dirname } from "path";
 import { writeFile, readFile } from "fs/promises";
 import { ensureDir } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
-import { renderTemplate } from "../utils/template.js";
+import { renderTemplate, renderNav } from "../utils/template.js";
 import { minifyCss } from "../utils/compress.js";
 import config from "../config.js";
 
@@ -53,6 +53,7 @@ export async function buildPage(
     year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
     css: inlinedCss,
+    nav: renderNav(config.nav),
   };
   const output = renderTemplate(baseLayout, baseData);
 

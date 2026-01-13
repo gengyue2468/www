@@ -2,7 +2,7 @@ import { join, dirname, extname, basename } from "path";
 import { readdir, writeFile, stat } from "fs/promises";
 import { ensureDir } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
-import { renderTemplate } from "../utils/template.js";
+import { renderTemplate, renderNav } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
 import { hasFileChanged } from "../utils/cache.js";
 import config from "../config.js";
@@ -103,6 +103,7 @@ export async function buildBlogIndex(
     year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
     css: css || "",
+    nav: renderNav(config.nav),
   };
   const output = renderTemplate(baseLayout, baseData);
 
@@ -203,6 +204,7 @@ export async function buildBlogPosts(
       year: year?.toString() || new Date().getFullYear().toString(),
       content: renderedContent,
       css: css || "",
+      nav: renderNav(config.nav),
     };
     const output = renderTemplate(baseLayout, baseData);
 

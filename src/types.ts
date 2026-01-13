@@ -31,6 +31,12 @@ export interface PlaceholdersConfig {
   fold: string;
 }
 
+export interface NavItem {
+  name: string;
+  path: string;
+  show: boolean;
+}
+
 export interface Config {
   site: SiteConfig;
   dirs: DirsConfig;
@@ -41,6 +47,8 @@ export interface Config {
   rss: RSSConfig;
   sitemap: SitemapConfig;
   robots: RobotsConfig;
+  cdn?: string;
+  nav: NavItem[];
 }
 
 export interface RSSConfig {

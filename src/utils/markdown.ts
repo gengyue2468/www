@@ -200,6 +200,18 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
     '<a rel="noopener noreferrer" target="_blank" href="$1">'
   );
 
+  // CDN optimization: replace local static asset paths with CDN
+  if (config.cdn) {
+    html = html.replace(
+      /(<img\s+[^>]*src=")(\/static\/|\/images\/|\/img\/|\/assets\/)([^"]+)"/gi,
+      (match, prefix, path, filename) => `${prefix}${config.cdn}${path}${filename}"`
+    );
+    html = html.replace(
+      /(<a\s+[^>]*href=")(\/static\/|\/images\/|\/img\/|\/assets\/)([^"]+)"/gi,
+      (match, prefix, path, filename) => `${prefix}${config.cdn}${path}${filename}"`
+    );
+  }
+
   return { frontmatter: frontmatter as FrontMatter, html };
 }
 
