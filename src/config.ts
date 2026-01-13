@@ -5,7 +5,7 @@ const config: Config = {
     title: "gengyue",
     author: "gengyue",
     description: "The personal website of gengyue.",
-    url: "http://106.53.99.53/",
+    url: "https://www.gengyue.site",
   },
 
   dirs: {
