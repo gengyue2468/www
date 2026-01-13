@@ -42,7 +42,8 @@ export async function buildBlogIndex(
   cacheManager?: BuildCacheManager,
   force?: boolean,
   year?: number,
-  css?: string
+  css?: string,
+  postsChanged?: boolean
 ): Promise<{ posts: Post[]; indexChanged: boolean; postsChanged: boolean }> {
   const blogDir = config.dirs.blog;
   const posts: Post[] = [];
@@ -62,6 +63,15 @@ export async function buildBlogIndex(
         const filePath = join(blogDir, file);
         const { frontmatter } = await renderMarkdown(filePath);
         const slug = basename(file, ".md");
+
+        // Check if this post has changed
+        const postChanged = cacheManager
+          ? await hasFileChanged(filePath, cacheManager.getBlogPostMtime(slug))
+          : true;
+        if (postChanged) {
+          postsChanged = true;
+        }
+
         posts.push({
           slug,
           title: frontmatter.title || slug,
@@ -111,9 +121,9 @@ export async function buildBlogIndex(
   await ensureDir(dirname(outputPath));
 
   // Check if we should rebuild
-  const shouldRebuild = force === true;
+  const shouldRebuild = force === true || postsChanged === true;
   let indexChanged = shouldRebuild;
-  let postsChanged = shouldRebuild;
+  postsChanged = shouldRebuild; // Track if any posts changed for return value
 
   if (!shouldRebuild && cacheManager) {
     const outputStat = await stat(outputPath).catch(() => null);

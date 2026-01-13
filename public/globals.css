@@ -110,7 +110,7 @@ nav a:hover {
   src: url("/fonts/et-book-roman-line-figures.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 @font-face {
@@ -118,7 +118,7 @@ nav a:hover {
   src: url("/fonts/et-book-display-italic-old-style-figures.woff2") format("woff2");
   font-weight: normal;
   font-style: italic;
-  font-display: swap;
+  font-display: optional;
 }
 
 @font-face {
@@ -126,7 +126,7 @@ nav a:hover {
   src: url("/fonts/et-book-bold-line-figures.woff2") format("woff2");
   font-weight: bold;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 /* Main landmark styling */
