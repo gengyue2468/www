@@ -20,10 +20,6 @@ export async function getInlinedCss(): Promise<string> {
     let tufteCss = await readFile(tuftePath, "utf-8");
     let globalsCss = await readFile(globalsPath, "utf-8");
 
-    // Replace local font URLs with CDN URLs for better caching
-    const cdnUrl = config.cdn;
-    // Handle both quoted and unquoted URLs, replace with quoted CDN URL
-    globalsCss = globalsCss.replace(/url\("?\/fonts\//g, `url("${cdnUrl}/fonts/`);
 
     // Merge and minify CSS
     const combined = `/* tufte.css */\n${tufteCss}\n\n/* globals.css */\n${globalsCss}`;

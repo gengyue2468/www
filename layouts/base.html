@@ -7,6 +7,10 @@
     <meta name="description" content="{{description}}" />
     <title>{{title}} - {{siteTitle}}</title>
     <link rel="icon" href="/favicon.ico" />
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="/fonts/et-book-roman-line-figures.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/et-book-display-italic-old-style-figures.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/et-book-bold-line-figures.woff2" as="font" type="font/woff2" crossorigin />
     <!-- Critical CSS inlined for performance -->
     {{css}}
   </head>
