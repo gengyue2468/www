@@ -271,6 +271,11 @@ pre>code {
     font-size: 1.2rem;
   }
 
+  /* Fullwidth content truly full-width on mobile */
+  .fullwidth-content {
+    max-width: 100% !important;
+  }
+
   .mermaid {
     width: 100%;
     max-width: 100%;
