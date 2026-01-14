@@ -154,7 +154,8 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
   let processedMarkdown = markdown;
   for (const processor of processors) {
     if (processor.process) {
-      processedMarkdown = processor.process(processedMarkdown);
+      const result = processor.process(processedMarkdown);
+      processedMarkdown = result instanceof Promise ? await result : result;
     }
   }
 
@@ -167,7 +168,8 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
   // Apply post-processors
   for (const processor of processors) {
     if (processor.postProcess) {
-      html = processor.postProcess(html);
+      const result = processor.postProcess(html);
+      html = result instanceof Promise ? await result : result;
     }
   }
 

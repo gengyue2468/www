@@ -61,7 +61,7 @@
   --width-code: 52.5%;
   --width-code-margin: 2.5%;
   --width-fullwidth: 90%;
-  --width-fullwidth-mobile: 97%;
+  --width-fullwidth-mobile: 100%;
   --width-list-mobile: 90%;
   --width-figure-mobile: 90%;
   --width-table-mobile: 85%;
@@ -160,6 +160,90 @@ pre>code {
   margin-left: 0 !important;
 }
 
+/* Mermaid diagram styling - border on parent container, scroll inside */
+.mermaid {
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  margin: 1.4rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--bg-color);
+  padding: 1.5rem;
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.mermaid svg {
+  font-family: var(--font-mono) !important;
+  color: var(--text-color);
+  display: block;
+  min-width: fit-content;
+  height: auto;
+  font-size: 16px !important;
+}
+
+/* Ensure text elements use monospace font and larger size */
+.mermaid .nodeLabel,
+.mermaid .edgeLabel,
+.mermaid text,
+.mermaid tspan {
+  font-family: var(--font-mono) !important;
+  font-size: 16px !important;
+}
+
+/* Node styling - ensure text is fully visible with proper padding */
+.mermaid .label-container,
+.mermaid rect.label-container {
+  overflow: visible !important;
+}
+
+.mermaid foreignObject {
+  overflow: visible !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.mermaid foreignObject > div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ensure text elements have proper spacing */
+.mermaid .nodeLabel,
+.mermaid .edgeLabel {
+  padding: 4px 6px;
+  text-align: center !important;
+}
+
+/* Ensure SVG text elements are not clipped */
+.mermaid text {
+  overflow: visible !important;
+}
+
+/* Dark mode support for mermaid */
+@media (prefers-color-scheme: dark) {
+  .mermaid {
+    background: var(--bg-color-dark);
+  }
+
+  .mermaid svg {
+    color: var(--text-color-dark);
+  }
+
+  /* Override text colors for dark mode */
+  .mermaid svg text,
+  .mermaid svg tspan,
+  .mermaid svg .nodeLabel,
+  .mermaid svg .edgeLabel {
+    fill: var(--text-color-dark) !important;
+    color: var(--text-color-dark) !important;
+  }
+}
+
 /* Mobile responsive */
 @media (max-width: 760px) {
   pre {
@@ -185,5 +269,10 @@ pre>code {
 
   nav a {
     font-size: 1.2rem;
+  }
+
+  .mermaid {
+    width: 100%;
+    max-width: 100%;
   }
 }

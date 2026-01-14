@@ -8,7 +8,12 @@ import { generateSitemap } from "./generators/sitemap.js";
 import { generateRobotsTxt } from "./generators/robots.js";
 import { createCacheManager, hasFileChanged } from "./utils/cache.js";
 import { compressHtmlFiles } from "./utils/compress.js";
+import { registerPlugin } from "./extensions/plugin.js";
+import { mermaidPlugin } from "./extensions/mermaid.js";
 import config from "./config.js";
+
+// Register plugins
+registerPlugin(mermaidPlugin);
 
 // Parse CLI arguments
 const args = process.argv.slice(2);

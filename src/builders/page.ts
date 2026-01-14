@@ -4,6 +4,7 @@ import { ensureDir } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate, renderNav } from "../utils/template.js";
 import { minifyCss } from "../utils/compress.js";
+import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import config from "../config.js";
 
 // Cache for CSS content to avoid reading files multiple times
@@ -41,11 +42,17 @@ export async function buildPage(
   const { frontmatter, html } = await renderMarkdown(filePath);
   const title = frontmatter.title || "Untitled";
 
+  // Check if content contains mermaid diagrams (after rendering)
+  const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
+
   const contentData = { title, content: html };
   const renderedContent = renderTemplate(contentLayout, contentData);
 
   // Get inlined CSS for critical rendering path
   const inlinedCss = await getInlinedCss();
+
+  // Add mermaid script if page has mermaid diagrams
+  const scripts = hasMermaid ? mermaidScript : "";
 
   const baseData = {
     title,
@@ -56,6 +63,7 @@ export async function buildPage(
     content: renderedContent,
     css: inlinedCss,
     nav: renderNav(config.nav),
+    scripts,
   };
   const output = renderTemplate(baseLayout, baseData);
 

@@ -5,6 +5,7 @@ import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate, renderNav } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
 import { hasFileChanged } from "../utils/cache.js";
+import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import config from "../config.js";
 import type { Post } from "../types.js";
 import type { BuildCacheManager } from "../utils/cache.js";
@@ -114,6 +115,7 @@ export async function buildBlogIndex(
     content: renderedContent,
     css: css || "",
     nav: renderNav(config.nav),
+    scripts: "",
   };
   const output = renderTemplate(baseLayout, baseData);
 
@@ -206,6 +208,9 @@ export async function buildBlogPosts(
     const renderedContent = renderTemplate(blogPostLayout, contentData);
 
     const description = frontmatter.summary || config.site.description;
+    const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
+    const scripts = hasMermaid ? mermaidScript : "";
+
     const baseData = {
       title,
       siteTitle: config.site.title,
@@ -215,6 +220,7 @@ export async function buildBlogPosts(
       content: renderedContent,
       css: css || "",
       nav: renderNav(config.nav),
+      scripts,
     };
     const output = renderTemplate(baseLayout, baseData);
 

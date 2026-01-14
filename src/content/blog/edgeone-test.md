@@ -63,6 +63,25 @@ EO-Cache-Status: MISSxxxxxxxxxx $ curl -I https://cdn.gengyue.site/HTTP/1.1 423
 
 哎，怎么还是不行，`curl`一下看看，发现`Server`竟然还是`Cloudflare`，哎，问了 ChatGPT 它告诉我 EdgeOne 的加速服务用的是 Cloudflare 的部分节点？？晕，一看就不靠谱。看来是搞出 CDN Loop 了，害，蒜鸟。
 
+用 ChatGPT 画了个图，大概就是下面这样：
+:::fullwidth
+```mermaid
+flowchart LR
+    Browser[浏览器]
+    CF_DNS[Cloudflare DNS]
+    EdgeOne[Tencent EdgeOne]
+    CF_Proxy[Cloudflare Proxy<br/>（橙云）]
+
+    Browser --> CF_DNS
+    CF_DNS --> EdgeOne
+    EdgeOne --> CF_Proxy
+    CF_Proxy --> EdgeOne
+
+    EdgeOne -.->|cdn-loop: loops=16| EdgeOne
+```
+:::
+
+
 等下，我们为啥要直接回源源站呢？[Vercel](https://vercel.com)似乎提供了一个免费的`*.vercel.app`域名，我们直接回源这个不就行了。反正我们的 EdgeOne 也是在非中国大陆地区运行的，这似乎很适合。[note:vercel.app 在中国大陆的可用性为 0]
 
 于是妙妙将源站回源地址改成 `*.vercel.app` 然后等等部署再`curl`测试一番，欸，怎么还是不行，后来改了一下回源 hosts，神奇的好了。[note:欸，那之前的配置估计也是回源 hosts 不匹配被 EdgeOne 当成 Loop 了...，那么...懒，不改了]现在：
@@ -91,6 +110,19 @@ NEL: {"success_fraction":0.1,"report_to":"eo-nel","max_age":604800}
 Report-To: {"endpoints":[{"url":"https://nel.teo-rum.com/eo-cgi/nel"}],"group":"eo-nel","max_age":604800}
 ```
 
-好耶！成功了。
+好耶！成功了。大概的工作原理见下图：
+:::fullwidth
+```mermaid
+flowchart LR
+    Browser[浏览器]
+    CF_DNS[Cloudflare DNS]
+    EdgeOne[Tencent EdgeOne]
+    Vercel[Vercel<br/>*.vercel.app]
+
+    Browser --> CF_DNS
+    CF_DNS --> EdgeOne
+    EdgeOne -->|回源 + Host 修正| Vercel
+```
+:::
 
 剩下的工作就是在 EdgeOne 上配置一些服务逻辑啥的了，比如搞个非`/static/``/fonts`目录就直接`throw new error (403)`之类的东西，外加设置个缓存头之类的什么，总之，现在静态文件加载快多了，还不用浪费轻量云少得可怜的流量！美美的吃😋[note: TTL 缓存对于字体可以搞 365 天，图片之类的 30 天也行，反正不怎么更新...]

@@ -18,11 +18,17 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@mermaid-js/mermaid-cli": "^11.12.0",
+    "@types/jsdom": "^27.0.0",
+    "dompurify": "^3.3.1",
     "feed": "^5.1.0",
+    "flowchart.js": "^1.18.0",
     "generate-robotstxt": "^8.0.3",
     "gray-matter": "^4.0.3",
+    "jsdom": "^27.4.0",
     "markdown-it": "^14.1.0",
     "markdown-it-container": "^3.0.0",
+    "mermaid": "^9.4.3",
     "sitemap": "^9.0.0"
   },
   "devDependencies": {

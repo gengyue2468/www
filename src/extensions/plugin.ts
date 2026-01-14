@@ -3,9 +3,9 @@ import type { RenderedContent, FrontMatter } from "../types.js";
 export interface MarkdownProcessor {
   name: string;
   // Run before markdown-it rendering, transforms markdown syntax to HTML-compatible
-  process?: (markdown: string) => string;
+  process?: (markdown: string) => string | Promise<string>;
   // Run after markdown-it rendering, can transform HTML
-  postProcess?: (html: string) => string;
+  postProcess?: (html: string) => string | Promise<string>;
 }
 
 export interface NoteProcessor {
