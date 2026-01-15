@@ -12,6 +12,7 @@ title: About
 
 - [HUST 吃饭](https://chifan.huster.fun/) RESTful 风格的 node.js API，能够 GET 华科食堂的开饭时间！
 - DoraBot 一个傻乎乎的 QQ 机器人，只不过被我私有化了😋。
+- [ToRead List](https://toread.gengyue.site/) 和 QQ 机器人集成的私人 ToRead List。
 - ...
 
 你可能会在我的 [GitHub](https://github.com/gengyue2468) 上找到更多，不过也说不准...
