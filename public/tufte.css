@@ -565,3 +565,74 @@ details > *:not(summary) {
   max-width: 100%;
   width: 100%;
 }
+
+/* Table styling - Tufte CSS style */
+table {
+  border-collapse: collapse;
+  font-family: var(--font-serif);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  width: 100%;
+  margin: 1.4rem 0;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+}
+
+table caption {
+  caption-side: top;
+  font-family: var(--font-serif);
+  font-size: var(--font-size-sidenote);
+  text-align: left;
+  margin: 0 1rem 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--accent);
+  color: var(--text-color);
+}
+
+table th {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  vertical-align: bottom;
+}
+
+table td {
+  padding: 0.75rem 1rem;
+  vertical-align: top;
+  border-bottom: 1px solid var(--accent);
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table tbody tr:hover {
+  background-color: var(--accent);
+}
+
+/* Numeric columns - right aligned with tabular figures */
+table td.numeral,
+table th.numeral {
+  font-family: var(--font-serif);
+  text-align: right;
+}
+
+/* Dark mode support for tables */
+@media (prefers-color-scheme: dark) {
+  table caption {
+    color: var(--text-color-dark);
+  }
+
+  table thead {
+    border-bottom-color: var(--text-color-dark);
+  }
+
+  table td {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  table tbody tr:hover {
+    background-color: var(--accent);
+  }
+}
