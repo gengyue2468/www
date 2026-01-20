@@ -1,3 +1,40 @@
-# Cache fonts for 1 year
+# Cache static assets for 1 year
+# Fonts
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
+
+# JavaScript - cache for 1 year (versioned files)
+*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+# CSS - cache for 1 year (versioned files)
+*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images - cache for 1 year
+*.png
+  Cache-Control: public, max-age=31536000, immutable
+*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+*.gif
+  Cache-Control: public, max-age=31536000, immutable
+*.svg
+  Cache-Control: public, max-age=31536000, immutable
+*.ico
+  Cache-Control: public, max-age=31536000, immutable
+*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML - short cache for content updates
+/*.html
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# XML feeds
+/sitemap.xml
+  Cache-Control: public, max-age=3600, must-revalidate
+/robots.txt
+  Cache-Control: public, max-age=3600, must-revalidate
+/rss.xml
+  Cache-Control: public, max-age=3600, must-revalidate

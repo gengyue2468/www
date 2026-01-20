@@ -7,7 +7,9 @@
       "Bash(curl -sL \"https://cdn.jsdelivr.net/gh/edwardtufte/et-book@gh-pages/et-book/et-book-bold-line-figures/et-book-bold-line-figures.woff\" -o public/fonts/et-book-bold-line-figures.woff)",
       "Bash(npm install:*)",
       "Bash(npm uninstall:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(powershell.exe -Command:*)",
+      "Bash(dir:*)"
     ]
   }
 }
