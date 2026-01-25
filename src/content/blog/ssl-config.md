@@ -28,7 +28,7 @@ flowchart LR
 
 一个比较简单粗暴的解决方案是直接把 Rules 换成“灵活”，哎，这样就解决了。不过我们如果还是想让 CF 和源站之间加密连接呢，自然还是有办法的。一般来说可以考虑：
 
-- 用 [Let's Encrypt]([Let's Encrypt](https://letsencrypt.org/zh-cn/)) 颁发的证书来签名，这样似乎还很不错，嘻嘻，不过我嫌麻烦。
+- 用 [Let's Encrypt](https://letsencrypt.org/zh-cn/) 颁发的证书来签名，这样似乎还很不错，嘻嘻，不过我嫌麻烦。
 - 用 Cloudflare 提供的十五年期限的、只有 CF 和源站服务器之间信任的边缘证书，这个问题似乎就迎刃而解了。
 
 哎，直接去`SSL/TLS → Origin Server → Create Certificate`这个位置，搞到一个证书，为

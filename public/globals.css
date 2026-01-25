@@ -8,7 +8,7 @@
   --accent: rgba(0, 0, 0, 0.05);
 
   --font-base-size: 15px;
-  --font-serif: et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, ui-serif, serif;
+  --font-serif: et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
   --font-sans: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
   --font-sans-alt: "Trebuchet MS", "Gill Sans", "Gill Sans MT", sans-serif;
   --font-mono: Consolas, "Liberation Mono", Menlo, Courier, monospace;
