@@ -7,8 +7,10 @@
   --danger-color: red;
   --accent: rgba(0, 0, 0, 0.05);
 
-  --font-base-size: 15px;
-  --font-serif: et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+  --font-base-size: 14px;
+  --font-serif:
+    et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua",
+    Georgia, serif;
   --font-sans: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
   --font-sans-alt: "Trebuchet MS", "Gill Sans", "Gill Sans MT", sans-serif;
   --font-mono: Consolas, "Liberation Mono", Menlo, Courier, monospace;
@@ -23,14 +25,14 @@
   --font-size-code: 1.4rem;
   --font-size-code-sans: 1.2rem;
   --font-size-code-small: 1.2rem;
-  --font-size-code-heading: 0.80em;
+  --font-size-code-heading: 0.8em;
   --font-size-newthought: 1.2em;
 
-  --line-height-base: 1;
-  --line-height-body: 2rem;
-  --line-height-sidenote: 1.3;
-  --line-height-code: 1.42;
-  --line-height-caption: 1.6;
+  --line-height-base: 1.6;
+  --line-height-body: 2.2rem;
+  --line-height-sidenote: 1.6;
+  --line-height-code: 1.45;
+  --line-height-caption: 1.65;
 
   --spacing-h1-top: 4rem;
   --spacing-h1-bottom: 1.5rem;
@@ -114,7 +116,8 @@ nav a:hover {
 
 @font-face {
   font-family: "et-book";
-  src: url("/fonts/et-book-display-italic-old-style-figures.woff2") format("woff2");
+  src: url("/fonts/et-book-display-italic-old-style-figures.woff2")
+    format("woff2");
   font-weight: normal;
   font-style: italic;
   font-display: swap;
@@ -136,13 +139,24 @@ main {
 /* Blog post date styling */
 .post-date {
   font-style: italic;
-  color: #666;
+  color: #444;
   margin-top: -1rem;
   margin-bottom: 2rem;
 }
 
 .post-date.hidden {
   display: none;
+}
+
+/* Dark mode support for post-date */
+@media (prefers-color-scheme: dark) {
+  .post-date {
+    color: #bbb;
+  }
+
+  .posts-list .post-item span {
+    color: #bbb !important;
+  }
 }
 
 /* Code block styling */
@@ -155,7 +169,7 @@ pre {
   overflow-wrap: break-word;
 }
 
-pre>code {
+pre > code {
   width: 100% !important;
   margin-left: 0 !important;
 }
@@ -246,6 +260,10 @@ pre>code {
 
 /* Mobile responsive */
 @media (max-width: 760px) {
+  html {
+    font-size: 13px;
+  }
+
   pre {
     width: 100%;
     max-width: 100%;
@@ -257,7 +275,7 @@ pre>code {
     box-sizing: border-box;
   }
 
-  pre>code {
+  pre > code {
     width: 100% !important;
     margin-left: 0 !important;
     padding: 0;
@@ -267,6 +285,7 @@ pre>code {
     width: 100% !important;
   }
 
+  /* Keep nav unchanged */
   nav a {
     font-size: 1.2rem;
   }

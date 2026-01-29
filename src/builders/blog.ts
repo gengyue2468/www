@@ -4,11 +4,9 @@ import { ensureDir } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate, renderNav } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
-import { hasFileChanged } from "../utils/cache.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import config from "../config.js";
 import type { Post } from "../types.js";
-import type { BuildCacheManager } from "../utils/cache.js";
 
 function generateTagsHTML(allTags: string[]): string {
   const tagCounts: Record<string, number> = {};
@@ -37,41 +35,68 @@ function generatePostTagsHTML(tags: string[] | undefined): string {
   return tagsHtml;
 }
 
+function generatePostsListHTML(posts: Post[]): string {
+  // Group posts by year
+  const postsByYear: Record<string, Post[]> = {};
+  for (const post of posts) {
+    if (post.date) {
+      const year = new Date(post.date).getFullYear().toString();
+      if (!postsByYear[year]) {
+        postsByYear[year] = [];
+      }
+      postsByYear[year].push(post);
+    } else {
+      if (!postsByYear[""]) {
+        postsByYear[""] = [];
+      }
+      postsByYear[""].push(post);
+    }
+  }
+
+  // Get sorted years (descending)
+  const years = Object.keys(postsByYear).sort((a, b) => {
+    if (a === "") return 1;
+    if (b === "") return -1;
+    return parseInt(b) - parseInt(a);
+  });
+
+  let postsHtml = '';
+  for (const year of years) {
+    const yearPosts = postsByYear[year];
+    if (year) {
+      postsHtml += `<h3>${year}</h3>`;
+    }
+    postsHtml += '<ul class="posts-list">';
+    for (const post of yearPosts) {
+      postsHtml += `<li class="post-item">`;
+      postsHtml += `<a href="/blog/${post.slug}">${post.title}</a>`;
+      if (post.date) {
+        const formattedDate = formatDate(post.date);
+        postsHtml += ` <span style="${config.styles.dateInline}">${formattedDate}</span>`;
+      }
+      postsHtml += "</li>";
+    }
+    postsHtml += "</ul>";
+  }
+  return postsHtml;
+}
+
 export async function buildBlogIndex(
   baseLayout: string,
   blogIndexLayout: string,
-  cacheManager?: BuildCacheManager,
-  force?: boolean,
   year?: number,
-  css?: string,
-  postsChanged?: boolean
-): Promise<{ posts: Post[]; indexChanged: boolean; postsChanged: boolean }> {
+  css?: string
+): Promise<Post[]> {
   const blogDir = config.dirs.blog;
   const posts: Post[] = [];
 
-  // Check if blog directory exists
-  let blogDirExists = true;
   try {
-    await stat(blogDir);
-  } catch {
-    blogDirExists = false;
-  }
-
-  if (blogDirExists) {
     const files = await readdir(blogDir);
     for (const file of files) {
       if (extname(file) === ".md") {
         const filePath = join(blogDir, file);
         const { frontmatter } = await renderMarkdown(filePath);
         const slug = basename(file, ".md");
-
-        // Check if this post has changed
-        const postChanged = cacheManager
-          ? await hasFileChanged(filePath, cacheManager.getBlogPostMtime(slug))
-          : true;
-        if (postChanged) {
-          postsChanged = true;
-        }
 
         posts.push({
           slug,
@@ -83,13 +108,15 @@ export async function buildBlogIndex(
         });
       }
     }
-
-    posts.sort((a, b) => {
-      if (!a.date) return 1;
-      if (!b.date) return -1;
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
+  } catch {
+    // Blog directory doesn't exist
   }
+
+  posts.sort((a, b) => {
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
 
   const allTags: string[] = [];
   posts.forEach((post) => {
@@ -121,48 +148,16 @@ export async function buildBlogIndex(
 
   const outputPath = join(config.dirs.dist, "blog", "index.html");
   await ensureDir(dirname(outputPath));
+  await writeFile(outputPath, output, "utf-8");
+  console.log(`✓ Built /blog -> ${outputPath}`);
 
-  // Check if we should rebuild
-  const shouldRebuild = force === true || postsChanged === true;
-  let indexChanged = shouldRebuild;
-  postsChanged = shouldRebuild; // Track if any posts changed for return value
-
-  if (!shouldRebuild && cacheManager) {
-    const outputStat = await stat(outputPath).catch(() => null);
-    indexChanged = !outputStat;
-  }
-
-  if (indexChanged || shouldRebuild) {
-    await writeFile(outputPath, output, "utf-8");
-    console.log(`✓ Built /blog -> ${outputPath}`);
-  } else {
-    console.log(`⏭ Skipped /blog (unchanged)`);
-  }
-
-  return { posts, indexChanged, postsChanged };
-}
-
-function generatePostsListHTML(posts: Post[]): string {
-  let postsHtml = '<ul class="posts-list">';
-  for (const post of posts) {
-    postsHtml += `<li class="post-item">`;
-    postsHtml += `<a href="/blog/${post.slug}">${post.title}</a>`;
-    if (post.date) {
-      const formattedDate = formatDate(post.date);
-      postsHtml += ` <span style="${config.styles.dateInline}">${formattedDate}</span>`;
-    }
-    postsHtml += "</li>";
-  }
-  postsHtml += "</ul>";
-  return postsHtml;
+  return posts;
 }
 
 export async function buildBlogPosts(
   posts: Post[],
   baseLayout: string,
   blogPostLayout: string,
-  cacheManager?: BuildCacheManager,
-  force?: boolean,
   year?: number,
   css?: string
 ): Promise<void> {
@@ -175,7 +170,6 @@ export async function buildBlogPosts(
     const title = frontmatter.title || post.slug;
 
     const formattedDate = formatDate(frontmatter.date);
-    const dateDisplay = formattedDate ? "block" : "none";
 
     let prevPost: Post | null = null;
     let nextPost: Post | null = null;
@@ -196,7 +190,7 @@ export async function buildBlogPosts(
     }
 
     const postTagsHtml = generatePostTagsHTML(frontmatter.tags);
-    const dateClass = dateDisplay === "none" ? " hidden" : "";
+    const dateClass = formattedDate ? "" : " hidden";
     const contentData = {
       title,
       date: formattedDate,
@@ -226,19 +220,7 @@ export async function buildBlogPosts(
 
     const outputPath = join(config.dirs.dist, "blog", post.slug, "index.html");
     await ensureDir(dirname(outputPath));
-
-    // Check if we should rebuild
-    const fileMtime = (await stat(filePath)).mtimeMs;
-    const shouldRebuild = force === true ||
-      (cacheManager && hasFileChanged(filePath, cacheManager.getBlogPostMtime(post.slug)));
-
-    if (shouldRebuild || force) {
-      await writeFile(outputPath, output, "utf-8");
-      console.log(`✓ Built /blog/${post.slug} -> ${outputPath}`);
-      cacheManager?.setBlogPostMtime(post.slug, fileMtime);
-    } else {
-      console.log(`⏭ Skipped /blog/${post.slug} (unchanged)`);
-    }
+    await writeFile(outputPath, output, "utf-8");
+    console.log(`✓ Built /blog/${post.slug}`);
   }
 }
-

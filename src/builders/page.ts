@@ -3,7 +3,6 @@ import { writeFile, readFile } from "fs/promises";
 import { ensureDir } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate, renderNav } from "../utils/template.js";
-import { minifyCss } from "../utils/compress.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import config from "../config.js";
 
@@ -18,13 +17,11 @@ export async function getInlinedCss(): Promise<string> {
   const globalsPath = join(publicDir, "globals.css");
 
   try {
-    let tufteCss = await readFile(tuftePath, "utf-8");
-    let globalsCss = await readFile(globalsPath, "utf-8");
+    const tufteCss = await readFile(tuftePath, "utf-8");
+    const globalsCss = await readFile(globalsPath, "utf-8");
 
-
-    // Merge and minify CSS
     const combined = `/* tufte.css */\n${tufteCss}\n\n/* globals.css */\n${globalsCss}`;
-    cachedCss = `<style>\n${minifyCss(combined)}\n</style>`;
+    cachedCss = `<style>\n${combined}\n</style>`;
     return cachedCss;
   } catch (err) {
     console.warn("Warning: Could not read CSS files for inlining");
@@ -42,16 +39,12 @@ export async function buildPage(
   const { frontmatter, html } = await renderMarkdown(filePath);
   const title = frontmatter.title || "Untitled";
 
-  // Check if content contains mermaid diagrams (after rendering)
   const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
 
   const contentData = { title, content: html };
   const renderedContent = renderTemplate(contentLayout, contentData);
 
-  // Get inlined CSS for critical rendering path
   const inlinedCss = await getInlinedCss();
-
-  // Add mermaid script if page has mermaid diagrams
   const scripts = hasMermaid ? mermaidScript : "";
 
   const baseData = {
@@ -76,5 +69,4 @@ export async function buildPage(
   }
 
   await writeFile(outputPath, output, "utf-8");
-  console.log(`✓ Built ${route} -> ${outputPath}`);
 }

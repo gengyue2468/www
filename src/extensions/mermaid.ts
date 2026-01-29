@@ -47,7 +47,6 @@ export const mermaidPlugin: Plugin = {
  * Mermaid script to be injected for client-side rendering
  */
 export const mermaidScript = `
-<!-- Mermaid.js for client-side diagram rendering -->
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 

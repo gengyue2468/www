@@ -19,6 +19,16 @@ body {
   overflow-x: hidden;
 }
 
+/* Italic elements */
+h2,
+h3,
+blockquote,
+div.epigraph > blockquote,
+div.epigraph > blockquote > p,
+div.epigraph > blockquote > footer > cite {
+  font-style: italic;
+}
+
 ::selection {
   background: var(--accent);
   color: var(--text-color);
@@ -125,7 +135,7 @@ div.epigraph > blockquote {
 
 div.epigraph > blockquote,
 div.epigraph > blockquote > p {
-  font-style: italic;
+  font-style: oblique 6deg;
 }
 
 div.epigraph > blockquote > footer {
@@ -133,7 +143,7 @@ div.epigraph > blockquote > footer {
 }
 
 div.epigraph > blockquote > footer > cite {
-  font-style: italic;
+  font-style: oblique 6deg;
 }
 /* end chapter epigraphs styles */
 
