@@ -1,5 +1,5 @@
-import { join } from "path";
-import { stat } from "fs/promises";
+import { join, dirname } from "path";
+import { stat, readFile, rm, writeFile } from "fs/promises";
 import { ensureDir, loadLayout, copyPublicFiles } from "./utils/fs.js";
 import { buildPage, getInlinedCss } from "./builders/page.js";
 import { buildBlogIndex, buildBlogPosts } from "./builders/blog.js";
@@ -59,6 +59,14 @@ async function build(): Promise<void> {
   try {
     await stat(filePath404);
     await buildPage("/404", filePath404, baseLayout, pageLayout, currentYear);
+    // Copy 404/index.html to 404.html and remove directory
+    const dist404DirPath = join(config.dirs.dist, "404", "index.html");
+    const dist404Path = join(config.dirs.dist, "404.html");
+    try {
+      const content = await readFile(dist404DirPath, "utf-8");
+      await writeFile(dist404Path, content, "utf-8");
+      await rm(join(config.dirs.dist, "404"), { recursive: true, force: true });
+    } catch { /* ignore */ }
     console.log("✓ Built /404");
   } catch (err) {
     const error = err as NodeJS.ErrnoException;
