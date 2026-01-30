@@ -1,11 +1,11 @@
 ---
-title: '试一试 Functional Calling'
+title: '试一试 Intent Parsing'
 date: '2026-01-29'
 tags: ['技术','LLM','AI']
-summary: 把 LLM 当作自然语言与后端 API 之间的中间层，试着用 functional calling 做一次可控的意图解析实验。
+summary: 把 LLM 当作自然语言与后端 API 之间的中间层，做一次可控的 Intent Parsing / 语义路由实验。
 ---
 
-前段时间 jyi 写了一个留学申请的院校库后端 api，闲的没事想要试试 [PPIO](https://ppio.com) 爆的金币的 LLM 模型的 functional calling [note: Functional Calling：函数视为一等公民，通过组合与传参完成调用，强调无副作用与可预测性，而非执行顺序本身。] 怎么样，毕竟之前自己也没试过，也是第一次玩玩这个玩意儿，试试看。
+前段时间 jyi 写了一个留学申请的院校库后端 api，闲的没事想要试试 [PPIO](https://ppio.com) 爆的金币的 LLM 模型的 intent parsing 怎么样，毕竟之前自己也没试过，也是第一次玩玩这个玩意儿，试试看。
 
 首先，~~作为懒惰的人类~~，我们要用 LLM 完成 LLM 应该做的事情，简单用 LLM 规划一下结构：
 
@@ -17,7 +17,7 @@ summary: 把 LLM 当作自然语言与后端 API 之间的中间层，试着用 
   - route.ts
 ```
 
-> 其实要试验一下 functional calling 只需要第一个`/intent` api 路由就足够了[note:因为我们本质上在找一种用户自然语言到 JSON schema 的映射关系，LLM 只是帮助我们处理这一层]，不过我更喜欢让 llm 输出一些废话😋
+> 其实要试验一下 intent parsing 只需要第一个`/intent` api 路由就足够了[note:因为我们本质上在找一种用户自然语言到 JSON schema 的映射关系，LLM 只是帮助我们处理这一层]，不过我更喜欢让 llm 输出一些废话😋
 
 我们的思路是，llm 根据我们喂给它的 system prompt 中的 api route 文档，生成一个结构化的 JSON schema，然后前端通过某些神秘操作解析这个 JSON，根据 `type` 和相关的 `params` 请求对应的 API，拿到数据之后放在前端展示就 ok。
 
