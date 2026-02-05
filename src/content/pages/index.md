@@ -2,7 +2,7 @@
 title: Hi 👋!
 ---
 
-耶！此地属于 gengyue。目前这个页面应该是被扔到[腾讯云](https://cloud.tencent.com/)在[广东](https://zh.wikipedia.org/wiki/%E5%B9%BF%E4%B8%9C%E7%9C%81)[广州](https://zh.wikipedia.org/wiki/%E5%B9%BF%E5%B7%9E%E5%B8%82)的某台轻量云服务器上了。[^ 哎，配置挺低的...]
+耶！此地属于 gengyue。目前这个页面应该是被扔到 [Cloudflare](https://zh.wikipedia.org/wiki/Cloudflare) 的全球网络上了。
 
 不过这里也没有许多东西，比如一些有趣的服务或者小玩具，又比如<s>[JavaScript](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide) 脚本</s>现在有了，[Cloudflare](https://cloudflare.com/)的反爬虫脚本和 Insights 脚本，不过无关紧要了。实话讲，这就是拿 [Node.js](https://nodejs.org/) 构建 [Markdown](https://www.markdown.cn/docs/intro/) 文档生成的一堆 [HTML](https://developer.mozilla.org/zh-CN/docs/Web/HTML) 文档而已。
 
