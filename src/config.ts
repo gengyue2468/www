@@ -35,7 +35,7 @@ const config: Config = {
   styles: {
     date: "font-style: italic; color: #444; margin-top: -1rem; margin-bottom: 2rem;",
     dateInline: "font-style: italic; color: #444; font-size: 0.9em; white-space: nowrap;",
-    nav: "margin-top: 3rem; font-size: 1.4rem;",
+    nav: "margin-top: 3rem; font-size: 1.45rem;",
     navLink: "white-space: nowrap;",
   },
 
