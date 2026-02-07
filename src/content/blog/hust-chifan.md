@@ -5,6 +5,8 @@ date: 2025-12-15
 summary: 吃饭这件事，也可以用代码玩出花样！本文介绍了用 Next.js 重写的 HUST 食堂信息小玩具，通过爬取官网、清洗数据、计算当前开放状态，你就能随时知道哪家食堂开门，还能轻松集成到自己的 bot 中，让吃饭变得科技感满满——从此再也不用盲目问“哪家食堂开门啦？”
 ---
 
+https://github.com/jyi2ya/HUST-Chifan
+
 灵感是上边这个👆，原项目是用 perl 写的，奈何本人并不会写 perl ，并且 perl 对于我而言针对 web 集成而言其实相当不友好，于是决定用 next.js 重写一个版本，嘻嘻，这下配置容易些了。[^原项目：<a href="https://github.com/jyi2ya/HUST-Chifan">HUST-Chifan</a> (Perl 版本)]
 
 ## 核心

@@ -9,7 +9,8 @@
       "Bash(npm uninstall:*)",
       "Bash(npx tsc:*)",
       "Bash(powershell.exe -Command:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(npm run build-only)"
     ]
   }
 }

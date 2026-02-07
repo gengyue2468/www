@@ -32,7 +32,7 @@ neofetch
 
 耍帅时间到！哇，好帅，这一刻，show time has arrived! 原来安装 Linux 是为了装啊，一切，一切，都满足了。
 
-![](/static/tech/neofetch.webp)
+![Neofetch](/static/tech/neofetch.webp)
 
 What are u waiting for? 现在开始，可能只需要一次安装！你将拥有和 Windows 无缝集成德芙般丝滑流畅的开发体验！
 

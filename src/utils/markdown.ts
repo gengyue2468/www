@@ -173,6 +173,31 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
     }
   }
 
+  // Image optimization: wrap images with alt text in figure/figcaption
+  html = html.replace(
+    /<img\s+([^>]*?)alt="([^"]*)"([^>]*?)>/gi,
+    '<figure><img $1alt="$2"$3><figcaption>$2</figcaption></figure>'
+  );
+
+  // Fix invalid HTML: extract <figure> from inside <p> tags
+  // Browsers handle <figure> inside <p> by breaking the <p>, which disrupts sidenote/marginnote positioning
+  html = html.replace(
+    /<p>([\s\S]*?)<\/p>/gi,
+    (match, inner) => {
+      if (!inner.includes('<figure>')) return match;
+      const parts = inner.split(/(<figure>[\s\S]*?<\/figure>)/gi);
+      let result = '';
+      for (const part of parts) {
+        if (part.match(/^<figure>/i)) {
+          result += part;
+        } else if (part.trim()) {
+          result += `<p>${part}</p>`;
+        }
+      }
+      return result || match;
+    }
+  );
+
   // Image optimization: add lazy loading and async decoding
   html = html.replace(
     /<img\s+(?![^>]*\bloading=)([^>]*?)>/gi,
@@ -183,6 +208,9 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
   for (const note of notes) {
     let renderedContent = md.render(note.content);
     renderedContent = renderedContent.trim().replace(/^<p>(.*)<\/p>$/s, "$1").trim();
+
+    // Note: don't wrap note images in <figure> - block elements inside <span> break DOM structure
+    // Note images are already styled by .sidenote img / .marginnote img CSS rules
 
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 11);

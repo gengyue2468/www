@@ -36,6 +36,9 @@ div.epigraph > blockquote > footer > cite {
 
 /* Adds dark mode */
 @media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
   body {
     background-color: var(--bg-color-dark);
     color: var(--text-color-dark);
@@ -261,12 +264,55 @@ img {
   object-fit: contain;
 }
 
-.sidenote img {
+.sidenote img,
+.marginnote img {
   max-width: 100%;
   width: 100%;
   height: auto;
   display: block;
   margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+/* Ensure figures inside sidenotes/marginnotes don't float - override default figure/figcaption styles */
+.sidenote figure,
+.marginnote figure {
+  float: none !important;
+  clear: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-width: 100vw !important;
+  margin: 0 0 0.5rem 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  font-size: 100% !important;
+  -webkit-margin-start: 0 !important;
+  -webkit-margin-end: 0 !important;
+}
+
+.sidenote figure img,
+.marginnote figure img {
+  margin: 0;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+}
+
+.sidenote figcaption,
+.marginnote figcaption {
+  float: none !important;
+  clear: none !important;
+  position: static !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: 1rem !important;
+  font: inherit !important;
+  vertical-align: baseline !important;
+  margin: 0 0 0.5rem 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  line-height: 1.6 !important;
 }
 
 .sidenote-number {

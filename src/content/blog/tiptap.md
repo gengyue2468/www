@@ -8,7 +8,7 @@ summary: 本文分享了 Tiptap——一个基于 ProseMirror 的开源富文本
 ## 简介
 
 最近在写 [BuddyUp](https://buddyup.top/)的前端，其中文书生成之后需要一个编辑器（进行一些修改），
-简单的`contentEditable`怎么能行！于是就寻找一个功能丰富、配置简单的富文本编辑器，于是就接触到了大名鼎鼎的 [Tiptap](https://tiptap.dev)，[^ ![](/static/tech/tiptap.webp)
+简单的`contentEditable`怎么能行！于是就寻找一个功能丰富、配置简单的富文本编辑器，于是就接触到了大名鼎鼎的 [Tiptap](https://tiptap.dev)，[^ ![Tiptap](/static/tech/tiptap.webp)
 <strong>Tiptap</strong> 是一个开源的富文本编辑器框架，基于 ProseMirror 构建，具有高度的可定制性和扩展性。它支持 Vue 和 React 的集成，并拥有丰富的插件生态。]
 下面粘贴一段简介，先水几行：
 

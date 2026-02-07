@@ -10,7 +10,8 @@
   --font-base-size: 14px;
   --font-serif:
     et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua",
-    Georgia, serif;
+    Georgia, "Noto Serif CJK SC", "Noto Serif SC", "Source Han Serif SC",
+    "Songti SC", STSong, SimSun, serif;
   --font-sans: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
   --font-sans-alt: "Trebuchet MS", "Gill Sans", "Gill Sans MT", sans-serif;
   --font-mono: Consolas, "Liberation Mono", Menlo, Courier, monospace;
