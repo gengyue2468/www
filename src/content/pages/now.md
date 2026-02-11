@@ -2,7 +2,7 @@
 title: Now
 ---
 
-> 最后更新于 2026 年 1 月 20 日，中国武汉市洪山区珞喻路 1037 号华中科技大学
+> 最后更新于 2026 年 2 月 11 日，中国山东省烟台市
 
 受到 https://nownownow.com/about 这个页面的启发，我也来写一个"Now"页面，我很欣赏这个网站中的一些观点：[note:这个时间戳是工人智能手动写在这里的，所以应该不会有频繁的更新，更~~夸张~~的说，这个页面也许都不会频繁地更新，很有意思]
 
@@ -19,6 +19,7 @@ title: Now
 - Build [Read List](https://toread.gengyue.site/)
 - 和 Bot 在一起玩耍
 - 回家！放寒假！
+- 准备过年啦！
 - ~~经历苦痛的期末周（已经结束力）~~
 - ~~参加神秘的期末考试~~
 
@@ -36,8 +37,8 @@ title: Now
 - buddyup.studio
 - buddyup.top
 
-大多数玩具都是放在 [Vercel](https://vercel.com) 上面，可能 [Cloudflare Pages](https://pages.cloudflare.com) 和 [Cloudflare Workers](https://workers.cloudflare.com) 上面还有一些没来得及迁移的旧项目。[EdgeOne](https://edgeone.io)上可能也有，嘻嘻:)[note:当时白嫖了一堆云服务是这样的，东西都不知道放上去干嘛了]
+大多数玩具都是放在 [Vercel](https://vercel.com) 上面，可能 [Cloudflare Pages](https://pages.cloudflare.com) 和 [Cloudflare Workers](https://workers.cloudflare.com) 上面还有一些没来得及迁移的旧项目 [note: Cloudflare Pages 上爆了 300 + 部署，甚至需要用官方的超级不稳定妙妙 Node.js 脚本才能删除掉，坏...]。[EdgeOne](https://edgeone.io)上可能也有，嘻嘻:)[note:当时白嫖了一堆云服务是这样的，东西都不知道放上去干嘛了]
 
-有一些东西是靠[腾讯云](https://cloud.tencent.com)的一台轻量云服务器干的，比方说那个 QQ 机器人。除此以外就拿来跑一些轻量的 Node 服务了，~~其实我还在等域名备案流程，到时候我就把域名解析到腾讯云上 😋~~现在解析好了，不过套了一层 [Cloudflare](https://cloudflare.com/)的 CDN 延迟也低不到哪儿去了。[note:哎，减速 CDN 实至名归]
+有一些东西是靠[腾讯云](https://cloud.tencent.com)的一台轻量云服务器干的，比方说那个 QQ 机器人。除此以外就拿来跑一些轻量的 Node 服务了，~~其实我还在等域名备案流程，到时候我就把域名解析到腾讯云上 😋~~~~现在解析好了，不过套了一层 [Cloudflare](https://cloudflare.com/)的 CDN 延迟也低不到哪儿去了。~~  现在一些有趣的公网服务全部都迁移到 [Racknerd](https://racknerd.com) 的一台廉价小鸡上面了，哎，不知道能用多久[note:哎，~~减速 CDN 实至名归~~ 现在把服务迁到海外应该能强点，至少回源不用打那么远了...]
 
 就这么多了罢 :)
