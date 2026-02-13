@@ -38,6 +38,33 @@ md.use(container, "fullwidth", {
   },
 });
 
+// Register embed container plugin
+function parseEmbedParams(info: string): { src: string; title: string } | null {
+  const trimmed = info.trim().replace(/^embed\s+/i, "").trim();
+  const srcMatch = trimmed.match(/src=["']([^"']*)["']/);
+  if (!srcMatch) return null;
+  const titleMatch = trimmed.match(/title=["']([^"']*)["']/);
+  return {
+    src: md.utils.escapeHtml(srcMatch[1]),
+    title: titleMatch ? md.utils.escapeHtml(titleMatch[1]) : "",
+  };
+}
+
+md.use(container, "embed", {
+  validate: (params: string) => params.trim().match(/^embed\b/i),
+  render: (tokens: any[], idx: number) => {
+    const info = tokens[idx].info.trim();
+    const params = parseEmbedParams(info);
+    if (tokens[idx].nesting === 1) {
+      if (params) {
+        return `<div class="embed-block"><iframe src="${params.src}" title="${params.title}" loading="lazy"></iframe>\n`;
+      }
+      return `<div class="embed-block">\n`;
+    }
+    return "</div>\n";
+  },
+});
+
 // Extract note content - finds the last closing bracket on the same line
 function extractNoteContent(
   text: string,

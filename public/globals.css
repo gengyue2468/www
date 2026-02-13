@@ -169,19 +169,39 @@ main {
   }
 }
 
-/* Code block styling */
+/* Code block styling - 与 .embed-block 宽度一致 */
 pre {
   border: 1px solid var(--accent);
   border-radius: 4px;
   padding: 1rem;
   margin: 1.4rem 0;
+  width: 100%;
   max-width: var(--width-content);
+  box-sizing: border-box;
   overflow-wrap: break-word;
 }
 
 pre > code {
   width: 100% !important;
   margin-left: 0 !important;
+}
+
+.embed-block {
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 1rem;
+  margin: 1.4rem 0;
+  max-width: var(--width-content);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.embed-block iframe {
+  width: 100%;
+  min-height: 50vh;
+  border: 0;
+  display: block;
 }
 
 /* Mermaid diagram styling - border on parent container, scroll inside */
@@ -275,6 +295,17 @@ pre > code {
   }
 
   pre {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: var(--width-padding-left-mobile);
+    padding-right: var(--width-padding-left-mobile);
+    border-radius: 0;
+    box-sizing: border-box;
+  }
+
+  .embed-block {
     width: 100%;
     max-width: 100%;
     margin-left: 0;
