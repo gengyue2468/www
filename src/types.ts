@@ -47,6 +47,7 @@ export interface Config {
   rss: RSSConfig;
   sitemap: SitemapConfig;
   robots: RobotsConfig;
+  llms: LlmsConfig;
   cdn: string;
   nav: NavItem[];
 }
@@ -71,6 +72,12 @@ export interface RobotsConfig {
   userAgent: string;
   allow: string[];
   disallow: string[];
+}
+
+export interface LlmsConfig {
+  enabled: boolean;
+  /** 可选：llms.txt 中的一句话摘要，不填则用 site.description */
+  summary?: string;
 }
 
 export interface FrontMatter {

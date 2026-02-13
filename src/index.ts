@@ -6,6 +6,7 @@ import { buildBlogIndex, buildBlogPosts } from "./builders/blog.js";
 import { generateRSS } from "./generators/rss.js";
 import { generateSitemap } from "./generators/sitemap.js";
 import { generateRobotsTxt } from "./generators/robots.js";
+import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
 import { registerPlugin } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
 import config from "./config.js";
@@ -53,6 +54,12 @@ async function build(): Promise<void> {
   if (config.rss.enabled) await generateRSS(posts);
   if (config.sitemap.enabled) await generateSitemap(posts);
   if (config.robots.enabled) await generateRobotsTxt();
+
+  // LLM 友好：原文 Markdown 输出 + llms.txt
+  if (config.llms.enabled) {
+    await emitMarkdownFiles(posts);
+    await generateLlmsTxt(posts);
+  }
 
   // Build 404 page
   const filePath404 = join(config.dirs.pages, "404.md");

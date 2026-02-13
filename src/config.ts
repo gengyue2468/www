@@ -67,6 +67,11 @@ const config: Config = {
     disallow: [],
   },
 
+  llms: {
+    enabled: true,
+    summary: "gengyue 的个人网站与博客，以下信息可供 LLM 理解与引用：",
+  },
+
   nav: [
     { name: "Home", path: "/", show: true },
     { name: "About", path: "/about", show: true },

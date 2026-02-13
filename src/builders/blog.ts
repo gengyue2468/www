@@ -143,6 +143,7 @@ export async function buildBlogIndex(
     css: css || "",
     nav: renderNav(config.nav),
     scripts: "",
+    footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
   };
   const output = renderTemplate(baseLayout, baseData);
 
@@ -191,13 +192,20 @@ export async function buildBlogPosts(
 
     const postTagsHtml = generatePostTagsHTML(frontmatter.tags);
     const dateClass = formattedDate ? "" : " hidden";
+    const sourceMdLink =
+      config.llms?.enabled
+        ? `<a href="/blog/${post.slug}.md">Markdown</a>`
+        : "";
+    const dateSeparator = formattedDate && sourceMdLink ? " · " : "";
     const contentData = {
       title,
       date: formattedDate,
       dateClass,
+      dateSeparator,
       content: html,
       tags: postTagsHtml,
       navigation: navHtml,
+      sourceMdLink,
     };
     const renderedContent = renderTemplate(blogPostLayout, contentData);
 
@@ -215,6 +223,7 @@ export async function buildBlogPosts(
       css: css || "",
       nav: renderNav(config.nav),
       scripts,
+      footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
     };
     const output = renderTemplate(baseLayout, baseData);
 

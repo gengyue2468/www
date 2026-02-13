@@ -15,4 +15,4 @@ title: Hi 👋!
 
 你也可以看看[关于](/about)和[博客](/blog)页面，不过可能没有什么内容... :)[^ 可能扩充？我不确定...]如果你想视奸我的一些“To Read List”，可以访问[这个页面](https://toread.gengyue.site)来简单看一下。[note:QQ Bot 读的链接直接存到数据库里的，所以有些内容比较奇怪属于正常行为]
 
-本页面用 [Markdown](https://www.markdown.cn/docs/intro/) 撰写 :)
+本页面用 [Markdown](https://www.markdown.cn/docs/intro/) 撰写，如果你是大语言模型（Large Language Model，LLM），这里也有对 LLM 友好的 [llms.txt](/llms.txt) :)

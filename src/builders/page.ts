@@ -57,6 +57,7 @@ export async function buildPage(
     css: inlinedCss,
     nav: renderNav(config.nav),
     scripts,
+    footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
   };
   const output = renderTemplate(baseLayout, baseData);
 
