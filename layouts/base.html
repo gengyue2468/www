@@ -30,6 +30,7 @@
       type="font/woff2"
       crossorigin
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       rel="preload"
       href="/fonts/et-book-display-italic-old-style-figures.woff2"
@@ -44,6 +45,11 @@
       type="font/woff2"
       crossorigin
     />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&display=swap"
+      rel="stylesheet"
+    />
     {{css}}
   </head>
   <body>
@@ -55,7 +61,7 @@
       </article>
     </main>
 
-    <footer>
+    <footer class="footer">
       <p>
         &copy; {{year}} {{author}}. <a href="/rss.xml">RSS</a> |
         <a href="/sitemap.xml">Sitemap</a>{{footerLlms}}
