@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "pages/now.md",
+                "file": "pages/index.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "now"
+              "title": "index"
             }
           }
         ]
@@ -204,8 +204,8 @@
   },
   "active": "ea8f2adeaef719a8",
   "lastOpenFiles": [
-    "blog/2025-year-in-review.md",
     "pages/now.md",
+    "blog/2025-year-in-review.md",
     "pages/index.md",
     "pages/about.md",
     "未命名.canvas",

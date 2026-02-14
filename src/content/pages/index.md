@@ -6,7 +6,7 @@ title: Hi 👋!
 
 不过这里也没有许多东西，比如一些有趣的服务或者小玩具，又比如 <s>[JavaScript](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide) 脚本</s>现在有了，[Cloudflare ](https://cloudflare.com/)的反爬虫脚本和 Insights 脚本，不过无关紧要了。实话讲，这就是拿 [Node.js](https://nodejs.org/) 构建 [Markdown](https://www.markdown.cn/docs/intro/) 文档生成的一堆 [HTML](https://developer.mozilla.org/zh-CN/docs/Web/HTML) 文档而已。
 
-这个页面的 CSS 是基于 [Tufte CSS](https://edwardtufte.github.io/tufte-css/)[^Tufte CSS 是 Edward Tufte 风格的 CSS 框架，专注于简洁优雅的排版和侧边栏注释。] 修改出来的，字体用的是 [ET Book](https://edwardtufte.github.io/et-book/)，部分静态资源~~用 [JsDelivr](https://www.jsdelivr.com/) 托管~~现在用腾讯云的 [EdgeOne](https://edgeone.ai/) 托管。
+这个页面的 CSS 是基于 [Tufte CSS](https://edwardtufte.github.io/tufte-css/)[^Tufte CSS 是 Edward Tufte 风格的 CSS 框架，专注于简洁优雅的排版和侧边栏注释。] 修改出来的，字体用的是 [ET Book](https://edwardtufte.github.io/et-book/)，部分静态资源~~用 [JsDelivr](https://www.jsdelivr.com/) 托管~~现在用腾讯云的 [EdgeOne](https://edgeone.ai/) 托管，哎现在又有一部分是由  [JsDelivr](https://www.jsdelivr.com/) 托管。
 
 如果你想找我聊聊或者关注我，可以参考下面的联系方式：
 
