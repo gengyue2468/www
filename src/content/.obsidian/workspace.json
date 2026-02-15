@@ -219,8 +219,9 @@
   },
   "active": "5dfc19d87605b168",
   "lastOpenFiles": [
-    "blog/tailscale.md",
+    "blog/nested-inline-parser.md",
     "blog/weird-cloudflare-tunnel.md",
+    "blog/tailscale.md",
     "blog/ssl-config.md",
     "blog/tiptap.md",
     "blog/walk-outside.md",
@@ -232,7 +233,6 @@
     "未命名.canvas",
     "pages/404.md",
     "blog/try-intent-parsing.md",
-    "blog/nested-inline-parser.md",
     "blog/memos-migration.md",
     "blog/hust-chifan.md",
     "blog/magic-wsl.md"
