@@ -1,87 +1,96 @@
 import MarkdownIt from "markdown-it";
 import container from "markdown-it-container";
 import matter from "gray-matter";
-import { readFile } from "fs/promises";
 import type { Note, RenderedContent, FrontMatter } from "../types.js";
 import config from "../config.js";
-import { getMarkdownProcessors, getNoteProcessors } from "../extensions/plugin.js";
+import { getCachedRender, setCachedRender } from "./cache.js";
 
-const md = new MarkdownIt({
-  html: true,
-  breaks: true,
-  linkify: true,
-});
+// Singleton markdown-it instance
+let md: MarkdownIt | null = null;
 
-// Register fold container plugin
-md.use(container, "fold", {
-  validate: (params: string) => params.trim().match(/^fold\s+(.*)$/),
-  render: (tokens: any[], idx: number) => {
-    const m = tokens[idx].info.trim().match(/^fold\s+(.*)$/);
-    if (tokens[idx].nesting === 1) {
-      const title = m ? md.utils.escapeHtml(m[1]) : "";
-      return `<details><summary>${title}</summary>\n`;
-    } else {
-      return "</details>\n";
-    }
-  },
-});
+// Cached processors array
+let cachedProcessors: ReturnType<typeof import("../extensions/plugin.js").getMarkdownProcessors> | null = null;
 
-// Register fullwidth container plugin
-md.use(container, "fullwidth", {
-  validate: (params: string) => params.trim().match(/^fullwidth$/i),
-  render: (tokens: any[], idx: number) => {
-    if (tokens[idx].nesting === 1) {
-      return `<div class="fullwidth-content">\n`;
-    } else {
+/**
+ * Initialize markdown-it with plugins (lazy initialization)
+ */
+function getMarkdownIt(): MarkdownIt {
+  if (md) return md;
+
+  md = new MarkdownIt({
+    html: true,
+    breaks: true,
+    linkify: true,
+  });
+
+  // Register fold container plugin
+  md.use(container, "fold", {
+    validate: (params: string) => params.trim().match(/^fold\s+(.*)$/),
+    render: (tokens: any[], idx: number) => {
+      const m = tokens[idx].info.trim().match(/^fold\s+(.*)$/);
+      if (tokens[idx].nesting === 1) {
+        const title = m ? md!.utils.escapeHtml(m[1]) : "";
+        return `<details><summary>${title}</summary>\n`;
+      } else {
+        return "</details>\n";
+      }
+    },
+  });
+
+  // Register fullwidth container plugin
+  md.use(container, "fullwidth", {
+    validate: (params: string) => params.trim().match(/^fullwidth$/i),
+    render: (tokens: any[], idx: number) => {
+      if (tokens[idx].nesting === 1) {
+        return `<div class="fullwidth-content">\n`;
+      } else {
+        return "</div>\n";
+      }
+    },
+  });
+
+  // Register embed container plugin
+  md.use(container, "embed", {
+    validate: (params: string) => params.trim().match(/^embed\b/i),
+    render: (tokens: any[], idx: number) => {
+      const info = tokens[idx].info.trim();
+      const params = parseEmbedParams(info);
+      if (tokens[idx].nesting === 1) {
+        if (params) {
+          return `<div class="embed-block"><iframe src="${params.src}" title="${params.title}" loading="lazy"></iframe>\n`;
+        }
+        return `<div class="embed-block">\n`;
+      }
       return "</div>\n";
-    }
-  },
-});
+    },
+  });
 
-// Register embed container plugin
+  return md;
+}
+
+/**
+ * Get cached processors
+ */
+async function getProcessors() {
+  if (!cachedProcessors) {
+    const { getMarkdownProcessors } = await import("../extensions/plugin.js");
+    cachedProcessors = getMarkdownProcessors();
+  }
+  return cachedProcessors;
+}
+
+/**
+ * Parse embed params for the embed container
+ */
 function parseEmbedParams(info: string): { src: string; title: string } | null {
   const trimmed = info.trim().replace(/^embed\s+/i, "").trim();
   const srcMatch = trimmed.match(/src=["']([^"']*)["']/);
   if (!srcMatch) return null;
   const titleMatch = trimmed.match(/title=["']([^"']*)["']/);
   return {
-    src: md.utils.escapeHtml(srcMatch[1]),
-    title: titleMatch ? md.utils.escapeHtml(titleMatch[1]) : "",
+    src: getMarkdownIt().utils.escapeHtml(srcMatch[1]),
+    title: titleMatch ? getMarkdownIt().utils.escapeHtml(titleMatch[1]) : "",
   };
-}
-
-md.use(container, "embed", {
-  validate: (params: string) => params.trim().match(/^embed\b/i),
-  render: (tokens: any[], idx: number) => {
-    const info = tokens[idx].info.trim();
-    const params = parseEmbedParams(info);
-    if (tokens[idx].nesting === 1) {
-      if (params) {
-        return `<div class="embed-block"><iframe src="${params.src}" title="${params.title}" loading="lazy"></iframe>\n`;
-      }
-      return `<div class="embed-block">\n`;
-    }
-    return "</div>\n";
-  },
-});
-
-// Extract note content - finds the last closing bracket on the same line
-function extractNoteContent(
-  text: string,
-  startIndex: number,
-  prefix: string
-): { content: string; endIndex: number } | null {
-  const contentStart = startIndex + prefix.length;
-  // Find line end
-  const lineEnd = text.indexOf("\n", contentStart);
-  const searchEnd = lineEnd === -1 ? text.length : lineEnd;
-
-  // Find the last closing bracket on the same line (before line end)
-  const closeIndex = text.lastIndexOf("]", searchEnd);
-  if (closeIndex === -1 || closeIndex < contentStart) return null;
-
-  const content = text.substring(contentStart, closeIndex);
-  return { content, endIndex: closeIndex + 1 };
 }
 
 // Find the matching closing bracket, skipping over markdown links and images
@@ -104,7 +113,9 @@ function findNoteEnd(text: string, startPos: number): number {
   return -1;
 }
 
-// Process note syntax
+/**
+ * Process note syntax - extracts sidenotes [^content] and marginnotes [note:content]
+ */
 function processNoteSyntax(markdown: string): { processed: string; notes: Note[] } {
   const notes: Note[] = [];
   let processed = markdown;
@@ -113,13 +124,13 @@ function processNoteSyntax(markdown: string): { processed: string; notes: Note[]
   const sidenotePrefix = `<!-- ${config.placeholders.sidenote}_`;
   const marginnotePrefix = `<!-- ${config.placeholders.marginnote}_`;
 
-  // Process sidenotes [^content] - content can contain links/images
+  // Process sidenotes [^content]
   let sidenoteIndex = 0;
   while (true) {
     const startPos = processed.indexOf('[^', sidenoteIndex);
     if (startPos === -1) break;
 
-    const contentStart = startPos + 2; // Skip [^
+    const contentStart = startPos + 2;
     const endPos = findNoteEnd(processed, contentStart);
 
     if (endPos === -1) {
@@ -147,7 +158,7 @@ function processNoteSyntax(markdown: string): { processed: string; notes: Note[]
     const startPos = processed.indexOf('[note:', marginnoteIndex);
     if (startPos === -1) break;
 
-    const contentStart = startPos + 6; // Skip [note:
+    const contentStart = startPos + 6;
     const endPos = findNoteEnd(processed, contentStart);
 
     if (endPos === -1) {
@@ -172,12 +183,115 @@ function processNoteSyntax(markdown: string): { processed: string; notes: Note[]
   return { processed, notes };
 }
 
+/**
+ * Apply HTML transformations in a single pass where possible
+ */
+function applyHtmlTransforms(html: string): string {
+  // Image optimization: wrap images with alt text in figure/figcaption
+  html = html.replace(
+    /<img\s+([^>]*?)alt="([^"]*)"([^>]*?)>/gi,
+    '<figure><img $1alt="$2"$3><figcaption>$2</figcaption></figure>'
+  );
+
+  // Image optimization: add lazy loading and async decoding
+  html = html.replace(
+    /<img\s+(?![^>]*\bloading=)([^>]*?)>/gi,
+    '<img loading="lazy" decoding="async" $1>'
+  );
+
+  return html;
+}
+
+/**
+ * Fix invalid HTML: extract <figure> from inside <p> tags
+ */
+function fixFigureInParagraphs(html: string): string {
+  return html.replace(
+    /<p>([\s\S]*?)<\/p>/gi,
+    (match, inner) => {
+      if (!inner.includes('<figure>')) return match;
+      const parts = inner.split(/(<figure>[\s\S]*?<\/figure>)/gi);
+      const result: string[] = [];
+      for (const part of parts) {
+        if (part.match(/^<figure>/i)) {
+          result.push(part);
+        } else if (part.trim()) {
+          result.push(`<p>${part}</p>`);
+        }
+      }
+      return result.join('') || match;
+    }
+  );
+}
+
+/**
+ * Render notes to HTML
+ */
+function renderNotes(html: string, notes: Note[]): string {
+  const timestamp = Date.now();
+
+  for (let i = 0; i < notes.length; i++) {
+    const note = notes[i];
+    let renderedContent = getMarkdownIt().render(note.content);
+    renderedContent = renderedContent.trim().replace(/^<p>(.*)<\/p>$/s, "$1").trim();
+
+    const random = Math.random().toString(36).substring(2, 11);
+    const id = `sn-${i}-${timestamp}-${random}`;
+
+    const noteHtml =
+      note.type === "sidenote"
+        ? `<label for="${id}" class="margin-toggle sidenote-number"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote">${renderedContent}</span>`
+        : `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
+
+    html = html.replace(note.placeholder, noteHtml);
+  }
+
+  return html;
+}
+
+/**
+ * Add link optimization
+ */
+function addLinkOptimization(html: string): string {
+  // Link optimization: add rel and target for external links
+  html = html.replace(
+    /<a\s+(?![^>]*\brel=)(?![^>]*\btarget=)href="(https?:\/\/[^"]+)">/gi,
+    '<a rel="noopener noreferrer" target="_blank" href="$1">'
+  );
+
+  // CDN optimization
+  if (config.cdn) {
+    html = html.replace(
+      /(<img\s+[^>]*src=")(\/static\/|\/images\/|\/img\/|\/assets\/)([^"]+")/gi,
+      `$1${config.cdn}$2$3`
+    );
+    html = html.replace(
+      /(<a\s+[^>]*href=")(\/static\/|\/images\/|\/img\/|\/assets\/)([^"]+")/gi,
+      `$1${config.cdn}$2$3`
+    );
+  }
+
+  return html;
+}
+
+/**
+ * Main render function with caching support
+ */
 export async function renderMarkdown(filePath: string): Promise<RenderedContent> {
-  const content = await readFile(filePath, "utf-8");
+  // Check cache first
+  const cached = await getCachedRender(filePath);
+  if (cached) {
+    return cached;
+  }
+
+  // Read file using Bun.file()
+  const file = Bun.file(filePath);
+  const content = await file.text();
+
   const { data: frontmatter, content: markdown } = matter(content);
 
   // Apply markdown processors from plugin system
-  const processors = getMarkdownProcessors();
+  const processors = await getProcessors();
   let processedMarkdown = markdown;
   for (const processor of processors) {
     if (processor.process) {
@@ -190,7 +304,7 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
   const { processed: markdownWithNotes, notes } = processNoteSyntax(processedMarkdown);
 
   // Render markdown
-  let html = md.render(markdownWithNotes);
+  let html = getMarkdownIt().render(markdownWithNotes);
 
   // Apply post-processors
   for (const processor of processors) {
@@ -200,79 +314,82 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
     }
   }
 
-  // Image optimization: wrap images with alt text in figure/figcaption
-  html = html.replace(
-    /<img\s+([^>]*?)alt="([^"]*)"([^>]*?)>/gi,
-    '<figure><img $1alt="$2"$3><figcaption>$2</figcaption></figure>'
-  );
+  // Apply HTML transformations
+  html = applyHtmlTransforms(html);
 
-  // Fix invalid HTML: extract <figure> from inside <p> tags
-  // Browsers handle <figure> inside <p> by breaking the <p>, which disrupts sidenote/marginnote positioning
-  html = html.replace(
-    /<p>([\s\S]*?)<\/p>/gi,
-    (match, inner) => {
-      if (!inner.includes('<figure>')) return match;
-      const parts = inner.split(/(<figure>[\s\S]*?<\/figure>)/gi);
-      let result = '';
-      for (const part of parts) {
-        if (part.match(/^<figure>/i)) {
-          result += part;
-        } else if (part.trim()) {
-          result += `<p>${part}</p>`;
-        }
-      }
-      return result || match;
+  // Fix figures in paragraphs
+  html = fixFigureInParagraphs(html);
+
+  // Render notes
+  html = renderNotes(html, notes);
+
+  // Add link optimization
+  html = addLinkOptimization(html);
+
+  const result = { frontmatter: frontmatter as FrontMatter, html };
+
+  // Cache the result
+  await setCachedRender(filePath, result);
+
+  return result;
+}
+
+/**
+ * Render markdown from string (for worker use)
+ */
+export async function renderMarkdownString(content: string): Promise<RenderedContent> {
+  const { data: frontmatter, content: markdown } = matter(content);
+
+  // Apply markdown processors from plugin system
+  const processors = await getProcessors();
+  let processedMarkdown = markdown;
+  for (const processor of processors) {
+    if (processor.process) {
+      const result = processor.process(processedMarkdown);
+      processedMarkdown = result instanceof Promise ? await result : result;
     }
-  );
-
-  // Image optimization: add lazy loading and async decoding
-  html = html.replace(
-    /<img\s+(?![^>]*\bloading=)([^>]*?)>/gi,
-    '<img loading="lazy" decoding="async" $1>'
-  );
-
-  // Replace note placeholders with rendered HTML (before link optimization)
-  for (const note of notes) {
-    let renderedContent = md.render(note.content);
-    renderedContent = renderedContent.trim().replace(/^<p>(.*)<\/p>$/s, "$1").trim();
-
-    // Note: don't wrap note images in <figure> - block elements inside <span> break DOM structure
-    // Note images are already styled by .sidenote img / .marginnote img CSS rules
-
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 11);
-    const id = `sn-${notes.indexOf(note)}-${timestamp}-${random}`;
-
-    const noteHtml =
-      note.type === "sidenote"
-        ? `<label for="${id}" class="margin-toggle sidenote-number"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote">${renderedContent}</span>`
-        : `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
-
-    html = html.replace(note.placeholder, noteHtml);
   }
 
-  // Link optimization: add rel and target for external links
-  html = html.replace(
-    /<a\s+(?![^>]*\brel=)(?![^>]*\btarget=)href="(https?:\/\/[^"]+)">/gi,
-    '<a rel="noopener noreferrer" target="_blank" href="$1">'
-  );
+  // Process notes
+  const { processed: markdownWithNotes, notes } = processNoteSyntax(processedMarkdown);
 
-  // CDN optimization: replace local static asset paths with CDN
-  if (config.cdn) {
-    html = html.replace(
-      /(<img\s+[^>]*src=")(\/static\/|\/images\/|\/img\/|\/assets\/)([^"]+)"/gi,
-      (match, prefix, path, filename) => `${prefix}${config.cdn}${path}${filename}"`
-    );
-    html = html.replace(
-      /(<a\s+[^>]*href=")(\/static\/|\/images\/|\/img\/|\/assets\/)([^"]+)"/gi,
-      (match, prefix, path, filename) => `${prefix}${config.cdn}${path}${filename}"`
-    );
+  // Render markdown
+  let html = getMarkdownIt().render(markdownWithNotes);
+
+  // Apply post-processors
+  for (const processor of processors) {
+    if (processor.postProcess) {
+      const result = processor.postProcess(html);
+      html = result instanceof Promise ? await result : result;
+    }
   }
+
+  // Apply HTML transformations
+  html = applyHtmlTransforms(html);
+
+  // Fix figures in paragraphs
+  html = fixFigureInParagraphs(html);
+
+  // Render notes
+  html = renderNotes(html, notes);
+
+  // Add link optimization
+  html = addLinkOptimization(html);
 
   return { frontmatter: frontmatter as FrontMatter, html };
 }
 
-// Get the markdown-it instance for plugins that need it
-export function getMarkdownIt(): MarkdownIt {
-  return md;
+/**
+ * Get the markdown-it instance for plugins that need it
+ */
+export function getMarkdownItInstance(): MarkdownIt {
+  return getMarkdownIt();
+}
+
+/**
+ * Clear the markdown-it cache (for hot reload scenarios)
+ */
+export function clearMarkdownCache(): void {
+  md = null;
+  cachedProcessors = null;
 }

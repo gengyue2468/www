@@ -4,39 +4,53 @@
     "type": "split",
     "children": [
       {
-        "id": "219129255ef5f507",
+        "id": "f737311c4abf9d31",
         "type": "tabs",
         "children": [
           {
-            "id": "ea8f2adeaef719a8",
+            "id": "d3b5b68abd5ab374",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "pages/index.md",
+                "file": "blog/2025-a-z.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "index"
+              "title": "2025-a-z"
             }
           },
           {
-            "id": "5dfc19d87605b168",
+            "id": "b4d69714c2310437",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "blog/weird-cloudflare-tunnel.md",
+                "file": "blog/magic-wsl.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "weird-cloudflare-tunnel"
+              "title": "magic-wsl"
+            }
+          },
+          {
+            "id": "210eb847e7ba91ce",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "blog/derp-server.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "derp-server"
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -217,24 +231,29 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "5dfc19d87605b168",
+  "active": "210eb847e7ba91ce",
   "lastOpenFiles": [
-    "blog/nested-inline-parser.md",
+    "blog/ink-tui.md",
+    "blog/derp-server.md",
+    "未命名.md",
+    "blog/magic-wsl.md",
+    "blog/2025-a-z.md",
+    "blog/hust-chifan.md",
+    "pages/index.md",
+    "blog/hello-world.md",
+    "2025-12-12.md",
     "blog/weird-cloudflare-tunnel.md",
+    "blog/nested-inline-parser.md",
     "blog/tailscale.md",
     "blog/ssl-config.md",
     "blog/tiptap.md",
     "blog/walk-outside.md",
-    "blog/2025-a-z.md",
-    "pages/index.md",
     "pages/now.md",
     "blog/2025-year-in-review.md",
     "pages/about.md",
     "未命名.canvas",
     "pages/404.md",
     "blog/try-intent-parsing.md",
-    "blog/memos-migration.md",
-    "blog/hust-chifan.md",
-    "blog/magic-wsl.md"
+    "blog/memos-migration.md"
   ]
 }

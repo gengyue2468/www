@@ -571,33 +571,56 @@ details > *:not(summary) {
   margin-top: 0.5rem;
 }
 
-/* Tags system - Tufte CSS style */
+/* Tags system - Consistent with body text links */
 .tags-list,
-.post-tags {
+.post-tags,
+.tags-cloud {
   margin: 1rem 0;
   line-height: 1.8;
 }
 
 .tags-list .tag,
-.post-tags .tag {
+.post-tags .tag,
+.tags-cloud .tag {
   display: inline;
   font-style: italic;
   font-size: 1.2rem;
-  color: var(--text-color);
+  color: inherit;
   margin-right: 1.2rem;
+  text-underline-offset: var(--text-underline-offset);
+  text-decoration-thickness: var(--text-decoration-thickness);
 }
 
 .tags-list .tag:last-child,
-.post-tags .tag:last-child {
+.post-tags .tag:last-child,
+.tags-cloud .tag:last-child {
   margin-right: 0;
 }
 
-/* Dark mode support for tags */
-@media (prefers-color-scheme: dark) {
-  .tags-list .tag,
-  .post-tags .tag {
-    color: var(--text-color-dark);
-  }
+/* Tag count styling */
+.tag-count {
+  font-style: normal;
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+/* Tag cloud specific */
+.tags-cloud {
+  margin: 2rem 0;
+  line-height: 2.2;
+}
+
+/* Tag size classes based on count */
+.tag-size-1 {
+  font-size: 1.1rem;
+}
+
+.tag-size-2 {
+  font-size: 1.3rem;
+}
+
+.tag-size-3 {
+  font-size: 1.5rem;
 }
 
 /* Fullwidth content container - breaks out of sidenote width constraints */

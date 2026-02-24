@@ -1,6 +1,5 @@
 import { join, dirname } from "path";
-import { writeFile, readFile } from "fs/promises";
-import { ensureDir } from "../utils/fs.js";
+import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate, renderNav } from "../utils/template.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
@@ -9,6 +8,9 @@ import config from "../config.js";
 // Cache for CSS content to avoid reading files multiple times
 let cachedCss: string | null = null;
 
+/**
+ * Get inlined CSS using Bun.file() for fast reading
+ */
 export async function getInlinedCss(): Promise<string> {
   if (cachedCss) return cachedCss;
 
@@ -17,18 +19,29 @@ export async function getInlinedCss(): Promise<string> {
   const globalsPath = join(publicDir, "globals.css");
 
   try {
-    const tufteCss = await readFile(tuftePath, "utf-8");
-    const globalsCss = await readFile(globalsPath, "utf-8");
+    // Read both files in parallel using Bun.file()
+    const [tufteFile, globalsFile] = await Promise.all([
+      Bun.file(tuftePath),
+      Bun.file(globalsPath),
+    ]);
+
+    const [tufteCss, globalsCss] = await Promise.all([
+      tufteFile.text(),
+      globalsFile.text(),
+    ]);
 
     const combined = `/* tufte.css */\n${tufteCss}\n\n/* globals.css */\n${globalsCss}`;
     cachedCss = `<style>\n${combined}\n</style>`;
     return cachedCss;
-  } catch (err) {
+  } catch (_err) {
     console.warn("Warning: Could not read CSS files for inlining");
     return "";
   }
 }
 
+/**
+ * Build a static page
+ */
 export async function buildPage(
   route: string,
   filePath: string,
@@ -69,5 +82,12 @@ export async function buildPage(
     await ensureDir(dirname(outputPath));
   }
 
-  await writeFile(outputPath, output, "utf-8");
+  await writeFileContent(outputPath, output);
+}
+
+/**
+ * Clear the CSS cache (useful for hot reload)
+ */
+export function clearCssCache(): void {
+  cachedCss = null;
 }

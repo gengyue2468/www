@@ -4,11 +4,12 @@
   "description": "gengyue's website.",
   "type": "module",
   "scripts": {
-    "build": "tsc && node dist-build/index.js",
-    "dev": "tsc && node dist-build/index.js && npx serve dist",
-    "watch": "tsc --watch",
+    "build": "bun run src/index.ts",
+    "dev": "bun run src/index.ts && bunx serve dist",
+    "serve": "bunx serve dist",
     "deploy": "bash scripts/deploy.sh",
-    "build-only": "bash scripts/build.sh"
+    "build-only": "bash scripts/build.sh",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "blog",
@@ -30,6 +31,7 @@
     "@types/html-minifier": "^4.0.6",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^20.11.0",
+    "bun-types": "^1.1.0",
     "clean-css": "^5.3.3",
     "html-minifier": "^4.0.0",
     "serve": "^14.2.1",

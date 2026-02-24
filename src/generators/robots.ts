@@ -1,8 +1,11 @@
 import { join } from "path";
-import { writeFile } from "fs/promises";
 import generateRobotstxt from "generate-robotstxt";
+import { writeFileContent } from "../utils/fs.js";
 import config from "../config.js";
 
+/**
+ * Generate robots.txt using optimized file writing
+ */
 export async function generateRobotsTxt(): Promise<void> {
   if (!config.robots.enabled) return;
 
@@ -22,6 +25,6 @@ export async function generateRobotsTxt(): Promise<void> {
   const robotsTxt = await generateRobotstxt(robotsConfig);
 
   const robotsPath = join(config.dirs.dist, "robots.txt");
-  await writeFile(robotsPath, robotsTxt, "utf-8");
+  await writeFileContent(robotsPath, robotsTxt);
   console.log(`✓ Generated robots.txt -> ${robotsPath}`);
 }

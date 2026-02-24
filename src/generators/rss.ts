@@ -1,9 +1,12 @@
 import { join } from "path";
-import { writeFile } from "fs/promises";
 import { Feed } from "feed";
 import config from "../config.js";
+import { writeFileContent } from "../utils/fs.js";
 import type { Post } from "../types.js";
 
+/**
+ * Generate RSS feed using optimized file writing
+ */
 export async function generateRSS(posts: Post[]): Promise<void> {
   if (!config.rss.enabled) return;
 
@@ -24,6 +27,7 @@ export async function generateRSS(posts: Post[]): Promise<void> {
     feedLinks: { rss2: `${cleanSiteUrl}/rss.xml` },
   });
 
+  // Add items using array for efficiency
   for (const post of rssItems) {
     const postUrl = `${cleanSiteUrl}/blog/${post.slug}`;
     const description = post.summary || post.excerpt || config.site.description;
@@ -41,6 +45,6 @@ export async function generateRSS(posts: Post[]): Promise<void> {
 
   const rssXml = feed.rss2();
   const rssPath = join(config.dirs.dist, "rss.xml");
-  await writeFile(rssPath, rssXml, "utf-8");
+  await writeFileContent(rssPath, rssXml);
   console.log(`✓ Generated RSS feed -> ${rssPath}`);
 }
