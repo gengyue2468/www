@@ -33,11 +33,10 @@ const config: Config = {
   },
 
   styles: {
-    date: "font-style: italic; color: #444; margin-top: -1rem; margin-bottom: 2rem;",
-    dateInline: "font-style: italic; color: #444; font-size: 0.9em; white-space: nowrap;",
-    nav: "margin-top: 3rem; font-size: 1.45rem;",
-    navLink: "white-space: nowrap;",
-  },
+    // Styles moved to CSS classes for better maintainability
+    // .post-date, .post-date-inline in globals.css
+    // .post-nav in tufte.css
+  } as Record<string, string>,
 
   placeholders: {
     sidenote: "SNOTE",

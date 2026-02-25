@@ -225,6 +225,41 @@ img {
   max-width: 100%;
 }
 
+/* Post navigation - Desktop: like header nav, Mobile: justify-between */
+.post-nav {
+  margin-top: 3rem;
+  font-size: 1.45rem;
+}
+
+.post-nav a {
+  margin-right: 1rem;
+  text-decoration: none;
+  padding: 0.2rem 0.5rem;
+  white-space: nowrap;
+}
+
+.post-nav a:last-child {
+  margin-right: 0;
+}
+
+/* Mobile: prev left, next right with justify-between */
+@media (max-width: 760px) {
+  .post-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .post-nav a {
+    margin-right: 0;
+  }
+
+  .post-nav a:first-child:not(:last-child) {
+    margin-right: auto;
+  }
+}
+
 .sidenote,
 .marginnote {
   float: right;
@@ -582,9 +617,9 @@ details > *:not(summary) {
 .tags-list .tag,
 .post-tags .tag,
 .tags-cloud .tag {
-  display: inline;
+  display: inline-block;
   font-style: italic;
-  font-size: 1.2rem;
+  font-size: var(--font-size-body);
   color: inherit;
   margin-right: 1.2rem;
   text-underline-offset: var(--text-underline-offset);
@@ -610,17 +645,17 @@ details > *:not(summary) {
   line-height: 2.2;
 }
 
-/* Tag size classes based on count */
+/* Tag size classes based on count (relative to body text) */
 .tag-size-1 {
-  font-size: 1.1rem;
+  font-size: calc(var(--font-size-body) * 0.9);
 }
 
 .tag-size-2 {
-  font-size: 1.3rem;
+  font-size: calc(var(--font-size-body) * 1.1);
 }
 
 .tag-size-3 {
-  font-size: 1.5rem;
+  font-size: calc(var(--font-size-body) * 1.3);
 }
 
 /* Fullwidth content container - breaks out of sidenote width constraints */

@@ -255,25 +255,43 @@ main {
 }
 
 /* Blog post date styling */
-.post-date {
+.post-date,
+.post-date-inline {
   font-style: italic;
   color: #444;
+}
+
+.post-date {
   margin-top: -1rem;
   margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
 .post-date.hidden {
   display: none;
 }
 
+.post-date-inline {
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.md-link {
+  opacity: 0.6;
+  text-decoration: none;
+}
+
+.md-link:hover {
+  opacity: 1;
+}
+
 /* Dark mode support for post-date */
 @media (prefers-color-scheme: dark) {
-  .post-date {
+  .post-date,
+  .post-date-inline {
     color: #bbb;
-  }
-
-  .posts-list .post-item span {
-    color: #bbb !important;
   }
 }
 

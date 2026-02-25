@@ -7,8 +7,7 @@ tags:
   - 前端
   - TUI
   - Ink
-  - 玩具项目
-  - 开发
+  - 项目
 ---
 [Ink](https://github.com/vadimdemedes/ink) 是一个能让你用写 React 应用的思路写终端应用的库，并且由于它是一个 React 的渲染器，所以 React 的大多数特性仍然可用，所以可以像写 React App 那样写 Ink。[note: Claude Code 的 CLI 就曾使用 Ink 构建]
 

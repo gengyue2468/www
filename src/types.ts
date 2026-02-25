@@ -19,10 +19,10 @@ export interface DateConfig {
 }
 
 export interface StylesConfig {
-  date: string;
-  dateInline: string;
-  nav: string;
-  navLink: string;
+  // Styles are now defined in CSS files for better maintainability
+  // .post-date, .post-date-inline in globals.css
+  // .post-nav in tufte.css
+  [key: string]: string;
 }
 
 export interface PlaceholdersConfig {

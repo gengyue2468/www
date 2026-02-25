@@ -16,6 +16,98 @@ interface PostWithContent extends Post {
 }
 
 /**
+ * Truncate description to optimal length for SEO (150 chars)
+ */
+function truncateDescription(description: string, maxLength = 150): string {
+  if (description.length <= maxLength) return description;
+  // Find the last sentence or phrase boundary before maxLength
+  const truncated = description.substring(0, maxLength);
+  const lastPeriod = truncated.lastIndexOf("。");
+  const lastSpace = truncated.lastIndexOf(" ");
+  const cutoff = lastPeriod > 0 ? lastPeriod + 1 : (lastSpace > 0 ? lastSpace : maxLength);
+  return truncated.substring(0, cutoff) + "...";
+}
+
+/**
+ * Generate keywords meta tag from tags array
+ */
+function generateKeywords(tags: string[] | undefined): string {
+  if (!tags || tags.length === 0) return "";
+  const keywords = tags.join(", ");
+  return `<meta name="keywords" content="${keywords}" />`;
+}
+
+/**
+ * Generate Open Graph meta tags
+ */
+function generateOgTags(
+  title: string,
+  description: string,
+  url: string,
+  type: string,
+  tags?: string[]
+): string {
+  const parts: string[] = [
+    `<meta property="og:title" content="${title}" />`,
+    `<meta property="og:description" content="${truncateDescription(description)}" />`,
+    `<meta property="og:url" content="${url}" />`,
+    `<meta property="og:type" content="${type}" />`,
+    `<meta property="og:site_name" content="${config.site.title}" />`,
+    `<meta name="twitter:card" content="summary" />`,
+    `<meta name="twitter:title" content="${title}" />`,
+    `<meta name="twitter:description" content="${truncateDescription(description)}" />`,
+  ];
+
+  if (tags && tags.length > 0) {
+    parts.push(`<meta name="twitter:label1" content="标签" />`);
+    parts.push(`<meta name="twitter:data1" content="${tags.slice(0, 3).join(", ")}" />`);
+  }
+
+  return parts.join("\n    ");
+}
+
+/**
+ * Generate JSON-LD structured data for blog posts
+ */
+function generateJsonLd(
+  title: string,
+  description: string,
+  url: string,
+  date: string | undefined,
+  tags: string[] | undefined
+): string {
+  const data: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    description: truncateDescription(description),
+    url: url,
+    author: {
+      "@type": "Person",
+      name: config.site.author,
+    },
+    publisher: {
+      "@type": "Person",
+      name: config.site.author,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
+  };
+
+  if (date) {
+    data.datePublished = new Date(date).toISOString();
+  }
+
+  if (tags && tags.length > 0) {
+    data.keywords = tags.join(", ");
+  }
+
+  return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+}
+
+/**
  * URL-safe tag slug generator
  * Converts tag names to URL-friendly slugs
  */
@@ -109,7 +201,7 @@ function generatePostsListHTML(posts: Post[]): string {
       parts.push(`<a href="/blog/${post.slug}">${post.title}</a>`);
       if (post.date) {
         const formattedDate = formatDate(post.date);
-        parts.push(` <span style="${config.styles.dateInline}">${formattedDate}</span>`);
+        parts.push(` <span class="post-date-inline">${formattedDate}</span>`);
       }
       parts.push("</li>");
     }
@@ -181,10 +273,11 @@ export async function buildBlogIndex(
   const contentData = { title: "Blog", postsList: postsListHtml + tagsSection };
   const renderedContent = renderTemplate(blogIndexLayout, contentData);
 
+  const blogUrl = `${config.site.url}/blog`;
   const baseData = {
     title: "Blog",
     siteTitle: config.site.title,
-    description: config.site.description,
+    description: truncateDescription(config.site.description),
     author: config.site.author,
     year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
@@ -192,6 +285,10 @@ export async function buildBlogIndex(
     nav: renderNav(config.nav),
     scripts: "",
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
+    canonicalUrl: blogUrl,
+    keywords: "",
+    ogTags: generateOgTags("Blog", config.site.description, blogUrl, "website"),
+    jsonLd: "",
   };
   const output = renderTemplate(baseLayout, baseData);
 
@@ -228,12 +325,12 @@ export async function buildBlogPosts(
     // Build navigation HTML using array join
     let navHtml = "";
     if (prevPost || nextPost) {
-      const navParts: string[] = [`<nav style="${config.styles.nav}">`];
+      const navParts: string[] = [`<nav class="post-nav">`];
       if (prevPost) {
-        navParts.push(`<a href="/blog/${prevPost.slug}" style="${config.styles.navLink}">← ${prevPost.title}</a>`);
+        navParts.push(`<a href="/blog/${prevPost.slug}">← ${prevPost.title}</a>`);
       }
       if (nextPost) {
-        navParts.push(`<a href="/blog/${nextPost.slug}" style="${config.styles.navLink}">${nextPost.title} →</a>`);
+        navParts.push(`<a href="/blog/${nextPost.slug}">${nextPost.title} →</a>`);
       }
       navParts.push("</nav>");
       navHtml = navParts.join("");
@@ -241,16 +338,25 @@ export async function buildBlogPosts(
 
     const postTagsHtml = generatePostTagsHTML(frontmatter.tags as string[]);
     const dateClass = formattedDate ? "" : " hidden";
+
+    // Calculate word count (Chinese characters + English words)
+    const plainText = html.replace(/<[^>]+>/g, "").replace(/\s+/g, "");
+    const wordCountNum = plainText.length;
+    const wordCount = `${wordCountNum} 字`;
+
+    // Markdown source link in post date line
     const sourceMdLink = config.llms?.enabled
-      ? `<a href="/blog/${post.slug}.md">Markdown</a>`
+      ? `<a href="/blog/${post.slug}.md" class="md-link">.md</a>`
       : "";
-    const dateSeparator = formattedDate && sourceMdLink ? " · " : "";
+
+    const dateSeparator = formattedDate ? " · " : "";
 
     const contentData = {
       title,
       date: formattedDate,
       dateClass,
       dateSeparator,
+      wordCount,
       content: html,
       tags: postTagsHtml,
       navigation: navHtml,
@@ -262,10 +368,13 @@ export async function buildBlogPosts(
     const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
     const scripts = hasMermaid ? mermaidScript : "";
 
+    const postUrl = `${config.site.url}/blog/${post.slug}`;
+    const postTags = frontmatter.tags as string[] | undefined;
+
     const baseData = {
       title,
       siteTitle: config.site.title,
-      description,
+      description: truncateDescription(description),
       author: config.site.author,
       year: year?.toString() || new Date().getFullYear().toString(),
       content: renderedContent,
@@ -273,6 +382,10 @@ export async function buildBlogPosts(
       nav: renderNav(config.nav),
       scripts,
       footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
+      canonicalUrl: postUrl,
+      keywords: generateKeywords(postTags),
+      ogTags: generateOgTags(title, description, postUrl, "article", postTags),
+      jsonLd: generateJsonLd(title, description, postUrl, frontmatter.date as string, postTags),
     };
     const output = renderTemplate(baseLayout, baseData);
 
@@ -347,10 +460,13 @@ export async function buildTagPages(
       };
       const renderedContent = renderTemplate(tagsLayout, contentData);
 
+      const tagUrl = `${config.site.url}/blog/tag/${slug}`;
+      const tagDescription = `标签 "${tag}" 下的所有文章 - ${config.site.title}`;
+
       const baseData = {
         title: `Tag: #${tag}`,
         siteTitle: config.site.title,
-        description: `标签 "${tag}" 下的所有文章 - ${config.site.title}`,
+        description: truncateDescription(tagDescription),
         author: config.site.author,
         year: year?.toString() || new Date().getFullYear().toString(),
         content: renderedContent,
@@ -358,6 +474,10 @@ export async function buildTagPages(
         nav: renderNav(config.nav),
         scripts: "",
         footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
+        canonicalUrl: tagUrl,
+        keywords: generateKeywords([tag]),
+        ogTags: generateOgTags(`Tag: #${tag}`, tagDescription, tagUrl, "website", [tag]),
+        jsonLd: "",
       };
       const output = renderTemplate(baseLayout, baseData);
 
@@ -426,10 +546,13 @@ async function buildTagIndexPage(
   };
   const renderedContent = renderTemplate(tagsLayout, contentData);
 
+  const tagsIndexUrl = `${config.site.url}/blog/tag`;
+  const tagsIndexDescription = `浏览所有文章标签 - ${config.site.title}`;
+
   const baseData = {
     title: "All Tags",
     siteTitle: config.site.title,
-    description: `浏览所有文章标签 - ${config.site.title}`,
+    description: truncateDescription(tagsIndexDescription),
     author: config.site.author,
     year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
@@ -437,6 +560,10 @@ async function buildTagIndexPage(
     nav: renderNav(config.nav),
     scripts: "",
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
+    canonicalUrl: tagsIndexUrl,
+    keywords: "",
+    ogTags: generateOgTags("All Tags", tagsIndexDescription, tagsIndexUrl, "website"),
+    jsonLd: "",
   };
   const output = renderTemplate(baseLayout, baseData);
 

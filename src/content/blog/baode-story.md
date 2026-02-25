@@ -1,5 +1,5 @@
 ---
-tags: [故事,程序员,生活]
+tags: [故事,生活]
 title: 小故事:我们不说“包的”
 date: 2025-12-16
 summary: 阳光明媚，小明回家却遇上了“429 Too Many Requests”的漏水事件。感谢慈母和水管工人的高能救援，配合《Get Started Document》与 webpack 打包，最终在 useEffect 的神奇加持下，水顺利来了。这是一个充满程序员风格的家庭小故事：bug、修复、等待，再配上美味饺子，生活也能如此有趣。

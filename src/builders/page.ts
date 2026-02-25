@@ -5,6 +5,35 @@ import { renderTemplate, renderNav } from "../utils/template.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import config from "../config.js";
 
+/**
+ * Truncate description to optimal length for SEO (150 chars)
+ */
+function truncateDescription(description: string, maxLength = 150): string {
+  if (description.length <= maxLength) return description;
+  const truncated = description.substring(0, maxLength);
+  const lastPeriod = truncated.lastIndexOf("。");
+  const lastSpace = truncated.lastIndexOf(" ");
+  const cutoff = lastPeriod > 0 ? lastPeriod + 1 : (lastSpace > 0 ? lastSpace : maxLength);
+  return truncated.substring(0, cutoff) + "...";
+}
+
+/**
+ * Generate Open Graph meta tags
+ */
+function generateOgTags(title: string, description: string, url: string, type: string): string {
+  const parts: string[] = [
+    `<meta property="og:title" content="${title}" />`,
+    `<meta property="og:description" content="${truncateDescription(description)}" />`,
+    `<meta property="og:url" content="${url}" />`,
+    `<meta property="og:type" content="${type}" />`,
+    `<meta property="og:site_name" content="${config.site.title}" />`,
+    `<meta name="twitter:card" content="summary" />`,
+    `<meta name="twitter:title" content="${title}" />`,
+    `<meta name="twitter:description" content="${truncateDescription(description)}" />`,
+  ];
+  return parts.join("\n    ");
+}
+
 // Cache for CSS content to avoid reading files multiple times
 let cachedCss: string | null = null;
 
@@ -60,10 +89,13 @@ export async function buildPage(
   const inlinedCss = await getInlinedCss();
   const scripts = hasMermaid ? mermaidScript : "";
 
+  const pageUrl = `${config.site.url}${route}`;
+  const description = (frontmatter.summary as string) || (frontmatter.excerpt as string) || config.site.description;
+
   const baseData = {
     title,
     siteTitle: config.site.title,
-    description: config.site.description,
+    description: truncateDescription(description),
     author: config.site.author,
     year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
@@ -71,6 +103,10 @@ export async function buildPage(
     nav: renderNav(config.nav),
     scripts,
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
+    canonicalUrl: pageUrl,
+    keywords: "",
+    ogTags: generateOgTags(title, description, pageUrl, "website"),
+    jsonLd: "",
   };
   const output = renderTemplate(baseLayout, baseData);
 

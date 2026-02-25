@@ -29,7 +29,17 @@ docker compose up -d
 然后不出所料地爆爆了，原来是 docker.io 没法访问导致的。[note: 不过我之前似乎配置了 Docker 镜像啊，很奇怪。]
 
 ```bash
-ubuntu@VM-0-6-ubuntu:~/memos$ docker compose up -d [+] Running 1/1 ✘ memos Error Get "https://registry-1.docker.io/v2/": context deadline exceeded (Client.Timeout e... 15.1s Error response from daemon: Get "https://registry-1.docker.io/v2/": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+ubuntu@VM-0-6-ubuntu:~/memos$ docker compose up -d
+
+[+] Running 1/1
+✘ memos Error Get "https://registry-1.docker.io/v2/":
+  context deadline exceeded
+  (Client.Timeout exceeded while awaiting headers)
+
+Error response from daemon:
+  Get "https://registry-1.docker.io/v2/":
+  context deadline exceeded
+  (Client.Timeout exceeded while awaiting headers)
 ```
 
 按照[腾讯云官方的指导教程](https://cloud.tencent.com/document/product/1207/45596)，用 nano 编辑 `/etc/docker/daemon.json` 文件，哎，结果打开一看，怎么已经有了 ` "https://mirror.ccs.tencentyun.com"` 啊。于是`sudo docker info` 一下看看，结果发现怎么镜像地址是之前错配的中科大的 docker 镜像页面，哎，坏。[note:好像地址爆爆了]

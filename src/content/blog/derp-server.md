@@ -6,7 +6,7 @@ tags:
   - Tailscale
   - 技术
   - 内网组网
-  - 开发
+  - 项目
 ---
 [BitsFlowCloud](https://ccp.bitsflow.cloud/) 推出了 CNY ￥ 49/yr 的~~穷鬼~~ KVM VPS 套餐，竟然还是对移动友好的香港 VPS，于是顶着每月 ~ $0.5 USD 的花销整了一台，512 MB 的内存正好跑一个 Tailscale 自建 Derp 服务器比较适合! [note: Tailscale 是著名的内网组网工具，不过由于其在大陆没有 Derp 服务器，导致 P2P 打洞比较慢，而自建服务器可以在一定程度上缓解这个问题]
 
@@ -80,6 +80,30 @@ sudo ufw status verbose
 ```
 
 这样 `ufw` 防火墙只会允许来自我的 Tailscale 内部 tailnet 的 `100.101.102.0/24` 这个网段的 Tailscale 流量走自建 Derp 服务器，双重保障哈哈。
+
+搞定服务端配置之后去 [Access controls](https://login.tailscale.com/admin/acls/file) 找到 `Edit File`，添加类似下面这样的配置：
+
+```json
+"derpMap": {
+		"Regions": {
+			"900": {
+				"RegionID":   900,
+				"RegionCode": "hk",
+				"RegionName": "Hong Kong Self",
+				"Nodes": [
+					{
+						"Name":     "hk-1",
+						"RegionID": 900,
+						"HostName": "my-elegant-domain",
+						"DERPPort": 443,
+					},
+				],
+			},
+		},
+	},
+```
+
+好耶，现在可以用 `tailscale netcheck` 测试一下了，当自建 Derp 服务器挂了的时候也会自动 fallback 到 Tailscale 的 Derp 服务器，所以还算不错！
 
 最终结果（在我的本地 Laptop 上测试）：[note: 忽略时间戳，因为是好几天之后才想起来写这篇 logbook 临时补的测试哈哈]
 

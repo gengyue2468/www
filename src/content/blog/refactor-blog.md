@@ -1,7 +1,7 @@
 ---
 title: 重构博客
 date: 2026-01-09
-tags: ['技术','前端','玩具项目']
+tags: ['技术','前端','项目']
 summary: "用 Node.js + Markdown-It + Tufte CSS 重新打造的 0 运行时 JavaScript 的极简文件驱动博客，支持自定义路由、旁注语法和 TypeScript 构建流程，性能优先、排版优雅、内容完全自主可控。"
 ---
 

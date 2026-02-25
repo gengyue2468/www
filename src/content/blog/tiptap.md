@@ -1,5 +1,5 @@
 ---
-tags: [前端,编辑器,React]
+tags: [前端,项目]
 title: 组会分享:神奇的 Tiptap 编辑器
 date: 2025-12-20
 summary: 本文分享了 Tiptap——一个基于 ProseMirror 的开源富文本编辑器框架。Tiptap 具有高度可定制性和丰富插件生态，支持 Vue 和 React，可通过自定义插件和 UI 满足各种复杂文本编辑需求，是轻量化、高效的前端编辑解决方案。

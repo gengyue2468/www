@@ -41,12 +41,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "blog/derp-server.md",
+                "file": "blog/memos.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "derp-server"
+              "title": "memos"
             }
           }
         ],
@@ -233,13 +233,16 @@
   },
   "active": "210eb847e7ba91ce",
   "lastOpenFiles": [
-    "blog/ink-tui.md",
+    "pages/now.md",
+    "pages/index.md",
+    "pages/about.md",
+    "pages/404.md",
     "blog/derp-server.md",
+    "blog/ink-tui.md",
     "未命名.md",
     "blog/magic-wsl.md",
     "blog/2025-a-z.md",
     "blog/hust-chifan.md",
-    "pages/index.md",
     "blog/hello-world.md",
     "2025-12-12.md",
     "blog/weird-cloudflare-tunnel.md",
@@ -248,11 +251,8 @@
     "blog/ssl-config.md",
     "blog/tiptap.md",
     "blog/walk-outside.md",
-    "pages/now.md",
     "blog/2025-year-in-review.md",
-    "pages/about.md",
     "未命名.canvas",
-    "pages/404.md",
     "blog/try-intent-parsing.md",
     "blog/memos-migration.md"
   ]
