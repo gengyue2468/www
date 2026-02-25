@@ -4,7 +4,7 @@ const config: Config = {
   site: {
     title: "gengyue",
     author: "gengyue",
-    description: "The personal website of gengyue.",
+    description: "gengyue 的个人网站与博客 - 华中科技大学计算机专业学生，记录技术探索、开发经验与项目实践。分享技术、开发等文章，以及开源项目和小玩具建设经验。",
     url: "https://www.gengyue.site",
   },
 
@@ -64,6 +64,7 @@ const config: Config = {
     userAgent: "*",
     allow: ["/"],
     disallow: [],
+    crawlDelay: 1,
   },
 
   llms: {

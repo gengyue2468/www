@@ -29,6 +29,15 @@ function truncateDescription(description: string, maxLength = 150): string {
 }
 
 /**
+ * Generate SEO-friendly blog post title
+ * Geek style: clean, minimal, English-based
+ */
+function generatePostTitle(postTitle: string, _tags?: string[]): string {
+  const siteName = config.site.title;
+  return `${postTitle} - ${siteName}`;
+}
+
+/**
  * Generate keywords meta tag from tags array
  */
 function generateKeywords(tags: string[] | undefined): string {
@@ -274,8 +283,9 @@ export async function buildBlogIndex(
   const renderedContent = renderTemplate(blogIndexLayout, contentData);
 
   const blogUrl = `${config.site.url}/blog`;
+  const blogTitle = `Blog - ${config.site.title}`;
   const baseData = {
-    title: "Blog",
+    title: blogTitle,
     siteTitle: config.site.title,
     description: truncateDescription(config.site.description),
     author: config.site.author,
@@ -287,7 +297,7 @@ export async function buildBlogIndex(
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
     canonicalUrl: blogUrl,
     keywords: "",
-    ogTags: generateOgTags("Blog", config.site.description, blogUrl, "website"),
+    ogTags: generateOgTags(blogTitle, config.site.description, blogUrl, "website"),
     jsonLd: "",
   };
   const output = renderTemplate(baseLayout, baseData);
@@ -370,9 +380,10 @@ export async function buildBlogPosts(
 
     const postUrl = `${config.site.url}/blog/${post.slug}`;
     const postTags = frontmatter.tags as string[] | undefined;
+    const fullTitle = generatePostTitle(title, postTags);
 
     const baseData = {
-      title,
+      title: fullTitle,
       siteTitle: config.site.title,
       description: truncateDescription(description),
       author: config.site.author,
@@ -384,7 +395,7 @@ export async function buildBlogPosts(
       footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
       canonicalUrl: postUrl,
       keywords: generateKeywords(postTags),
-      ogTags: generateOgTags(title, description, postUrl, "article", postTags),
+      ogTags: generateOgTags(fullTitle, description, postUrl, "article", postTags),
       jsonLd: generateJsonLd(title, description, postUrl, frontmatter.date as string, postTags),
     };
     const output = renderTemplate(baseLayout, baseData);
@@ -461,10 +472,11 @@ export async function buildTagPages(
       const renderedContent = renderTemplate(tagsLayout, contentData);
 
       const tagUrl = `${config.site.url}/blog/tag/${slug}`;
-      const tagDescription = `标签 "${tag}" 下的所有文章 - ${config.site.title}`;
+      const tagDescription = `Posts tagged with "${tag}" - ${config.site.title}`;
+      const tagPageTitle = `#${tag} - ${config.site.title}`;
 
       const baseData = {
-        title: `Tag: #${tag}`,
+        title: tagPageTitle,
         siteTitle: config.site.title,
         description: truncateDescription(tagDescription),
         author: config.site.author,
@@ -476,7 +488,7 @@ export async function buildTagPages(
         footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
         canonicalUrl: tagUrl,
         keywords: generateKeywords([tag]),
-        ogTags: generateOgTags(`Tag: #${tag}`, tagDescription, tagUrl, "website", [tag]),
+        ogTags: generateOgTags(tagPageTitle, tagDescription, tagUrl, "website", [tag]),
         jsonLd: "",
       };
       const output = renderTemplate(baseLayout, baseData);
@@ -547,10 +559,11 @@ async function buildTagIndexPage(
   const renderedContent = renderTemplate(tagsLayout, contentData);
 
   const tagsIndexUrl = `${config.site.url}/blog/tag`;
-  const tagsIndexDescription = `浏览所有文章标签 - ${config.site.title}`;
+  const tagsIndexDescription = `All tags - ${config.site.title}`;
+  const tagsIndexTitle = `Tags - ${config.site.title}`;
 
   const baseData = {
-    title: "All Tags",
+    title: tagsIndexTitle,
     siteTitle: config.site.title,
     description: truncateDescription(tagsIndexDescription),
     author: config.site.author,
@@ -562,7 +575,7 @@ async function buildTagIndexPage(
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
     canonicalUrl: tagsIndexUrl,
     keywords: "",
-    ogTags: generateOgTags("All Tags", tagsIndexDescription, tagsIndexUrl, "website"),
+    ogTags: generateOgTags(tagsIndexTitle, tagsIndexDescription, tagsIndexUrl, "website"),
     jsonLd: "",
   };
   const output = renderTemplate(baseLayout, baseData);

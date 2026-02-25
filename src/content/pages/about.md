@@ -1,5 +1,6 @@
 ---
 title: About
+summary: 关于 gengyue —— 华中科技大学计算机专业学生，冰岩作坊前端组成员。热爱开源，持续探索前端技术与新兴技术方向，喜欢折腾各种有趣的小玩具与实践项目，记录学习成长与技术思考。
 ---
 
 哈喽啊，我现在在 [华中科技大学 (HUST)](https://hust.edu.cn)[^ <img src="/static/hust/hust.webp" style="width:96px" alt="HUST" /> ]念大一，是 xdx，~~臭学计算机的~~。目前是 [冰岩作坊](https://www.bingyan.net/) 前端组的成员。

@@ -11,14 +11,19 @@ export async function generateRobotsTxt(): Promise<void> {
 
   const siteUrl = config.site.url;
 
+  const policy: Record<string, unknown> = {
+    userAgent: config.robots.userAgent,
+    allow: config.robots.allow.length > 0 ? config.robots.allow : "/",
+    disallow: config.robots.disallow.length > 0 ? config.robots.disallow : [],
+  };
+
+  // Add crawl delay if configured (helps with crawl capacity)
+  if (config.robots.crawlDelay && config.robots.crawlDelay > 0) {
+    policy.crawlDelay = config.robots.crawlDelay;
+  }
+
   const robotsConfig = {
-    policy: [
-      {
-        userAgent: config.robots.userAgent,
-        allow: config.robots.allow.length > 0 ? config.robots.allow : "/",
-        disallow: config.robots.disallow.length > 0 ? config.robots.disallow : [],
-      },
-    ],
+    policy: [policy],
     sitemap: config.sitemap.enabled ? `${siteUrl.replace(/\/$/, "")}/sitemap.xml` : undefined,
   };
 

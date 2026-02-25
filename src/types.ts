@@ -72,6 +72,7 @@ export interface RobotsConfig {
   userAgent: string;
   allow: string[];
   disallow: string[];
+  crawlDelay?: number;
 }
 
 export interface LlmsConfig {

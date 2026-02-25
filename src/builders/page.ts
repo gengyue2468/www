@@ -18,6 +18,25 @@ function truncateDescription(description: string, maxLength = 150): string {
 }
 
 /**
+ * Generate SEO-friendly page title
+ * Geek style: clean, minimal, English-based
+ */
+function generatePageTitle(pageTitle: string, route: string): string {
+  const siteName = config.site.title;
+
+  // Route-specific title templates - geek & minimal
+  const titleTemplates: Record<string, string> = {
+    "/": `${pageTitle} - ${siteName}`,
+    "/about": `${pageTitle} - ${siteName}`,
+    "/now": `${pageTitle} - ${siteName}`,
+    "/blog": `Blog - ${siteName}`,
+  };
+
+  // Use template if available, otherwise default format
+  return titleTemplates[route] || `${pageTitle} - ${siteName}`;
+}
+
+/**
  * Generate Open Graph meta tags
  */
 function generateOgTags(title: string, description: string, url: string, type: string): string {
@@ -92,8 +111,10 @@ export async function buildPage(
   const pageUrl = `${config.site.url}${route}`;
   const description = (frontmatter.summary as string) || (frontmatter.excerpt as string) || config.site.description;
 
+  const fullTitle = generatePageTitle(title, route);
+
   const baseData = {
-    title,
+    title: fullTitle,
     siteTitle: config.site.title,
     description: truncateDescription(description),
     author: config.site.author,
@@ -105,7 +126,7 @@ export async function buildPage(
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
     canonicalUrl: pageUrl,
     keywords: "",
-    ogTags: generateOgTags(title, description, pageUrl, "website"),
+    ogTags: generateOgTags(fullTitle, description, pageUrl, "website"),
     jsonLd: "",
   };
   const output = renderTemplate(baseLayout, baseData);
