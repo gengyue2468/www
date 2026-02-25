@@ -3,6 +3,11 @@ export interface SiteConfig {
   author: string;
   description: string;
   url: string;
+  /** 静态 OG 图路径，如 /static/og/default.webp；有 cdn 时自动用 cdn 域名 */
+  ogImage?: string;
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  ogImageAlt?: string;
 }
 
 export interface DirsConfig {

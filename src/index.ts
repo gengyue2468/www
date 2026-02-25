@@ -7,7 +7,6 @@ import { generateRSS } from "./generators/rss.js";
 import { generateSitemap } from "./generators/sitemap.js";
 import { generateRobotsTxt } from "./generators/robots.js";
 import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
-import { generateDefaultOgImage } from "./generators/og-image.js";
 import { registerPlugin } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
 import config from "./config.js";
@@ -67,12 +66,9 @@ async function build(): Promise<void> {
   const inlinedCss = await getInlinedCss();
   timer.end("setup");
 
-  // Generate default OG image for static pages
-  timer.start("og-image");
-  const defaultOgImagePath = await generateDefaultOgImage();
-  const ogImageBase = (config.cdn || config.site.url).replace(/\/$/, "");
-  const defaultOgImageUrl = `${ogImageBase}${defaultOgImagePath}`;
-  timer.end("og-image");
+  const defaultOgImageUrl = config.site.ogImage
+    ? (config.cdn || config.site.url).replace(/\/$/, "") + config.site.ogImage
+    : undefined;
 
   // Build static pages in parallel
   timer.start("static-pages");

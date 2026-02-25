@@ -3,7 +3,6 @@ import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate, renderNav } from "../utils/template.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
-import { generateDefaultOgImage } from "../generators/og-image.js";
 import config from "../config.js";
 
 /**
@@ -38,9 +37,18 @@ function generatePageTitle(pageTitle: string, route: string): string {
 }
 
 /**
- * Generate Open Graph meta tags
+ * Generate Open Graph meta tags（含移动端优化：width/height/alt）
  */
-function generateOgTags(title: string, description: string, url: string, type: string, ogImage?: string): string {
+function generateOgTags(
+  title: string,
+  description: string,
+  url: string,
+  type: string,
+  ogImageUrl?: string,
+  ogImageWidth?: number,
+  ogImageHeight?: number,
+  ogImageAlt?: string
+): string {
   const parts: string[] = [
     `<meta property="og:title" content="${title}" />`,
     `<meta property="og:description" content="${truncateDescription(description)}" />`,
@@ -52,10 +60,12 @@ function generateOgTags(title: string, description: string, url: string, type: s
     `<meta name="twitter:description" content="${truncateDescription(description)}" />`,
   ];
 
-  // Add OG image if provided
-  if (ogImage) {
-    parts.push(`<meta property="og:image" content="${ogImage}" />`);
-    parts.push(`<meta name="twitter:image" content="${ogImage}" />`);
+  if (ogImageUrl) {
+    parts.push(`<meta property="og:image" content="${ogImageUrl}" />`);
+    if (ogImageWidth) parts.push(`<meta property="og:image:width" content="${ogImageWidth}" />`);
+    if (ogImageHeight) parts.push(`<meta property="og:image:height" content="${ogImageHeight}" />`);
+    if (ogImageAlt) parts.push(`<meta property="og:image:alt" content="${ogImageAlt}" />`);
+    parts.push(`<meta name="twitter:image" content="${ogImageUrl}" />`);
   }
 
   return parts.join("\n    ");
@@ -135,7 +145,16 @@ export async function buildPage(
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
     canonicalUrl: pageUrl,
     keywords: "",
-    ogTags: generateOgTags(fullTitle, description, pageUrl, "website", ogImageUrl),
+    ogTags: generateOgTags(
+      fullTitle,
+      description,
+      pageUrl,
+      "website",
+      ogImageUrl,
+      config.site.ogImageWidth,
+      config.site.ogImageHeight,
+      config.site.ogImageAlt
+    ),
     jsonLd: "",
   };
   const output = renderTemplate(baseLayout, baseData);
