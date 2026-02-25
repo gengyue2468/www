@@ -26,6 +26,7 @@ blockquote,
 div.epigraph > blockquote,
 div.epigraph > blockquote > p,
 div.epigraph > blockquote > footer > cite {
+  text-wrap: balance;
   font-style: italic;
 }
 
@@ -257,6 +258,11 @@ img {
 
   .post-nav a:first-child:not(:last-child) {
     margin-right: auto;
+  }
+
+  /* When links wrap: keep the first on the left and the second on the right */
+  .post-nav a:last-child:not(:first-child) {
+    margin-left: auto;
   }
 }
 

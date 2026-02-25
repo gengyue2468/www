@@ -7,6 +7,7 @@ import { generateRSS } from "./generators/rss.js";
 import { generateSitemap } from "./generators/sitemap.js";
 import { generateRobotsTxt } from "./generators/robots.js";
 import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
+import { generateDefaultOgImage } from "./generators/og-image.js";
 import { registerPlugin } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
 import config from "./config.js";
@@ -66,6 +67,13 @@ async function build(): Promise<void> {
   const inlinedCss = await getInlinedCss();
   timer.end("setup");
 
+  // Generate default OG image for static pages
+  timer.start("og-image");
+  const defaultOgImagePath = await generateDefaultOgImage();
+  const ogImageBase = (config.cdn || config.site.url).replace(/\/$/, "");
+  const defaultOgImageUrl = `${ogImageBase}${defaultOgImagePath}`;
+  timer.end("og-image");
+
   // Build static pages in parallel
   timer.start("static-pages");
   const staticPagePromises: Promise<void>[] = [];
@@ -78,7 +86,7 @@ async function build(): Promise<void> {
       (async () => {
         try {
           await stat(filePath);
-          await buildPage(route, filePath, baseLayout, pageLayout, currentYear);
+          await buildPage(route, filePath, baseLayout, pageLayout, currentYear, defaultOgImageUrl);
           console.log(`✓ Built ${route}`);
         } catch (err) {
           const error = err as NodeJS.ErrnoException;
@@ -141,7 +149,7 @@ async function build(): Promise<void> {
   const filePath404 = join(config.dirs.pages, "404.md");
   try {
     await stat(filePath404);
-    await buildPage("/404", filePath404, baseLayout, pageLayout, currentYear);
+    await buildPage("/404", filePath404, baseLayout, pageLayout, currentYear, defaultOgImageUrl);
 
     // Copy 404/index.html to 404.html and remove directory
     const dist404DirPath = join(config.dirs.dist, "404", "index.html");

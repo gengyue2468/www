@@ -5,6 +5,7 @@ import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate, renderNav } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
+import { generateOgImage } from "../generators/og-image.js";
 import config from "../config.js";
 import type { Post } from "../types.js";
 
@@ -54,7 +55,8 @@ function generateOgTags(
   description: string,
   url: string,
   type: string,
-  tags?: string[]
+  tags?: string[],
+  ogImage?: string
 ): string {
   const parts: string[] = [
     `<meta property="og:title" content="${title}" />`,
@@ -62,10 +64,16 @@ function generateOgTags(
     `<meta property="og:url" content="${url}" />`,
     `<meta property="og:type" content="${type}" />`,
     `<meta property="og:site_name" content="${config.site.title}" />`,
-    `<meta name="twitter:card" content="summary" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${title}" />`,
     `<meta name="twitter:description" content="${truncateDescription(description)}" />`,
   ];
+
+  // Add OG image if provided
+  if (ogImage) {
+    parts.push(`<meta property="og:image" content="${ogImage}" />`);
+    parts.push(`<meta name="twitter:image" content="${ogImage}" />`);
+  }
 
   if (tags && tags.length > 0) {
     parts.push(`<meta name="twitter:label1" content="标签" />`);
@@ -382,6 +390,16 @@ export async function buildBlogPosts(
     const postTags = frontmatter.tags as string[] | undefined;
     const fullTitle = generatePostTitle(title, postTags);
 
+    // Generate OG image for this post
+    const ogImagePath = await generateOgImage(
+      post.slug,
+      title,
+      frontmatter.date as string | undefined,
+      frontmatter.tags as string[] | undefined
+    );
+    const ogImageBase = (config.cdn || config.site.url).replace(/\/$/, "");
+    const ogImageUrl = `${ogImageBase}${ogImagePath}`;
+
     const baseData = {
       title: fullTitle,
       siteTitle: config.site.title,
@@ -395,7 +413,7 @@ export async function buildBlogPosts(
       footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
       canonicalUrl: postUrl,
       keywords: generateKeywords(postTags),
-      ogTags: generateOgTags(fullTitle, description, postUrl, "article", postTags),
+      ogTags: generateOgTags(fullTitle, description, postUrl, "article", postTags, ogImageUrl),
       jsonLd: generateJsonLd(title, description, postUrl, frontmatter.date as string, postTags),
     };
     const output = renderTemplate(baseLayout, baseData);
