@@ -129,6 +129,32 @@ function generateJsonLd(
 }
 
 /**
+ * Generate schema.org JSON-LD
+ */
+function generateBlogIndexJsonLd(
+  title: string,
+  description: string,
+  url: string,
+  numberOfItems: number
+): string {
+  const baseUrl = config.site.url.replace(/\/$/, "");
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    url,
+    name: title,
+    description: truncateDescription(description),
+    numberOfItems,
+    isPartOf: {
+      "@type": "WebSite",
+      name: config.site.title,
+      url: baseUrl + "/",
+    },
+  };
+  return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+}
+
+/**
  * URL-safe tag slug generator
  * Converts tag names to URL-friendly slugs
  */
@@ -310,7 +336,7 @@ export async function buildBlogIndex(
     canonicalUrl: blogUrl,
     keywords: "",
     ogTags: generateOgTags(blogTitle, config.site.description, blogUrl, "website"),
-    jsonLd: "",
+    jsonLd: generateBlogIndexJsonLd(blogTitle, config.site.description, blogUrl, posts.length),
   };
   const output = renderTemplate(baseLayout, baseData);
 

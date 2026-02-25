@@ -37,7 +37,7 @@ function generatePageTitle(pageTitle: string, route: string): string {
 }
 
 /**
- * Generate Open Graph meta tags（含移动端优化：width/height/alt）
+ * Generate Open Graph meta tags
  */
 function generateOgTags(
   title: string,
@@ -69,6 +69,51 @@ function generateOgTags(
   }
 
   return parts.join("\n    ");
+}
+
+function generatePageJsonLd(route: string, title: string, description: string): string {
+  const baseUrl = config.site.url.replace(/\/$/, "");
+  const siteName = config.site.title;
+  const authorName = config.site.author;
+
+  if (route === "/" || route === "") {
+    const data = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": `${baseUrl}/#website`,
+          url: baseUrl + "/",
+          name: siteName,
+          description: truncateDescription(description),
+          author: { "@type": "Person", name: authorName },
+        },
+        {
+          "@type": "WebPage",
+          "@id": `${baseUrl}/#webpage`,
+          url: baseUrl + "/",
+          name: title,
+          isPartOf: { "@id": `${baseUrl}/#website` },
+        },
+      ],
+    };
+    return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+  }
+
+  const pageUrl = baseUrl + (route === "/" ? "/" : route);
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    url: pageUrl,
+    name: title,
+    description: truncateDescription(description),
+    isPartOf: {
+      "@type": "WebSite",
+      name: siteName,
+      url: baseUrl + "/",
+    },
+  };
+  return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
 }
 
 // Cache for CSS content to avoid reading files multiple times
@@ -155,7 +200,7 @@ export async function buildPage(
       config.site.ogImageHeight,
       config.site.ogImageAlt
     ),
-    jsonLd: "",
+    jsonLd: generatePageJsonLd(route, fullTitle, description),
   };
   const output = renderTemplate(baseLayout, baseData);
 
