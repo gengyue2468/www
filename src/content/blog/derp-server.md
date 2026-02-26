@@ -69,17 +69,16 @@ sudo systemctl status derper
 
 好耶，这就差不多搞定了，还是相当傻瓜式操作的。
 
-不过为了保证安全，可以采用一些更加激进 & 极端的方式来保护一下，比如在服务器上：
+~~不过为了保证安全，可以采用一些更加激进 & 极端的方式来保护一下，比如在服务器上：
+~~
 
 ```bash
-sudo ufw allow from 100.101.102.0/24 to any port 443 proto tcp
-sudo ufw allow from 127.0.0.1 to any port 443 proto tcp
-sudo ufw deny 443/tcp
-sudo ufw enable
-sudo ufw status verbose
+code here has been expired or deprecated.
 ```
 
-这样 `ufw` 防火墙只会允许来自我的 Tailscale 内部 tailnet 的 `100.101.102.0/24` 这个网段的 Tailscale 流量走自建 Derp 服务器，双重保障哈哈。
+~~这样 `ufw` 防火墙只会允许来自我的 Tailscale 内部 tailnet 的 `100.101.102.0/24` 这个网段的 Tailscale 流量走自建 Derp 服务器，双重保障哈哈。~~
+
+> 靠，千万不要去尝试用 `ufw` 或者 `nginx` 等各种方式隐藏你的 derp 服务，不然到时候连不上 `ssh` 只能去 `VNC` 救小鸡的时候就狼狈了...
 
 搞定服务端配置之后去 [Access controls](https://login.tailscale.com/admin/acls/file) 找到 `Edit File`，添加类似下面这样的配置：
 
