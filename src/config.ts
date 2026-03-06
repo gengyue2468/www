@@ -4,7 +4,8 @@ const config: Config = {
   site: {
     title: "gengyue",
     author: "gengyue",
-    description: "gengyue 的个人网站与博客 - 华中科技大学计算机专业学生，记录技术探索、开发经验与项目实践。分享技术、开发等文章，以及开源项目和小玩具建设经验。",
+    description:
+      "gengyue 的个人网站与博客 - 华中科技大学计算机专业学生，记录技术探索、开发经验与项目实践。分享技术、开发等文章，以及开源项目和小玩具建设经验。",
     url: "https://www.gengyue.site",
     ogImage: "/static/og/og-image.webp",
     ogImageWidth: 1200,
@@ -23,8 +24,8 @@ const config: Config = {
   routes: {
     "/": "index.md",
     "/about": "about.md",
-    "/now": "now.md",
     "/blog": "blog.md",
+    "/shitposts": "shitposts.md",
   },
 
   date: {
@@ -75,13 +76,11 @@ const config: Config = {
   nav: [
     { name: "Home", path: "/", show: true },
     { name: "About", path: "/about", show: true },
-    { name: "Now", path: "/now", show: true },
     { name: "Blog", path: "/blog", show: true },
+    { name: "Shitposts", path: "https://www.shitposts.org", show: true },
   ],
 
   cdn: "https://cdn.gengyue.site",
-
 };
 
 export default config;
-
