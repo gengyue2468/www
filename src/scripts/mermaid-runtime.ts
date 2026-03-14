@@ -157,9 +157,11 @@ function transformMermaidCodeBlocks(): void {
     const pre = codeEl.parentElement;
     if (!pre || pre.tagName !== "PRE") return;
 
+    const source = codeEl.textContent || "";
     const div = document.createElement("div");
     div.className = "mermaid";
-    div.textContent = codeEl.textContent || "";
+    div.textContent = source;
+    div.dataset.mermaidSource = source;
     pre.replaceWith(div);
   });
 }
@@ -193,8 +195,24 @@ async function enhanceBlogContent(): Promise<void> {
   await renderMermaid();
 }
 
+function resetEnhancements(): void {
+  document.querySelectorAll<HTMLElement>("[data-blog-content] pre[data-code-enhanced]").forEach((pre) => {
+    pre.removeAttribute("data-code-enhanced");
+  });
+  document.querySelectorAll<HTMLElement>("[data-blog-content] .mermaid[data-mermaid-rendered]").forEach((node) => {
+    const src = node.dataset.mermaidSource;
+    if (src) node.textContent = src;
+    node.removeAttribute("data-mermaid-rendered");
+  });
+}
+
 export function mountMermaidRuntime(): void {
   document.addEventListener("astro:page-load", () => {
     enhanceBlogContent().catch(() => {});
   });
+
+  new MutationObserver(() => {
+    resetEnhancements();
+    enhanceBlogContent().catch(() => {});
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 }

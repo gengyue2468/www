@@ -342,7 +342,7 @@ samp {
   font-size: 0.875rem;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1279px) {
   .sidenote {
     display: block;
     margin-top: 0.75rem;
@@ -352,9 +352,9 @@ samp {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   :root {
-    --sidenote-rail-width: 24rem;
+    --sidenote-rail-width: 20rem;
     --sidenote-rail-offset: 0.5rem;
     --content-shift-x: 4rem;
   }
@@ -375,7 +375,7 @@ samp {
     right: calc(-1 * (((100vw - 100%) / 2) + var(--content-shift-x) - var(--sidenote-rail-offset)));
     width: min(var(--sidenote-rail-width), calc(100vw - 2 * var(--sidenote-rail-offset)));
     padding-left: 0;
-    padding-right: 4rem;
+    padding-right: 2rem;
     text-align: left;
   }
 }
