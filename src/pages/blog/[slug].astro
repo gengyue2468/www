@@ -1,0 +1,130 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { PageLayout, PageHeader } from "../../components/layouts";
+import BlogContent from "../../components/render/blog-content.astro";
+import { PostToc } from "../../components/ui";
+import {
+  ensureBlogPostsInitialized,
+  getAllPosts,
+  getAdjacentPosts,
+} from "../../lib/blog";
+import { extractTocFromHtml, renderMarkdown } from "../../lib/markdown";
+import dayjs from "dayjs";
+
+// Generate static paths for all blog posts
+export async function getStaticPaths() {
+  await ensureBlogPostsInitialized();
+
+  const posts = getAllPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { slug } = Astro.params;
+const { post } = Astro.props;
+
+if (!post) {
+  return Astro.redirect("/404");
+}
+
+const html = await renderMarkdown(post.content);
+const tocItems = extractTocFromHtml(html);
+await ensureBlogPostsInitialized();
+const { prev, next } = getAdjacentPosts(slug!);
+const primaryTag = post.tags?.[0];
+const breadcrumbs = primaryTag
+  ? [
+      { label: "博客", to: "/blog" },
+      { label: primaryTag, to: `/blog/tag/${encodeURIComponent(primaryTag)}` },
+    ]
+  : [{ label: "博客", to: "/blog" }];
+---
+
+<Layout
+  title={post.title}
+  description={post.summary}
+  path={`/blog/${post.slug}`}
+  type="article"
+  publishedTime={post.date}
+  modifiedTime={post.date}
+  tags={post.tags}
+  articleSection="Blog"
+>
+  <PageLayout>
+    <nav class="post-breadcrumb-rail page-breadcrumbs" aria-label="文章面包屑导航">
+      {breadcrumbs.map((crumb, index) => (
+        <span class="page-breadcrumb-item">
+          {index > 0 && <span> / </span>}
+          {crumb.to ? (
+            <a href={crumb.to} class="muted-link">
+              {crumb.label}
+            </a>
+          ) : (
+            <span>{crumb.label}</span>
+          )}
+        </span>
+      ))}
+    </nav>
+    <PageHeader
+      title={post.title}
+      transitionName={`blog-title-${post.slug}`}
+      subtitle={post.date ? dayjs(post.date).format("YYYY 年 MM 月 DD 日") : undefined}
+    />
+
+    {tocItems.length > 0 && <PostToc items={tocItems} />}
+
+    <div class="mt-4">
+      <BlogContent html={html} />
+    </div>
+
+    {
+      post.tags && post.tags.length > 0 && (
+        <div class="mt-8">
+          <div class="flex flex-wrap">
+            分类：
+            {post.tags.map((tag: string) => (
+              <a href={`/blog/tag/${encodeURIComponent(tag)}`}>{tag}</a>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    <nav
+      class="flex flex-row justify-between gap-4 pt-8 mt-8 border-t border-border-subtle"
+    >
+      {
+        prev ? (
+          <a
+            href={`/blog/${prev.slug}`}
+            class="group flex flex-col gap-1 sm:w-1/2 sm:pr-4"
+          >
+            <span class="text-sm text-text-muted">上一篇</span>
+            <span class="text-base font-medium group-hover:text-text-muted-hover transition-colors">
+              {prev.title}
+            </span>
+          </a>
+        ) : (
+          <div class="sm:w-1/2 sm:pr-4" />
+        )
+      }
+      {
+        next ? (
+          <a
+            href={`/blog/${next.slug}`}
+            class="group flex flex-col gap-1 sm:w-1/2 sm:pl-4 text-right items-end"
+          >
+            <span class="text-sm text-text-muted">下一篇</span>
+            <span class="text-base font-medium group-hover:text-text-muted-hover transition-colors">
+              {next.title}
+            </span>
+          </a>
+        ) : (
+          <div class="sm:w-1/2 sm:pl-4" />
+        )
+      }
+    </nav>
+  </PageLayout>
+</Layout>

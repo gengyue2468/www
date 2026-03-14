@@ -1,0 +1,44 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { PageLayout, PageHeader } from "../../../components/layouts";
+import { PostTimeline } from "../../../components/ui";
+import { ensureBlogPostsInitialized, getAllPosts, getPostsByTag } from "../../../lib/blog";
+
+// Generate static paths for all tags
+export async function getStaticPaths() {
+  await ensureBlogPostsInitialized();
+
+  const posts = getAllPosts();
+  const tagSet = new Set<string>();
+  posts.forEach(post => {
+    post.tags?.forEach(tag => tagSet.add(tag));
+  });
+
+  return Array.from(tagSet).map(tag => ({
+    params: { tagName: tag },
+    props: { tag },
+  }));
+}
+
+const { tagName } = Astro.params;
+const { tag } = Astro.props;
+
+if (!tag) {
+  return Astro.redirect('/404');
+}
+
+await ensureBlogPostsInitialized();
+
+const posts = getPostsByTag(tag);
+---
+
+<Layout title={`标签: ${tag}`} description={`查看所有 "${tag}" 相关的文章`}>
+  <PageLayout>
+    <PageHeader title={tag} subtitle={`共 ${posts.length} 篇文章`} />
+      {posts.length > 0 ? (
+        <PostTimeline posts={posts} />
+      ) : (
+        <p class="text-text-muted">没有找到相关文章。</p>
+      )}
+  </PageLayout>
+</Layout>

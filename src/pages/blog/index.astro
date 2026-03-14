@@ -1,0 +1,19 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { PageLayout, PageHeader } from "../../components/layouts";
+import { PostTimeline } from "../../components/ui";
+import { ensureBlogPostsInitialized, getAllPosts } from "../../lib/blog";
+
+await ensureBlogPostsInitialized();
+
+const posts = getAllPosts();
+const title = "博客";
+const description = "一些我的想法、笔记或随笔。";
+---
+
+<Layout title={title} description={description}>
+  <PageLayout>
+    <PageHeader title={title} subtitle={description} />
+    <PostTimeline posts={posts} />
+  </PageLayout>
+</Layout>

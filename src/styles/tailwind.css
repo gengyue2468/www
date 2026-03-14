@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Overused Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "JetBrains Mono", "Jetbrains Mono", ui-monospace, SFMono-Regular, "SF Mono",
+    Consolas, monospace;
+  --color-bg: #fafafa;
+  --color-surface: #f2f2f2;
+  --color-surface-hover: #e8e8e8;
+  --color-border: #ddd;
+  --color-border-subtle: #eaeaea;
+  --color-text: #1a1a1a;
+  --color-text-muted: #737373;
+  --color-accent: rgba(0, 0, 0, 0.04);
+  --color-link: #1a1a1a;
+  --color-link-hover: #666;
+}

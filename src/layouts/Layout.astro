@@ -1,0 +1,71 @@
+---
+import "../styles/tailwind.css";
+import "../styles/custom.css";
+import { ClientRouter } from "astro:transitions";
+import BaseLayout from "../components/layouts/base";
+import Navigation from "../components/layouts/navigation";
+import SeoHead from "../components/render/seo-head.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  path?: string;
+  image?: string;
+  type?: "website" | "article";
+  publishedTime?: string;
+  modifiedTime?: string;
+  tags?: string[];
+  noindex?: boolean;
+  articleSection?: string;
+}
+
+const {
+  title,
+  description,
+  path,
+  image,
+  type,
+  publishedTime,
+  modifiedTime,
+  tags,
+  noindex,
+  articleSection,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <ClientRouter />
+    <SeoHead
+      title={title}
+      description={description}
+      path={path}
+      image={image}
+      type={type}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      tags={tags}
+      noindex={noindex}
+      articleSection={articleSection}
+    />
+    <slot name="head" />
+  </head>
+  <body class="min-h-screen bg-bg text-text antialiased root">
+    <script>
+      import { mountMermaidRuntime } from "../scripts/mermaid-runtime";
+
+      mountMermaidRuntime();
+    </script>
+    <Navigation client:load transition:persist />
+    <BaseLayout>
+      <main id="main-content" class="outline-none" tabindex="-1" transition:name="page-content">
+        <slot />
+      </main>
+    </BaseLayout>
+  </body>
+</html>

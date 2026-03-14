@@ -1,0 +1,74 @@
+---
+title: 您好，我是 gengyue
+description: Z2VuZ3l1ZQo=
+---
+
+上面是一串神秘的数字 ↑，你可能觉得很奇怪也很突兀。事实上，这是 base64 编码的字符串，你可以试试解码看看这是什么。[note: 其实就是 gengyue]
+
+您能够访问这个页面，说明这个页面的构建是成功的，部署是成功的，您与浏览器，浏览器与 Cloudflare，Cloudflare 与源站之间的连接都是成功的，这并不是一种成功学理论，也不是侃侃而谈的废话，而是彻头彻尾的废话，没有那么多高大上，也没有那么温文尔雅。[note: 读者相想必熟悉网页的访问哲学，这里不再赘述。但是，提请读者注意，假使 Cloudflare 挂了，或者源站挂了，或者访问者的网络挂了，那么这个页面就无法访问了，这就是互联网的魅力所在 —— infra 构成了脆弱的构石]
+
+一个合格的站点应该有一个关于页面，我的也不例外，您可以访问[关于](/about)页面来详细了解一下，不过那里的信息可能也并不全面。
+
+如果你喜欢看一些技术性的东西，或者想看看我在写什么，那么你可以访问[博客](/blog)页面，那里有一些我写的文章，虽然不多，但也算是一个开始了。[note: 博客里的内容可能会很杂乱无章，所以没啥好看的...或者说，可以叫做垃圾场...随便你怎么说]
+
+如果你需要一些代码库，可以看我的 [GitHub](https://github.com/gengyue2468)，可能那里有一些~~有趣的~~小玩具，但是估计都没什么大用处。
+
+hmm... 感觉差不多了，如果你想要和我聊聊，可以发邮件到 [hi [at] gengyue [dot] site](mailto:hi@gengyue.site)，或者随便找个社交媒体然后和我发消息。[note:前提是你能盒到我的社交媒体]
+
+如果您希望加密您的投递，可以使用我的 PGP 公钥，贴在这里：
+
+```
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+=6gYL
+-----END PGP PUBLIC KEY BLOCK-----
+```
+
+感谢您在此停留，阅读上面的废话，或者只是简单地跳读到了这里，不管怎么样，感谢您在这里的停留，您的停留不仅在 Cloudflare 的 beacon.js 留下了访问痕迹，而且在互联网上留下了独属于您的痕迹，感谢您为互联网做的一切！[note: 再次感谢，如果您还在阅读这个 sidenote 的话]

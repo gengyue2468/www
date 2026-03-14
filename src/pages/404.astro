@@ -1,0 +1,21 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { PageLayout, PageHeader } from "../components/layouts";
+import BlogContent from "../components/render/blog-content.astro";
+import { renderMarkdown, parsePageFrontmatter } from "../lib/markdown";
+
+// Import 404.md content
+import notFoundContent from "../contents/pages/404.md?raw";
+
+const { frontmatter, body } = parsePageFrontmatter(notFoundContent);
+const html = await renderMarkdown(body);
+const title = frontmatter.title ?? "404";
+const description = frontmatter.description ?? "页面未找到";
+---
+
+<Layout title={title} description={description} noindex={true}>
+  <PageLayout>
+    <PageHeader title={title} subtitle={description} />
+    <BlogContent html={html} />
+  </PageLayout>
+</Layout>

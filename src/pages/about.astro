@@ -1,0 +1,27 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { PageLayout, PageHeader } from "../components/layouts";
+import BlogContent from "../components/render/blog-content.astro";
+import { renderMarkdown, parsePageFrontmatter } from "../lib/markdown";
+
+// Import about.md content
+import aboutContent from "../contents/pages/about.md?raw";
+
+const { frontmatter, body } = parsePageFrontmatter(aboutContent);
+const html = await renderMarkdown(body);
+const title = frontmatter.title ?? "关于";
+const description = frontmatter.description ?? frontmatter.summary ?? "关于我";
+---
+
+<Layout
+  title={title}
+  description={description}
+>
+  <PageLayout>
+    <PageHeader
+      title={title}
+      subtitle={description}
+    />
+    <BlogContent html={html} />
+  </PageLayout>
+</Layout>

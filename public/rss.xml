@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>gengyue Blog</title>
+        <link>https://gengyue.site</link>
+        <description>gengyue 的个人网站，记录技术探索、项目实践与生活思考。</description>
+        <lastBuildDate>Tue, 24 Feb 2026 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <language>zh-CN</language>
+        <image>
+            <title>gengyue Blog</title>
+            <url>https://gengyue.site/static/og/og-image.webp</url>
+            <link>https://gengyue.site</link>
+        </image>
+        <copyright>2026 gengyue</copyright>
+        <item>
+            <title><![CDATA[用 Ink 写 TUI！]]></title>
+            <link>https://gengyue.site/blog/ink-tui</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/ink-tui</guid>
+            <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[用 Ink 写 TUI，React 语法写 CLI，给 HUST-Chifan 做了终端界面。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[自建 Tailscale Derp 服务器]]></title>
+            <link>https://gengyue.site/blog/derp-server</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/derp-server</guid>
+            <pubDate>Sun, 22 Feb 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[49 元/年香港 VPS 跑 Tailscale 自建 DERP，移动友好，systemd 持久化，安全省钱。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[奇怪的 Cloudflare Tunnel]]></title>
+            <link>https://gengyue.site/blog/weird-cloudflare-tunnel</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/weird-cloudflare-tunnel</guid>
+            <pubDate>Sat, 14 Feb 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[Cloudflare Tunnel + Zero Trust 穿透内网连 Mac，折腾 LaunchDaemon 自启和证书配置。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[简单的标记嵌套处理]]></title>
+            <link>https://gengyue.site/blog/nested-inline-parser</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/nested-inline-parser</guid>
+            <pubDate>Fri, 13 Feb 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[手写支持嵌套的文本解析器，栈处理括号匹配，递归构建 AST。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[用 Tailscale 组大内网！]]></title>
+            <link>https://gengyue.site/blog/tailscale</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/tailscale</guid>
+            <pubDate>Tue, 10 Feb 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[用 Tailscale 替代 WireGuard 组大内网，多设备互通，macOS 重启需重认证。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[迁移 Memos 到 Racknerd]]></title>
+            <link>https://gengyue.site/blog/memos-migration</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/memos-migration</guid>
+            <pubDate>Sat, 07 Feb 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[Memos 迁移到 RackNerd，配了定时备份脚本，数据双保险。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[装一下 Memos]]></title>
+            <link>https://gengyue.site/blog/memos</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/memos</guid>
+            <pubDate>Sun, 01 Feb 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[自部署 Memos，Docker + Nginx 反代，API 接入 QQ Bot 自动推送。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[试一试 Intent Parsing]]></title>
+            <link>https://gengyue.site/blog/try-intent-parsing</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/try-intent-parsing</guid>
+            <pubDate>Thu, 29 Jan 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[用 LLM 做 Intent Parsing，自然语言转结构化 API 调用，探索语义路由。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[配置一下 SSL]]></title>
+            <link>https://gengyue.site/blog/ssl-config</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/ssl-config</guid>
+            <pubDate>Mon, 19 Jan 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[解决 Cloudflare 522 错误，配 Origin Certificate 和 Nginx HTTPS，发现是 ufw 没开 443。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[折腾一下 EdgeOne]]></title>
+            <link>https://gengyue.site/blog/edgeone-test</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/edgeone-test</guid>
+            <pubDate>Tue, 13 Jan 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[从 Cloudflare Pages 迁移到 EdgeOne，踩坑 cdn-loop 后改回源 Vercel，搞定静态加速。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[重构博客]]></title>
+            <link>https://gengyue.site/blog/refactor-blog</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/refactor-blog</guid>
+            <pubDate>Fri, 09 Jan 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[Node.js + Markdown-It + Tufte CSS 重构博客，0 运行时 JS，Lighthouse 几乎满分。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[出去走走]]></title>
+            <link>https://gengyue.site/blog/walk-outside</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/walk-outside</guid>
+            <pubDate>Fri, 02 Jan 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[元旦武汉 city walk：归元寺、月湖、龟山、长江大桥、户部巷，图片记录松弛旅途。]]></description>
+            <author>gengyue</author>
+            <category>生活</category>
+        </item>
+        <item>
+            <title><![CDATA[2025 年终总结]]></title>
+            <link>https://gengyue.site/blog/2025-year-in-review</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/2025-year-in-review</guid>
+            <pubDate>Thu, 01 Jan 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[2025 回顾：高考结束、成都武汉 travels、大学军训冰社实习，绿皮车跨年。]]></description>
+            <author>gengyue</author>
+            <category>生活</category>
+        </item>
+        <item>
+            <title><![CDATA[2025 浏览器从A-Z]]></title>
+            <link>https://gengyue.site/blog/2025-a-z</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/2025-a-z</guid>
+            <pubDate>Wed, 31 Dec 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[A-Z 盘点 2025 常访网站：AI 工具、前端框架、设计资源，浓缩上网轨迹。]]></description>
+            <author>gengyue</author>
+            <category>生活</category>
+        </item>
+        <item>
+            <title><![CDATA[组会分享:神奇的 Tiptap 编辑器]]></title>
+            <link>https://gengyue.site/blog/tiptap</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/tiptap</guid>
+            <pubDate>Sat, 20 Dec 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Tiptap 富文本编辑器分享，无头设计、插件丰富，适合高度定制场景。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[好神奇的 WSL!]]></title>
+            <link>https://gengyue.site/blog/magic-wsl</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/magic-wsl</guid>
+            <pubDate>Fri, 19 Dec 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[WSL 让 Linux 和 Windows 无缝融合，一行命令安装，丝滑开发体验。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[童话:玛德和法克的故事]]></title>
+            <link>https://gengyue.site/blog/mother-fuck</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/mother-fuck</guid>
+            <pubDate>Thu, 18 Dec 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[程序员童话：玛德和法克的友情被 Params、Request 等新朋友打破，分组玩耍各有归属。]]></description>
+            <author>gengyue</author>
+            <category>生活</category>
+        </item>
+        <item>
+            <title><![CDATA[小故事:我们不说“包的”]]></title>
+            <link>https://gengyue.site/blog/baode-story</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/baode-story</guid>
+            <pubDate>Tue, 16 Dec 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[程序员风格家庭小故事：429 漏水、webpack 修水管、useEffect 异步等水来。]]></description>
+            <author>gengyue</author>
+            <category>生活</category>
+        </item>
+        <item>
+            <title><![CDATA[小玩具:HUST 吃饭]]></title>
+            <link>https://gengyue.site/blog/hust-chifan</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/hust-chifan</guid>
+            <pubDate>Mon, 15 Dec 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Next.js 重写 HUST 食堂查询，爬取官网数据，实时计算开放状态，支持 API 集成。]]></description>
+            <author>gengyue</author>
+            <category>技术</category>
+        </item>
+        <item>
+            <title><![CDATA[月入 -1.2k的不精致男大学生如何坐火车？]]></title>
+            <link>https://gengyue.site/blog/train</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/train</guid>
+            <pubDate>Sun, 14 Dec 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[手把手教你坐火车，从买票到包整节车厢，冬季别开绿皮车窗。]]></description>
+            <author>gengyue</author>
+            <category>生活</category>
+        </item>
+        <item>
+            <title><![CDATA[重新开始写博客]]></title>
+            <link>https://gengyue.site/blog/hello-world</link>
+            <guid isPermaLink="false">https://gengyue.site/blog/hello-world</guid>
+            <pubDate>Fri, 12 Dec 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[回归写博客，在 AI 时代选择自言自语，记录思绪和代码折腾。]]></description>
+            <author>gengyue</author>
+            <category>生活</category>
+        </item>
+    </channel>
+</rss>
