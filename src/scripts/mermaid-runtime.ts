@@ -5,10 +5,12 @@ type MermaidApi = {
 
 type ShikiHighlighter = {
   codeToHtml: (code: string, opts: { lang: string; theme: string }) => string;
+  loadLanguage: (...langs: any[]) => Promise<void>;
+  getLoadedLanguages: () => string[];
 };
 
 let mermaidPromise: Promise<MermaidApi> | null = null;
-let shikiPromise: Promise<ShikiHighlighter> | null = null;
+let highlighter: ShikiHighlighter | null = null;
 
 function getMermaid(): Promise<MermaidApi> {
   if (!mermaidPromise) {
@@ -17,42 +19,21 @@ function getMermaid(): Promise<MermaidApi> {
   return mermaidPromise;
 }
 
-function getHighlighter(): Promise<ShikiHighlighter> {
-  if (!shikiPromise) {
-    shikiPromise = import("shiki").then(({ createHighlighter }) =>
-      createHighlighter({
-        themes: ["github-dark", "github-light"],
-        langs: [
-          "javascript",
-          "typescript",
-          "js",
-          "ts",
-          "jsx",
-          "tsx",
-          "json",
-          "html",
-          "css",
-          "bash",
-          "shell",
-          "python",
-          "rust",
-          "go",
-          "java",
-          "markdown",
-          "md",
-          "yaml",
-          "toml",
-          "sql",
-          "dockerfile",
-          "nginx",
-          "vim",
-          "lua",
-          "text",
-        ],
-      }),
-    );
+async function getHighlighter(langs: string[]): Promise<ShikiHighlighter> {
+  const { createHighlighter } = await import("shiki");
+  if (!highlighter) {
+    highlighter = (await createHighlighter({
+      themes: ["github-dark", "github-light"],
+      langs,
+    })) as unknown as ShikiHighlighter;
+    return highlighter;
   }
-  return shikiPromise;
+  const loaded = new Set(highlighter.getLoadedLanguages());
+  const newLangs = langs.filter((l) => !loaded.has(l));
+  if (newLangs.length) {
+    await Promise.allSettled(newLangs.map((l) => highlighter!.loadLanguage(l as any)));
+  }
+  return highlighter;
 }
 
 function resolveIsDark(): boolean {
@@ -131,7 +112,15 @@ async function highlightCodeBlocks(): Promise<void> {
 
   if (!blocks.length) return;
 
-  const highlighter = await getHighlighter();
+  const pageLangs = [
+    ...new Set(
+      blocks
+        .map(detectLang)
+        .filter((l) => l !== "mermaid" && l !== "text" && l !== "plain"),
+    ),
+  ];
+
+  const hl = await getHighlighter(pageLangs);
   const theme = getShikiTheme();
 
   for (const codeEl of blocks) {
@@ -145,19 +134,13 @@ async function highlightCodeBlocks(): Promise<void> {
     const rawCode = codeEl.textContent || "";
 
     try {
-      const html = highlighter.codeToHtml(rawCode, {
-        lang,
-        theme,
-      });
+      const html = hl.codeToHtml(rawCode, { lang, theme });
       const wrapper = document.createElement("div");
       wrapper.innerHTML = html;
       const shikiCode = wrapper.querySelector("pre code");
-
       if (shikiCode) {
-        // Keep the existing <pre> so prose block styling remains unchanged.
         codeEl.innerHTML = shikiCode.innerHTML;
       }
-
       pre.setAttribute("data-code-enhanced", "true");
     } catch {
       pre.setAttribute("data-code-enhanced", "true");
