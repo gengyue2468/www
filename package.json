@@ -1,0 +1,40 @@
+{
+  "name": "www",
+  "version": "1.0.0",
+  "description": "gengyue's website.",
+  "type": "module",
+  "scripts": {
+    "build": "bun run src/index.ts",
+    "dev": "bun run src/index.ts && bunx serve dist",
+    "serve": "bunx serve dist",
+    "deploy": "bash scripts/deploy.sh",
+    "build-only": "bash scripts/build.sh",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "blog",
+    "static",
+    "tufte-css"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "feed": "^5.1.0",
+    "generate-robotstxt": "^8.0.3",
+    "gray-matter": "^4.0.3",
+    "markdown-it": "^14.1.0",
+    "markdown-it-container": "^3.0.0",
+    "sitemap": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/clean-css": "^4.2.11",
+    "@types/html-minifier": "^4.0.6",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^20.11.0",
+    "bun-types": "^1.1.0",
+    "clean-css": "^5.3.3",
+    "html-minifier": "^4.0.0",
+    "serve": "^14.2.1",
+    "typescript": "^5.3.3"
+  }
+}

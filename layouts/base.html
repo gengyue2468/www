@@ -1,0 +1,92 @@
+<!--
+==============================================================================
+|
+|   ggggg    eeeee   n   n   ggggg   y   y   u   u   eeeee
+|  g        e        nn  n  g        y   y   u   u   e
+|  g  ggg   eeee     n n n  g  ggg    y y    u   u   eeee
+|  g    g   e        n  nn  g    g     y     u   u   e
+|   ggggg    eeeee   n   n   ggggg     y      uuuu   eeeee
+|
+| > I'm gengyue.
+| > Welcome to my website.
+| > Below is the pure DOM structure of the site.
+| > Have fun!
+|
+==============================================================================
+-->
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="author" content="{{author}}" />
+    <meta name="description" content="{{description}}" />
+    {{keywords}}
+    <title>{{title}}</title>
+    <link rel="canonical" href="{{canonicalUrl}}" />
+    {{ogTags}} {{jsonLd}}
+    <link rel="icon" href="/favicon.ico" />
+    <link
+      rel="preload"
+      href="/fonts/et-book-roman-line-figures.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/et-book-display-italic-old-style-figures.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/et-book-bold-line-figures.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/source-han-serif-cn-vf/result.css"
+      as="style"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+    />
+    <noscript>
+      <link rel="stylesheet" href="/fonts/source-han-serif-cn-vf/result.css" />
+    </noscript>
+    <link rel="dns-prefetch" href="https://umami.gengyue.site" />
+    <link rel="preconnect" href="https://umami.gengyue.site" crossorigin />
+    <script
+      defer
+      src="https://umami.gengyue.site/script.js"
+      data-website-id="365406e1-29dc-44b9-895d-ff41a1e21ae1"
+    ></script>
+    {{css}}
+  </head>
+  <body>
+    <nav>{{nav}}</nav>
+
+    <main>
+      <article>
+        <section>{{content}}</section>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <p>
+        &copy; {{year}} {{author}}. <a href="/rss.xml">RSS</a> |
+        <a href="/sitemap.xml">Sitemap</a>{{footerLlms}}
+      </p>
+    </footer>
+
+    {{scripts}}
+  </body>
+</html>
