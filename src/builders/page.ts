@@ -3,19 +3,13 @@ import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate, renderNav } from "../utils/template.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
+import {
+  buildMetaDescription,
+  escapeHtmlAttr,
+  escapeHtmlText,
+  smartTruncate,
+} from "../utils/seo.js";
 import config from "../config.js";
-
-/**
- * Truncate description to optimal length for SEO (150 chars)
- */
-function truncateDescription(description: string, maxLength = 150): string {
-  if (description.length <= maxLength) return description;
-  const truncated = description.substring(0, maxLength);
-  const lastPeriod = truncated.lastIndexOf("。");
-  const lastSpace = truncated.lastIndexOf(" ");
-  const cutoff = lastPeriod > 0 ? lastPeriod + 1 : (lastSpace > 0 ? lastSpace : maxLength);
-  return truncated.substring(0, cutoff) + "...";
-}
 
 /**
  * Generate SEO-friendly page title
@@ -49,23 +43,30 @@ function generateOgTags(
   ogImageHeight?: number,
   ogImageAlt?: string
 ): string {
+  const safeTitle = escapeHtmlAttr(title);
+  const safeDescription = escapeHtmlAttr(smartTruncate(description));
+  const safeUrl = escapeHtmlAttr(url);
+  const safeType = escapeHtmlAttr(type);
+  const safeSiteName = escapeHtmlAttr(config.site.title);
+
   const parts: string[] = [
-    `<meta property="og:title" content="${title}" />`,
-    `<meta property="og:description" content="${truncateDescription(description)}" />`,
-    `<meta property="og:url" content="${url}" />`,
-    `<meta property="og:type" content="${type}" />`,
-    `<meta property="og:site_name" content="${config.site.title}" />`,
+    `<meta property="og:title" content="${safeTitle}" />`,
+    `<meta property="og:description" content="${safeDescription}" />`,
+    `<meta property="og:url" content="${safeUrl}" />`,
+    `<meta property="og:type" content="${safeType}" />`,
+    `<meta property="og:site_name" content="${safeSiteName}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
-    `<meta name="twitter:title" content="${title}" />`,
-    `<meta name="twitter:description" content="${truncateDescription(description)}" />`,
+    `<meta name="twitter:title" content="${safeTitle}" />`,
+    `<meta name="twitter:description" content="${safeDescription}" />`,
   ];
 
   if (ogImageUrl) {
-    parts.push(`<meta property="og:image" content="${ogImageUrl}" />`);
+    const safeOgImageUrl = escapeHtmlAttr(ogImageUrl);
+    parts.push(`<meta property="og:image" content="${safeOgImageUrl}" />`);
     if (ogImageWidth) parts.push(`<meta property="og:image:width" content="${ogImageWidth}" />`);
     if (ogImageHeight) parts.push(`<meta property="og:image:height" content="${ogImageHeight}" />`);
-    if (ogImageAlt) parts.push(`<meta property="og:image:alt" content="${ogImageAlt}" />`);
-    parts.push(`<meta name="twitter:image" content="${ogImageUrl}" />`);
+    if (ogImageAlt) parts.push(`<meta property="og:image:alt" content="${escapeHtmlAttr(ogImageAlt)}" />`);
+    parts.push(`<meta name="twitter:image" content="${safeOgImageUrl}" />`);
   }
 
   return parts.join("\n    ");
@@ -85,7 +86,7 @@ function generatePageJsonLd(route: string, title: string, description: string): 
           "@id": `${baseUrl}/#website`,
           url: baseUrl + "/",
           name: siteName,
-          description: truncateDescription(description),
+          description: smartTruncate(description),
           author: { "@type": "Person", name: authorName },
         },
         {
@@ -106,7 +107,7 @@ function generatePageJsonLd(route: string, title: string, description: string): 
     "@type": "WebPage",
     url: pageUrl,
     name: title,
-    description: truncateDescription(description),
+    description: smartTruncate(description),
     isPartOf: {
       "@type": "WebSite",
       name: siteName,
@@ -173,22 +174,29 @@ export async function buildPage(
   const scripts = hasMermaid ? mermaidScript : "";
 
   const pageUrl = `${config.site.url}${route}`;
-  const description = (frontmatter.summary as string) || (frontmatter.excerpt as string) || config.site.description;
-
   const fullTitle = generatePageTitle(title, route);
+  const description = buildMetaDescription({
+    title,
+    primary:
+      (frontmatter.summary as string) ||
+      (frontmatter.excerpt as string) ||
+      (frontmatter.description as string),
+    fallbackHtml: html,
+    siteDescription: config.site.description,
+  });
 
   const baseData = {
-    title: fullTitle,
+    title: escapeHtmlText(fullTitle),
     siteTitle: config.site.title,
-    description: truncateDescription(description),
-    author: config.site.author,
+    description: escapeHtmlAttr(description),
+    author: escapeHtmlAttr(config.site.author),
     year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
     css: inlinedCss,
     nav: renderNav(config.nav),
     scripts,
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
-    canonicalUrl: pageUrl,
+    canonicalUrl: escapeHtmlAttr(pageUrl),
     keywords: "",
     ogTags: generateOgTags(
       fullTitle,

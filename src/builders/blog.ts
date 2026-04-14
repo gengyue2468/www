@@ -5,6 +5,12 @@ import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate, renderNav } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
+import {
+  buildMetaDescription,
+  escapeHtmlAttr,
+  escapeHtmlText,
+  smartTruncate,
+} from "../utils/seo.js";
 import config from "../config.js";
 import type { Post } from "../types.js";
 
@@ -13,19 +19,6 @@ interface PostWithContent extends Post {
   html: string;
   filePath: string;
   frontmatter: Record<string, unknown>;
-}
-
-/**
- * Truncate description to optimal length for SEO (150 chars)
- */
-function truncateDescription(description: string, maxLength = 150): string {
-  if (description.length <= maxLength) return description;
-  // Find the last sentence or phrase boundary before maxLength
-  const truncated = description.substring(0, maxLength);
-  const lastPeriod = truncated.lastIndexOf("。");
-  const lastSpace = truncated.lastIndexOf(" ");
-  const cutoff = lastPeriod > 0 ? lastPeriod + 1 : (lastSpace > 0 ? lastSpace : maxLength);
-  return truncated.substring(0, cutoff) + "...";
 }
 
 /**
@@ -43,7 +36,7 @@ function generatePostTitle(postTitle: string, _tags?: string[]): string {
 function generateKeywords(tags: string[] | undefined): string {
   if (!tags || tags.length === 0) return "";
   const keywords = tags.join(", ");
-  return `<meta name="keywords" content="${keywords}" />`;
+  return `<meta name="keywords" content="${escapeHtmlAttr(keywords)}" />`;
 }
 
 /**
@@ -60,28 +53,35 @@ function generateOgTags(
   ogImageHeight?: number,
   ogImageAlt?: string
 ): string {
+  const safeTitle = escapeHtmlAttr(title);
+  const safeDescription = escapeHtmlAttr(smartTruncate(description));
+  const safeUrl = escapeHtmlAttr(url);
+  const safeType = escapeHtmlAttr(type);
+  const safeSiteName = escapeHtmlAttr(config.site.title);
+
   const parts: string[] = [
-    `<meta property="og:title" content="${title}" />`,
-    `<meta property="og:description" content="${truncateDescription(description)}" />`,
-    `<meta property="og:url" content="${url}" />`,
-    `<meta property="og:type" content="${type}" />`,
-    `<meta property="og:site_name" content="${config.site.title}" />`,
+    `<meta property="og:title" content="${safeTitle}" />`,
+    `<meta property="og:description" content="${safeDescription}" />`,
+    `<meta property="og:url" content="${safeUrl}" />`,
+    `<meta property="og:type" content="${safeType}" />`,
+    `<meta property="og:site_name" content="${safeSiteName}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
-    `<meta name="twitter:title" content="${title}" />`,
-    `<meta name="twitter:description" content="${truncateDescription(description)}" />`,
+    `<meta name="twitter:title" content="${safeTitle}" />`,
+    `<meta name="twitter:description" content="${safeDescription}" />`,
   ];
 
   if (ogImageUrl) {
-    parts.push(`<meta property="og:image" content="${ogImageUrl}" />`);
+    const safeOgImageUrl = escapeHtmlAttr(ogImageUrl);
+    parts.push(`<meta property="og:image" content="${safeOgImageUrl}" />`);
     if (ogImageWidth) parts.push(`<meta property="og:image:width" content="${ogImageWidth}" />`);
     if (ogImageHeight) parts.push(`<meta property="og:image:height" content="${ogImageHeight}" />`);
-    if (ogImageAlt) parts.push(`<meta property="og:image:alt" content="${ogImageAlt}" />`);
-    parts.push(`<meta name="twitter:image" content="${ogImageUrl}" />`);
+    if (ogImageAlt) parts.push(`<meta property="og:image:alt" content="${escapeHtmlAttr(ogImageAlt)}" />`);
+    parts.push(`<meta name="twitter:image" content="${safeOgImageUrl}" />`);
   }
 
   if (tags && tags.length > 0) {
     parts.push(`<meta name="twitter:label1" content="标签" />`);
-    parts.push(`<meta name="twitter:data1" content="${tags.slice(0, 3).join(", ")}" />`);
+    parts.push(`<meta name="twitter:data1" content="${escapeHtmlAttr(tags.slice(0, 3).join(", "))}" />`);
   }
 
   return parts.join("\n    ");
@@ -101,7 +101,7 @@ function generateJsonLd(
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: title,
-    description: truncateDescription(description),
+    description: smartTruncate(description),
     url: url,
     author: {
       "@type": "Person",
@@ -143,7 +143,7 @@ function generateBlogIndexJsonLd(
     "@type": "CollectionPage",
     url,
     name: title,
-    description: truncateDescription(description),
+    description: smartTruncate(description),
     numberOfItems,
     isPartOf: {
       "@type": "WebSite",
@@ -322,21 +322,28 @@ export async function buildBlogIndex(
 
   const blogUrl = `${config.site.url}/blog`;
   const blogTitle = `Blog - ${config.site.title}`;
+  const blogDescription = buildMetaDescription({
+    title: "Blog",
+    primary: config.site.description,
+    fallbackText: `Latest posts from ${config.site.title}`,
+    siteDescription: config.site.description,
+  });
+
   const baseData = {
-    title: blogTitle,
+    title: escapeHtmlText(blogTitle),
     siteTitle: config.site.title,
-    description: truncateDescription(config.site.description),
-    author: config.site.author,
+    description: escapeHtmlAttr(blogDescription),
+    author: escapeHtmlAttr(config.site.author),
     year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
     css: css || "",
     nav: renderNav(config.nav),
     scripts: "",
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
-    canonicalUrl: blogUrl,
+    canonicalUrl: escapeHtmlAttr(blogUrl),
     keywords: "",
-    ogTags: generateOgTags(blogTitle, config.site.description, blogUrl, "website"),
-    jsonLd: generateBlogIndexJsonLd(blogTitle, config.site.description, blogUrl, posts.length),
+    ogTags: generateOgTags(blogTitle, blogDescription, blogUrl, "website"),
+    jsonLd: generateBlogIndexJsonLd(blogTitle, blogDescription, blogUrl, posts.length),
   };
   const output = renderTemplate(baseLayout, baseData);
 
@@ -412,7 +419,15 @@ export async function buildBlogPosts(
     };
     const renderedContent = renderTemplate(blogPostLayout, contentData);
 
-    const description = (frontmatter.summary as string) || config.site.description;
+    const description = buildMetaDescription({
+      title,
+      primary:
+        (frontmatter.summary as string) ||
+        (frontmatter.excerpt as string) ||
+        (frontmatter.description as string),
+      fallbackHtml: html,
+      siteDescription: config.site.description,
+    });
     const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
     const scripts = hasMermaid ? mermaidScript : "";
 
@@ -425,17 +440,17 @@ export async function buildBlogPosts(
       : undefined;
 
     const baseData = {
-      title: fullTitle,
+      title: escapeHtmlText(fullTitle),
       siteTitle: config.site.title,
-      description: truncateDescription(description),
-      author: config.site.author,
+      description: escapeHtmlAttr(description),
+      author: escapeHtmlAttr(config.site.author),
       year: year?.toString() || new Date().getFullYear().toString(),
       content: renderedContent,
       css: css || "",
       nav: renderNav(config.nav),
       scripts,
       footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
-      canonicalUrl: postUrl,
+      canonicalUrl: escapeHtmlAttr(postUrl),
       keywords: generateKeywords(postTags),
       ogTags: generateOgTags(
         fullTitle,
@@ -524,21 +539,26 @@ export async function buildTagPages(
       const renderedContent = renderTemplate(tagsLayout, contentData);
 
       const tagUrl = `${config.site.url}/blog/tag/${slug}`;
-      const tagDescription = `Posts tagged with "${tag}" - ${config.site.title}`;
+      const tagDescription = buildMetaDescription({
+        title: `#${tag}`,
+        primary: `Posts tagged with \"${tag}\" on ${config.site.title}`,
+        fallbackText: config.site.description,
+        siteDescription: config.site.description,
+      });
       const tagPageTitle = `#${tag} - ${config.site.title}`;
 
       const baseData = {
-        title: tagPageTitle,
+        title: escapeHtmlText(tagPageTitle),
         siteTitle: config.site.title,
-        description: truncateDescription(tagDescription),
-        author: config.site.author,
+        description: escapeHtmlAttr(tagDescription),
+        author: escapeHtmlAttr(config.site.author),
         year: year?.toString() || new Date().getFullYear().toString(),
         content: renderedContent,
         css: css || "",
         nav: renderNav(config.nav),
         scripts: "",
         footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
-        canonicalUrl: tagUrl,
+        canonicalUrl: escapeHtmlAttr(tagUrl),
         keywords: generateKeywords([tag]),
         ogTags: generateOgTags(tagPageTitle, tagDescription, tagUrl, "website", [tag]),
         jsonLd: "",
@@ -611,21 +631,26 @@ async function buildTagIndexPage(
   const renderedContent = renderTemplate(tagsLayout, contentData);
 
   const tagsIndexUrl = `${config.site.url}/blog/tag`;
-  const tagsIndexDescription = `All tags - ${config.site.title}`;
   const tagsIndexTitle = `Tags - ${config.site.title}`;
+  const tagsIndexDescription = buildMetaDescription({
+    title: "Tags",
+    primary: `Browse all tags and discover posts on ${config.site.title}`,
+    fallbackText: config.site.description,
+    siteDescription: config.site.description,
+  });
 
   const baseData = {
-    title: tagsIndexTitle,
+    title: escapeHtmlText(tagsIndexTitle),
     siteTitle: config.site.title,
-    description: truncateDescription(tagsIndexDescription),
-    author: config.site.author,
+    description: escapeHtmlAttr(tagsIndexDescription),
+    author: escapeHtmlAttr(config.site.author),
     year: year?.toString() || new Date().getFullYear().toString(),
     content: renderedContent,
     css: css || "",
     nav: renderNav(config.nav),
     scripts: "",
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
-    canonicalUrl: tagsIndexUrl,
+    canonicalUrl: escapeHtmlAttr(tagsIndexUrl),
     keywords: "",
     ogTags: generateOgTags(tagsIndexTitle, tagsIndexDescription, tagsIndexUrl, "website"),
     jsonLd: "",

@@ -91,6 +91,7 @@ export interface FrontMatter {
   date?: string;
   excerpt?: string;
   summary?: string;
+  description?: string;
   tags?: string[];
   [key: string]: unknown;
 }
