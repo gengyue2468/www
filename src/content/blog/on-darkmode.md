@@ -133,6 +133,39 @@ function initTheme() {
 }
 ```
 
+**Updated 2026-04-15** 针对上面 Memos 的案例，Memos 的开发者利用 Codex 巧妙的修复了这个问题，首先判断是否是黑暗模式：
+
+```typescript
+const isDarkTheme = (theme: ResolvedTheme): boolean => {
+  return theme.endsWith("-dark") || theme.endsWith(".dark");
+};
+
+/**
+ * Updates the browser native control color scheme to match the current theme.
+ */
+const updateColorScheme = (theme: ResolvedTheme): void => {
+  document.documentElement.style.colorScheme = isDarkTheme(theme) ? "dark" : "light";
+};
+
+```
+
+根据是否是黑暗模式更新 DOM 的 `colorScheme`，如果是，就设置为 `dark`，反之为 `light`。
+
+另外，Memos 的前端使用 React Router 构建，它们的 `/utils/theme.ts` 对于主题加载的函数也很值得学习：
+
+```typescript
+export const loadTheme = (themeName: string): void => {
+  const validTheme = validateTheme(themeName);
+  injectThemeStyle(resolvedTheme);
+  setThemeAttribute(resolvedTheme);
+  updateThemeColorMeta(resolvedTheme);
+  updateColorScheme(resolvedTheme);
+  setStoredTheme(validTheme); // Store original theme preference (not resolved)
+};
+```
+
+根据主题按需注入主题 CSS -> 设置主题偏好 -> 更新 Meta 颜色元数据 -> 更新 colorScheme -> 持久化到本地存储，这也是很不错的最佳实践。
+
 在某种程度上，`prefers-color-scheme` 和 `color-scheme: light dark;` 仍然是最优解，因为我们可以完全依靠浏览器的原生能力而不是繁杂的 JavaScript 脚本来控制这个极其细微的细节。一般来说，用户使用了深色主题，它们在访问网站的时候，往往需要的是一个同样舒服的深色主题，而不是选择手动切换到可能亮瞎眼的浅色模式。某种程度上，如果不是像 Memos 那样维护其它例如 Paper 这样的暖色主题（区分于 light/dark 模式），主题切换按钮往往也是没有必要的、甚至是过度设计的（over-designed)。
 
 所以，下次设计用户界面的时候，不妨先思考一下：用户真的需要手动切换主题吗？或者说，您认为用户反复的手动切换主题对它们来说也算是一种乐趣。如果是后者，那么设计一个按钮、维护一些 JavaScript 也无可厚非，但是如果用户觉得这没必要，那还是删除比较好，毕竟，少即是多嘛。
