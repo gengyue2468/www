@@ -114,13 +114,15 @@ function initTheme() {
 
 正确的做法是：**如果需要手动控制，就不要用 `color-scheme: light dark;` 而是将 `color-scheme` 的变换完全交给`.dark` 类控制。** 这是一个很细微的细节，看起来很简单，但是许多网站并没有注意这一点，导致外观上出现了一定程度的脱节。[note: 这种脱节更多地体现在浏览器的原生组件中，例如滚动条或者 Native Select 这类原生 UI 组件]
 
-比如 Memos， Memos 是一款很有趣好用开源的自由备忘录软件，前端设计得很现代精致，可惜黑暗模式下侧边栏的滚动条是白色的，这种割裂的设计顿时会让设计的优雅气质衰减。截至我在用的 0.26.0 版本，这个问题仍未解决。猜想应该是因为 Memos 维护了诸多主题的原因，不过有待考证。
+比如 Memos， Memos 是一款很有趣好用开源的自由备忘录软件，前端设计得很现代精致，可惜黑暗模式下侧边栏的滚动条是白色的（见下图），这种割裂的设计顿时会让设计的优雅气质衰减。截至我在用的 0.26.0 版本，这个问题仍未解决。猜想应该是因为 Memos 维护了诸多主题的原因，不过有待考证。
+
+![Memos 黑暗模式下滚动条的突兀](/static/tech/memos-darkmode.webp)
 
 > Updated 2026-04-15
 > 
 > 我给 Memos 提了一个 Issue: [Dark themes do not set `color-scheme`, causing native browser UI elements such as scrollbar to stay light · Issue #5839 · usememos/memos](https://github.com/usememos/memos/issues/5839)。可惜下午满课，手边没有电脑，~~没法水个 pr~~。但是这个问题确实在 [chore: set native color scheme for dark themes by boojack · Pull Request #5840 · usememos/memos](https://github.com/usememos/memos/pull/5840) 中解决了，还是很快速的。
 > 
-> 哎，不过我似乎并不打算更新 Memos 的版本，所以只为服务后人了...
+> 哎，不过我似乎并不打算更新 Memos 的版本，所以只为服务后人了...（其实并非，我们可以通过简单的自定义代码解决这个问题，见下面提到的解决方案）
 
 要解决类似的问题，其实只需要让 `color-scheme` 跟随 `.dark` 类的变化就行，例如：
 
@@ -165,6 +167,43 @@ export const loadTheme = (themeName: string): void => {
 ```
 
 根据主题按需注入主题 CSS -> 设置主题偏好 -> 更新 Meta 颜色元数据 -> 更新 colorScheme -> 持久化到本地存储，这也是很不错的最佳实践。
+
+当然，如果您使用的是旧版 Memos，仍然可以通过注入自定义脚本来监听并及时更新 `color-scheme` 状态，这很简单，只需要去 `Settings -> System -> Additional script` 添加下面的代码就 ok ：
+
+```javascript
+(function() {
+    const isDarkTheme = (theme) => {
+        return theme === "default-dark" || theme === "midnight";
+    };
+
+    const updateColorScheme = (theme) => {
+        const scheme = (theme && isDarkTheme(theme)) ? "dark" : "light";
+        document.documentElement.style.colorScheme = scheme;
+    };
+
+    const applyColorScheme = () => {
+        const currentTheme = document.documentElement.getAttribute("data-theme");
+        updateColorScheme(currentTheme);
+    };
+
+    applyColorScheme();
+
+
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            if (mutation.attributeName === "data-theme") {
+                applyColorScheme();
+                break;
+            }
+        }
+    });
+    observer.observe(document.documentElement, { attributes: true });
+
+    window.addEventListener("load", applyColorScheme);
+
+    setTimeout(applyColorScheme, 1000);
+})();
+```
 
 在某种程度上，`prefers-color-scheme` 和 `color-scheme: light dark;` 仍然是最优解，因为我们可以完全依靠浏览器的原生能力而不是繁杂的 JavaScript 脚本来控制这个极其细微的细节。一般来说，用户使用了深色主题，它们在访问网站的时候，往往需要的是一个同样舒服的深色主题，而不是选择手动切换到可能亮瞎眼的浅色模式。某种程度上，如果不是像 Memos 那样维护其它例如 Paper 这样的暖色主题（区分于 light/dark 模式），主题切换按钮往往也是没有必要的、甚至是过度设计的（over-designed)。
 

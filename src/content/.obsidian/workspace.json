@@ -131,8 +131,7 @@
               "title": "书签"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -261,11 +260,12 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "b7768facb56829d3",
+  "active": "d053afb82dd88e2e",
   "lastOpenFiles": [
     "blog/webpage-without-css-and-js.md",
     "blog/on-darkmode.md",
     "html.webp",
+    "b79185f3ef8f72e205a02d1929a52f2c.jpg",
     "pages/index.md",
     "pages/404.md",
     "pages/about.md",
