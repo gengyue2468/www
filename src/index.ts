@@ -133,39 +133,36 @@ async function build(): Promise<void> {
 
   // Build static pages
   timer.start("static-pages");
-  const staticPagePromises: Promise<void>[] = [];
+  const staticPageResults = await Promise.allSettled(
+    Object.entries(config.routes).map(async ([route, file]) => {
+      const isCollectionRoute = config.collections.some(
+        c => route === `/${c.urlPrefix || c.name}`
+      );
+      if (isCollectionRoute) return;
 
-  for (const [route, file] of Object.entries(config.routes)) {
-    // Skip routes that match a collection urlPrefix
-    const isCollectionRoute = config.collections.some(
-      c => route === `/${c.urlPrefix || c.name}`
-    );
-    if (isCollectionRoute) continue;
-
-    const filePath = join(config.dirs.pages, file);
-    staticPagePromises.push(
-      (async () => {
-        try {
-          await stat(filePath);
-          await buildPage(
-            route, filePath, baseLayout, pageLayout,
-            currentYear, defaultOgImageUrl,
-            cacheManager, hooks
-          );
-          console.log(`✓ Built ${route}`);
-        } catch (err) {
-          const error = err as NodeJS.ErrnoException;
-          if (error.code === "ENOENT") {
-            console.warn(`⚠ Warning: ${filePath} not found, skipping ${route}`);
-          } else {
-            throw err;
-          }
+      const filePath = join(config.dirs.pages, file);
+      try {
+        await stat(filePath);
+        await buildPage(
+          route, filePath, baseLayout, pageLayout,
+          currentYear, defaultOgImageUrl,
+          cacheManager, hooks
+        );
+        console.log(`✓ Built ${route}`);
+      } catch (err) {
+        const error = err as NodeJS.ErrnoException;
+        if (error.code === "ENOENT") {
+          console.warn(`⚠ Warning: ${filePath} not found, skipping ${route}`);
+        } else {
+          throw err;
         }
-      })()
-    );
+      }
+    })
+  );
+  const pageErrors = staticPageResults.filter(r => r.status === "rejected");
+  if (pageErrors.length > 0) {
+    for (const e of pageErrors) console.error("Page build error:", (e as PromiseRejectedResult).reason);
   }
-
-  await Promise.all(staticPagePromises);
   timer.end("static-pages");
 
   // Build all collections
@@ -203,16 +200,24 @@ async function build(): Promise<void> {
     feedPromises.push(generateRobotsTxt());
   }
 
-  await Promise.all(feedPromises);
+  const feedResults = await Promise.allSettled(feedPromises);
+  const feedErrors = feedResults.filter(r => r.status === "rejected");
+  if (feedErrors.length > 0) {
+    for (const e of feedErrors) console.error("Feed generation error:", (e as PromiseRejectedResult).reason);
+  }
   timer.end("feeds");
 
   // LLM-friendly outputs
   if (config.llms.enabled) {
     timer.start("llms");
-    await Promise.all([
+    const llmsResults = await Promise.allSettled([
       emitMarkdownFiles(allCollectionOutputs),
       generateLlmsTxt(allCollectionOutputs),
     ]);
+    const llmsErrors = llmsResults.filter(r => r.status === "rejected");
+    if (llmsErrors.length > 0) {
+      for (const e of llmsErrors) console.error("LLM output error:", (e as PromiseRejectedResult).reason);
+    }
     timer.end("llms");
   }
 

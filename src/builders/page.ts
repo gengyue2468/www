@@ -83,16 +83,18 @@ export async function buildPage(
     siteDescription: config.site.description,
   });
 
+  const pageTitle = route === "/" ? `${title} - ${config.site.title}` : `${title} - ${config.site.title}`;
+
   let output = renderPage(baseLayout, {
     route,
-    title: title as string,
+    title: pageTitle,
     description,
     content: renderedContent,
     css: inlinedCss,
     scripts,
     keywords: generateKeywords(frontmatter.tags as string[]),
     ogTags: {
-      title: title as string,
+      title: pageTitle,
       description,
       url: `${config.site.url}${route}`,
       type: "website",

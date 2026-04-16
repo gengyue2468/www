@@ -37,6 +37,12 @@ export interface NavItem {
   show: boolean;
 }
 
+export interface AnalyticsConfig {
+  enabled: boolean;
+  scriptUrl: string;
+  websiteId: string;
+}
+
 export interface Config {
   site: SiteConfig;
   dirs: DirsConfig;
@@ -44,6 +50,7 @@ export interface Config {
   date: DateConfig;
   styles: StylesConfig;
   placeholders: PlaceholdersConfig;
+  analytics: AnalyticsConfig;
   rss: RSSConfig;
   sitemap: SitemapConfig;
   robots: RobotsConfig;

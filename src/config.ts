@@ -23,7 +23,6 @@ const config: Config = {
   routes: {
     "/": "index.md",
     "/about": "about.md",
-    "/blog": "blog.md",
     "/shitposts": "shitposts.md",
   },
 
@@ -56,6 +55,12 @@ const config: Config = {
     sidenote: "SNOTE",
     marginnote: "MNOTE",
     fold: "FOLD",
+  },
+
+  analytics: {
+    enabled: true,
+    scriptUrl: "https://umami.gengyue.site/script.js",
+    websiteId: "365406e1-29dc-44b9-895d-ff41a1e21ae1",
   },
 
   rss: {

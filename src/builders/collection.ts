@@ -342,7 +342,7 @@ async function buildCollectionTagPages(
   year?: number,
   css?: string
 ): Promise<void> {
-  const tagMap = new Map<string, Post[]>();
+  const tagMap = new Map<string, PostWithContent[]>();
 
   for (const post of posts) {
     if (post.tags && Array.isArray(post.tags)) {
@@ -354,11 +354,19 @@ async function buildCollectionTagPages(
 
   if (tagMap.size === 0) return;
 
+  const anyPostChanged = posts.some(p => p.changed);
+
   const tagPromises: Promise<void>[] = [];
 
   for (const [tag, taggedPosts] of tagMap) {
     tagPromises.push((async () => {
       const slug = getTagSlug(tag);
+
+      // Skip if no post in this tag changed
+      if (!anyPostChanged && !taggedPosts.some(p => p.changed)) {
+        console.log(`  (cached) /${urlPrefix}/tag/${slug}`);
+        return;
+      }
 
       taggedPosts.sort((a, b) => {
         if (!a.date) return 1;
@@ -411,6 +419,11 @@ async function buildCollectionTagPages(
   await Promise.all(tagPromises);
 
   // Tag index page
+  if (!anyPostChanged) {
+    console.log(`  (cached) /${urlPrefix}/tag`);
+    return;
+  }
+
   const allTags: string[] = [];
   for (const post of posts) {
     if (post.tags && Array.isArray(post.tags)) allTags.push(...post.tags);

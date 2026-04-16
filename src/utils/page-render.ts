@@ -39,11 +39,15 @@ export function renderPage(
     year,
   } = options;
 
-  const fullTitle = title.includes(config.site.title) ? title : `${title} - ${config.site.title}`;
+  const fullTitle = title;
   const pageUrl = `${config.site.url}${route}`;
   const ogImageBase = config.site.ogImage
     ? (config.cdn || config.site.url).replace(/\/$/, "") + config.site.ogImage
     : undefined;
+
+  const analytics = config.analytics.enabled
+    ? `<link rel="dns-prefetch" href="${new URL(config.analytics.scriptUrl).origin}" />\n<link rel="preconnect" href="${new URL(config.analytics.scriptUrl).origin}" crossorigin />\n<script defer src="${config.analytics.scriptUrl}" data-website-id="${config.analytics.websiteId}"></script>`
+    : "";
 
   const baseData = {
     title: escapeHtmlText(fullTitle),
@@ -55,6 +59,7 @@ export function renderPage(
     css,
     nav: renderNav(config.nav),
     scripts,
+    analytics,
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
     canonicalUrl: escapeHtmlAttr(pageUrl),
     keywords,
