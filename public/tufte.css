@@ -360,24 +360,26 @@ img {
   counter-increment: sidenote-counter;
 }
 
-.sidenote-number:after,
-.sidenote:before {
-  font-family: var(--font-numeral);
-  position: relative;
-  vertical-align: baseline;
-}
-
 .sidenote-number:after {
+  font-family: var(--font-numeral);
   content: counter(sidenote-counter);
   font-size: 1rem;
+  position: relative;
+  vertical-align: baseline;
   top: var(--sidenote-number-top);
   left: var(--sidenote-number-left);
 }
 
-.sidenote:before {
-  content: counter(sidenote-counter) " ";
+.sidenote-ref {
+  font-family: var(--font-numeral);
   font-size: 1rem;
+  position: relative;
   top: var(--sidenote-number-top);
+  vertical-align: baseline;
+}
+
+.sidenote > .sidenote-ref {
+  display: inline;
 }
 
 blockquote .sidenote,
@@ -539,6 +541,10 @@ label.margin-toggle:not(.sidenote-number) {
     margin: 1rem 2.5%;
     vertical-align: baseline;
     position: relative;
+  }
+
+  .sidenote-ref {
+    font-weight: bold;
   }
 
   label {
@@ -754,5 +760,18 @@ table th.numeral {
 
   table tbody tr:hover {
     background-color: var(--accent);
+  }
+}
+
+/* Screen reader / speech mode: always show sidenotes and marginnotes */
+@media speech {
+  .sidenote,
+  .marginnote {
+    display: block !important;
+  }
+
+  .margin-toggle,
+  label.margin-toggle {
+    display: none !important;
   }
 }

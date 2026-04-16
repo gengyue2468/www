@@ -255,13 +255,11 @@ function renderNotes(html: string, notes: Note[]): string {
     let noteHtml: string;
 
     if (note.type === "sidenote") {
-      noteHtml = `<label for="${id}" class="margin-toggle sidenote-number"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote">${renderedContent}</span>`;
+      noteHtml = `<label for="${id}" class="margin-toggle sidenote-number" aria-hidden="true"></label><input type="checkbox" id="${id}" class="margin-toggle" aria-hidden="true"/><aside class="sidenote" role="note"><span class="sidenote-ref">${i + 1}</span> ${renderedContent}</aside>`;
     } else if (note.type === "marginnote") {
-      noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
+      noteHtml = `<label for="${id}" class="margin-toggle" aria-hidden="true">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle" aria-hidden="true"/><aside class="marginnote" role="note">${renderedContent}</aside>`;
     } else {
-      // Custom note type — use plugin rendering if available
-      // Fallback: marginnote style
-      noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
+      noteHtml = `<label for="${id}" class="margin-toggle" aria-hidden="true">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle" aria-hidden="true"/><aside class="marginnote" role="note">${renderedContent}</aside>`;
     }
 
     html = html.replace(note.placeholder, noteHtml);
@@ -298,7 +296,7 @@ async function renderPluginNotes(html: string, notes: Note[]): Promise<string> {
     if (!rendered) {
       let renderedContent = getMarkdownIt().render(note.content);
       renderedContent = renderedContent.trim().replace(/^<p>(.*)<\/p>$/s, "$1").trim();
-      const noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
+      const noteHtml = `<label for="${id}" class="margin-toggle" aria-hidden="true">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle" aria-hidden="true"/><aside class="marginnote" role="note">${renderedContent}</aside>`;
       html = html.replace(note.placeholder, noteHtml);
     }
   }
