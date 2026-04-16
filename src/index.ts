@@ -2,19 +2,20 @@ import { join, dirname } from "path";
 import { stat, rm } from "fs/promises";
 import { ensureDir, loadLayout, copyPublicFiles, writeFileContent } from "./utils/fs.js";
 import { buildPage, getInlinedCss } from "./builders/page.js";
-import { buildBlogIndex, buildBlogPosts, buildTagPages } from "./builders/blog.js";
+import { buildCollection, getRequiredLayouts } from "./builders/collection.js";
 import { generateRSS } from "./generators/rss.js";
 import { generateSitemap } from "./generators/sitemap.js";
 import { generateRobotsTxt } from "./generators/robots.js";
 import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
-import { registerPlugin } from "./extensions/plugin.js";
+import { registerPlugin, getComposedHooks } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
+import { createCacheManager, clearContentCache } from "./utils/cache.js";
+import type { BuildCacheManager } from "./utils/cache.js";
+import type { CollectionOutput } from "./types.js";
 import config from "./config.js";
 
-// Register plugins
 registerPlugin(mermaidPlugin);
 
-// Performance timer utility
 class PerformanceTimer {
   private times = new Map<string, number>();
   private results: Array<{ name: string; duration: number }> = [];
@@ -44,6 +45,35 @@ class PerformanceTimer {
   }
 }
 
+async function checkLayoutsChanged(
+  cacheManager: BuildCacheManager,
+  layoutsDir: string,
+  extraLayouts: string[] = []
+): Promise<boolean> {
+  const base = ["base", "page"];
+  const all = [...base, ...extraLayouts];
+  for (const name of all) {
+    const layoutPath = join(layoutsDir, `${name}.html`);
+    if (await cacheManager.hasLayoutChanged(name, layoutPath)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+async function updateLayoutMtimes(
+  cacheManager: BuildCacheManager,
+  layoutsDir: string,
+  extraLayouts: string[] = []
+): Promise<void> {
+  const base = ["base", "page"];
+  const all = [...base, ...extraLayouts];
+  for (const name of all) {
+    const layoutPath = join(layoutsDir, `${name}.html`);
+    await cacheManager.updateLayoutMtime(name, layoutPath);
+  }
+}
+
 const timer = new PerformanceTimer();
 
 async function build(): Promise<void> {
@@ -53,14 +83,45 @@ async function build(): Promise<void> {
   timer.start("setup");
   await ensureDir(config.dirs.dist);
 
-  // Load layouts in parallel
-  const [baseLayout, pageLayout, blogIndexLayout, blogPostLayout, tagsLayout] = await Promise.all([
-    loadLayout("base", config.dirs.layouts),
-    loadLayout("page", config.dirs.layouts),
-    loadLayout("blog-index", config.dirs.layouts),
-    loadLayout("blog-post", config.dirs.layouts),
-    loadLayout("tags", config.dirs.layouts),
-  ]);
+  const cacheManager = await createCacheManager(config.dirs);
+  const hooks = getComposedHooks();
+
+  const configPath = join(import.meta.dir, "config.ts");
+  if (await cacheManager.hasConfigChanged(configPath)) {
+    console.log("  Config changed, invalidating cache");
+    cacheManager.invalidateAll();
+    clearContentCache();
+  }
+
+  // Determine all layout names needed
+  const collectionLayouts = getRequiredLayouts(config.collections);
+  const layoutsChanged = await checkLayoutsChanged(cacheManager, config.dirs.layouts, collectionLayouts);
+  if (layoutsChanged) {
+    console.log("  Layout changed, clearing render cache");
+    cacheManager.invalidateAll();
+    clearContentCache();
+  }
+
+  if (hooks.beforeBuild) {
+    await hooks.beforeBuild();
+  }
+
+  // Load all layouts in parallel
+  const allLayoutNames = ["base", "page", ...collectionLayouts];
+  const layoutEntries = await Promise.all(
+    allLayoutNames.map(async (name) => {
+      const path = join(config.dirs.layouts, `${name}.html`);
+      const content = await loadLayout(name, config.dirs.layouts);
+      return [name, content] as const;
+    })
+  );
+  const layoutsMap = Object.fromEntries(layoutEntries);
+
+  await updateLayoutMtimes(cacheManager, config.dirs.layouts, collectionLayouts);
+  await cacheManager.updateConfigMtime(configPath);
+
+  const baseLayout = layoutsMap["base"];
+  const pageLayout = layoutsMap["page"];
 
   const currentYear = new Date().getFullYear();
   const inlinedCss = await getInlinedCss();
@@ -70,19 +131,27 @@ async function build(): Promise<void> {
     ? (config.cdn || config.site.url).replace(/\/$/, "") + config.site.ogImage
     : undefined;
 
-  // Build static pages in parallel
+  // Build static pages
   timer.start("static-pages");
   const staticPagePromises: Promise<void>[] = [];
 
   for (const [route, file] of Object.entries(config.routes)) {
-    if (route === "/blog") continue;
-    const filePath = join(config.dirs.pages, file);
+    // Skip routes that match a collection urlPrefix
+    const isCollectionRoute = config.collections.some(
+      c => route === `/${c.urlPrefix || c.name}`
+    );
+    if (isCollectionRoute) continue;
 
+    const filePath = join(config.dirs.pages, file);
     staticPagePromises.push(
       (async () => {
         try {
           await stat(filePath);
-          await buildPage(route, filePath, baseLayout, pageLayout, currentYear, defaultOgImageUrl);
+          await buildPage(
+            route, filePath, baseLayout, pageLayout,
+            currentYear, defaultOgImageUrl,
+            cacheManager, hooks
+          );
           console.log(`✓ Built ${route}`);
         } catch (err) {
           const error = err as NodeJS.ErrnoException;
@@ -99,29 +168,36 @@ async function build(): Promise<void> {
   await Promise.all(staticPagePromises);
   timer.end("static-pages");
 
-  // Build blog
-  timer.start("blog-index");
-  const posts = await buildBlogIndex(baseLayout, blogIndexLayout, currentYear, inlinedCss);
-  timer.end("blog-index");
+  // Build all collections
+  const allCollectionOutputs: CollectionOutput[] = [];
 
-  timer.start("blog-posts");
-  await buildBlogPosts(posts, baseLayout, blogPostLayout, currentYear, inlinedCss);
-  timer.end("blog-posts");
+  for (const coll of config.collections) {
+    timer.start(`collection:${coll.name}`);
+    const output = await buildCollection(
+      coll,
+      baseLayout,
+      layoutsMap,
+      currentYear,
+      inlinedCss,
+      cacheManager,
+      hooks
+    );
+    allCollectionOutputs.push(output);
+    timer.end(`collection:${coll.name}`);
+  }
 
-  // Build tag pages
-  timer.start("tag-pages");
-  await buildTagPages(posts, baseLayout, tagsLayout, currentYear, inlinedCss);
-  timer.end("tag-pages");
+  // Use first collection (blog) as the primary feed source
+  const primaryCollection = allCollectionOutputs[0];
 
   // Generate feeds in parallel
   timer.start("feeds");
   const feedPromises: Promise<void>[] = [];
 
-  if (config.rss.enabled) {
-    feedPromises.push(generateRSS(posts));
+  if (config.rss.enabled && primaryCollection) {
+    feedPromises.push(generateRSS(primaryCollection));
   }
   if (config.sitemap.enabled) {
-    feedPromises.push(generateSitemap(posts));
+    feedPromises.push(generateSitemap(allCollectionOutputs));
   }
   if (config.robots.enabled) {
     feedPromises.push(generateRobotsTxt());
@@ -134,8 +210,8 @@ async function build(): Promise<void> {
   if (config.llms.enabled) {
     timer.start("llms");
     await Promise.all([
-      emitMarkdownFiles(posts),
-      generateLlmsTxt(posts),
+      emitMarkdownFiles(allCollectionOutputs),
+      generateLlmsTxt(allCollectionOutputs),
     ]);
     timer.end("llms");
   }
@@ -145,9 +221,12 @@ async function build(): Promise<void> {
   const filePath404 = join(config.dirs.pages, "404.md");
   try {
     await stat(filePath404);
-    await buildPage("/404", filePath404, baseLayout, pageLayout, currentYear, defaultOgImageUrl);
+    await buildPage(
+      "/404", filePath404, baseLayout, pageLayout,
+      currentYear, defaultOgImageUrl,
+      cacheManager, hooks
+    );
 
-    // Copy 404/index.html to 404.html and remove directory
     const dist404DirPath = join(config.dirs.dist, "404", "index.html");
     const dist404Path = join(config.dirs.dist, "404.html");
     try {
@@ -170,13 +249,18 @@ async function build(): Promise<void> {
   await copyPublicFiles(config.dirs);
   timer.end("copy-public");
 
+  cacheManager.save();
+
+  if (hooks.afterBuild) {
+    await hooks.afterBuild();
+  }
+
   timer.end("total");
   timer.report();
 
   console.log("\n✓ Build complete!");
 }
 
-// Run build
 build().catch((err) => {
   console.error("Build failed:", err);
   process.exit(1);

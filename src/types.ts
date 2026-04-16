@@ -3,7 +3,6 @@ export interface SiteConfig {
   author: string;
   description: string;
   url: string;
-  /** 静态 OG 图路径，如 /static/og/default.webp；有 cdn 时自动用 cdn 域名 */
   ogImage?: string;
   ogImageWidth?: number;
   ogImageHeight?: number;
@@ -12,7 +11,6 @@ export interface SiteConfig {
 
 export interface DirsConfig {
   pages: string;
-  blog: string;
   public: string;
   dist: string;
   layouts: string;
@@ -24,9 +22,6 @@ export interface DateConfig {
 }
 
 export interface StylesConfig {
-  // Styles are now defined in CSS files for better maintainability
-  // .post-date, .post-date-inline in globals.css
-  // .post-nav in tufte.css
   [key: string]: string;
 }
 
@@ -55,6 +50,7 @@ export interface Config {
   llms: LlmsConfig;
   cdn: string;
   nav: NavItem[];
+  collections: CollectionConfig[];
 }
 
 export interface RSSConfig {
@@ -82,8 +78,26 @@ export interface RobotsConfig {
 
 export interface LlmsConfig {
   enabled: boolean;
-  /** 可选：llms.txt 中的一句话摘要，不填则用 site.description */
   summary?: string;
+}
+
+export interface CollectionConfig {
+  name: string;
+  srcDir?: string;
+  urlPrefix?: string;
+  tags?: boolean;
+  layouts?: Partial<{
+    index: string;
+    post: string;
+    tags: string;
+  }>;
+}
+
+export interface CollectionOutput {
+  name: string;
+  urlPrefix: string;
+  srcDir: string;
+  items: Post[];
 }
 
 export interface FrontMatter {
@@ -97,7 +111,7 @@ export interface FrontMatter {
 }
 
 export interface Note {
-  type: "sidenote" | "marginnote";
+  type: string;
   content: string;
   placeholder: string;
 }
@@ -115,4 +129,3 @@ export interface RenderedContent {
   frontmatter: FrontMatter;
   html: string;
 }
-

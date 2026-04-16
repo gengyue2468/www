@@ -15,7 +15,6 @@ const config: Config = {
 
   dirs: {
     pages: "./src/content/pages",
-    blog: "./src/content/blog",
     public: "./public",
     dist: "./dist",
     layouts: "./layouts",
@@ -27,6 +26,20 @@ const config: Config = {
     "/blog": "blog.md",
     "/shitposts": "shitposts.md",
   },
+
+  collections: [
+    {
+      name: "blog",
+      srcDir: "./src/content/blog",
+      urlPrefix: "blog",
+      tags: true,
+      layouts: {
+        index: "blog-index",
+        post: "blog-post",
+        tags: "tags",
+      },
+    },
+  ],
 
   date: {
     locale: "zh-CN",

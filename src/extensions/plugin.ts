@@ -1,19 +1,18 @@
-import type { RenderedContent, FrontMatter } from "../types.js";
+import type { RenderedContent, FrontMatter, Note } from "../types.js";
 
 export interface MarkdownProcessor {
   name: string;
-  // Run before markdown-it rendering, transforms markdown syntax to HTML-compatible
   process?: (markdown: string) => string | Promise<string>;
-  // Run after markdown-it rendering, can transform HTML
   postProcess?: (html: string) => string | Promise<string>;
 }
 
 export interface NoteProcessor {
   name: string;
-  // Regex pattern to match note syntax like [^content] or [note:content]
   pattern: RegExp;
-  // Render the matched note content to HTML
+  prefix: string;
   render: (content: string, id: string, type: string) => string;
+  extractContent: (match: RegExpMatchArray) => string;
+  getType: (match: RegExpMatchArray) => string;
 }
 
 export interface BuildHooks {
@@ -34,7 +33,6 @@ export interface Plugin {
 
 const plugins: Plugin[] = [];
 
-// Built-in processors that are always registered
 const builtInProcessors: MarkdownProcessor[] = [
   {
     name: "fold",
@@ -56,17 +54,67 @@ export function getNoteProcessors(): NoteProcessor[] {
   return plugins.flatMap(p => p.noteProcessors || []);
 }
 
-export function getBuildHooks(): BuildHooks {
-  const hooks: BuildHooks = {};
-  for (const plugin of plugins) {
-    if (plugin.hooks) {
-      Object.assign(hooks, plugin.hooks);
-    }
-  }
-  return hooks;
+export function getComposedHooks(): BuildHooks {
+  const allHooks = plugins
+    .filter(p => p.hooks)
+    .map(p => p.hooks!);
+
+  if (allHooks.length === 0) return {};
+
+  return {
+    beforeBuild: async () => {
+      for (const hooks of allHooks) {
+        if (hooks.beforeBuild) await hooks.beforeBuild();
+      }
+    },
+    afterBuild: async () => {
+      for (const hooks of allHooks) {
+        if (hooks.afterBuild) await hooks.afterBuild();
+      }
+    },
+    beforeRenderPage: async (route, content) => {
+      let result = content;
+      for (const hooks of allHooks) {
+        if (hooks.beforeRenderPage) {
+          const r = hooks.beforeRenderPage(route, result);
+          result = r instanceof Promise ? await r : r;
+        }
+      }
+      return result;
+    },
+    afterRenderPage: async (route, html) => {
+      let result = html;
+      for (const hooks of allHooks) {
+        if (hooks.afterRenderPage) {
+          const r = hooks.afterRenderPage(route, result);
+          result = r instanceof Promise ? await r : r;
+        }
+      }
+      return result;
+    },
+    beforeRenderPost: async (slug, content) => {
+      let result = content;
+      for (const hooks of allHooks) {
+        if (hooks.beforeRenderPost) {
+          const r = hooks.beforeRenderPost(slug, result);
+          result = r instanceof Promise ? await r : r;
+        }
+      }
+      return result;
+    },
+    afterRenderPost: async (slug, html) => {
+      let result = html;
+      for (const hooks of allHooks) {
+        if (hooks.afterRenderPost) {
+          const r = hooks.afterRenderPost(slug, result);
+          result = r instanceof Promise ? await r : r;
+        }
+      }
+      return result;
+    },
+  };
 }
 
-// Get all plugins (for external use)
 export function getPlugins(): Plugin[] {
   return [...plugins];
 }

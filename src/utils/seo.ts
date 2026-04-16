@@ -11,9 +11,6 @@ export interface MetaDescriptionOptions {
 const DEFAULT_MIN_LENGTH = 90;
 const DEFAULT_MAX_LENGTH = 160;
 
-/**
- * Escape text for safe HTML text-node usage.
- */
 export function escapeHtmlText(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -21,18 +18,12 @@ export function escapeHtmlText(value: string): string {
     .replace(/>/g, "&gt;");
 }
 
-/**
- * Escape text for safe HTML attribute usage.
- */
 export function escapeHtmlAttr(value: string): string {
   return escapeHtmlText(value)
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
-/**
- * Convert rich HTML into plain text for snippet generation.
- */
 export function htmlToPlainText(html: string): string {
   return normalizeText(
     html
@@ -42,18 +33,12 @@ export function htmlToPlainText(html: string): string {
   );
 }
 
-/**
- * Normalize whitespace and trim content.
- */
 export function normalizeText(text: string): string {
   return text
     .replace(/\s+/g, " ")
     .trim();
 }
 
-/**
- * Truncate text at semantic boundaries while keeping a natural ending.
- */
 export function smartTruncate(text: string, maxLength = DEFAULT_MAX_LENGTH): string {
   if (text.length <= maxLength) return text;
 
@@ -75,9 +60,6 @@ export function smartTruncate(text: string, maxLength = DEFAULT_MAX_LENGTH): str
   return `${cut.trimEnd()}...`;
 }
 
-/**
- * Build a unique, SEO-friendly meta description with length constraints.
- */
 export function buildMetaDescription(options: MetaDescriptionOptions): string {
   const minLength = options.minLength ?? DEFAULT_MIN_LENGTH;
   const maxLength = options.maxLength ?? DEFAULT_MAX_LENGTH;
@@ -108,4 +90,135 @@ export function buildMetaDescription(options: MetaDescriptionOptions): string {
   }
 
   return smartTruncate(description, maxLength);
+}
+
+export function generateKeywords(tags: string[] | undefined): string {
+  if (!tags || tags.length === 0) return "";
+  const keywords = tags.join(", ");
+  return `<meta name="keywords" content="${escapeHtmlAttr(keywords)}" />`;
+}
+
+export interface OgTagsOptions {
+  title: string;
+  description: string;
+  url: string;
+  type: string;
+  siteName: string;
+  tags?: string[];
+  ogImageUrl?: string;
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  ogImageAlt?: string;
+}
+
+export function generateOgTags(options: OgTagsOptions): string {
+  const { title, description, url, type, siteName, tags, ogImageUrl, ogImageWidth, ogImageHeight, ogImageAlt } = options;
+  const safeTitle = escapeHtmlAttr(title);
+  const safeDescription = escapeHtmlAttr(smartTruncate(description));
+  const safeUrl = escapeHtmlAttr(url);
+
+  const parts: string[] = [
+    `<meta property="og:title" content="${safeTitle}" />`,
+    `<meta property="og:description" content="${safeDescription}" />`,
+    `<meta property="og:url" content="${safeUrl}" />`,
+    `<meta property="og:type" content="${escapeHtmlAttr(type)}" />`,
+    `<meta property="og:site_name" content="${escapeHtmlAttr(siteName)}" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${safeTitle}" />`,
+    `<meta name="twitter:description" content="${safeDescription}" />`,
+  ];
+
+  if (ogImageUrl) {
+    const safeOgImageUrl = escapeHtmlAttr(ogImageUrl);
+    parts.push(`<meta property="og:image" content="${safeOgImageUrl}" />`);
+    if (ogImageWidth) parts.push(`<meta property="og:image:width" content="${ogImageWidth}" />`);
+    if (ogImageHeight) parts.push(`<meta property="og:image:height" content="${ogImageHeight}" />`);
+    if (ogImageAlt) parts.push(`<meta property="og:image:alt" content="${escapeHtmlAttr(ogImageAlt)}" />`);
+    parts.push(`<meta name="twitter:image" content="${safeOgImageUrl}" />`);
+  }
+
+  if (tags && tags.length > 0) {
+    parts.push(`<meta name="twitter:label1" content="标签" />`);
+    parts.push(`<meta name="twitter:data1" content="${escapeHtmlAttr(tags.slice(0, 3).join(", "))}" />`);
+  }
+
+  return parts.join("\n    ");
+}
+
+export interface JsonLdOptions {
+  type: "WebPage" | "WebSite" | "BlogPosting" | "CollectionPage";
+  title: string;
+  description: string;
+  url: string;
+  siteName: string;
+  authorName: string;
+  siteUrl: string;
+  date?: string;
+  tags?: string[];
+  numberOfItems?: number;
+}
+
+export function generateJsonLd(options: JsonLdOptions): string {
+  const { type, title, description, url, siteName, authorName, siteUrl, date, tags, numberOfItems } = options;
+  const baseUrl = siteUrl.replace(/\/$/, "");
+
+  if (type === "WebSite" || type === "WebPage") {
+    if (url === baseUrl + "/" || url === baseUrl) {
+      const data = {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": `${baseUrl}/#website`,
+            url: baseUrl + "/",
+            name: siteName,
+            description: smartTruncate(description),
+            author: { "@type": "Person", name: authorName },
+          },
+          {
+            "@type": "WebPage",
+            "@id": `${baseUrl}/#webpage`,
+            url,
+            name: title,
+            isPartOf: { "@id": `${baseUrl}/#website` },
+          },
+        ],
+      };
+      return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+    }
+
+    const data: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      url,
+      name: title,
+      description: smartTruncate(description),
+      isPartOf: { "@type": "WebSite", name: siteName, url: baseUrl + "/" },
+    };
+    return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+  }
+
+  const data: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": type,
+    headline: title,
+    description: smartTruncate(description),
+    url,
+  };
+
+  if (type === "BlogPosting") {
+    data.author = { "@type": "Person", name: authorName };
+    data.publisher = { "@type": "Person", name: authorName };
+    data.mainEntityOfPage = { "@type": "WebPage", "@id": url };
+  }
+
+  if (type === "CollectionPage" && numberOfItems !== undefined) {
+    data.numberOfItems = numberOfItems;
+    data.isPartOf = { "@type": "WebSite", name: siteName, url: baseUrl + "/" };
+  }
+
+  if (date) data.datePublished = new Date(date).toISOString();
+  if (tags && tags.length > 0) data.keywords = tags.join(", ");
+
+  return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
 }

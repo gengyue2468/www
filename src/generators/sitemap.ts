@@ -2,12 +2,9 @@ import { join } from "path";
 import { SitemapStream, streamToPromise } from "sitemap";
 import config from "../config.js";
 import { writeFileContent } from "../utils/fs.js";
-import type { Post } from "../types.js";
+import type { CollectionOutput } from "../types.js";
 
-/**
- * Generate sitemap using optimized file writing
- */
-export async function generateSitemap(posts: Post[]): Promise<void> {
+export async function generateSitemap(collections: CollectionOutput[]): Promise<void> {
   if (!config.sitemap.enabled) return;
 
   const siteUrl = config.site.url;
@@ -15,7 +12,10 @@ export async function generateSitemap(posts: Post[]): Promise<void> {
 
   const sitemap = new SitemapStream({ hostname: siteUrl });
 
-  // Write entries using array for batch processing
+  const collectionRoutes = new Set(
+    collections.map(c => `/${c.urlPrefix}`)
+  );
+
   const entries = [
     {
       url: "/",
@@ -24,28 +24,29 @@ export async function generateSitemap(posts: Post[]): Promise<void> {
       lastmod: now,
     },
     ...Object.entries(config.routes)
-      .filter(([route]) => route !== "/blog")
+      .filter(([route]) => !collectionRoutes.has(route))
       .map(([route]) => ({
         url: route,
         changefreq: config.sitemap.changefreq as any,
         priority: config.sitemap.priority.pages,
         lastmod: now,
       })),
-    {
-      url: "/blog",
-      changefreq: config.sitemap.changefreq as any,
-      priority: config.sitemap.priority.blog,
-      lastmod: now,
-    },
-    ...posts.map((post) => ({
-      url: `/blog/${post.slug}`,
-      changefreq: config.sitemap.changefreq as any,
-      priority: config.sitemap.priority.posts,
-      lastmod: post.date ? new Date(post.date) : now,
-    })),
+    ...collections.flatMap(collection => [
+      {
+        url: `/${collection.urlPrefix}`,
+        changefreq: config.sitemap.changefreq as any,
+        priority: config.sitemap.priority.blog,
+        lastmod: now,
+      },
+      ...collection.items.map((post) => ({
+        url: `/${collection.urlPrefix}/${post.slug}`,
+        changefreq: config.sitemap.changefreq as any,
+        priority: config.sitemap.priority.posts,
+        lastmod: post.date ? new Date(post.date) : now,
+      })),
+    ]),
   ];
 
-  // Write all entries
   for (const entry of entries) {
     sitemap.write(entry);
   }

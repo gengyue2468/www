@@ -2,16 +2,13 @@ import { join } from "path";
 import { Feed } from "feed";
 import config from "../config.js";
 import { writeFileContent } from "../utils/fs.js";
-import type { Post } from "../types.js";
+import type { CollectionOutput } from "../types.js";
 
-/**
- * Generate RSS feed using optimized file writing
- */
-export async function generateRSS(posts: Post[]): Promise<void> {
+export async function generateRSS(collection: CollectionOutput): Promise<void> {
   if (!config.rss.enabled) return;
 
   const siteUrl = config.site.url;
-  const rssItems = posts.slice(0, config.rss.items.limit);
+  const rssItems = collection.items.slice(0, config.rss.items.limit);
   const cleanSiteUrl = siteUrl.replace(/\/$/, "");
 
   const feed = new Feed({
@@ -27,9 +24,8 @@ export async function generateRSS(posts: Post[]): Promise<void> {
     feedLinks: { rss2: `${cleanSiteUrl}/rss.xml` },
   });
 
-  // Add items using array for efficiency
   for (const post of rssItems) {
-    const postUrl = `${cleanSiteUrl}/blog/${post.slug}`;
+    const postUrl = `${cleanSiteUrl}/${collection.urlPrefix}/${post.slug}`;
     const description = post.summary || post.excerpt || config.site.description;
     const date = post.date ? new Date(post.date) : new Date();
 
