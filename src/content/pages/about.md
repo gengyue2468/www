@@ -3,23 +3,47 @@ title: About
 description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方向，喜欢折腾各种有趣的小玩具与实践项目，记录学习成长与技术思考，也写了一些有趣的小玩具。
 ---
 
-哈喽啊，我现在在 [华中科技大学 (HUST)](https://hust.edu.cn)[^ <img src="/static/hust/hust.webp" style="width:96px" alt="HUST" /> ]念大一，是 xdx，在口口院。目前是 [冰岩作坊](https://www.bingyan.net/) 前端组的成员。
+哈喽啊，我现在在 [华中科技大学](https://hust.edu.cn)[^ <img src="/static/hust/hust.webp" style="width:96px" alt="HUST" /> ]念大一， 坐标[计算机科学与技术学院](https://cs.hust.edu.cn/)。目前是 [冰岩作坊](https://www.bingyan.net/) 前端组的成员。
 
-技术方面，就写了一点点 [C语言](https://www.iso-9899.info/)，没写过 C++。前端技术方面，我写过一点点 [React](https://react.dev/) / [Next.js](https://nextjs.org/) / [React Router v7 (former Remix)](https://reactrouter.com/)，一般用 [TailwindCSS](https://tailwindcss.com/) 组织样式，[Framer Motion](https://www.framer.com/motion/) 作为动画库。[note: 不过好久没写过动画了，怎么回事呢🤔]
+<div style="display: flex; gap: 40px; flex-wrap: wrap;">
+<div style="white-space: nowrap; width: max-content;">
 
-目前在写一个 AI 辅助留学文书生成工具 [BuddyUp](https://buddyup.studio)，slogan 是“写出你的最佳个人陈述”，技术栈是 [Next.js](https://nextjs.org/)/[TailwindCSS](https://tailwindcss.com/)。[^如果你想要测试一下这个东西，可以访问[这里](https://buddyup.top/)，你的所有个人数据都保存在本地。]
+我使用的技术栈：
 
-写了~~一些~~小玩具:
+- [React](https://react.dev/)
+- [React Router V7](https://reactrouter.com/)
+- [Next.js](https://nextjs.org/)
+- [Bun](https://bun.sh/)
+- [Tailwind CSS.](https://tailwindcss.com/)
+...truncated
 
-- [HUST 吃饭](https://chifan.huster.fun/) RESTful 风格的 node.js API，能够 GET 华科食堂的开饭时间！
-- Dora 一个傻乎乎的 QQ 机器人，只不过被我私有化了😋。
-~~- [ToRead List](https://toread.gengyue.site/) 和 QQ 机器人集成的私人 ToRead List。~~（死了，并不打算复活）
-- ...
+</div>
 
-你可能会在我的 [GitHub](https://github.com/gengyue2468) 上找到更多，不过也说不准...
+<div style="white-space: nowrap; width: max-content;">
 
-~~如果你追求一些更加有时效性的消息，可以试试去 [Now Page](/now) 看看。不过我估计那里的内容比这里的时效性还差...~~[note:懒]
+我使用的语言：
 
-上面的东西已经被我删除了，哈哈哈。不过，如果你喜欢一些荒谬的东西，可以看看 [shitposts.org](https://shitposts.org/)，一个放任 LLM 到处拉屎的地方。
+- 中文（简体）
+- English (United States)
+- [TypeScript](https://www.typescriptlang.org/)
+- [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+...truncated
 
-本页面由人类 撰写 :)
+</div>
+</div>
+
+我比较喜欢写一些小玩具，基本上没用，也可能不好玩，比如：[note: 是全都没用，并且全都不好玩]
+
+- [HUST-Chifan](https://github.com/gengyue2468/HUST-Chifan) 基于 Hono 的 Restful API，显示 HUST 食堂的开放时间等 [演示站点](https://chifan.huster.fun)
+- [shitposts.org](https://github.com/gengyue2468/shitposts.org) 基于 LLM 幻觉和概率随机的垃圾水文生成器，与 GitHub Actions 集成。参阅 [这篇文章](https://www.gengyue.site/blog/let-llm-write-shitposts/)
+- [Zoogle](https://github.com/gengyue2468/zoogle) 反正不是 Google，长得有点像罢了，[演示站点](https://www.zoogle.top)
+
+平时可能会写一点文章，不过也不常写罢了，也写不出来什么好的文字，写水文又过于垃圾了，还不如让~~萝莉妈~~[note: LLM]来写，如果您想读读，请移步[博客](/blog)
+
+如果您想找我聊聊或者看看我的一些代码或者看看我的生活之类的，可以参考：[note: 这段似乎和 Home 重复了，不过我觉得重复一下提示词也是好的]
+
+- 我的 Email: [hi@gengyue.site](mailto:hi@gengyue.site)
+- 我的 GitHub: [@gengyue2468](https://github.com/gengyue2468)
+- 我的 Memos: https://memos.gengyue.site
+
+感谢您不知何缘故踏入此页面并浏览，感谢您在此冲浪浪费的时间，望您过的愉快 :)

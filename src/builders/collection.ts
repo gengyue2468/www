@@ -330,6 +330,10 @@ export async function buildCollection(
       summary: p.summary,
       tags: p.tags,
     })),
+    renderedItems: posts.map(p => ({
+      slug: p.slug,
+      html: p.html,
+    })),
   };
 }
 

@@ -4,6 +4,25 @@ import config from "../config.js";
 import { writeFileContent } from "../utils/fs.js";
 import type { CollectionOutput } from "../types.js";
 
+function htmlForRss(html: string): string {
+  let content = html;
+
+  // Replace sidenote: label + input + span → inline parenthetical note
+  // Pattern: <label ... class="margin-toggle sidenote-number" ...></label><input ... class="margin-toggle".../><span class="sidenote">NOTE</span>
+  content = content.replace(
+    /<label[^>]*class="margin-toggle sidenote-number"[^>]*><\/label><input[^>]*class="margin-toggle"[^>]*\/><span class="sidenote">([\s\S]*?)<\/span>/g,
+    (_, noteContent) => ` <span class="rss-sidenote">(${noteContent.trim()})</span>`
+  );
+
+  // Replace marginnote: label + input + span → inline parenthetical note with ⊕ prefix
+  content = content.replace(
+    /<label[^>]*class="margin-toggle"[^>]*>&#8853;<\/label><input[^>]*class="margin-toggle"[^>]*\/><span class="marginnote">([\s\S]*?)<\/span>/g,
+    (_, noteContent) => ` <span class="rss-marginnote">⊕ (${noteContent.trim()})</span>`
+  );
+
+  return content;
+}
+
 export async function generateRSS(collection: CollectionOutput): Promise<void> {
   if (!config.rss.enabled) return;
 
@@ -24,16 +43,24 @@ export async function generateRSS(collection: CollectionOutput): Promise<void> {
     feedLinks: { rss2: `${cleanSiteUrl}/rss.xml` },
   });
 
+  const renderedMap = new Map(
+    collection.renderedItems.map(r => [r.slug, r.html])
+  );
+
   for (const post of rssItems) {
     const postUrl = `${cleanSiteUrl}/${collection.urlPrefix}/${post.slug}`;
     const description = post.summary || post.excerpt || config.site.description;
     const date = post.date ? new Date(post.date) : new Date();
+
+    const rawHtml = renderedMap.get(post.slug);
+    const content = rawHtml ? htmlForRss(rawHtml) : undefined;
 
     feed.addItem({
       title: post.title,
       id: postUrl,
       link: postUrl,
       description,
+      content,
       date,
       author: [{ name: config.site.author }],
     });

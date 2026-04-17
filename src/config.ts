@@ -23,7 +23,6 @@ const config: Config = {
   routes: {
     "/": "index.md",
     "/about": "about.md",
-    "/shitposts": "shitposts.md",
   },
 
   collections: [
@@ -94,8 +93,7 @@ const config: Config = {
   nav: [
     { name: "Home", path: "/", show: true },
     { name: "About", path: "/about", show: true },
-    { name: "Blog", path: "/blog", show: true },
-    { name: "Shitposts", path: "https://www.shitposts.org", show: true },
+    { name: "Blog", path: "/blog", show: true }
   ],
 
   cdn: "",

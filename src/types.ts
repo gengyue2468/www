@@ -105,6 +105,7 @@ export interface CollectionOutput {
   urlPrefix: string;
   srcDir: string;
   items: Post[];
+  renderedItems: { slug: string; html: string }[];
 }
 
 export interface FrontMatter {

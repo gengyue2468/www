@@ -69,12 +69,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "blog/on-darkmode.md",
+                "file": "pages/about.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "on-darkmode"
+              "title": "about"
             }
           }
         ],
@@ -262,13 +262,13 @@
   },
   "active": "d053afb82dd88e2e",
   "lastOpenFiles": [
-    "blog/webpage-without-css-and-js.md",
+    "pages/index.md",
+    "pages/about.md",
     "blog/on-darkmode.md",
+    "blog/webpage-without-css-and-js.md",
     "html.webp",
     "b79185f3ef8f72e205a02d1929a52f2c.jpg",
-    "pages/index.md",
     "pages/404.md",
-    "pages/about.md",
     "blog/derp-server.md",
     "pages/shitposts.md",
     "blog/tailscale.md",
