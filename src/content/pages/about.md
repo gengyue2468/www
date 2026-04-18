@@ -38,7 +38,7 @@ description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方
 - [shitposts.org](https://github.com/gengyue2468/shitposts.org) 基于 LLM 幻觉和概率随机的垃圾水文生成器，与 GitHub Actions 集成。参阅 [这篇文章](https://www.gengyue.site/blog/let-llm-write-shitposts/)
 - [Zoogle](https://github.com/gengyue2468/zoogle) 反正不是 Google，长得有点像罢了，[演示站点](https://www.zoogle.top)
 
-平时可能会写一点文章，不过也不常写罢了，也写不出来什么好的文字，写水文又过于垃圾了，还不如让~~萝莉妈~~[note: LLM]来写，如果您想读读，请移步[博客](/blog)
+平时可能会写一点文章，不过也不常写罢了，也写不出来什么好的文字，写水文又过于垃圾了，还不如让~~萝莉妈~~[note: LLM]来写，如果您想读读，请移步 [Blog](/blog)。如果您想看水文或者碎片化的内容，请移步 [Logbook](/logbook) 
 
 如果您想找我聊聊或者看看我的一些代码或者看看我的生活之类的，可以参考：[note: 这段似乎和 Home 重复了，不过我觉得重复一下提示词也是好的]
 

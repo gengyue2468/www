@@ -37,6 +37,16 @@ const config: Config = {
         tags: "tags",
       },
     },
+    {
+      name: "logbook",
+      srcDir: "./src/content/logbook",
+      urlPrefix: "logbook",
+      tags: false,
+      layouts: {
+        index: "blog-index",
+        post: "blog-post",
+      },
+    },
   ],
 
   date: {
@@ -64,7 +74,7 @@ const config: Config = {
 
   rss: {
     enabled: true,
-    title: "gengyue's Blog",
+    title: "gengyue's blog",
     description: "The personal blog of gengyue.",
     language: "zh-CN",
     copyright: "Copyright © 2026 gengyue",
@@ -93,7 +103,8 @@ const config: Config = {
   nav: [
     { name: "Home", path: "/", show: true },
     { name: "About", path: "/about", show: true },
-    { name: "Blog", path: "/blog", show: true }
+    { name: "Blog", path: "/blog", show: true },
+    { name: "Logbook", path: "/logbook", show: true },
   ],
 
   cdn: "",
