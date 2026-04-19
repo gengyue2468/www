@@ -48,11 +48,20 @@ export function renderTemplate(
   return result;
 }
 
-export function renderNav(navItems: { name: string; path: string; show: boolean }[]): string {
+export function renderNav(navItems: { name: string; path: string; show: boolean }[], currentPath?: string): string {
   const parts: string[] = [];
   for (const item of navItems) {
     if (item.show) {
-      parts.push(`<a href="${item.path}">${item.name}</a>`);
+      let isCurrent = false;
+      if (currentPath) {
+        if (item.path === currentPath) {
+          isCurrent = true;
+        } else if (item.path !== "/" && currentPath.startsWith(item.path + "/")) {
+          isCurrent = true;
+        }
+      }
+      const ariaCurrent = isCurrent ? ' aria-current="page"' : "";
+      parts.push(`<a href="${item.path}"${ariaCurrent}>${item.name}</a>`);
     }
   }
   return parts.join("\n      ");

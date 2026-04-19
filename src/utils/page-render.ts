@@ -21,6 +21,7 @@ export interface RenderPageOptions {
   hookType?: "page" | "post";
   hookSlug?: string;
   robotsMeta?: string;
+  breadcrumbs?: { name: string; url: string }[];
 }
 
 export function renderPage(
@@ -39,6 +40,7 @@ export function renderPage(
     jsonLd,
     year,
     robotsMeta = "",
+    breadcrumbs,
   } = options;
 
   const fullTitle = title;
@@ -59,7 +61,7 @@ export function renderPage(
     year: (year || new Date().getFullYear()).toString(),
     content,
     css,
-    nav: renderNav(config.nav),
+    nav: renderNav(config.nav, route),
     scripts,
     analytics,
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
@@ -78,6 +80,7 @@ export function renderPage(
       siteName: config.site.title,
       authorName: config.site.author,
       siteUrl: config.site.url,
+      breadcrumbs,
     }),
   };
 

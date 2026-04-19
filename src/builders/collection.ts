@@ -145,6 +145,7 @@ export async function buildCollection(
         slug,
         title: (frontmatter.title as string) || slug,
         date: (frontmatter.date as string) || "",
+        updated: (frontmatter.updated as string) || "",
         excerpt: (frontmatter.excerpt as string) || "",
         summary: (frontmatter.summary as string) || "",
         tags: (frontmatter.tags as string[]) || [],
@@ -196,6 +197,10 @@ export async function buildCollection(
       css: css || "",
       ogTags: { title: indexTitle, description: indexDescription, url: `${config.site.url}/${urlPrefix}`, type: "website", siteName: config.site.title },
       jsonLd: { type: "CollectionPage", title: indexTitle, description: indexDescription, url: `${config.site.url}/${urlPrefix}`, numberOfItems: posts.length },
+      breadcrumbs: [
+        { name: config.site.title, url: config.site.url },
+        { name: coll.name.charAt(0).toUpperCase() + coll.name.slice(1), url: `${config.site.url}/${urlPrefix}` },
+      ],
       year,
     });
 
@@ -238,7 +243,7 @@ export async function buildCollection(
       const plainText = html.replace(/<[^>]+>/g, "").replace(/\s+/g, "");
       const wordCount = `${plainText.length} 字`;
       const sourceMdLink = config.llms?.enabled
-        ? `<a href="/${urlPrefix}/${post.slug}.md" class="md-link">.md</a>`
+        ? `<a href="/${urlPrefix}/${post.slug}.md" class="md-link" rel="nofollow">.md</a>`
         : "";
       const dateSeparator = formattedDate ? " · " : "";
 
@@ -285,6 +290,9 @@ export async function buildCollection(
           type: "article",
           siteName: config.site.title,
           tags: postTags,
+          publishedTime: frontmatter.date as string,
+          modifiedTime: (frontmatter.updated as string) || undefined,
+          authorName: config.site.author,
         },
         jsonLd: {
           type: "BlogPosting",
@@ -292,8 +300,14 @@ export async function buildCollection(
           description,
           url: `${config.site.url}/${urlPrefix}/${post.slug}`,
           date: frontmatter.date as string,
+          dateModified: (frontmatter.updated as string) || undefined,
           tags: postTags,
         },
+        breadcrumbs: [
+          { name: config.site.title, url: config.site.url },
+          { name: coll.name.charAt(0).toUpperCase() + coll.name.slice(1), url: `${config.site.url}/${urlPrefix}` },
+          { name: title, url: `${config.site.url}/${urlPrefix}/${post.slug}` },
+        ],
         year,
       });
 
@@ -326,6 +340,7 @@ export async function buildCollection(
       slug: p.slug,
       title: p.title,
       date: p.date,
+      updated: p.updated,
       excerpt: p.excerpt,
       summary: p.summary,
       tags: p.tags,
@@ -411,6 +426,11 @@ async function buildCollectionTagPages(
         robotsMeta: '<meta name="robots" content="noindex, follow" />',
         ogTags: { title: tagPageTitle, description: tagDescription, url: `${config.site.url}/${urlPrefix}/tag/${slug}`, type: "website", siteName: config.site.title, tags: [tag] },
         jsonLd: { type: "CollectionPage", title: tagPageTitle, description: tagDescription, url: `${config.site.url}/${urlPrefix}/tag/${slug}`, numberOfItems: taggedPosts.length },
+        breadcrumbs: [
+          { name: config.site.title, url: config.site.url },
+          { name: coll.name.charAt(0).toUpperCase() + coll.name.slice(1), url: `${config.site.url}/${urlPrefix}` },
+          { name: `#${tag}`, url: `${config.site.url}/${urlPrefix}/tag/${slug}` },
+        ],
         year,
       });
 
@@ -476,6 +496,11 @@ async function buildCollectionTagPages(
     robotsMeta: '<meta name="robots" content="noindex, follow" />',
     ogTags: { title: tagsIndexTitle, description: tagsIndexDescription, url: `${config.site.url}/${urlPrefix}/tag`, type: "website", siteName: config.site.title },
     jsonLd: { type: "CollectionPage", title: tagsIndexTitle, description: tagsIndexDescription, url: `${config.site.url}/${urlPrefix}/tag`, numberOfItems: sortedTags.length },
+    breadcrumbs: [
+      { name: config.site.title, url: config.site.url },
+      { name: coll.name.charAt(0).toUpperCase() + coll.name.slice(1), url: `${config.site.url}/${urlPrefix}` },
+      { name: "Tags", url: `${config.site.url}/${urlPrefix}/tag` },
+    ],
     year,
   });
 

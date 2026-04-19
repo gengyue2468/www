@@ -72,6 +72,10 @@ export interface RSSConfig {
 export interface SitemapConfig {
   enabled: boolean;
   changefreq: string;
+  changefreqHome?: string;
+  changefreqPages?: string;
+  changefreqBlog?: string;
+  changefreqPosts?: string;
   priority: Record<string, number>;
 }
 
@@ -111,6 +115,7 @@ export interface CollectionOutput {
 export interface FrontMatter {
   title?: string;
   date?: string;
+  updated?: string;
   excerpt?: string;
   summary?: string;
   description?: string;
@@ -128,6 +133,7 @@ export interface Post {
   slug: string;
   title: string;
   date: string;
+  updated?: string;
   excerpt: string;
   summary: string;
   tags: string[];

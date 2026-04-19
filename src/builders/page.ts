@@ -14,6 +14,30 @@ import config from "../config.js";
 
 let cachedCss: string | null = null;
 
+function deduplicateFontFaces(css: string): string {
+  const fontFaceRegex = /@font-face\s*\{[^}]+\}/g;
+  const seen = new Set<string>();
+  return css.replace(fontFaceRegex, (match) => {
+    const key = match.replace(/\s+/g, " ").trim();
+    if (seen.has(key)) return "";
+    seen.add(key);
+    return match;
+  });
+}
+
+function lightweightCssMinify(css: string): string {
+  let result = css;
+  result = deduplicateFontFaces(result);
+  result = result.replace(/\/\*[\s\S]*?\*\//g, "");
+  result = result.replace(/^\s+/gm, "");
+  result = result.replace(/\n{2,}/g, "\n");
+  result = result.replace(/\s*([{}:;,])\s*/g, "$1");
+  result = result.replace(/;\}/g, "}");
+  result = result.replace(/\s+/g, " ");
+  result = result.trim();
+  return result;
+}
+
 export async function getInlinedCss(): Promise<string> {
   if (cachedCss) return cachedCss;
 
@@ -32,8 +56,9 @@ export async function getInlinedCss(): Promise<string> {
       globalsFile.text(),
     ]);
 
-    const combined = `/* tufte.css */\n${tufteCss}\n\n/* globals.css */\n${globalsCss}`;
-    cachedCss = `<style>\n${combined}\n</style>`;
+    const combined = `${tufteCss}\n${globalsCss}`;
+    const minified = lightweightCssMinify(combined);
+    cachedCss = `<style>\n${minified}\n</style>`;
     return cachedCss;
   } catch (_err) {
     console.warn("Warning: Could not read CSS files for inlining");
@@ -49,7 +74,8 @@ export async function buildPage(
   year?: number,
   ogImageUrl?: string,
   cacheManager?: BuildCacheManager,
-  hooks?: BuildHooks
+  hooks?: BuildHooks,
+  robotsMeta?: string
 ): Promise<void> {
   if (cacheManager) {
     const changed = await cacheManager.hasPageChanged(filePath);
@@ -83,7 +109,7 @@ export async function buildPage(
     siteDescription: config.site.description,
   });
 
-  const pageTitle = route === "/" ? `${title} - ${config.site.title}` : `${title} - ${config.site.title}`;
+  const pageTitle = route === "/" ? config.site.title : `${title} - ${config.site.title}`;
 
   let output = renderPage(baseLayout, {
     route,
@@ -93,6 +119,7 @@ export async function buildPage(
     css: inlinedCss,
     scripts,
     keywords: generateKeywords(frontmatter.tags as string[]),
+    robotsMeta,
     ogTags: {
       title: pageTitle,
       description,
@@ -110,6 +137,10 @@ export async function buildPage(
       description,
       url: `${config.site.url}${route}`,
     },
+    breadcrumbs: [
+      { name: config.site.title, url: config.site.url },
+      { name: title as string, url: `${config.site.url}${route}` },
+    ],
     year,
   });
 

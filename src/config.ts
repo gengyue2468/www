@@ -84,6 +84,10 @@ const config: Config = {
   sitemap: {
     enabled: true,
     changefreq: "weekly",
+    changefreqHome: "daily",
+    changefreqPages: "monthly",
+    changefreqBlog: "weekly",
+    changefreqPosts: "monthly",
     priority: { home: 1.0, pages: 0.8, blog: 0.9, posts: 0.7 },
   },
 

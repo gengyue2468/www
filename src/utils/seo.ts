@@ -109,12 +109,15 @@ export interface OgTagsOptions {
   ogImageWidth?: number;
   ogImageHeight?: number;
   ogImageAlt?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  authorName?: string;
 }
 
 export function generateOgTags(options: OgTagsOptions): string {
-  const { title, description, url, type, siteName, tags, ogImageUrl, ogImageWidth, ogImageHeight, ogImageAlt } = options;
+  const { title, description, url, type, siteName, tags, ogImageUrl, ogImageWidth, ogImageHeight, ogImageAlt, publishedTime, modifiedTime, authorName } = options;
   const safeTitle = escapeHtmlAttr(title);
-  const safeDescription = escapeHtmlAttr(smartTruncate(description));
+  const safeDescription = escapeHtmlAttr(description);
   const safeUrl = escapeHtmlAttr(url);
 
   const parts: string[] = [
@@ -127,6 +130,17 @@ export function generateOgTags(options: OgTagsOptions): string {
     `<meta name="twitter:title" content="${safeTitle}" />`,
     `<meta name="twitter:description" content="${safeDescription}" />`,
   ];
+
+  if (type === "article") {
+    if (publishedTime) parts.push(`<meta property="article:published_time" content="${new Date(publishedTime).toISOString()}" />`);
+    if (modifiedTime) parts.push(`<meta property="article:modified_time" content="${new Date(modifiedTime).toISOString()}" />`);
+    if (authorName) parts.push(`<meta property="article:author" content="${escapeHtmlAttr(authorName)}" />`);
+    if (tags && tags.length > 0) {
+      for (const tag of tags) {
+        parts.push(`<meta property="article:tag" content="${escapeHtmlAttr(tag)}" />`);
+      }
+    }
+  }
 
   if (ogImageUrl) {
     const safeOgImageUrl = escapeHtmlAttr(ogImageUrl);
@@ -154,52 +168,75 @@ export interface JsonLdOptions {
   authorName: string;
   siteUrl: string;
   date?: string;
+  dateModified?: string;
   tags?: string[];
   numberOfItems?: number;
+  breadcrumbs?: { name: string; url: string }[];
 }
 
 export function generateJsonLd(options: JsonLdOptions): string {
-  const { type, title, description, url, siteName, authorName, siteUrl, date, tags, numberOfItems } = options;
+  const { type, title, description, url, siteName, authorName, siteUrl, date, dateModified, tags, numberOfItems, breadcrumbs } = options;
   const baseUrl = siteUrl.replace(/\/$/, "");
+
+  const breadcrumbLd = breadcrumbs && breadcrumbs.length > 0
+    ? {
+        "@type": "BreadcrumbList",
+        "itemListElement": breadcrumbs.map((crumb, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "name": crumb.name,
+          "item": crumb.url,
+        })),
+      }
+    : null;
 
   if (type === "WebSite" || type === "WebPage") {
     if (url === baseUrl + "/" || url === baseUrl) {
-      const data = {
-        "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "WebSite",
-            "@id": `${baseUrl}/#website`,
-            url: baseUrl + "/",
+      const graph: Record<string, unknown>[] = [
+        {
+          "@type": "WebSite",
+          "@id": `${baseUrl}/#website`,
+          url: baseUrl + "/",
+          name: siteName,
+          description: smartTruncate(description),
+          author: { "@type": "Person", name: authorName },
+          publisher: {
+            "@type": "Organization",
             name: siteName,
-            description: smartTruncate(description),
-            author: { "@type": "Person", name: authorName },
+            logo: { "@type": "ImageObject", url: `${baseUrl}/static/logo.webp` },
           },
-          {
-            "@type": "WebPage",
-            "@id": `${baseUrl}/#webpage`,
-            url,
-            name: title,
-            isPartOf: { "@id": `${baseUrl}/#website` },
-          },
-        ],
-      };
+        },
+        {
+          "@type": "WebPage",
+          "@id": `${baseUrl}/#webpage`,
+          url,
+          name: title,
+          isPartOf: { "@id": `${baseUrl}/#website` },
+        },
+      ];
+      if (breadcrumbLd) graph.push(breadcrumbLd);
+      const data = { "@context": "https://schema.org", "@graph": graph };
       return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
     }
 
-    const data: Record<string, unknown> = {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      url,
-      name: title,
-      description: smartTruncate(description),
-      isPartOf: { "@type": "WebSite", name: siteName, url: baseUrl + "/" },
-    };
-    return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+    const graph: Record<string, unknown>[] = [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        url,
+        name: title,
+        description: smartTruncate(description),
+        isPartOf: { "@type": "WebSite", name: siteName, url: baseUrl + "/" },
+      },
+    ];
+    if (breadcrumbLd) {
+      const data = { "@context": "https://schema.org", "@graph": [...graph, breadcrumbLd] };
+      return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+    }
+    return `<script type="application/ld+json">\n${JSON.stringify(graph[0], null, 2)}\n</script>`;
   }
 
   const data: Record<string, unknown> = {
-    "@context": "https://schema.org",
     "@type": type,
     headline: title,
     description: smartTruncate(description),
@@ -208,7 +245,11 @@ export function generateJsonLd(options: JsonLdOptions): string {
 
   if (type === "BlogPosting") {
     data.author = { "@type": "Person", name: authorName };
-    data.publisher = { "@type": "Person", name: authorName };
+    data.publisher = {
+      "@type": "Organization",
+      name: siteName,
+      logo: { "@type": "ImageObject", url: `${baseUrl}/static/logo.webp` },
+    };
     data.mainEntityOfPage = { "@type": "WebPage", "@id": url };
   }
 
@@ -218,7 +259,17 @@ export function generateJsonLd(options: JsonLdOptions): string {
   }
 
   if (date) data.datePublished = new Date(date).toISOString();
+  if (dateModified) {
+    data.dateModified = new Date(dateModified).toISOString();
+  } else if (date) {
+    data.dateModified = new Date(date).toISOString();
+  }
   if (tags && tags.length > 0) data.keywords = tags.join(", ");
+
+  if (breadcrumbLd) {
+    const wrapped = { "@context": "https://schema.org", "@graph": [data, breadcrumbLd] };
+    return `<script type="application/ld+json">\n${JSON.stringify(wrapped, null, 2)}\n</script>`;
+  }
 
   return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
 }

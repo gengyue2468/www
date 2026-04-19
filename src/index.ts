@@ -229,7 +229,8 @@ async function build(): Promise<void> {
     await buildPage(
       "/404", filePath404, baseLayout, pageLayout,
       currentYear, defaultOgImageUrl,
-      cacheManager, hooks
+      cacheManager, hooks,
+      '<meta name="robots" content="noindex, nofollow" />'
     );
 
     const dist404DirPath = join(config.dirs.dist, "404", "index.html");

@@ -58,7 +58,6 @@ export async function copyPublicFiles(dirs: DirsConfig): Promise<void> {
   try {
     const entries = await readdir(publicDir, { withFileTypes: true });
 
-    // Process directories and files in parallel
     await Promise.all(
       entries.map(async (entry) => {
         const srcPath = join(publicDir, entry.name);

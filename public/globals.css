@@ -288,6 +288,14 @@ main {
   opacity: 1;
 }
 
+article > section > h1:first-child {
+  font-style: italic;
+  font-weight: 400;
+  margin-top: var(--spacing-h2-top);
+  margin-bottom: var(--spacing-h2-bottom);
+  font-size: var(--font-size-h2);
+}
+
 /* Dark mode support for post-date */
 @media (prefers-color-scheme: dark) {
   .post-date,
