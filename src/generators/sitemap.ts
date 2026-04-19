@@ -24,7 +24,7 @@ export async function generateSitemap(collections: CollectionOutput[]): Promise<
       lastmod: now,
     },
     ...Object.entries(config.routes)
-      .filter(([route]) => !collectionRoutes.has(route))
+      .filter(([route]) => !collectionRoutes.has(route) && route !== "/")
       .map(([route]) => ({
         url: route,
         changefreq: config.sitemap.changefreq as any,

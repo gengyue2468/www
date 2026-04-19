@@ -91,8 +91,8 @@ const config: Config = {
     enabled: true,
     userAgent: "*",
     allow: ["/"],
-    disallow: [],
-    crawlDelay: 1,
+    disallow: ["/*.md", "/blog/tag/", "/logbook/tag/"],
+    crawlDelay: 0,
   },
 
   llms: {

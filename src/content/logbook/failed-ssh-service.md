@@ -15,7 +15,7 @@ gengyue@gengyue-laptop:~$
 
 Updated 2026-04-19
 
-发现问题了，`cat ~/.bashrc` 发现里头竟然有手动写入的 ssh 启动项 `auto startup ssh` 和 `sudo service ssh start`，手动删除之后就好了。
+发现问题了，`cat ~/.bashrc` 发现里头竟然有手动写入的 ssh 启动项 `auto startup ssh` 和 `sudo service ssh start`，手动删除之后手动 `source ~/.bashrc` 一下就好了。
 
 哎，在这个过程中好像顺便发现了一个问题，wsl 启用 `systemd` 的配置文件好像不在 Windows 下的 `~/.wslconfig` 而是在 wsl 下的 `/etc/wsl.conf` 中，需要：
 

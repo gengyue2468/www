@@ -20,6 +20,7 @@ export interface RenderPageOptions {
   hooks?: BuildHooks;
   hookType?: "page" | "post";
   hookSlug?: string;
+  robotsMeta?: string;
 }
 
 export function renderPage(
@@ -37,6 +38,7 @@ export function renderPage(
     ogTags,
     jsonLd,
     year,
+    robotsMeta = "",
   } = options;
 
   const fullTitle = title;
@@ -63,6 +65,7 @@ export function renderPage(
     footerLlms: config.llms?.enabled ? ' | <a href="/llms.txt">llms.txt</a>' : '',
     canonicalUrl: escapeHtmlAttr(pageUrl),
     keywords,
+    robotsMeta,
     ogTags: generateOgTags({
       ...ogTags,
       ogImageUrl: ogTags.ogImageUrl || ogImageBase,
