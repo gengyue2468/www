@@ -9,4 +9,14 @@ date: 2026-04-30
 
 果然，手动给域名申请了 let's encrypt 的证书并关掉了 Cloudflare 的橙云就好了，太神秘了，大调查一下...
 
+Updated 2026-05-01 12:23 AM
 
+大调查有了大结果！果然是 Cloudflare 拦了请求，估计是当成 AI Crawl 或者 Bot 之类的自动化程序了...哎，改改 WAF 规则。
+
+去 `Security -> WAF -> Rules` 新建一个规则，表达成 `http.user_agent contains "OpenAI"`，Actions 选 Skip，然后去把橙云打开！
+
+握草这校园网半夜怎么又断了啊，开热点电脑上 Cloudflare 好慢...
+
+哦齁齁，错怪流量了，是我的代理有问题，不管了，修好了...
+
+哎 Cloudflare 怎么这么好啊，Cloudflare 怎么又这么坏啊...
