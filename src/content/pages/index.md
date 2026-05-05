@@ -3,9 +3,9 @@ title: Hi 👋!
 description: 欢迎来到 gengyue 的个人网站，这里记录技术探索、项目实践与生活思考。博客涵盖编程开发、开源项目经验与总结，也分享一些有趣的技术实践与学习心得。欢迎浏览文章，了解成长轨迹与实践积累。
 ---
 
-此地属于 gengyue。目前这个页面应该是被扔到某台小鸡上了，利用 [Cloudflare](https://cloudflare.com/) 回源。
+此地属于 gengyue。目前这个页面应该是被扔到 [Netcup](https://www.netcup.com/en?ref=366353) 的一台 VPS [^ 纽伦堡，4c 8g] 上了，利用 [Cloudflare](https://cloudflare.com/) 回源。
 
-不过这里也没有许多东西，比如一些有趣的服务或者小玩具。实话讲，这就是拿 [Bun](https://bun.sh/) [^ 使用 Bun! 超快的构建] 构建 [Markdown](https://www.markdown.cn/docs/intro/) 文档生成的一堆 [HTML](https://developer.mozilla.org/zh-CN/docs/Web/HTML) 文档而已。[^ 其实 HTML 本身就是一种用于排版的超文本标记语言，我们在回归 Web 的本源，好耶！]
+不过这里也没有许多东西，比如一些有趣的服务或者小玩具。实话讲，这只是拿 [Bun](https://bun.sh/) [^ 使用 Bun! 超快的构建] 构建 [Markdown](https://www.markdown.cn/docs/intro/) 文档生成的一堆 [HTML](https://developer.mozilla.org/zh-CN/docs/Web/HTML) 文档而已。[^ 其实 HTML 本身就是一种用于排版的超文本标记语言，我们在回归 Web 的本源，好耶！至于为什么不用传统的构建器，那可能是因为轻量的考虑吧...]
 
 这个页面的 CSS 是基于 [Tufte CSS](https://edwardtufte.github.io/tufte-css/)[^Tufte CSS 是 Edward Tufte 风格的 CSS 框架，专注于简洁优雅的排版和侧边栏注释。] 修改出来的，字体用的是 [ET Book](https://edwardtufte.github.io/et-book/) 和 [Source Han Serif](https://github.com/adobe-fonts/source-han-serif/)，有一部分静态资源由  [JsDelivr](https://www.jsdelivr.com/) 托管，例如 Mermaid.js。
 
