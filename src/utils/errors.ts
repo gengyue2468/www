@@ -120,6 +120,11 @@ export class ConsoleErrorReporter implements ErrorReporter {
     return this.errors.length > 0;
   }
 
+  reset(): void {
+    this.errors = [];
+    this.warnings = [];
+  }
+
   throwIfErrors(): void {
     if (this.errors.length > 0) {
       const first = this.errors[0];

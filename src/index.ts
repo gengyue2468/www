@@ -45,6 +45,11 @@ class PerformanceTimer {
     console.log("─".repeat(50));
     console.log(`  ${"TOTAL".padEnd(30)} ${total.toFixed(2).padStart(8)}ms`);
   }
+
+  reset(): void {
+    this.times.clear();
+    this.results = [];
+  }
 }
 
 interface LayoutCache {
@@ -109,7 +114,7 @@ async function checkLayoutsChanged(
   const all = ["base", "page", ...extraLayouts];
   for (const name of all) {
     const layoutPath = join(layoutsDir, `${name}.html`);
-    if (await cacheManager.hasChanged("layouts", layoutPath)) {
+    if (await cacheManager.hasChanged("layouts", name, layoutPath)) {
       return true;
     }
   }
@@ -125,7 +130,7 @@ async function updateLayoutMtimes(
   await Promise.all(
     all.map(async (name) => {
       const layoutPath = join(layoutsDir, `${name}.html`);
-      await cacheManager.updateMtime("layouts", layoutPath);
+      await cacheManager.updateMtime("layouts", name, layoutPath);
     })
   );
 }
@@ -301,6 +306,8 @@ const timer = new PerformanceTimer();
 
 async function build(): Promise<void> {
   console.log("📦 Building site...\n");
+  errorReporter.reset();
+  timer.reset();
   timer.start("total");
 
   timer.start("setup");
@@ -311,7 +318,7 @@ async function build(): Promise<void> {
   const layoutManager = new LayoutManager(config.dirs.layouts);
 
   const configPath = join(import.meta.dir, "config.ts");
-  if (await cacheManager.hasChanged("config", configPath)) {
+  if (await cacheManager.hasChanged("config", "config", configPath)) {
     console.log("  Config changed, invalidating cache");
     cacheManager.invalidateAll();
     clearContentCache();
@@ -337,7 +344,7 @@ async function build(): Promise<void> {
   const layoutsMap = await layoutManager.loadAll(allLayoutNames, layoutsChanged);
 
   await updateLayoutMtimes(cacheManager, config.dirs.layouts, collectionLayouts);
-  await cacheManager.updateMtime("config", configPath);
+  await cacheManager.updateMtime("config", "config", configPath);
 
   const baseLayout = layoutsMap["base"];
   const pageLayout = layoutsMap["page"];
@@ -378,7 +385,7 @@ async function build(): Promise<void> {
   await copyPublicFiles(config.dirs);
   timer.end("copy-public");
 
-  cacheManager.save();
+  await cacheManager.save();
 
   if (hooks.afterBuild) {
     await hooks.afterBuild();

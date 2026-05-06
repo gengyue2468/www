@@ -149,11 +149,11 @@ async function loadPostsFromDir(
 
     let changed = true;
     if (cacheManager) {
-      changed = await cacheManager.hasChanged("blogPosts", filePath);
+      changed = await cacheManager.hasChanged("blogPosts", filePath, filePath);
     }
 
-    const { frontmatter, html } = await renderMarkdown(filePath);
     const slug = basename(file, ".md");
+    const { frontmatter, html } = await renderMarkdown(filePath);
 
     return {
       slug,
@@ -348,13 +348,23 @@ async function buildPostPages(
     await writeFileContent(outputPath, output);
 
     if (cacheManager) {
-      await cacheManager.updateMtime("blogPosts", post.filePath);
+      await cacheManager.updateMtime("blogPosts", post.filePath, post.filePath);
     }
 
     console.log(`✓ Built /${urlPrefix}/${post.slug}`);
   });
 
-  await Promise.all(buildPromises);
+  const results = await Promise.allSettled(buildPromises);
+  for (const result of results) {
+    if (result.status === "rejected") {
+      errorReporter.report(
+        AppError.fromError(result.reason, ErrorCode.BUILD_ERROR, {
+          phase: "post-pages",
+          collection: coll.name,
+        })
+      );
+    }
+  }
 }
 
 async function buildTagPages(

@@ -11,7 +11,8 @@ export async function generateRobotsTxt(): Promise<void> {
 
   lines.push(`User-agent: ${userAgent}`);
 
-  for (const rule of allow) {
+  const allowRules = allow.length > 0 ? allow : ["/"];
+  for (const rule of allowRules) {
     lines.push(`Allow: ${rule}`);
   }
 

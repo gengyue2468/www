@@ -82,34 +82,36 @@ export class BuildCacheManager {
     this.cache = loaded || { ...DEFAULT_CACHE };
   }
 
-  save(): void {
+  async save(): Promise<void> {
     if (!this.dirty) return;
-    Bun.write(this.cachePath, JSON.stringify(this.cache, null, 2)).catch((err) => {
+    try {
+      await Bun.write(this.cachePath, JSON.stringify(this.cache, null, 2));
+    } catch (err) {
       console.warn("Failed to save build cache:", err);
-    });
+    }
   }
 
-  async hasChanged(store: CacheStore, path: string): Promise<boolean>;
-  async hasChanged(store: "config", configPath: string): Promise<boolean>;
-  async hasChanged(store: CacheStore | "config", path: string): Promise<boolean> {
+  async hasChanged(store: CacheStore, key: string, filePath: string): Promise<boolean>;
+  async hasChanged(store: "config", _key: string, configPath: string): Promise<boolean>;
+  async hasChanged(store: CacheStore | "config", key: string, filePath: string): Promise<boolean> {
     if (store === "config") {
       const cached = this.cache.config;
-      return cached === 0 || hasFileChanged(path, cached);
+      return cached === 0 || hasFileChanged(filePath, cached);
     }
-    const cached = this.cache[store][path];
-    return cached === undefined || hasFileChanged(path, cached);
+    const cached = this.cache[store][key];
+    return cached === undefined || hasFileChanged(filePath, cached);
   }
 
-  async updateMtime(store: CacheStore, path: string): Promise<void>;
-  async updateMtime(store: "config", configPath: string): Promise<void>;
-  async updateMtime(store: CacheStore | "config", path: string): Promise<void> {
-    const mtime = await getFileMtime(path);
+  async updateMtime(store: CacheStore, key: string, filePath: string): Promise<void>;
+  async updateMtime(store: "config", _key: string, configPath: string): Promise<void>;
+  async updateMtime(store: CacheStore | "config", key: string, filePath: string): Promise<void> {
+    const mtime = await getFileMtime(filePath);
     if (mtime === null) return;
 
     if (store === "config") {
       this.cache.config = mtime;
     } else {
-      this.cache[store][path] = mtime;
+      this.cache[store][key] = mtime;
     }
     this.dirty = true;
   }
