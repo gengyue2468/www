@@ -1,4 +1,5 @@
 import { join, dirname } from "path";
+import { stat } from "fs/promises";
 import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
@@ -6,13 +7,18 @@ import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import type { BuildHooks } from "../extensions/plugin.js";
 import type { BuildCacheManager } from "../utils/cache.js";
-import {
-  buildMetaDescription,
-  generateKeywords,
-} from "../utils/seo.js";
+import type { FrontMatter } from "../types.js";
+import { buildMetaDescription, generateKeywords } from "../utils/seo.js";
+import { errorReporter } from "../utils/errors.js";
 import config from "../config.js";
 
-let cachedCss: string | null = null;
+interface CssCache {
+  content: string;
+  tufteMtime: number;
+  globalsMtime: number;
+}
+
+let cssCache: CssCache | null = null;
 
 function deduplicateFontFaces(css: string): string {
   const fontFaceRegex = /@font-face\s*\{[^}]+\}/g;
@@ -26,24 +32,40 @@ function deduplicateFontFaces(css: string): string {
 }
 
 function lightweightCssMinify(css: string): string {
-  let result = css;
-  result = deduplicateFontFaces(result);
-  result = result.replace(/\/\*[\s\S]*?\*\//g, "");
-  result = result.replace(/^\s+/gm, "");
-  result = result.replace(/\n{2,}/g, "\n");
-  result = result.replace(/\s*([{}:;,])\s*/g, "$1");
-  result = result.replace(/;\}/g, "}");
-  result = result.replace(/\s+/g, " ");
-  result = result.trim();
-  return result;
+  return deduplicateFontFaces(css)
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/^\s+/gm, "")
+    .replace(/\n{2,}/g, "\n")
+    .replace(/\s*([{}:;,])\s*/g, "$1")
+    .replace(/;\}/g, "}")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function getFileMtime(filePath: string): Promise<number> {
+  try {
+    const { mtimeMs } = await stat(filePath);
+    return mtimeMs;
+  } catch {
+    return 0;
+  }
 }
 
 export async function getInlinedCss(): Promise<string> {
-  if (cachedCss) return cachedCss;
-
   const { public: publicDir } = config.dirs;
   const tuftePath = join(publicDir, "tufte.css");
   const globalsPath = join(publicDir, "globals.css");
+
+  const [tufteMtime, globalsMtime] = await Promise.all([
+    getFileMtime(tuftePath),
+    getFileMtime(globalsPath),
+  ]);
+
+  if (cssCache && 
+      cssCache.tufteMtime >= tufteMtime && 
+      cssCache.globalsMtime >= globalsMtime) {
+    return cssCache.content;
+  }
 
   try {
     const [tufteFile, globalsFile] = await Promise.all([
@@ -58,12 +80,78 @@ export async function getInlinedCss(): Promise<string> {
 
     const combined = `${tufteCss}\n${globalsCss}`;
     const minified = lightweightCssMinify(combined);
-    cachedCss = `<style>\n${minified}\n</style>`;
-    return cachedCss;
-  } catch (_err) {
-    console.warn("Warning: Could not read CSS files for inlining");
+    const content = `<style>\n${minified}\n</style>`;
+    
+    cssCache = { content, tufteMtime, globalsMtime };
+    return content;
+  } catch (err) {
+    errorReporter.reportWarning("Could not read CSS files for inlining", {
+      tuftePath,
+      globalsPath,
+    });
     return "";
   }
+}
+
+function buildPageOutput(
+  baseLayout: string,
+  route: string,
+  title: string,
+  description: string,
+  renderedContent: string,
+  options: {
+    css: string;
+    scripts?: string;
+    tags?: string[];
+    robotsMeta?: string;
+    ogImageUrl?: string;
+    year?: number;
+    isArticle?: boolean;
+    date?: string;
+    updated?: string;
+  }
+): string {
+  const pageTitle = route === "/" ? config.site.title : `${title} - ${config.site.title}`;
+  
+  return renderPage(baseLayout, {
+    route,
+    title: pageTitle,
+    description,
+    content: renderedContent,
+    css: options.css,
+    scripts: options.scripts || "",
+    keywords: generateKeywords(options.tags),
+    robotsMeta: options.robotsMeta,
+    ogTags: {
+      title: pageTitle,
+      description,
+      url: `${config.site.url}${route}`,
+      type: options.isArticle ? "article" : "website",
+      siteName: config.site.title,
+      ogImageUrl: options.ogImageUrl,
+      ogImageWidth: config.site.ogImageWidth,
+      ogImageHeight: config.site.ogImageHeight,
+      ogImageAlt: config.site.ogImageAlt,
+      tags: options.tags,
+      publishedTime: options.date,
+      modifiedTime: options.updated,
+      authorName: config.site.author,
+    },
+    jsonLd: {
+      type: options.isArticle ? "BlogPosting" : "WebPage",
+      title,
+      description,
+      url: `${config.site.url}${route}`,
+      date: options.date,
+      dateModified: options.updated,
+      tags: options.tags,
+    },
+    breadcrumbs: [
+      { name: config.site.title, url: config.site.url },
+      { name: title, url: `${config.site.url}${route}` },
+    ],
+    year: options.year,
+  });
 }
 
 export async function buildPage(
@@ -78,7 +166,7 @@ export async function buildPage(
   robotsMeta?: string
 ): Promise<void> {
   if (cacheManager) {
-    const changed = await cacheManager.hasPageChanged(filePath);
+    const changed = await cacheManager.hasChanged("pages", filePath);
     if (!changed) {
       console.log(`  (cached) ${route}`);
       return;
@@ -89,7 +177,7 @@ export async function buildPage(
   const title = frontmatter.title || "Untitled";
 
   const hookResult = await applyHooks(hooks, "page", route, frontmatter as Record<string, unknown>, html);
-  frontmatter = hookResult.frontmatter as any;
+  frontmatter = hookResult.frontmatter as FrontMatter;
   html = hookResult.html;
 
   const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
@@ -109,38 +197,12 @@ export async function buildPage(
     siteDescription: config.site.description,
   });
 
-  const pageTitle = route === "/" ? config.site.title : `${title} - ${config.site.title}`;
-
-  let output = renderPage(baseLayout, {
-    route,
-    title: pageTitle,
-    description,
-    content: renderedContent,
+  let output = buildPageOutput(baseLayout, route, title as string, description, renderedContent, {
     css: inlinedCss,
     scripts,
-    keywords: generateKeywords(frontmatter.tags as string[]),
+    tags: frontmatter.tags as string[],
     robotsMeta,
-    ogTags: {
-      title: pageTitle,
-      description,
-      url: `${config.site.url}${route}`,
-      type: "website",
-      siteName: config.site.title,
-      ogImageUrl,
-      ogImageWidth: config.site.ogImageWidth,
-      ogImageHeight: config.site.ogImageHeight,
-      ogImageAlt: config.site.ogImageAlt,
-    },
-    jsonLd: {
-      type: "WebPage",
-      title: title as string,
-      description,
-      url: `${config.site.url}${route}`,
-    },
-    breadcrumbs: [
-      { name: config.site.title, url: config.site.url },
-      { name: title as string, url: `${config.site.url}${route}` },
-    ],
+    ogImageUrl,
     year,
   });
 
@@ -157,10 +219,10 @@ export async function buildPage(
   await writeFileContent(outputPath, output);
 
   if (cacheManager) {
-    await cacheManager.updatePageMtime(filePath);
+    await cacheManager.updateMtime("pages", filePath);
   }
 }
 
 export function clearCssCache(): void {
-  cachedCss = null;
+  cssCache = null;
 }

@@ -1,4 +1,4 @@
-import type { Plugin, MarkdownProcessor } from "./plugin.js";
+import type { Plugin } from "./plugin.js";
 
 /**
  * Decode HTML entities in a string

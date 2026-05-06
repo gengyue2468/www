@@ -1,7 +1,8 @@
 import { stat } from "fs/promises";
-import { readFileSync } from "fs";
 import { join } from "path";
 import type { DirsConfig, RenderedContent, FrontMatter } from "../types.js";
+import { AppError, ErrorCode, isENOENT } from "./errors.js";
+import { readJsonFile } from "./fs.js";
 
 interface BuildCache {
   pages: Record<string, number>;
@@ -49,6 +50,23 @@ class ContentCache {
 
 const contentCache = new ContentCache();
 
+async function getFileMtime(filePath: string): Promise<number | null> {
+  try {
+    const { mtimeMs } = await stat(filePath);
+    return mtimeMs;
+  } catch (err) {
+    if (isENOENT(err)) return null;
+    throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, { path: filePath });
+  }
+}
+
+async function hasFileChanged(filePath: string, cachedMtime: number): Promise<boolean> {
+  const mtime = await getFileMtime(filePath);
+  return mtime === null || mtime > cachedMtime;
+}
+
+type CacheStore = "pages" | "blogPosts" | "layouts";
+
 export class BuildCacheManager {
   private cache: BuildCache;
   private cachePath: string;
@@ -59,13 +77,9 @@ export class BuildCacheManager {
     this.cache = { ...DEFAULT_CACHE };
   }
 
-  load(): void {
-    try {
-      const data = readFileSync(this.cachePath, "utf-8");
-      this.cache = JSON.parse(data) as BuildCache;
-    } catch {
-      this.cache = { ...DEFAULT_CACHE };
-    }
+  async load(): Promise<void> {
+    const loaded = await readJsonFile<BuildCache>(this.cachePath);
+    this.cache = loaded || { ...DEFAULT_CACHE };
   }
 
   save(): void {
@@ -75,60 +89,29 @@ export class BuildCacheManager {
     });
   }
 
-  async hasPageChanged(path: string): Promise<boolean> {
-    const cached = this.cache.pages[path];
-    if (cached === undefined) return true;
-    return hasFileChanged(path, cached);
+  async hasChanged(store: CacheStore, path: string): Promise<boolean>;
+  async hasChanged(store: "config", configPath: string): Promise<boolean>;
+  async hasChanged(store: CacheStore | "config", path: string): Promise<boolean> {
+    if (store === "config") {
+      const cached = this.cache.config;
+      return cached === 0 || hasFileChanged(path, cached);
+    }
+    const cached = this.cache[store][path];
+    return cached === undefined || hasFileChanged(path, cached);
   }
 
-  async hasBlogPostChanged(path: string): Promise<boolean> {
-    const cached = this.cache.blogPosts[path];
-    if (cached === undefined) return true;
-    return hasFileChanged(path, cached);
-  }
+  async updateMtime(store: CacheStore, path: string): Promise<void>;
+  async updateMtime(store: "config", configPath: string): Promise<void>;
+  async updateMtime(store: CacheStore | "config", path: string): Promise<void> {
+    const mtime = await getFileMtime(path);
+    if (mtime === null) return;
 
-  async hasLayoutChanged(name: string, layoutPath: string): Promise<boolean> {
-    const cached = this.cache.layouts[name];
-    if (cached === undefined) return true;
-    return hasFileChanged(layoutPath, cached);
-  }
-
-  async hasConfigChanged(configPath: string): Promise<boolean> {
-    const cached = this.cache.config;
-    if (cached === 0) return true;
-    return hasFileChanged(configPath, cached);
-  }
-
-  async updatePageMtime(path: string): Promise<void> {
-    try {
-      const { mtimeMs } = await stat(path);
-      this.cache.pages[path] = mtimeMs;
-      this.dirty = true;
-    } catch { /* ignore */ }
-  }
-
-  async updateBlogPostMtime(path: string): Promise<void> {
-    try {
-      const { mtimeMs } = await stat(path);
-      this.cache.blogPosts[path] = mtimeMs;
-      this.dirty = true;
-    } catch { /* ignore */ }
-  }
-
-  async updateLayoutMtime(name: string, layoutPath: string): Promise<void> {
-    try {
-      const { mtimeMs } = await stat(layoutPath);
-      this.cache.layouts[name] = mtimeMs;
-      this.dirty = true;
-    } catch { /* ignore */ }
-  }
-
-  async updateConfigMtime(configPath: string): Promise<void> {
-    try {
-      const { mtimeMs } = await stat(configPath);
-      this.cache.config = mtimeMs;
-      this.dirty = true;
-    } catch { /* ignore */ }
+    if (store === "config") {
+      this.cache.config = mtime;
+    } else {
+      this.cache[store][path] = mtime;
+    }
+    this.dirty = true;
   }
 
   invalidateAll(): void {
@@ -137,39 +120,23 @@ export class BuildCacheManager {
   }
 }
 
-async function hasFileChanged(
-  filePath: string,
-  cachedMtime: number
-): Promise<boolean> {
-  try {
-    const { mtimeMs } = await stat(filePath);
-    return mtimeMs > cachedMtime;
-  } catch {
-    return true;
-  }
-}
-
 export async function createCacheManager(dirs: DirsConfig): Promise<BuildCacheManager> {
   const cachePath = join(dirs.dist, ".build-cache.json");
   const manager = new BuildCacheManager(cachePath);
-  manager.load();
+  await manager.load();
   return manager;
 }
 
 export async function getCachedRender(filePath: string): Promise<RenderedContent | undefined> {
-  try {
-    const { mtimeMs } = await stat(filePath);
-    return contentCache.getRender(filePath, mtimeMs);
-  } catch {
-    return undefined;
-  }
+  const mtime = await getFileMtime(filePath);
+  if (mtime === null) return undefined;
+  return contentCache.getRender(filePath, mtime);
 }
 
 export async function setCachedRender(filePath: string, result: RenderedContent): Promise<void> {
-  try {
-    const { mtimeMs } = await stat(filePath);
-    contentCache.setRender(filePath, mtimeMs, result);
-  } catch { /* ignore */ }
+  const mtime = await getFileMtime(filePath);
+  if (mtime === null) return;
+  contentCache.setRender(filePath, mtime, result);
 }
 
 export function clearContentCache(): void {

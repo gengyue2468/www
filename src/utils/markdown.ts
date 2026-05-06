@@ -6,6 +6,7 @@ import config from "../config.js";
 import { getCachedRender, setCachedRender } from "./cache.js";
 import { getMarkdownProcessors, getNoteProcessors } from "../extensions/plugin.js";
 import type { NoteProcessor } from "../extensions/plugin.js";
+import { AppError, ErrorCode } from "./errors.js";
 
 let md: MarkdownIt | null = null;
 let cachedProcessors: ReturnType<typeof getMarkdownProcessors> | null = null;
@@ -107,10 +108,9 @@ function findNoteEnd(text: string, startPos: number): number {
 function processNoteSyntax(markdown: string): { processed: string; notes: Note[] } {
   const notes: Note[] = [];
   let processed = markdown;
-
-  // Built-in sidenote: [^content]
-  let sidenoteIndex = 0;
   let noteCounter = 0;
+
+  let sidenoteIndex = 0;
   const sidenotePrefix = `<!-- ${config.placeholders.sidenote}_`;
   while (true) {
     const startPos = processed.indexOf('[^', sidenoteIndex);
@@ -127,18 +127,12 @@ function processNoteSyntax(markdown: string): { processed: string; notes: Note[]
     const content = processed.substring(contentStart, endPos);
     const placeholder = `${sidenotePrefix}${noteCounter} -->`;
 
-    notes.push({
-      type: 'sidenote',
-      content,
-      placeholder,
-    });
-
+    notes.push({ type: 'sidenote', content, placeholder });
     processed = processed.substring(0, startPos) + placeholder + processed.substring(endPos + 1);
     sidenoteIndex = startPos + placeholder.length;
     noteCounter++;
   }
 
-  // Built-in marginnote: [note:content]
   let marginnoteIndex = 0;
   const marginnotePrefix = `<!-- ${config.placeholders.marginnote}_`;
   while (true) {
@@ -156,19 +150,11 @@ function processNoteSyntax(markdown: string): { processed: string; notes: Note[]
     const content = processed.substring(contentStart, endPos);
     const placeholder = `${marginnotePrefix}${noteCounter} -->`;
 
-    notes.push({
-      type: 'marginnote',
-      content,
-      placeholder,
-    });
-
+    notes.push({ type: 'marginnote', content, placeholder });
     processed = processed.substring(0, startPos) + placeholder + processed.substring(endPos + 1);
     marginnoteIndex = startPos + placeholder.length;
     noteCounter++;
   }
-
-  // Plugin note processors
-  // (handled via NoteProcessor.extractContent in processPluginNotes)
 
   return { processed, notes };
 }
@@ -193,12 +179,7 @@ async function applyPluginNoteProcessors(markdown: string): Promise<{ processed:
       const noteType = proc.getType(match);
       const placeholder = `<!-- ${proc.prefix}_${noteCounter} -->`;
 
-      notes.push({
-        type: noteType,
-        content,
-        placeholder,
-      });
-
+      notes.push({ type: noteType, content, placeholder });
       processed = processed.substring(0, matchStart) + placeholder + processed.substring(matchStart + match[0].length);
       searchIndex = matchStart + placeholder.length;
       noteCounter++;
@@ -241,30 +222,86 @@ function fixFigureInParagraphs(html: string): string {
   );
 }
 
-function renderNotes(html: string, notes: Note[]): string {
+function generateNoteId(prefix: string, index: number): string {
   const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 11);
+  return `${prefix}-${index}-${timestamp}-${random}`;
+}
+
+function renderNoteContent(content: string): string {
+  let rendered = getMarkdownIt().render(content);
+  return rendered.trim().replace(/^<p>(.*)<\/p>$/s, "$1").trim();
+}
+
+interface CollectedNote {
+  id: string;
+  refId: string;
+  type: string;
+  content: string;
+  renderedContent: string;
+}
+
+function renderNotes(html: string, notes: Note[]): string {
+  const collected: CollectedNote[] = [];
 
   for (let i = 0; i < notes.length; i++) {
     const note = notes[i];
-    let renderedContent = getMarkdownIt().render(note.content);
-    renderedContent = renderedContent.trim().replace(/^<p>(.*)<\/p>$/s, "$1").trim();
-
-    const random = Math.random().toString(36).substring(2, 11);
-    const id = `sn-${i}-${timestamp}-${random}`;
+    const renderedContent = renderNoteContent(note.content);
+    const id = generateNoteId("sn", i);
+    const refId = `sn-ref-${i}`;
 
     let noteHtml: string;
-
     if (note.type === "sidenote") {
-      noteHtml = `<label for="${id}" class="margin-toggle sidenote-number"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote">${renderedContent}</span>`;
+      noteHtml = `<label for="${id}" class="margin-toggle sidenote-number"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote" id="${refId}">${renderedContent}</span>`;
     } else if (note.type === "marginnote") {
-      noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
+      noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote" id="${refId}">${renderedContent}</span>`;
     } else {
-      // Custom note type — use plugin rendering if available
-      // Fallback: marginnote style
-      noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
+      noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote" id="${refId}">${renderedContent}</span>`;
     }
 
     html = html.replace(note.placeholder, noteHtml);
+
+    if (note.type === "sidenote" || note.type === "marginnote") {
+      collected.push({ id: `sn-list-${i}`, refId, type: note.type, content: note.content, renderedContent });
+    }
+  }
+
+  if (collected.length > 0) {
+    const hasSidenotes = collected.some(n => n.type === "sidenote");
+    const hasMarginnotes = collected.some(n => n.type === "marginnote");
+    const mixed = hasSidenotes && hasMarginnotes;
+
+    let listHtml = `<footer class="notes-list"><h3>Notae</h3>`;
+
+    if (mixed) {
+      listHtml += `<ol>`;
+      for (const note of collected) {
+        const cls = note.type === "marginnote" ? ` class="marginnote-item"` : "";
+        listHtml += `<li${cls} id="${note.id}">${note.renderedContent} <a href="#${note.refId}">↩</a></li>`;
+      }
+      listHtml += `</ol>`;
+    } else if (hasSidenotes) {
+      listHtml += `<ol>`;
+      for (const note of collected) {
+        listHtml += `<li id="${note.id}">${note.renderedContent} <a href="#${note.refId}">↩</a></li>`;
+      }
+      listHtml += `</ol>`;
+    } else {
+      listHtml += `<ul>`;
+      for (const note of collected) {
+        listHtml += `<li id="${note.id}">${note.renderedContent} <a href="#${note.refId}">↩</a></li>`;
+      }
+      listHtml += `</ul>`;
+    }
+
+    listHtml += `</footer>`;
+
+    const closingTag = html.lastIndexOf("</article>");
+    if (closingTag !== -1) {
+      html = html.slice(0, closingTag) + listHtml + html.slice(closingTag);
+    } else {
+      html += listHtml;
+    }
   }
 
   return html;
@@ -277,14 +314,10 @@ async function renderPluginNotes(html: string, notes: Note[]): Promise<string> {
 
   for (let i = 0; i < notes.length; i++) {
     const note = notes[i];
-    // Only render plugin notes (not built-in sidenote/marginnote)
     if (note.type === "sidenote" || note.type === "marginnote") continue;
 
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 11);
-    const id = `pn-${i}-${timestamp}-${random}`;
+    const id = generateNoteId("pn", i);
 
-    // Find the processor by checking which prefix the placeholder contains
     let rendered = false;
     for (const proc of processors) {
       if (note.placeholder.includes(proc.prefix)) {
@@ -296,8 +329,7 @@ async function renderPluginNotes(html: string, notes: Note[]): Promise<string> {
     }
 
     if (!rendered) {
-      let renderedContent = getMarkdownIt().render(note.content);
-      renderedContent = renderedContent.trim().replace(/^<p>(.*)<\/p>$/s, "$1").trim();
+      const renderedContent = renderNoteContent(note.content);
       const noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
       html = html.replace(note.placeholder, noteHtml);
     }
@@ -332,8 +364,13 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
     return cached;
   }
 
-  const file = Bun.file(filePath);
-  const content = await file.text();
+  let content: string;
+  try {
+    const file = Bun.file(filePath);
+    content = await file.text();
+  } catch (err) {
+    throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, { path: filePath });
+  }
 
   const { data: frontmatter, content: markdown } = matter(content);
 
@@ -341,24 +378,45 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
   let processedMarkdown = markdown;
   for (const processor of processors) {
     if (processor.process) {
-      const result = processor.process(processedMarkdown);
-      processedMarkdown = result instanceof Promise ? await result : result;
+      try {
+        const result = processor.process(processedMarkdown);
+        processedMarkdown = result instanceof Promise ? await result : result;
+      } catch (err) {
+        throw AppError.fromError(err, ErrorCode.RENDER_ERROR, {
+          processor: processor.name,
+          stage: "pre-process",
+          path: filePath,
+        });
+      }
     }
   }
 
-  // Process built-in note syntax
   const { processed: markdownWithNotes, notes: builtinNotes } = processNoteSyntax(processedMarkdown);
-
-  // Process plugin note syntax
   const { processed: markdownWithAllNotes, notes: pluginNotes } = await applyPluginNoteProcessors(markdownWithNotes);
   const allNotes = [...builtinNotes, ...pluginNotes];
 
-  let html = getMarkdownIt().render(markdownWithAllNotes);
+  let html: string;
+  try {
+    html = getMarkdownIt().render(markdownWithAllNotes);
+  } catch (err) {
+    throw AppError.fromError(err, ErrorCode.RENDER_ERROR, {
+      stage: "markdown-it",
+      path: filePath,
+    });
+  }
 
   for (const processor of processors) {
     if (processor.postProcess) {
-      const result = processor.postProcess(html);
-      html = result instanceof Promise ? await result : result;
+      try {
+        const result = processor.postProcess(html);
+        html = result instanceof Promise ? await result : result;
+      } catch (err) {
+        throw AppError.fromError(err, ErrorCode.RENDER_ERROR, {
+          processor: processor.name,
+          stage: "post-process",
+          path: filePath,
+        });
+      }
     }
   }
 

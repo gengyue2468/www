@@ -1,55 +1,59 @@
 import { join } from "path";
-import { ensureDir, writeFileContent } from "../utils/fs.js";
+import { ensureDir, readFileContent, writeFileContent } from "../utils/fs.js";
+import { cleanBaseUrl } from "../utils/url.js";
 import config from "../config.js";
 import type { CollectionOutput } from "../types.js";
-
-const siteUrl = () => config.site.url.replace(/\/$/, "");
 
 export async function emitMarkdownFiles(collections: CollectionOutput[]): Promise<void> {
   const { dist, pages: pagesDir } = config.dirs;
 
-  const collPromises = collections.flatMap(collection =>
-    collection.items.map(async (post) => {
-      const srcPath = join(collection.srcDir, `${post.slug}.md`);
-      const outPath = join(dist, collection.urlPrefix, `${post.slug}.md`);
-      try {
-        await ensureDir(join(dist, collection.urlPrefix));
-        const file = Bun.file(srcPath);
-        const raw = await file.text();
-        await writeFileContent(outPath, raw);
-      } catch (err) {
-        console.warn(`⚠ llms: skip ${collection.urlPrefix}/${post.slug}.md:`, (err as NodeJS.ErrnoException).message);
-      }
-    })
-  );
+  let emittedCount = 0;
 
-  const pageRoutes = [
-    { file: "index.md", mdPath: "index.html.md" },
-    { file: "about.md", mdPath: "about.md" },
-  ];
+  const collPromises = collections.map(async (collection) => {
+    const outDir = join(dist, collection.urlPrefix);
+    await ensureDir(outDir);
+
+    const postPromises = collection.items.map(async (post) => {
+      const srcPath = join(collection.srcDir, `${post.slug}.md`);
+      const outPath = join(outDir, `${post.slug}.md`);
+      try {
+        const raw = await readFileContent(srcPath);
+        await writeFileContent(outPath, raw);
+        emittedCount++;
+      } catch (err) {
+        console.warn(`⚠ llms: skip ${collection.urlPrefix}/${post.slug}.md:`, (err as Error).message);
+      }
+    });
+
+    await Promise.all(postPromises);
+  });
+
+  const pageRoutes = Object.entries(config.routes).map(([route, file]) => {
+    const mdPath = route === "/" ? "index.html.md" : `${route.slice(1)}.md`;
+    return { file, mdPath };
+  });
 
   const pagePromises = pageRoutes.map(async ({ file, mdPath }) => {
     const srcPath = join(pagesDir, file);
     const outPath = join(dist, mdPath);
     try {
-      const fileContent = Bun.file(srcPath);
-      const raw = await fileContent.text();
+      const raw = await readFileContent(srcPath);
       await writeFileContent(outPath, raw);
+      emittedCount++;
     } catch (err) {
-      console.warn(`⚠ llms: skip page md ${file}:`, (err as NodeJS.ErrnoException).message);
+      console.warn(`⚠ llms: skip page md ${file}:`, (err as Error).message);
     }
   });
 
   await Promise.all([...collPromises, ...pagePromises]);
 
-  const total = collections.reduce((sum, c) => sum + c.items.length, 0) + pageRoutes.length;
-  console.log(`✓ Emitted ${total} markdown file(s) for LLMs`);
+  console.log(`✓ Emitted ${emittedCount} markdown file(s) for LLMs`);
 }
 
 export async function generateLlmsTxt(collections: CollectionOutput[]): Promise<void> {
   if (!config.llms.enabled) return;
 
-  const base = siteUrl();
+  const base = cleanBaseUrl(config.site.url);
   const title = config.site.title;
   const summary = config.llms.summary ?? config.site.description;
 
@@ -60,9 +64,13 @@ export async function generateLlmsTxt(collections: CollectionOutput[]): Promise<
     "",
     "## 页面",
     "",
-    `- [Home](${base}/index.html.md): Home 页`,
-    `- [About](${base}/about.md): About 页`,
   ];
+
+  for (const [route] of Object.entries(config.routes)) {
+    const mdPath = route === "/" ? "index.html.md" : `${route.slice(1)}.md`;
+    const label = route === "/" ? "Home" : route.slice(1).charAt(0).toUpperCase() + route.slice(2);
+    parts.push(`- [${label}](${base}/${mdPath}): ${label} 页`);
+  }
 
   for (const collection of collections) {
     const label = collection.name.charAt(0).toUpperCase() + collection.name.slice(1);

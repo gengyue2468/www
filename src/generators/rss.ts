@@ -2,6 +2,7 @@ import { join } from "path";
 import { Feed } from "feed";
 import config from "../config.js";
 import { writeFileContent } from "../utils/fs.js";
+import { cleanBaseUrl } from "../utils/url.js";
 import type { CollectionOutput } from "../types.js";
 
 function htmlForRss(html: string): string {
@@ -26,9 +27,8 @@ function htmlForRss(html: string): string {
 export async function generateRSS(collection: CollectionOutput): Promise<void> {
   if (!config.rss.enabled) return;
 
-  const siteUrl = config.site.url;
   const rssItems = collection.items.slice(0, config.rss.items.limit);
-  const cleanSiteUrl = siteUrl.replace(/\/$/, "");
+  const cleanSiteUrl = cleanBaseUrl(config.site.url);
 
   const feed = new Feed({
     title: config.rss.title,
@@ -38,7 +38,7 @@ export async function generateRSS(collection: CollectionOutput): Promise<void> {
     language: config.rss.language,
     copyright: config.rss.copyright,
     updated: new Date(),
-    generator: "Paper Blog",
+    generator: "Nofte",
     author: { name: config.site.author },
     feedLinks: { rss2: `${cleanSiteUrl}/rss.xml` },
   });

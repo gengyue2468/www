@@ -1,4 +1,4 @@
-import type { RenderedContent, FrontMatter, Note } from "../types.js";
+import type { RenderedContent } from "../types.js";
 
 export interface MarkdownProcessor {
   name: string;
@@ -54,6 +54,19 @@ export function getNoteProcessors(): NoteProcessor[] {
   return plugins.flatMap(p => p.noteProcessors || []);
 }
 
+type HookFn<A, R> = (arg: A) => R | Promise<R>;
+
+async function invokeSequential<T>(
+  fns: Array<HookFn<T, T>>,
+  initial: T
+): Promise<T> {
+  let result = initial;
+  for (const fn of fns) {
+    result = await fn(result);
+  }
+  return result;
+}
+
 export function getComposedHooks(): BuildHooks {
   const allHooks = plugins
     .filter(p => p.hooks)
@@ -61,56 +74,45 @@ export function getComposedHooks(): BuildHooks {
 
   if (allHooks.length === 0) return {};
 
+  const runAll = async (hookName: keyof BuildHooks, ...args: any[]): Promise<any> => {
+    for (const hooks of allHooks) {
+      const hook = hooks[hookName];
+      if (hook) {
+        await (hook as Function)(...args);
+      }
+    }
+  };
+
   return {
-    beforeBuild: async () => {
-      for (const hooks of allHooks) {
-        if (hooks.beforeBuild) await hooks.beforeBuild();
-      }
-    },
-    afterBuild: async () => {
-      for (const hooks of allHooks) {
-        if (hooks.afterBuild) await hooks.afterBuild();
-      }
-    },
+    beforeBuild: () => runAll("beforeBuild"),
+    afterBuild: () => runAll("afterBuild"),
+
     beforeRenderPage: async (route, content) => {
-      let result = content;
-      for (const hooks of allHooks) {
-        if (hooks.beforeRenderPage) {
-          const r = hooks.beforeRenderPage(route, result);
-          result = r instanceof Promise ? await r : r;
-        }
-      }
-      return result;
+      const fns = allHooks
+        .filter(h => h.beforeRenderPage)
+        .map(h => (c: RenderedContent) => h.beforeRenderPage!(route, c));
+      return invokeSequential(fns, content);
     },
+
     afterRenderPage: async (route, html) => {
-      let result = html;
-      for (const hooks of allHooks) {
-        if (hooks.afterRenderPage) {
-          const r = hooks.afterRenderPage(route, result);
-          result = r instanceof Promise ? await r : r;
-        }
-      }
-      return result;
+      const fns = allHooks
+        .filter(h => h.afterRenderPage)
+        .map(h => (s: string) => h.afterRenderPage!(route, s));
+      return invokeSequential(fns, html);
     },
+
     beforeRenderPost: async (slug, content) => {
-      let result = content;
-      for (const hooks of allHooks) {
-        if (hooks.beforeRenderPost) {
-          const r = hooks.beforeRenderPost(slug, result);
-          result = r instanceof Promise ? await r : r;
-        }
-      }
-      return result;
+      const fns = allHooks
+        .filter(h => h.beforeRenderPost)
+        .map(h => (c: RenderedContent) => h.beforeRenderPost!(slug, c));
+      return invokeSequential(fns, content);
     },
+
     afterRenderPost: async (slug, html) => {
-      let result = html;
-      for (const hooks of allHooks) {
-        if (hooks.afterRenderPost) {
-          const r = hooks.afterRenderPost(slug, result);
-          result = r instanceof Promise ? await r : r;
-        }
-      }
-      return result;
+      const fns = allHooks
+        .filter(h => h.afterRenderPost)
+        .map(h => (s: string) => h.afterRenderPost!(slug, s));
+      return invokeSequential(fns, html);
     },
   };
 }

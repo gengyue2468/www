@@ -405,6 +405,54 @@ pre > code {
   overflow: visible !important;
 }
 
+/* Notes list at end of article */
+.notes-list {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  font-size: var(--font-size-sidenote);
+  line-height: var(--line-height-sidenote);
+  width: var(--width-content);
+}
+
+.notes-list h3 {
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.notes-list ol,
+.notes-list ul {
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.notes-list li {
+  margin-bottom: 0.25rem;
+}
+
+/* Highlight on anchor jump */
+:target {
+  animation: highlight 3s ease-out;
+}
+
+@keyframes highlight {
+  0%, 100% { background: transparent; }
+  15% { background: #fff3cd; }
+}
+
+@media (prefers-color-scheme: dark) {
+  @keyframes highlight {
+    0%, 100% { background: transparent; }
+    15% { background: #3a3a2a; }
+  }
+}
+
+@media (max-width: 760px) {
+  .notes-list {
+    width: 100%;
+  }
+}
+
 /* Dark mode support for mermaid */
 @media (prefers-color-scheme: dark) {
   .mermaid {

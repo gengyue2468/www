@@ -1,35 +1,34 @@
 import { join } from "path";
-import generateRobotstxt from "generate-robotstxt";
 import { writeFileContent } from "../utils/fs.js";
+import { cleanBaseUrl } from "../utils/url.js";
 import config from "../config.js";
 
-/**
- * Generate robots.txt using optimized file writing
- */
 export async function generateRobotsTxt(): Promise<void> {
   if (!config.robots.enabled) return;
 
-  const siteUrl = config.site.url;
+  const lines: string[] = [];
+  const { userAgent, allow, disallow, crawlDelay } = config.robots;
 
-  const policy: Record<string, unknown> = {
-    userAgent: config.robots.userAgent,
-    allow: config.robots.allow.length > 0 ? config.robots.allow : "/",
-    disallow: config.robots.disallow.length > 0 ? config.robots.disallow : [],
-  };
+  lines.push(`User-agent: ${userAgent}`);
 
-  // Add crawl delay if configured (helps with crawl capacity)
-  if (config.robots.crawlDelay && config.robots.crawlDelay > 0) {
-    policy.crawlDelay = config.robots.crawlDelay;
+  for (const rule of allow) {
+    lines.push(`Allow: ${rule}`);
   }
 
-  const robotsConfig = {
-    policy: [policy],
-    sitemap: config.sitemap.enabled ? `${siteUrl.replace(/\/$/, "")}/sitemap.xml` : undefined,
-  };
+  for (const rule of disallow) {
+    lines.push(`Disallow: ${rule}`);
+  }
 
-  const robotsTxt = await generateRobotstxt(robotsConfig);
+  if (crawlDelay && crawlDelay > 0) {
+    lines.push(`Crawl-delay: ${crawlDelay}`);
+  }
+
+  if (config.sitemap.enabled) {
+    const sitemapUrl = `${cleanBaseUrl(config.site.url)}/sitemap.xml`;
+    lines.push(`Sitemap: ${sitemapUrl}`);
+  }
 
   const robotsPath = join(config.dirs.dist, "robots.txt");
-  await writeFileContent(robotsPath, robotsTxt);
+  await writeFileContent(robotsPath, lines.join("\n") + "\n");
   console.log(`✓ Generated robots.txt -> ${robotsPath}`);
 }

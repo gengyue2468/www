@@ -2,7 +2,13 @@ import { join } from "path";
 import { SitemapStream, streamToPromise } from "sitemap";
 import config from "../config.js";
 import { writeFileContent } from "../utils/fs.js";
-import type { CollectionOutput } from "../types.js";
+import type { CollectionOutput, SitemapConfig } from "../types.js";
+
+type ChangeFreq = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
+
+function getChangeFreq(key: keyof SitemapConfig): ChangeFreq {
+  return (config.sitemap[key] as string || config.sitemap.changefreq) as ChangeFreq;
+}
 
 export async function generateSitemap(collections: CollectionOutput[]): Promise<void> {
   if (!config.sitemap.enabled) return;
@@ -20,7 +26,7 @@ export async function generateSitemap(collections: CollectionOutput[]): Promise<
   const entries = [
     {
       url: "/",
-      changefreq: (cf.changefreqHome || cf.changefreq) as any,
+      changefreq: getChangeFreq("changefreqHome"),
       priority: cf.priority.home,
       lastmod: now,
     },
@@ -28,20 +34,20 @@ export async function generateSitemap(collections: CollectionOutput[]): Promise<
       .filter(([route]) => !collectionRoutes.has(route) && route !== "/")
       .map(([route]) => ({
         url: route,
-        changefreq: (cf.changefreqPages || cf.changefreq) as any,
+        changefreq: getChangeFreq("changefreqPages"),
         priority: cf.priority.pages,
         lastmod: now,
       })),
     ...collections.flatMap(collection => [
       {
         url: `/${collection.urlPrefix}`,
-        changefreq: (cf.changefreqBlog || cf.changefreq) as any,
+        changefreq: getChangeFreq("changefreqBlog"),
         priority: cf.priority.blog,
         lastmod: now,
       },
       ...collection.items.map((post) => ({
         url: `/${collection.urlPrefix}/${post.slug}`,
-        changefreq: (cf.changefreqPosts || cf.changefreq) as any,
+        changefreq: getChangeFreq("changefreqPosts"),
         priority: cf.priority.posts,
         lastmod: post.updated
           ? new Date(post.updated)

@@ -1,3 +1,6 @@
+import type { NavItem } from "../types.js";
+import { escapeHtmlAttr, escapeHtmlText } from "./seo.js";
+
 const TEMPLATE_REGEX_CACHE = new Map<string, RegExp>();
 const PLACEHOLDER_PREFIX = "\x00TPL";
 const PLACEHOLDER_SUFFIX = "\x00";
@@ -17,7 +20,6 @@ export function renderTemplate(
   template: string,
   data: Record<string, string>
 ): string {
-  // Step 1: Escape {{ in content values to prevent injection
   const placeholders = new Map<string, string>();
   const safeData: Record<string, string> = {};
 
@@ -33,14 +35,12 @@ export function renderTemplate(
     }
   }
 
-  // Step 2: Replace template variables
   let result = template;
   for (const [key, value] of Object.entries(safeData)) {
     const regex = getTemplateRegex(key);
     result = result.replace(regex, value);
   }
 
-  // Step 3: Restore escaped {{
   for (const [placeholder, original] of placeholders) {
     result = result.replaceAll(placeholder, original);
   }
@@ -48,7 +48,7 @@ export function renderTemplate(
   return result;
 }
 
-export function renderNav(navItems: { name: string; path: string; show: boolean }[], currentPath?: string): string {
+export function renderNav(navItems: NavItem[], currentPath?: string): string {
   const parts: string[] = [];
   for (const item of navItems) {
     if (item.show) {
@@ -61,12 +61,10 @@ export function renderNav(navItems: { name: string; path: string; show: boolean 
         }
       }
       const ariaCurrent = isCurrent ? ' aria-current="page"' : "";
-      parts.push(`<a href="${item.path}"${ariaCurrent}>${item.name}</a>`);
+      const safePath = escapeHtmlAttr(item.path);
+      const safeName = escapeHtmlText(item.name);
+      parts.push(`<a href="${safePath}"${ariaCurrent}>${safeName}</a>`);
     }
   }
   return parts.join("\n      ");
-}
-
-export function clearTemplateCache(): void {
-  TEMPLATE_REGEX_CACHE.clear();
 }

@@ -1,27 +1,28 @@
-import { mkdir, readdir, stat, copyFile } from "fs/promises";
+import { mkdir, readdir } from "fs/promises";
 import { join } from "path";
 import type { DirsConfig } from "../types.js";
+import { AppError, ErrorCode, isENOENT, isEEXIST, errorReporter } from "./errors.js";
 
-/**
- * Ensure directory exists using Bun-optimized approach
- */
 export async function ensureDir(dir: string): Promise<void> {
   try {
     await mkdir(dir, { recursive: true });
   } catch (err) {
-    const error = err as NodeJS.ErrnoException;
-    if (error.code !== "EEXIST") throw err;
+    if (!isEEXIST(err)) {
+      throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { dir });
+    }
   }
 }
 
-/**
- * Copy directory using parallel I/O for better performance
- */
 export async function copyDirectory(src: string, dest: string): Promise<void> {
   await ensureDir(dest);
-  const entries = await readdir(src, { withFileTypes: true });
+  
+  let entries;
+  try {
+    entries = await readdir(src, { withFileTypes: true });
+  } catch (err) {
+    throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, { src });
+  }
 
-  // Process directories and files in parallel batches
   const dirs: Array<{ src: string; dest: string }> = [];
   const files: Array<{ src: string; dest: string }> = [];
 
@@ -36,71 +37,99 @@ export async function copyDirectory(src: string, dest: string): Promise<void> {
     }
   }
 
-  // Copy all files in parallel using Bun's optimized file operations
   await Promise.all(
     files.map(async ({ src: srcPath, dest: destPath }) => {
-      const file = Bun.file(srcPath);
-      const content = await file.arrayBuffer();
-      await Bun.write(destPath, content);
+      try {
+        const file = Bun.file(srcPath);
+        const content = await file.arrayBuffer();
+        await Bun.write(destPath, content);
+      } catch (err) {
+        throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { src: srcPath, dest: destPath });
+      }
     })
   );
 
-  // Recursively copy directories in parallel
   await Promise.all(dirs.map(({ src: s, dest: d }) => copyDirectory(s, d)));
 }
 
-/**
- * Copy public files to dist using parallel processing
- */
 export async function copyPublicFiles(dirs: DirsConfig): Promise<void> {
   const { public: publicDir, dist } = dirs;
 
+  let entries;
   try {
-    const entries = await readdir(publicDir, { withFileTypes: true });
+    entries = await readdir(publicDir, { withFileTypes: true });
+  } catch (err) {
+    if (isENOENT(err)) {
+      errorReporter.reportWarning("Public directory not found, skipping", { dir: publicDir });
+      return;
+    }
+    throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, { dir: publicDir });
+  }
 
-    await Promise.all(
-      entries.map(async (entry) => {
-        const srcPath = join(publicDir, entry.name);
-        const destPath = join(dist, entry.name);
+  await Promise.all(
+    entries.map(async (entry) => {
+      const srcPath = join(publicDir, entry.name);
+      const destPath = join(dist, entry.name);
 
-        if (entry.isDirectory()) {
-          await ensureDir(destPath);
-          await copyDirectory(srcPath, destPath);
-        } else {
+      if (entry.isDirectory()) {
+        await ensureDir(destPath);
+        await copyDirectory(srcPath, destPath);
+      } else {
+        try {
           const file = Bun.file(srcPath);
           const content = await file.arrayBuffer();
           await Bun.write(destPath, content);
+        } catch (err) {
+          throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { src: srcPath, dest: destPath });
         }
-      })
-    );
+      }
+    })
+  );
+}
+
+export async function loadLayout(layoutName: string, layoutsDir: string): Promise<string> {
+  const layoutPath = join(layoutsDir, `${layoutName}.html`);
+  try {
+    const file = Bun.file(layoutPath);
+    return await file.text();
   } catch (err) {
-    const error = err as NodeJS.ErrnoException;
-    if (error.code !== "ENOENT") {
-      console.warn("Public directory not found, skipping...");
-    }
+    throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, { layout: layoutName, path: layoutPath });
   }
 }
 
-/**
- * Load layout file using Bun.file() for faster reading
- */
-export async function loadLayout(layoutName: string, layoutsDir: string): Promise<string> {
-  const layoutPath = join(layoutsDir, `${layoutName}.html`);
-  const file = Bun.file(layoutPath);
-  return await file.text();
-}
-
-/**
- * Fast file content reader using Bun.file()
- */
 export async function readFileContent(filePath: string): Promise<string> {
-  const file = Bun.file(filePath);
-  return await file.text();
+  try {
+    const file = Bun.file(filePath);
+    return await file.text();
+  } catch (err) {
+    throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, { path: filePath });
+  }
 }
 
-/**
- * Fast file writer using Bun.write()
- */
 export async function writeFileContent(filePath: string, content: string): Promise<void> {
-  await Bun.write(filePath, content);
+  try {
+    await Bun.write(filePath, content);
+  } catch (err) {
+    throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { path: filePath });
+  }
+}
+
+export async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    const file = Bun.file(filePath);
+    return await file.exists();
+  } catch {
+    return false;
+  }
+}
+
+export async function readJsonFile<T>(filePath: string): Promise<T | null> {
+  try {
+    const file = Bun.file(filePath);
+    if (!(await file.exists())) return null;
+    return await file.json() as T;
+  } catch (err) {
+    if (isENOENT(err)) return null;
+    throw AppError.fromError(err, ErrorCode.PARSE_ERROR, { path: filePath });
+  }
 }

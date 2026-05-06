@@ -1,7 +1,9 @@
 import { renderTemplate, renderNav } from "./template.js";
 import { escapeHtmlAttr, escapeHtmlText, generateOgTags, generateJsonLd } from "./seo.js";
 import type { OgTagsOptions, JsonLdOptions } from "./seo.js";
+import { cleanBaseUrl } from "./url.js";
 import type { BuildHooks } from "../extensions/plugin.js";
+import type { RenderedContent } from "../types.js";
 import config from "../config.js";
 
 export type JsonLdInput = Omit<JsonLdOptions, "siteName" | "authorName" | "siteUrl">;
@@ -46,7 +48,7 @@ export function renderPage(
   const fullTitle = title;
   const pageUrl = `${config.site.url}${route}`;
   const ogImageBase = config.site.ogImage
-    ? (config.cdn || config.site.url).replace(/\/$/, "") + config.site.ogImage
+    ? cleanBaseUrl(config.cdn || config.site.url) + config.site.ogImage
     : undefined;
 
   const analytics = config.analytics.enabled
@@ -87,47 +89,40 @@ export function renderPage(
   return renderTemplate(baseLayout, baseData);
 }
 
+type HookType = "page" | "post";
+
+interface HookContent {
+  frontmatter: Record<string, unknown>;
+  html: string;
+}
+
 export async function applyHooks(
   hooks: BuildHooks | undefined,
-  type: "page" | "post",
+  type: HookType,
   slug: string,
   frontmatter: Record<string, unknown>,
   html: string
-): Promise<{ frontmatter: Record<string, unknown>; html: string }> {
+): Promise<HookContent> {
   if (!hooks) return { frontmatter, html };
 
-  if (type === "page" && hooks.beforeRenderPage) {
-    const r = hooks.beforeRenderPage(slug, { frontmatter: frontmatter as any, html });
-    const result = r instanceof Promise ? await r : r;
-    return { frontmatter: result.frontmatter as Record<string, unknown>, html: result.html };
-  }
+  const hookFn = type === "page" ? hooks.beforeRenderPage : hooks.beforeRenderPost;
+  if (!hookFn) return { frontmatter, html };
 
-  if (type === "post" && hooks.beforeRenderPost) {
-    const r = hooks.beforeRenderPost(slug, { frontmatter: frontmatter as any, html });
-    const result = r instanceof Promise ? await r : r;
-    return { frontmatter: result.frontmatter as Record<string, unknown>, html: result.html };
-  }
-
-  return { frontmatter, html };
+  const content: RenderedContent = { frontmatter: frontmatter as any, html };
+  const result = await hookFn(slug, content);
+  return { frontmatter: result.frontmatter as Record<string, unknown>, html: result.html };
 }
 
 export async function applyAfterHooks(
   hooks: BuildHooks | undefined,
-  type: "page" | "post",
+  type: HookType,
   slug: string,
   html: string
 ): Promise<string> {
   if (!hooks) return html;
 
-  if (type === "page" && hooks.afterRenderPage) {
-    const r = hooks.afterRenderPage(slug, html);
-    return r instanceof Promise ? await r : r;
-  }
+  const hookFn = type === "page" ? hooks.afterRenderPage : hooks.afterRenderPost;
+  if (!hookFn) return html;
 
-  if (type === "post" && hooks.afterRenderPost) {
-    const r = hooks.afterRenderPost(slug, html);
-    return r instanceof Promise ? await r : r;
-  }
-
-  return html;
+  return hookFn(slug, html);
 }

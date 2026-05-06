@@ -7,11 +7,9 @@ export function formatDate(
 ): string {
   if (!dateString) return "";
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    console.warn(`Invalid date: ${dateString}`);
+    return "";
+  }
   return date.toLocaleDateString(dateConfig.locale, dateConfig.options);
 }
-
-export function formatDateForRSS(dateString: string | undefined): string {
-  if (!dateString) return new Date().toUTCString();
-  return new Date(dateString).toUTCString();
-}
-

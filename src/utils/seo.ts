@@ -1,3 +1,5 @@
+import { cleanBaseUrl } from "./url.js";
+
 export interface MetaDescriptionOptions {
   title?: string;
   primary?: string;
@@ -174,102 +176,149 @@ export interface JsonLdOptions {
   breadcrumbs?: { name: string; url: string }[];
 }
 
-export function generateJsonLd(options: JsonLdOptions): string {
-  const { type, title, description, url, siteName, authorName, siteUrl, date, dateModified, tags, numberOfItems, breadcrumbs } = options;
-  const baseUrl = siteUrl.replace(/\/$/, "");
+function buildBreadcrumbLd(breadcrumbs: { name: string; url: string }[]): Record<string, unknown> {
+  return {
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbs.map((crumb, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": crumb.name,
+      "item": crumb.url,
+    })),
+  };
+}
 
-  const breadcrumbLd = breadcrumbs && breadcrumbs.length > 0
-    ? {
-        "@type": "BreadcrumbList",
-        "itemListElement": breadcrumbs.map((crumb, i) => ({
-          "@type": "ListItem",
-          "position": i + 1,
-          "name": crumb.name,
-          "item": crumb.url,
-        })),
-      }
-    : null;
+function buildWebSiteLd(options: JsonLdOptions, baseUrl: string): Record<string, unknown> {
+  return {
+    "@type": "WebSite",
+    "@id": `${baseUrl}/#website`,
+    url: baseUrl + "/",
+    name: options.siteName,
+    description: smartTruncate(options.description),
+    author: { "@type": "Person", name: options.authorName },
+    publisher: {
+      "@type": "Organization",
+      name: options.siteName,
+      logo: { "@type": "ImageObject", url: `${baseUrl}/static/logo.webp` },
+    },
+  };
+}
 
-  if (type === "WebSite" || type === "WebPage") {
-    if (url === baseUrl + "/" || url === baseUrl) {
-      const graph: Record<string, unknown>[] = [
-        {
-          "@type": "WebSite",
-          "@id": `${baseUrl}/#website`,
-          url: baseUrl + "/",
-          name: siteName,
-          description: smartTruncate(description),
-          author: { "@type": "Person", name: authorName },
-          publisher: {
-            "@type": "Organization",
-            name: siteName,
-            logo: { "@type": "ImageObject", url: `${baseUrl}/static/logo.webp` },
-          },
-        },
-        {
-          "@type": "WebPage",
-          "@id": `${baseUrl}/#webpage`,
-          url,
-          name: title,
-          isPartOf: { "@id": `${baseUrl}/#website` },
-        },
-      ];
-      if (breadcrumbLd) graph.push(breadcrumbLd);
-      const data = { "@context": "https://schema.org", "@graph": graph };
-      return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
-    }
+function buildWebPageLd(options: JsonLdOptions, baseUrl: string): Record<string, unknown> {
+  return {
+    "@type": "WebPage",
+    "@id": `${baseUrl}/#webpage`,
+    url: options.url,
+    name: options.title,
+    isPartOf: { "@id": `${baseUrl}/#website` },
+  };
+}
 
-    const graph: Record<string, unknown>[] = [
-      {
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        url,
-        name: title,
-        description: smartTruncate(description),
-        isPartOf: { "@type": "WebSite", name: siteName, url: baseUrl + "/" },
-      },
-    ];
-    if (breadcrumbLd) {
-      const data = { "@context": "https://schema.org", "@graph": [...graph, breadcrumbLd] };
-      return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
-    }
-    return `<script type="application/ld+json">\n${JSON.stringify(graph[0], null, 2)}\n</script>`;
+function buildHomePageJsonLd(options: JsonLdOptions, baseUrl: string): string {
+  const graph: Record<string, unknown>[] = [
+    buildWebSiteLd(options, baseUrl),
+    buildWebPageLd(options, baseUrl),
+  ];
+
+  if (options.breadcrumbs && options.breadcrumbs.length > 0) {
+    graph.push(buildBreadcrumbLd(options.breadcrumbs));
   }
 
+  const data = { "@context": "https://schema.org", "@graph": graph };
+  return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+}
+
+function buildRegularPageJsonLd(options: JsonLdOptions, baseUrl: string): string {
   const data: Record<string, unknown> = {
-    "@type": type,
-    headline: title,
-    description: smartTruncate(description),
-    url,
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    url: options.url,
+    name: options.title,
+    description: smartTruncate(options.description),
+    isPartOf: { "@type": "WebSite", name: options.siteName, url: baseUrl + "/" },
   };
 
-  if (type === "BlogPosting") {
-    data.author = { "@type": "Person", name: authorName };
-    data.publisher = {
-      "@type": "Organization",
-      name: siteName,
-      logo: { "@type": "ImageObject", url: `${baseUrl}/static/logo.webp` },
-    };
-    data.mainEntityOfPage = { "@type": "WebPage", "@id": url };
-  }
-
-  if (type === "CollectionPage" && numberOfItems !== undefined) {
-    data.numberOfItems = numberOfItems;
-    data.isPartOf = { "@type": "WebSite", name: siteName, url: baseUrl + "/" };
-  }
-
-  if (date) data.datePublished = new Date(date).toISOString();
-  if (dateModified) {
-    data.dateModified = new Date(dateModified).toISOString();
-  } else if (date) {
-    data.dateModified = new Date(date).toISOString();
-  }
-  if (tags && tags.length > 0) data.keywords = tags.join(", ");
-
-  if (breadcrumbLd) {
-    const wrapped = { "@context": "https://schema.org", "@graph": [data, breadcrumbLd] };
+  if (options.breadcrumbs && options.breadcrumbs.length > 0) {
+    const wrapped = { "@context": "https://schema.org", "@graph": [data, buildBreadcrumbLd(options.breadcrumbs)] };
     return `<script type="application/ld+json">\n${JSON.stringify(wrapped, null, 2)}\n</script>`;
   }
 
   return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+}
+
+function buildBlogPostingJsonLd(options: JsonLdOptions, baseUrl: string): string {
+  const data: Record<string, unknown> = {
+    "@type": "BlogPosting",
+    headline: options.title,
+    description: smartTruncate(options.description),
+    url: options.url,
+    author: { "@type": "Person", name: options.authorName },
+    publisher: {
+      "@type": "Organization",
+      name: options.siteName,
+      logo: { "@type": "ImageObject", url: `${baseUrl}/static/logo.webp` },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": options.url },
+  };
+
+  if (options.date) data.datePublished = new Date(options.date).toISOString();
+  data.dateModified = options.dateModified
+    ? new Date(options.dateModified).toISOString()
+    : options.date
+      ? new Date(options.date).toISOString()
+      : undefined;
+  if (options.tags && options.tags.length > 0) data.keywords = options.tags.join(", ");
+
+  return wrapWithBreadcrumbs(data, options.breadcrumbs);
+}
+
+function buildCollectionPageJsonLd(options: JsonLdOptions, baseUrl: string): string {
+  const data: Record<string, unknown> = {
+    "@type": "CollectionPage",
+    headline: options.title,
+    description: smartTruncate(options.description),
+    url: options.url,
+  };
+
+  if (options.numberOfItems !== undefined) {
+    data.numberOfItems = options.numberOfItems;
+    data.isPartOf = { "@type": "WebSite", name: options.siteName, url: baseUrl + "/" };
+  }
+
+  if (options.date) data.datePublished = new Date(options.date).toISOString();
+  data.dateModified = options.dateModified
+    ? new Date(options.dateModified).toISOString()
+    : options.date
+      ? new Date(options.date).toISOString()
+      : undefined;
+  if (options.tags && options.tags.length > 0) data.keywords = options.tags.join(", ");
+
+  return wrapWithBreadcrumbs(data, options.breadcrumbs);
+}
+
+function wrapWithBreadcrumbs(data: Record<string, unknown>, breadcrumbs?: { name: string; url: string }[]): string {
+  if (breadcrumbs && breadcrumbs.length > 0) {
+    const wrapped = { "@context": "https://schema.org", "@graph": [data, buildBreadcrumbLd(breadcrumbs)] };
+    return `<script type="application/ld+json">\n${JSON.stringify(wrapped, null, 2)}\n</script>`;
+  }
+  return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+}
+
+export function generateJsonLd(options: JsonLdOptions): string {
+  const baseUrl = cleanBaseUrl(options.siteUrl);
+  const isHomePage = options.url === baseUrl + "/" || options.url === baseUrl;
+
+  switch (options.type) {
+    case "WebSite":
+    case "WebPage":
+      return isHomePage
+        ? buildHomePageJsonLd(options, baseUrl)
+        : buildRegularPageJsonLd(options, baseUrl);
+    case "BlogPosting":
+      return buildBlogPostingJsonLd(options, baseUrl);
+    case "CollectionPage":
+      return buildCollectionPageJsonLd(options, baseUrl);
+    default:
+      return buildRegularPageJsonLd(options, baseUrl);
+  }
 }
