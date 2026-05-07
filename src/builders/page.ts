@@ -166,8 +166,7 @@ export async function buildPage(
   robotsMeta?: string
 ): Promise<void> {
   if (cacheManager) {
-    const changed = await cacheManager.hasChanged("pages", filePath, filePath);
-    if (!changed) {
+    if (!(await cacheManager.hasChanged("pages", filePath))) {
       console.log(`  (cached) ${route}`);
       return;
     }
@@ -219,7 +218,7 @@ export async function buildPage(
   await writeFileContent(outputPath, output);
 
   if (cacheManager) {
-    await cacheManager.updateMtime("pages", filePath, filePath);
+    await cacheManager.updateMtime("pages", filePath);
   }
 }
 

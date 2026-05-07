@@ -52,116 +52,6 @@ class PerformanceTimer {
   }
 }
 
-interface LayoutCache {
-  content: string;
-  mtime: number;
-}
-
-class LayoutManager {
-  private cache = new Map<string, LayoutCache>();
-  private layoutsDir: string;
-
-  constructor(layoutsDir: string) {
-    this.layoutsDir = layoutsDir;
-  }
-
-  async load(name: string, force = false): Promise<string> {
-    const layoutPath = join(this.layoutsDir, `${name}.html`);
-    
-    if (!force) {
-      const cached = this.cache.get(name);
-      if (cached) {
-        try {
-          const { mtimeMs } = await stat(layoutPath);
-          if (mtimeMs <= cached.mtime) {
-            return cached.content;
-          }
-        } catch { /* file might not exist, reload anyway */ }
-      }
-    }
-
-    const content = await loadLayout(name, this.layoutsDir);
-    try {
-      const { mtimeMs } = await stat(layoutPath);
-      this.cache.set(name, { content, mtime: mtimeMs });
-    } catch {
-      this.cache.set(name, { content, mtime: Date.now() });
-    }
-    
-    return content;
-  }
-
-  async loadAll(names: string[], force = false): Promise<Record<string, string>> {
-    const entries = await Promise.all(
-      names.map(async (name) => {
-        const content = await this.load(name, force);
-        return [name, content] as const;
-      })
-    );
-    return Object.fromEntries(entries);
-  }
-
-  invalidate(): void {
-    this.cache.clear();
-  }
-}
-
-async function checkLayoutsChanged(
-  cacheManager: BuildCacheManager,
-  layoutsDir: string,
-  extraLayouts: string[] = []
-): Promise<boolean> {
-  const all = ["base", "page", ...extraLayouts];
-  for (const name of all) {
-    const layoutPath = join(layoutsDir, `${name}.html`);
-    if (await cacheManager.hasChanged("layouts", name, layoutPath)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-async function updateLayoutMtimes(
-  cacheManager: BuildCacheManager,
-  layoutsDir: string,
-  extraLayouts: string[] = []
-): Promise<void> {
-  const all = ["base", "page", ...extraLayouts];
-  await Promise.all(
-    all.map(async (name) => {
-      const layoutPath = join(layoutsDir, `${name}.html`);
-      await cacheManager.updateMtime("layouts", name, layoutPath);
-    })
-  );
-}
-
-async function checkCssChanged(
-  cacheManager: BuildCacheManager,
-  publicDir: string
-): Promise<boolean> {
-  const cssFiles = ["tufte.css", "globals.css"];
-  for (const name of cssFiles) {
-    const cssPath = join(publicDir, name);
-    if (await cacheManager.hasChanged("css", name, cssPath)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-async function updateCssMtimes(
-  cacheManager: BuildCacheManager,
-  publicDir: string
-): Promise<void> {
-  const cssFiles = ["tufte.css", "globals.css"];
-  await Promise.all(
-    cssFiles.map(async (name) => {
-      const cssPath = join(publicDir, name);
-      await cacheManager.updateMtime("css", name, cssPath);
-    })
-  );
-}
-
 async function buildStaticPages(
   routes: Record<string, string>,
   baseLayout: string,
@@ -223,13 +113,7 @@ async function buildCollections(
       timer.start(`collection:${coll.name}`);
       try {
         const output = await buildCollection(
-          coll,
-          baseLayout,
-          layoutsMap,
-          currentYear,
-          inlinedCss,
-          cacheManager,
-          hooks
+          coll, baseLayout, layoutsMap, currentYear, inlinedCss, cacheManager, hooks
         );
         return output;
       } finally {
@@ -285,7 +169,7 @@ async function generateLlmOutputs(allCollectionOutputs: CollectionOutput[]): Pro
     emitMarkdownFiles(allCollectionOutputs),
     generateLlmsTxt(allCollectionOutputs),
   ]);
-  
+
   for (const result of results) {
     if (result.status === "rejected") {
       errorReporter.report(
@@ -340,48 +224,21 @@ async function build(): Promise<void> {
   timer.start("setup");
   await ensureDir(config.dirs.dist);
 
+  clearContentCache();
+  clearCssCache();
+
   const cacheManager = await createCacheManager(config.dirs);
   const hooks = getComposedHooks();
-  const layoutManager = new LayoutManager(config.dirs.layouts);
-
-  const configPath = join(import.meta.dir, "config.ts");
-  if (await cacheManager.hasChanged("config", "config", configPath)) {
-    console.log("  Config changed, invalidating cache");
-    cacheManager.invalidateAll();
-    clearContentCache();
-    clearCssCache();
-    layoutManager.invalidate();
-  }
 
   const collectionLayouts = getRequiredLayouts(config.collections);
-  const layoutsChanged = await checkLayoutsChanged(cacheManager, config.dirs.layouts, collectionLayouts);
-  if (layoutsChanged) {
-    console.log("  Layout changed, clearing render cache");
-    cacheManager.invalidateAll();
-    clearContentCache();
-    clearCssCache();
-    layoutManager.invalidate();
-  }
-
-  const cssChanged = await checkCssChanged(cacheManager, config.dirs.public);
-  if (cssChanged) {
-    console.log("  CSS changed, clearing render cache");
-    cacheManager.invalidateAll();
-    clearContentCache();
-    clearCssCache();
-    layoutManager.invalidate();
-  }
-
-  if (hooks.beforeBuild) {
-    await hooks.beforeBuild();
-  }
-
   const allLayoutNames = ["base", "page", ...collectionLayouts];
-  const layoutsMap = await layoutManager.loadAll(allLayoutNames, layoutsChanged);
-
-  await updateLayoutMtimes(cacheManager, config.dirs.layouts, collectionLayouts);
-  await updateCssMtimes(cacheManager, config.dirs.public);
-  await cacheManager.updateMtime("config", "config", configPath);
+  const layoutEntries = await Promise.all(
+    allLayoutNames.map(async (name) => {
+      const content = await loadLayout(name, config.dirs.layouts);
+      return [name, content] as const;
+    })
+  );
+  const layoutsMap = Object.fromEntries(layoutEntries);
 
   const baseLayout = layoutsMap["base"];
   const pageLayout = layoutsMap["page"];
@@ -393,6 +250,10 @@ async function build(): Promise<void> {
   const defaultOgImageUrl = config.site.ogImage
     ? cleanBaseUrl(config.cdn || config.site.url) + config.site.ogImage
     : undefined;
+
+  if (hooks.beforeBuild) {
+    await hooks.beforeBuild();
+  }
 
   timer.start("static-pages");
   await buildStaticPages(config.routes, baseLayout, pageLayout, currentYear, defaultOgImageUrl, cacheManager, hooks);

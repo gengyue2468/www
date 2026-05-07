@@ -149,7 +149,7 @@ async function loadPostsFromDir(
 
     let changed = true;
     if (cacheManager) {
-      changed = await cacheManager.hasChanged("blogPosts", filePath, filePath);
+      changed = await cacheManager.hasChanged("blogPosts", filePath);
     }
 
     const slug = basename(file, ".md");
@@ -348,7 +348,7 @@ async function buildPostPages(
     await writeFileContent(outputPath, output);
 
     if (cacheManager) {
-      await cacheManager.updateMtime("blogPosts", post.filePath, post.filePath);
+      await cacheManager.updateMtime("blogPosts", post.filePath);
     }
 
     console.log(`✓ Built /${urlPrefix}/${post.slug}`);
