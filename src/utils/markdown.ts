@@ -248,21 +248,21 @@ function renderNotes(html: string, notes: Note[]): string {
     const note = notes[i];
     const renderedContent = renderNoteContent(note.content);
     const id = generateNoteId("sn", i);
-    const refId = `sn-ref-${i}`;
+    const markerId = `ref-marker-${i}`;
 
     let noteHtml: string;
     if (note.type === "sidenote") {
-      noteHtml = `<label for="${id}" class="margin-toggle sidenote-number"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote" id="${refId}">${renderedContent}</span>`;
+      noteHtml = `<label for="${id}" class="margin-toggle sidenote-number" id="${markerId}"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote">${renderedContent}</span>`;
     } else if (note.type === "marginnote") {
-      noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote" id="${refId}">${renderedContent}</span>`;
+      noteHtml = `<label for="${id}" class="margin-toggle" id="${markerId}">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
     } else {
-      noteHtml = `<label for="${id}" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote" id="${refId}">${renderedContent}</span>`;
+      noteHtml = `<label for="${id}" class="margin-toggle" id="${markerId}">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
     }
 
     html = html.replace(note.placeholder, noteHtml);
 
     if (note.type === "sidenote" || note.type === "marginnote") {
-      collected.push({ id: `sn-list-${i}`, refId, type: note.type, content: note.content, renderedContent });
+      collected.push({ id: `sn-list-${i}`, refId: markerId, type: note.type, content: note.content, renderedContent });
     }
   }
 
