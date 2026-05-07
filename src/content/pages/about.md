@@ -3,7 +3,7 @@ title: About
 description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方向，喜欢折腾各种有趣的小玩具与实践项目，记录学习成长与技术思考，也写了一些有趣的小玩具。
 ---
 
-哈喽啊，我现在在 [华中科技大学](https://hust.edu.cn)[计算机科学与技术学院][^ <img src="/static/hust/hust.webp" style="width:96px" alt="HUST" /> ]，是**大一**的小东西，(https://cs.hust.edu.cn/)。[冰岩作坊](https://www.bingyan.net/) 前端组成员。
+哈喽啊，我现在在 [华中科技大学](https://hust.edu.cn)[计算机科学与技术学院](https://cs.hust.edu.cn/) [^ <img src="/static/hust/hust.webp" style="width:96px" alt="HUST" /> ]，是**大一**的小东西。[冰岩作坊](https://www.bingyan.net/) 前端组成员。
 
 我主要使用的语言：[^ 我的主力语言是 JavaScript/TypeScript，虽然平时学校的课设之类的可能会写一点 C/C++，不过算不上主力]
 
