@@ -135,6 +135,33 @@ async function updateLayoutMtimes(
   );
 }
 
+async function checkCssChanged(
+  cacheManager: BuildCacheManager,
+  publicDir: string
+): Promise<boolean> {
+  const cssFiles = ["tufte.css", "globals.css"];
+  for (const name of cssFiles) {
+    const cssPath = join(publicDir, name);
+    if (await cacheManager.hasChanged("css", name, cssPath)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+async function updateCssMtimes(
+  cacheManager: BuildCacheManager,
+  publicDir: string
+): Promise<void> {
+  const cssFiles = ["tufte.css", "globals.css"];
+  await Promise.all(
+    cssFiles.map(async (name) => {
+      const cssPath = join(publicDir, name);
+      await cacheManager.updateMtime("css", name, cssPath);
+    })
+  );
+}
+
 async function buildStaticPages(
   routes: Record<string, string>,
   baseLayout: string,
@@ -336,6 +363,15 @@ async function build(): Promise<void> {
     layoutManager.invalidate();
   }
 
+  const cssChanged = await checkCssChanged(cacheManager, config.dirs.public);
+  if (cssChanged) {
+    console.log("  CSS changed, clearing render cache");
+    cacheManager.invalidateAll();
+    clearContentCache();
+    clearCssCache();
+    layoutManager.invalidate();
+  }
+
   if (hooks.beforeBuild) {
     await hooks.beforeBuild();
   }
@@ -344,6 +380,7 @@ async function build(): Promise<void> {
   const layoutsMap = await layoutManager.loadAll(allLayoutNames, layoutsChanged);
 
   await updateLayoutMtimes(cacheManager, config.dirs.layouts, collectionLayouts);
+  await updateCssMtimes(cacheManager, config.dirs.public);
   await cacheManager.updateMtime("config", "config", configPath);
 
   const baseLayout = layoutsMap["base"];

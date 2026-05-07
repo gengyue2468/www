@@ -8,6 +8,7 @@ interface BuildCache {
   pages: Record<string, number>;
   blogPosts: Record<string, number>;
   layouts: Record<string, number>;
+  css: Record<string, number>;
   config: number;
 }
 
@@ -15,6 +16,7 @@ const DEFAULT_CACHE: BuildCache = {
   pages: {},
   blogPosts: {},
   layouts: {},
+  css: {},
   config: 0,
 };
 
@@ -65,7 +67,7 @@ async function hasFileChanged(filePath: string, cachedMtime: number): Promise<bo
   return mtime === null || mtime > cachedMtime;
 }
 
-type CacheStore = "pages" | "blogPosts" | "layouts";
+type CacheStore = "pages" | "blogPosts" | "layouts" | "css";
 
 export class BuildCacheManager {
   private cache: BuildCache;
@@ -79,7 +81,17 @@ export class BuildCacheManager {
 
   async load(): Promise<void> {
     const loaded = await readJsonFile<BuildCache>(this.cachePath);
-    this.cache = loaded || { ...DEFAULT_CACHE };
+    if (loaded) {
+      this.cache = {
+        pages: loaded.pages ?? {},
+        blogPosts: loaded.blogPosts ?? {},
+        layouts: loaded.layouts ?? {},
+        css: loaded.css ?? {},
+        config: loaded.config ?? 0,
+      };
+    } else {
+      this.cache = { ...DEFAULT_CACHE };
+    }
   }
 
   async save(): Promise<void> {
