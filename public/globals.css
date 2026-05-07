@@ -547,3 +547,10 @@ pre > code {
     font-size: 1.25rem !important;
   }
 }
+
+.ascii-art pre,
+pre.ascii-art {
+  background-color: #181818 !important;
+  color: #e8e6e3 !important;
+  color-scheme: dark !important;
+}
