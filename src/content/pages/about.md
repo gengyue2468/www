@@ -3,9 +3,9 @@ title: About
 description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方向，喜欢折腾各种有趣的小玩具与实践项目，记录学习成长与技术思考，也写了一些有趣的小玩具。
 ---
 
-哈喽啊，我现在在 [华中科技大学](https://hust.edu.cn)[计算机科学与技术学院](https://cs.hust.edu.cn/) [^ <img src="/static/hust/hust.webp" style="width:96px" alt="HUST" /> ]，是**大一**的小东西。[冰岩作坊](https://www.bingyan.net/) 前端组成员。
+哈喽啊，我目前就读于 [华中科技大学](https://hust.edu.cn) [计算机科学与技术学院](https://cs.hust.edu.cn/)，是**大一**的小东西。[冰岩作坊](https://www.bingyan.net/) 前端组成员。
 
-我主要使用的语言：[^ 我的主力语言是 JavaScript/TypeScript，虽然平时学校的课设之类的可能会写一点 C/C++，不过算不上主力]
+我主要使用的语言[^ 我的主力语言是 JavaScript/TypeScript，虽然平时学校的课设之类的可能会写一点 C/C++，不过算不上主力]：
 
 ```
 
@@ -23,7 +23,7 @@ description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方
 ```
 
 
-我的技术栈：[^ 从左至右依次为：React/React Router/Next.js/TailwindCSS/Bun]
+我的技术栈[^ 从左至右依次为：React/React Router/Next.js/TailwindCSS/Bun]：
 
 ```
 
@@ -37,20 +37,11 @@ description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方
                                                                        .
 ```
 
+如果您想继续阅读...，可参阅：
 
-
-我比较喜欢写一些小玩具，基本上没用，也可能不好玩，比如：
-
-- [HUST-Chifan](https://github.com/gengyue2468/HUST-Chifan) 基于 Hono 的 Restful API，显示 HUST 食堂的开放时间等 [演示站点](https://chifan.huster.fun)
-- [shitposts.org](https://github.com/gengyue2468/shitposts.org) 基于 LLM 幻觉和概率随机的垃圾水文生成器，与 GitHub Actions 集成。参阅 [这篇文章](https://www.gengyue.site/blog/let-llm-write-shitposts/)
-- [Zoogle](https://github.com/gengyue2468/zoogle) 反正不是 Google，长得有点像罢了，[演示站点](https://www.zoogle.top)
-
-平时可能会写一点文章，不过也不常写罢了，也写不出来什么好的文字，写水文又过于垃圾了，还不如让~~萝莉妈~~[note: LLM， 即 Large Language Model，大语言模型]来写，如果您想读读，请移步 [Blog](/blog)。如果您想看水文或者一点碎片化的内容，请移步 [Logbook](/logbook) 
-
-我的联系方式：
-
-- 我的 Email: [hi@gengyue.site](mailto:hi@gengyue.site)
+- [我的 Blog](/blog) - 一些可能比较正式的文章，早期可能混杂了一点生活记录
+- [我的 Logbook](/logbook) - 一些可能比较随意的记录，可能是一些技术实践的流水账，也可能是一些生活记录
 - 我的 GitHub: [@gengyue2468](https://github.com/gengyue2468)
 - 我的 Memos: https://memos.gengyue.site
 
-感谢您不知何缘故踏入此页面并浏览，感谢您在此冲浪浪费的时间，望您过的愉快 :)
+欢迎找我聊天，我的 Email 是 [hi@gengyue.site](mailto:hi@gengyue.site)
