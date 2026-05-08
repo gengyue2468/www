@@ -95,7 +95,7 @@ const config: Config = {
     enabled: true,
     userAgent: "*",
     allow: ["/"],
-    disallow: ["/*.md", "/blog/tag/", "/logbook/tag/"],
+    disallow: ["/*.md"],
     crawlDelay: 0,
   },
 

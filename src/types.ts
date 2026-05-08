@@ -109,7 +109,7 @@ export interface CollectionOutput {
   urlPrefix: string;
   srcDir: string;
   items: Post[];
-  renderedItems: { slug: string; html: string }[];
+  renderedItems: { slug: string; html: string; _render?: () => Promise<string> }[];
 }
 
 export interface FrontMatter {

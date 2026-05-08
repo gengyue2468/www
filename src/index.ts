@@ -1,7 +1,7 @@
 import { join } from "path";
 import { stat, rm } from "fs/promises";
 import { ensureDir, loadLayout, copyPublicFiles, writeFileContent } from "./utils/fs.js";
-import { buildPage, getInlinedCss, clearCssCache } from "./builders/page.js";
+import { buildPage, getInlinedCss } from "./builders/page.js";
 import { buildCollection, getRequiredLayouts } from "./builders/collection.js";
 import { generateRSS } from "./generators/rss.js";
 import { generateSitemap } from "./generators/sitemap.js";
@@ -9,7 +9,7 @@ import { generateRobotsTxt } from "./generators/robots.js";
 import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
 import { registerPlugin, getComposedHooks } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
-import { createCacheManager, clearContentCache } from "./utils/cache.js";
+import { createCacheManager } from "./utils/cache.js";
 import { AppError, ErrorCode, errorReporter } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
 import type { BuildCacheManager } from "./utils/cache.js";
@@ -223,9 +223,6 @@ async function build(): Promise<void> {
 
   timer.start("setup");
   await ensureDir(config.dirs.dist);
-
-  clearContentCache();
-  clearCssCache();
 
   const cacheManager = await createCacheManager(config.dirs);
   const hooks = getComposedHooks();

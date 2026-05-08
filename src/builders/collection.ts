@@ -1,6 +1,6 @@
 import { join, dirname, extname, basename } from "path";
 import { readdir } from "fs/promises";
-import { ensureDir, writeFileContent } from "../utils/fs.js";
+import { ensureDir, writeFileContent, readFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
@@ -10,6 +10,7 @@ import type { BuildHooks } from "../extensions/plugin.js";
 import type { BuildCacheManager } from "../utils/cache.js";
 import { buildMetaDescription, generateKeywords } from "../utils/seo.js";
 import { AppError, ErrorCode, isENOENT, errorReporter } from "../utils/errors.js";
+import matter from "gray-matter";
 import config from "../config.js";
 import type { CollectionConfig, CollectionOutput, Post } from "../types.js";
 
@@ -149,10 +150,29 @@ async function loadPostsFromDir(
 
     let changed = true;
     if (cacheManager) {
-      changed = await cacheManager.hasChanged("blogPosts", filePath);
+      changed = await cacheManager.hasChanged(filePath);
     }
 
     const slug = basename(file, ".md");
+
+    if (!changed) {
+      const raw = await readFileContent(filePath);
+      const { data: frontmatter } = matter(raw);
+      return {
+        slug,
+        title: (frontmatter.title as string) || slug,
+        date: (frontmatter.date as string) || "",
+        updated: (frontmatter.updated as string) || "",
+        excerpt: (frontmatter.excerpt as string) || "",
+        summary: (frontmatter.summary as string) || "",
+        tags: (frontmatter.tags as string[]) || [],
+        html: "",
+        filePath,
+        frontmatter,
+        changed,
+      };
+    }
+
     const { frontmatter, html } = await renderMarkdown(filePath);
 
     return {
@@ -348,7 +368,7 @@ async function buildPostPages(
     await writeFileContent(outputPath, output);
 
     if (cacheManager) {
-      await cacheManager.updateMtime("blogPosts", post.filePath);
+      await cacheManager.updateMtime(post.filePath);
     }
 
     console.log(`✓ Built /${urlPrefix}/${post.slug}`);
@@ -472,11 +492,10 @@ async function buildTagPages(
     return;
   }
 
-  const allTags = collectAllTags(posts);
-  if (allTags.length === 0) return;
+  if (allTagsGlobal.length === 0) return;
 
-  const tagsCloudHtml = generateTagsHTML(allTags, urlPrefix);
-  const uniqueTagCount = new Set(allTags).size;
+  const tagsCloudHtml = generateTagsHTML(allTagsGlobal, urlPrefix);
+  const uniqueTagCount = new Set(allTagsGlobal).size;
 
   const contentData = {
     title: "All Tags",
@@ -577,6 +596,10 @@ export async function buildCollection(
     renderedItems: posts.map(p => ({
       slug: p.slug,
       html: p.html,
+      _render: p.changed ? undefined : async () => {
+        const { html } = await renderMarkdown(p.filePath);
+        return html;
+      },
     })),
   };
 }

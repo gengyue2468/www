@@ -1,45 +1,15 @@
 import { stat } from "fs/promises";
-import { join } from "path";
-import type { DirsConfig, RenderedContent, FrontMatter } from "../types.js";
+import { join, dirname } from "path";
+import type { DirsConfig } from "../types.js";
 import { readJsonFile } from "./fs.js";
 
 interface BuildCache {
-  pages: Record<string, number>;
-  blogPosts: Record<string, number>;
+  md: Record<string, number>;
 }
 
 const DEFAULT_CACHE: BuildCache = {
-  pages: {},
-  blogPosts: {},
+  md: {},
 };
-
-interface RenderCacheEntry {
-  mtime: number;
-  frontmatter: FrontMatter;
-  html: string;
-}
-
-class ContentCache {
-  private renderCache = new Map<string, RenderCacheEntry>();
-
-  getRender(filePath: string, mtime: number): RenderedContent | undefined {
-    const entry = this.renderCache.get(filePath);
-    if (entry && entry.mtime === mtime) {
-      return { frontmatter: entry.frontmatter, html: entry.html };
-    }
-    return undefined;
-  }
-
-  setRender(filePath: string, mtime: number, result: RenderedContent): void {
-    this.renderCache.set(filePath, { mtime, frontmatter: result.frontmatter, html: result.html });
-  }
-
-  clear(): void {
-    this.renderCache.clear();
-  }
-}
-
-const contentCache = new ContentCache();
 
 async function getFileMtime(filePath: string): Promise<number | null> {
   try {
@@ -63,10 +33,7 @@ export class BuildCacheManager {
   async load(): Promise<void> {
     const loaded = await readJsonFile<BuildCache>(this.cachePath);
     if (loaded) {
-      this.cache = {
-        pages: loaded.pages ?? {},
-        blogPosts: loaded.blogPosts ?? {},
-      };
+      this.cache = { md: loaded.md ?? {} };
     } else {
       this.cache = { ...DEFAULT_CACHE };
     }
@@ -81,40 +48,25 @@ export class BuildCacheManager {
     }
   }
 
-  async hasChanged(store: keyof BuildCache, filePath: string): Promise<boolean> {
-    const cached = this.cache[store][filePath];
+  async hasChanged(filePath: string): Promise<boolean> {
+    const cached = this.cache.md[filePath];
     if (cached === undefined) return true;
     const mtime = await getFileMtime(filePath);
     return mtime === null || mtime > cached;
   }
 
-  async updateMtime(store: keyof BuildCache, filePath: string): Promise<void> {
+  async updateMtime(filePath: string): Promise<void> {
     const mtime = await getFileMtime(filePath);
     if (mtime === null) return;
-    this.cache[store][filePath] = mtime;
+    this.cache.md[filePath] = mtime;
     this.dirty = true;
   }
 }
 
 export async function createCacheManager(dirs: DirsConfig): Promise<BuildCacheManager> {
-  const cachePath = join(dirs.dist, ".build-cache.json");
+  const rootDir = dirname(dirs.dist);
+  const cachePath = join(rootDir, ".build-cache.json");
   const manager = new BuildCacheManager(cachePath);
   await manager.load();
   return manager;
-}
-
-export async function getCachedRender(filePath: string): Promise<RenderedContent | undefined> {
-  const mtime = await getFileMtime(filePath);
-  if (mtime === null) return undefined;
-  return contentCache.getRender(filePath, mtime);
-}
-
-export async function setCachedRender(filePath: string, result: RenderedContent): Promise<void> {
-  const mtime = await getFileMtime(filePath);
-  if (mtime === null) return;
-  contentCache.setRender(filePath, mtime, result);
-}
-
-export function clearContentCache(): void {
-  contentCache.clear();
 }

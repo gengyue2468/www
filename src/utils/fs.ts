@@ -1,16 +1,10 @@
 import { mkdir, readdir } from "fs/promises";
 import { join } from "path";
 import type { DirsConfig } from "../types.js";
-import { AppError, ErrorCode, isENOENT, isEEXIST, errorReporter } from "./errors.js";
+import { AppError, ErrorCode, isENOENT, errorReporter } from "./errors.js";
 
 export async function ensureDir(dir: string): Promise<void> {
-  try {
-    await mkdir(dir, { recursive: true });
-  } catch (err) {
-    if (!isEEXIST(err)) {
-      throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { dir });
-    }
-  }
+  await mkdir(dir, { recursive: true });
 }
 
 export async function copyDirectory(src: string, dest: string): Promise<void> {

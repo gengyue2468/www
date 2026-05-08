@@ -16,7 +16,7 @@ function decodeHtmlEntities(text: string): string {
  * Check if markdown contains mermaid code blocks
  */
 export function hasMermaidCode(markdown: string): boolean {
-  return /```mermaid\r?\n[\s\S]*?```/g.test(markdown);
+  return /```mermaid\r?\n[\s\S]*?```/.test(markdown);
 }
 
 /**

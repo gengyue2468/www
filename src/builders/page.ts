@@ -38,7 +38,10 @@ function lightweightCssMinify(css: string): string {
     .replace(/\n{2,}/g, "\n")
     .replace(/\s*([{}:;,])\s*/g, "$1")
     .replace(/;\}/g, "}")
+    .replace(/calc\([^)]+\)/g, (m) => m.replace(/ \+ /g, "§ADD§").replace(/ - /g, "§SUB§"))
     .replace(/\s+/g, " ")
+    .replace(/§ADD§/g, " + ")
+    .replace(/§SUB§/g, " - ")
     .trim();
 }
 
@@ -166,7 +169,7 @@ export async function buildPage(
   robotsMeta?: string
 ): Promise<void> {
   if (cacheManager) {
-    if (!(await cacheManager.hasChanged("pages", filePath))) {
+    if (!(await cacheManager.hasChanged(filePath))) {
       console.log(`  (cached) ${route}`);
       return;
     }
@@ -218,7 +221,7 @@ export async function buildPage(
   await writeFileContent(outputPath, output);
 
   if (cacheManager) {
-    await cacheManager.updateMtime("pages", filePath);
+    await cacheManager.updateMtime(filePath);
   }
 }
 

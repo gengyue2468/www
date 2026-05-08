@@ -42,48 +42,8 @@ export class AppError extends Error {
   }
 }
 
-export type Result<T> = { ok: true; value: T } | { ok: false; error: AppError };
-
-export function ok<T>(value: T): Result<T> {
-  return { ok: true, value };
-}
-
-export function err<T>(error: AppError): Result<T> {
-  return { ok: false, error };
-}
-
-export async function tryCatch<T>(
-  fn: () => Promise<T>,
-  code: ErrorCode,
-  context?: Record<string, unknown>
-): Promise<Result<T>> {
-  try {
-    const value = await fn();
-    return ok(value);
-  } catch (e) {
-    return err(AppError.fromError(e, code, context));
-  }
-}
-
-export function tryCatchSync<T>(
-  fn: () => T,
-  code: ErrorCode,
-  context?: Record<string, unknown>
-): Result<T> {
-  try {
-    const value = fn();
-    return ok(value);
-  } catch (e) {
-    return err(AppError.fromError(e, code, context));
-  }
-}
-
 export function isENOENT(err: unknown): boolean {
   return err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code === "ENOENT";
-}
-
-export function isEEXIST(err: unknown): boolean {
-  return err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code === "EEXIST";
 }
 
 export interface ErrorReporter {
@@ -116,55 +76,10 @@ export class ConsoleErrorReporter implements ErrorReporter {
     return { errors: this.errors.length, warnings: this.warnings.length };
   }
 
-  hasErrors(): boolean {
-    return this.errors.length > 0;
-  }
-
   reset(): void {
     this.errors = [];
     this.warnings = [];
   }
-
-  throwIfErrors(): void {
-    if (this.errors.length > 0) {
-      const first = this.errors[0];
-      throw new AppError(
-        `Build failed with ${this.errors.length} error(s). First: ${first.message}`,
-        ErrorCode.BUILD_ERROR,
-        { errorCount: this.errors.length },
-        first
-      );
-    }
-  }
 }
 
 export const errorReporter = new ConsoleErrorReporter();
-
-export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
-  fn: T,
-  code: ErrorCode,
-  getContext?: (...args: Parameters<T>) => Record<string, unknown>
-): T {
-  return (async (...args: Parameters<T>) => {
-    try {
-      return await fn(...args);
-    } catch (e) {
-      if (AppError.isAppError(e)) throw e;
-      const context = getContext ? getContext(...args) : undefined;
-      throw AppError.fromError(e, code, context);
-    }
-  }) as T;
-}
-
-export function safeAsync<T>(
-  fn: () => Promise<T>,
-  fallback: T,
-  warningMessage?: string
-): Promise<T> {
-  return fn().catch((e) => {
-    if (warningMessage) {
-      errorReporter.reportWarning(warningMessage, { error: String(e) });
-    }
-    return fallback;
-  });
-}

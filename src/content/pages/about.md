@@ -25,6 +25,7 @@ description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方
 
 我的技术栈[^ 从左至右依次为：React/React Router/Next.js/TailwindCSS/Bun]：
 
+:::fullwidth
 <pre class="ascii-art">
    <code>
         .       .                                                       .                                       .....
@@ -37,6 +38,7 @@ description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方
                                                                        .
 </code>
 </pre>
+:::
 
 如果您想继续阅读...，可参阅：
 

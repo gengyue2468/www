@@ -3,7 +3,6 @@ import container from "markdown-it-container";
 import matter from "gray-matter";
 import type { Note, RenderedContent, FrontMatter } from "../types.js";
 import config from "../config.js";
-import { getCachedRender, setCachedRender } from "./cache.js";
 import { getMarkdownProcessors, getNoteProcessors } from "../extensions/plugin.js";
 import type { NoteProcessor } from "../extensions/plugin.js";
 import { AppError, ErrorCode } from "./errors.js";
@@ -223,9 +222,7 @@ function fixFigureInParagraphs(html: string): string {
 }
 
 function generateNoteId(prefix: string, index: number): string {
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 11);
-  return `${prefix}-${index}-${timestamp}-${random}`;
+  return `${prefix}-${index}`;
 }
 
 function renderNoteContent(content: string): string {
@@ -359,11 +356,6 @@ function addLinkOptimization(html: string): string {
 }
 
 export async function renderMarkdown(filePath: string): Promise<RenderedContent> {
-  const cached = await getCachedRender(filePath);
-  if (cached) {
-    return cached;
-  }
-
   let content: string;
   try {
     const file = Bun.file(filePath);
@@ -427,8 +419,6 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
   html = addLinkOptimization(html);
 
   const result = { frontmatter: frontmatter as FrontMatter, html };
-
-  await setCachedRender(filePath, result);
 
   return result;
 }
