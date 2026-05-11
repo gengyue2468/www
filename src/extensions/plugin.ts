@@ -116,7 +116,3 @@ export function getComposedHooks(): BuildHooks {
     },
   };
 }
-
-export function getPlugins(): Plugin[] {
-  return [...plugins];
-}

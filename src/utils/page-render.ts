@@ -24,6 +24,7 @@ export interface RenderPageOptions {
   hookSlug?: string;
   robotsMeta?: string;
   breadcrumbs?: { name: string; url: string }[];
+  headLinks?: string;
 }
 
 export function renderPage(
@@ -43,6 +44,7 @@ export function renderPage(
     year,
     robotsMeta = "",
     breadcrumbs,
+    headLinks = "",
   } = options;
 
   const fullTitle = title;
@@ -51,9 +53,15 @@ export function renderPage(
     ? cleanBaseUrl(config.cdn || config.site.url) + config.site.ogImage
     : undefined;
 
-  const analytics = config.analytics.enabled
-    ? `<link rel="dns-prefetch" href="${new URL(config.analytics.scriptUrl).origin}" />\n<link rel="preconnect" href="${new URL(config.analytics.scriptUrl).origin}" crossorigin />\n<script defer src="${config.analytics.scriptUrl}" data-website-id="${config.analytics.websiteId}"></script>`
-    : "";
+  let analytics = "";
+  if (config.analytics.enabled && config.analytics.scriptUrl) {
+    try {
+      const origin = new URL(config.analytics.scriptUrl).origin;
+      analytics = `<link rel="dns-prefetch" href="${origin}" />\n<link rel="preconnect" href="${origin}" crossorigin />\n<script defer src="${config.analytics.scriptUrl}" data-website-id="${config.analytics.websiteId}"></script>`;
+    } catch {
+      analytics = `<script defer src="${config.analytics.scriptUrl}" data-website-id="${config.analytics.websiteId}"></script>`;
+    }
+  }
 
   const baseData = {
     title: escapeHtmlText(fullTitle),
@@ -84,6 +92,7 @@ export function renderPage(
       siteUrl: config.site.url,
       breadcrumbs,
     }),
+    headLinks,
   };
 
   return renderTemplate(baseLayout, baseData);
@@ -108,7 +117,7 @@ export async function applyHooks(
   const hookFn = type === "page" ? hooks.beforeRenderPage : hooks.beforeRenderPost;
   if (!hookFn) return { frontmatter, html };
 
-  const content: RenderedContent = { frontmatter: frontmatter as any, html };
+  const content: RenderedContent = { frontmatter: frontmatter as RenderedContent["frontmatter"], html };
   const result = await hookFn(slug, content);
   return { frontmatter: result.frontmatter as Record<string, unknown>, html: result.html };
 }

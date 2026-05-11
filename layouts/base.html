@@ -34,6 +34,15 @@
     <link rel="alternate" type="application/rss+xml" title="{{siteTitle}}" href="/rss.xml" />
     <link rel="alternate" hreflang="zh-CN" href="{{canonicalUrl}}" />
     {{ogTags}} {{jsonLd}}
+    {{headLinks}}
+    <script type="speculationrules">
+    {
+      "prefetch": [{
+        "source": "document",
+        "where": { "href_matches": "/*" }
+      }]
+    }
+    </script>
     <link rel="icon" href="/favicon.ico" />
     <link
       rel="preload"

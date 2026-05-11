@@ -1,5 +1,11 @@
 import { cleanBaseUrl } from "./url.js";
 
+function safeToISOString(dateStr: string | undefined): string | undefined {
+  if (!dateStr) return undefined;
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? undefined : d.toISOString();
+}
+
 export interface MetaDescriptionOptions {
   title?: string;
   primary?: string;
@@ -134,8 +140,10 @@ export function generateOgTags(options: OgTagsOptions): string {
   ];
 
   if (type === "article") {
-    if (publishedTime) parts.push(`<meta property="article:published_time" content="${new Date(publishedTime).toISOString()}" />`);
-    if (modifiedTime) parts.push(`<meta property="article:modified_time" content="${new Date(modifiedTime).toISOString()}" />`);
+    const pubIso = safeToISOString(publishedTime);
+    const modIso = safeToISOString(modifiedTime);
+    if (pubIso) parts.push(`<meta property="article:published_time" content="${pubIso}" />`);
+    if (modIso) parts.push(`<meta property="article:modified_time" content="${modIso}" />`);
     if (authorName) parts.push(`<meta property="article:author" content="${escapeHtmlAttr(authorName)}" />`);
     if (tags && tags.length > 0) {
       for (const tag of tags) {
@@ -261,12 +269,8 @@ function buildBlogPostingJsonLd(options: JsonLdOptions, baseUrl: string): string
     mainEntityOfPage: { "@type": "WebPage", "@id": options.url },
   };
 
-  if (options.date) data.datePublished = new Date(options.date).toISOString();
-  data.dateModified = options.dateModified
-    ? new Date(options.dateModified).toISOString()
-    : options.date
-      ? new Date(options.date).toISOString()
-      : undefined;
+  data.datePublished = safeToISOString(options.date);
+  data.dateModified = safeToISOString(options.dateModified) || safeToISOString(options.date);
   if (options.tags && options.tags.length > 0) data.keywords = options.tags.join(", ");
 
   return wrapWithBreadcrumbs(data, options.breadcrumbs);
@@ -285,12 +289,8 @@ function buildCollectionPageJsonLd(options: JsonLdOptions, baseUrl: string): str
     data.isPartOf = { "@type": "WebSite", name: options.siteName, url: baseUrl + "/" };
   }
 
-  if (options.date) data.datePublished = new Date(options.date).toISOString();
-  data.dateModified = options.dateModified
-    ? new Date(options.dateModified).toISOString()
-    : options.date
-      ? new Date(options.date).toISOString()
-      : undefined;
+  data.datePublished = safeToISOString(options.date);
+  data.dateModified = safeToISOString(options.dateModified) || safeToISOString(options.date);
   if (options.tags && options.tags.length > 0) data.keywords = options.tags.join(", ");
 
   return wrapWithBreadcrumbs(data, options.breadcrumbs);

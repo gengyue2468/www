@@ -224,7 +224,3 @@ export async function buildPage(
     await cacheManager.updateMtime(filePath);
   }
 }
-
-export function clearCssCache(): void {
-  cssCache = null;
-}

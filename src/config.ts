@@ -58,12 +58,9 @@ const config: Config = {
     },
   },
 
-  styles: {},
-
   placeholders: {
     sidenote: "SNOTE",
     marginnote: "MNOTE",
-    fold: "FOLD",
   },
 
   analytics: {

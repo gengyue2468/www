@@ -250,8 +250,6 @@ function renderNotes(html: string, notes: Note[]): string {
     let noteHtml: string;
     if (note.type === "sidenote") {
       noteHtml = `<label for="${id}" class="margin-toggle sidenote-number" id="${markerId}"></label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="sidenote">${renderedContent}</span>`;
-    } else if (note.type === "marginnote") {
-      noteHtml = `<label for="${id}" class="margin-toggle" id="${markerId}">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
     } else {
       noteHtml = `<label for="${id}" class="margin-toggle" id="${markerId}">&#8853;</label><input type="checkbox" id="${id}" class="margin-toggle"/><span class="marginnote">${renderedContent}</span>`;
     }
@@ -421,14 +419,4 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
   const result = { frontmatter: frontmatter as FrontMatter, html };
 
   return result;
-}
-
-export function getMarkdownItInstance(): MarkdownIt {
-  return getMarkdownIt();
-}
-
-export function clearMarkdownCache(): void {
-  md = null;
-  cachedProcessors = null;
-  cachedNoteProcessors = null;
 }

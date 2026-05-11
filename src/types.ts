@@ -21,14 +21,9 @@ export interface DateConfig {
   options: Intl.DateTimeFormatOptions;
 }
 
-export interface StylesConfig {
-  [key: string]: string;
-}
-
 export interface PlaceholdersConfig {
   sidenote: string;
   marginnote: string;
-  fold: string;
 }
 
 export interface NavItem {
@@ -48,7 +43,6 @@ export interface Config {
   dirs: DirsConfig;
   routes: Record<string, string>;
   date: DateConfig;
-  styles: StylesConfig;
   placeholders: PlaceholdersConfig;
   analytics: AnalyticsConfig;
   rss: RSSConfig;

@@ -10,7 +10,7 @@ import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
 import { registerPlugin, getComposedHooks } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
 import { createCacheManager } from "./utils/cache.js";
-import { AppError, ErrorCode, errorReporter } from "./utils/errors.js";
+import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
 import type { BuildCacheManager } from "./utils/cache.js";
 import type { CollectionOutput } from "./types.js";
@@ -78,9 +78,7 @@ async function buildStaticPages(
         );
         console.log(`✓ Built ${route}`);
       } catch (err) {
-        if (AppError.isAppError(err) && err.code === ErrorCode.FILE_NOT_FOUND) {
-          console.warn(`⚠ Warning: ${filePath} not found, skipping ${route}`);
-        } else if (err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code === "ENOENT") {
+        if (isENOENT(err)) {
           console.warn(`⚠ Warning: ${filePath} not found, skipping ${route}`);
         } else {
           throw err;
@@ -204,10 +202,12 @@ async function build404Page(
       const content = await file404.text();
       await writeFileContent(dist404Path, content);
       await rm(join(config.dirs.dist, "404"), { recursive: true, force: true });
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.warn(`⚠ Failed to copy 404 page:`, (err as Error).message);
+    }
     console.log("✓ Built /404");
   } catch (err) {
-    if (err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code !== "ENOENT") {
+    if (!isENOENT(err)) {
       throw err;
     }
   }

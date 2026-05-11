@@ -288,6 +288,11 @@ async function buildPostPages(
       navHtml = navParts.join("");
     }
 
+    const headLinkParts: string[] = [];
+    if (prevPost) headLinkParts.push(`<link rel="prev" href="/${urlPrefix}/${prevPost.slug}" />`);
+    if (nextPost) headLinkParts.push(`<link rel="next" href="/${urlPrefix}/${nextPost.slug}" />`);
+    const headLinks = headLinkParts.join("\n    ");
+
     const postTagsHtml = generatePostTagsHTML(frontmatter.tags as string[], urlPrefix);
     const dateClass = formattedDate ? "" : " hidden";
     const plainText = html.replace(/<[^>]+>/g, "").replace(/\s+/g, "");
@@ -359,6 +364,7 @@ async function buildPostPages(
         { name: title, url: `${config.site.url}/${urlPrefix}/${post.slug}` },
       ],
       year,
+      headLinks,
     });
 
     output = await applyAfterHooks(hooks, "post", post.slug, output);

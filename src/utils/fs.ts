@@ -34,9 +34,7 @@ export async function copyDirectory(src: string, dest: string): Promise<void> {
   await Promise.all(
     files.map(async ({ src: srcPath, dest: destPath }) => {
       try {
-        const file = Bun.file(srcPath);
-        const content = await file.arrayBuffer();
-        await Bun.write(destPath, content);
+        await Bun.write(destPath, Bun.file(srcPath));
       } catch (err) {
         throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { src: srcPath, dest: destPath });
       }
@@ -70,9 +68,7 @@ export async function copyPublicFiles(dirs: DirsConfig): Promise<void> {
         await copyDirectory(srcPath, destPath);
       } else {
         try {
-          const file = Bun.file(srcPath);
-          const content = await file.arrayBuffer();
-          await Bun.write(destPath, content);
+          await Bun.write(destPath, Bun.file(srcPath));
         } catch (err) {
           throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { src: srcPath, dest: destPath });
         }
@@ -105,15 +101,6 @@ export async function writeFileContent(filePath: string, content: string): Promi
     await Bun.write(filePath, content);
   } catch (err) {
     throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { path: filePath });
-  }
-}
-
-export async function fileExists(filePath: string): Promise<boolean> {
-  try {
-    const file = Bun.file(filePath);
-    return await file.exists();
-  } catch {
-    return false;
   }
 }
 
