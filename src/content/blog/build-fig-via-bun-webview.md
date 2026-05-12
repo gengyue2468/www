@@ -1,5 +1,5 @@
 ---
-title: 利用 Bun 的最新内置 API Bun.Webview 搭建轻量网页抓取小玩具 Fig
+title: 利用 Bun 的最新内置 API Bun.Webview 搭建轻量网页抓取小玩具
 date: 2026-05-11
 summary: 本文介绍了如何利用 Bun 的实验性 API `Bun.Webview` 构建一个轻量级网页抓取工具 Fig，重点解决了在 Windows 下连接 Chrome 后端的问题（通过远程调试端口和手动启动浏览器），并实现了 HTML 到 Markdown 的转换、自定义 User-Agent 插件绕过微信公众号风控，最终部署为 HTTP 服务，可集成到 QQ 机器人等场景中。
 tags:
@@ -7,7 +7,7 @@ tags:
   - 技术
   - 项目
 ---
-## 前言
+### 前言
 
 [Bun](https://bun.com)在 1.3.12 版本之后内置了一个全新的 API `Bun.Webview`，可以实现一些简单的浏览器自动化，~~能够~~部分替代 [Playwright](https://playwright.dev/)的职能。哈，大好，试吃一下看看。[note: 请注意此 API 仍然处于实验状态， Bun 官方也承认 *This API is experimental and may change in future releases.*，并且存在一些神秘 Bug，建议用于测试而非生产环境。]
 
@@ -21,7 +21,7 @@ tags:
 4. 常见的安装目录
 5. Playwright 的缓存 (`~/Library/Caches/ms-playwright` or `~/.cache/ms-playwright`) for `chrome-headless-shell`
 
-## 集成 chrome 后端
+### 集成 chrome 后端
 
 但是在实际操作中，我发现无论在 Windows 下如何设置 `BUN_CHROME_PATH` ，Bun 似乎都无法正确的找到并启动 chrome 后端，即使你安装了 chrome、chromium 或者 edge。在 [Bun 的 Issue 区](https://github.com/oven-sh/bun/issues)找到了一个[类似的 Issue](https://github.com/oven-sh/bun/issues/29102)，看起来这是设计早期的缺陷，*应该*会在后续的版本中获得改进。
 
@@ -64,7 +64,7 @@ const view = new Bun.WebView({
 
 好耶，经过这一番操作，Bun 应该能顺利连上浏览器后端了。
 
-## 抓取网页与格式化
+### 抓取网页与格式化
 
 `Bun.Webview` 的 API 和 playwright 基本上类似，我们可以通过类似下面的代码完成对网页的简单抓取：
 
@@ -79,7 +79,7 @@ const html = await view.evaluate("document.documentElement.outerHTML");
 const text = await view.evaluate("document.documentElement.innerText");
 ```
 
-对于抓取到的数据，我通过一个自定义的 `parser`，利用 `cheerio` 清理一下 DOM 结构，然后用 `@mizchi/readability` 尝试把 html 转换成 Markdown 格式：
+对于抓取到的数据，我通过一个自定义的 `parser`，利用 `cheerio` 清理一下 DOM 结构去除 `script` `style` 等无意义的标签，只取出 `body` 部分，然后用 `@mizchi/readability` 尝试把 html 转换成 Markdown 格式：[note: 这样可以减少一部分 token 消耗，也就是省下了钱钱！]
 
 ```typescript
 import { extract, toMarkdown } from "@mizchi/readability";
@@ -155,9 +155,9 @@ url: https://www.gengyue.site
 ... truncated
 ```
 
-## UA 与插件系统
+### UA 与插件系统
 
-启动成功了自然要测一下常见的网站能不能爬，例如知乎、小红书、微信公众号。奇怪的是，知乎、小红书都是正常的，不幸的是，微信被风控拦了，但是我们是聪明的工人智能，可以想到伪造一点 UA 绕过限制，虽然看起来比较绿皮科技，但是确实有效。
+启动成功了自然要测一下常见的网站能不能爬：例如知乎、小红书、微信公众号。奇怪的是，知乎、小红书都是正常的，但不幸的是，微信被风控拦了，但是我们是聪明的工人智能，可以想到伪造一点 UA 绕过限制，虽然看起来比较绿皮，但是确实有效。
 
 预制了一点 UA，仅供参考：
 
@@ -175,7 +175,7 @@ export const UA_PRESETS = {
 } as const;
 ```
 
-经过实测，伪造一个 iPhone Webview 的 UA 就可以绕过微信公众号的限制！参考 `wechat.ts` 插件：
+经过实测，伪造一个 iPhone Webview 的 UA 就可以绕过微信公众号的限制！参考 `wechat.ts` 插件：[note: 微信是否歧视安卓用户🤔🤯]
 
 ```typescript
 import type { UAPlugin } from "../registry";
@@ -219,7 +219,7 @@ const matchedUA = pluginRegistry.resolve(url);
 
 好耶！爬爬
 
-## 部署
+### 部署
 
 最初写这个小玩具也是为了和 QQ 机器人结合，于是用 Bun + Hono 搭了一个简易的 HTTP 后端。部署这个 Hono 程序很简单，只需要在小鸡上 clone 仓库然后 `bun i` 然后用 `pm2` 持久化启动一下就好。
 
@@ -231,7 +231,9 @@ sudo apt install -y ca-certificates fonts-liberation fonts-noto-cjk
 sudo apt install -y chromium-browser
 ```
 
-为了让浏览器看起来更像真人，我们安装  `xvdf` 以让 chromium 以非 `headless` 模式启动！
+为了让浏览器看起来更像真人，我们安装  `xvfb` 以让 chromium 以非 `headless` 模式启动！
+
+> 注意，这样可能会让您的小鸡消耗相当多的资源，如果小鸡性能不是很强或者负载比较大，建议还是以 headless 模式启动 chrome 后端。最好不要让这个绿皮科技承载过多的并发，否则短时间的高负载极其容易导致 OOM 杀进程。
 
 为了持久化运行，我们创建一个 `systemd` 进程，编辑  `~/.config/systemd/user/chromium.service`:
 
@@ -265,9 +267,9 @@ WantedBy=default.target
 然后启动服务并设置开机自启：
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl start chrome-remote-debug.service
-sudo systemctl enable chrome-remote-debug.service
+systemctl --user daemon-reload
+systemctl --user enable chromium.service
+systemctl --user start chromium.service
 ```
 
 测试一下：
@@ -279,10 +281,6 @@ curl -X POST http://localhost:9233/read \
   -d '{"url":"https://www.gengyue.site"}'
 ```
 
-好耶，跑起来了，下面就可以接入 QQ 机器人或者任何想要接入的场景了
+好耶，跑起来了，下面就可以接入 QQ 机器人或者任何想要接入的场景了[note: 毕竟这是一个 HTTP 路由，强烈建议引入 `authMiddleware` 保护路由，防止被扫到滥用]
 
-## 后记
-
-我把它命名为 `fig`，也就是**无花果**，或者过度解读一下，可能是 "Fetch Input (And) Generate" 的意思[note: 不过确实没有这么高级]，您可以在[GitHub](https://github.com/gengyue2468/fig)上读到这个绿皮科技的完整源码，可能这个小玩具不够稳定，但是它确实是我摇摇欲坠的基建的一部分了！
-
-随着 Bun Webview API 的不断完善，这里的内容肯定会过时，我可能会跟随着更新...
+您可以在[GitHub](https://github.com/gengyue2468/fig)上读到这个绿皮科技的完整源码，可能这个小玩具不够稳定，但是它确实是我摇摇欲坠的基建的一部分了！
