@@ -32,7 +32,7 @@ export interface NavItem {
   show: boolean;
 }
 
-export interface AnalyticsConfig {
+export interface UmamiConfig {
   enabled: boolean;
   scriptUrl: string;
   websiteId: string;
@@ -44,12 +44,12 @@ export interface Config {
   routes: Record<string, string>;
   date: DateConfig;
   placeholders: PlaceholdersConfig;
-  analytics: AnalyticsConfig;
+  umami: UmamiConfig;
   rss: RSSConfig;
   sitemap: SitemapConfig;
   robots: RobotsConfig;
   llms: LlmsConfig;
-  cdn: string;
+  cdn?: string;
   nav: NavItem[];
   collections: CollectionConfig[];
 }

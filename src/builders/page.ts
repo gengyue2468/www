@@ -65,8 +65,8 @@ export async function getInlinedCss(): Promise<string> {
   ]);
 
   if (cssCache && 
-      cssCache.tufteMtime >= tufteMtime && 
-      cssCache.globalsMtime >= globalsMtime) {
+      cssCache.tufteMtime > tufteMtime && 
+      cssCache.globalsMtime > globalsMtime) {
     return cssCache.content;
   }
 
@@ -149,10 +149,12 @@ function buildPageOutput(
       dateModified: options.updated,
       tags: options.tags,
     },
-    breadcrumbs: [
-      { name: config.site.title, url: config.site.url },
-      { name: title, url: `${config.site.url}${route}` },
-    ],
+    breadcrumbs: route === "/"
+      ? [{ name: config.site.title, url: config.site.url }]
+      : [
+          { name: config.site.title, url: config.site.url },
+          { name: title, url: `${config.site.url}${route}` },
+        ],
     year: options.year,
   });
 }

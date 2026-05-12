@@ -54,12 +54,12 @@ export function renderPage(
     : undefined;
 
   let analytics = "";
-  if (config.analytics.enabled && config.analytics.scriptUrl) {
+  if (config.umami.enabled && config.umami.scriptUrl) {
     try {
-      const origin = new URL(config.analytics.scriptUrl).origin;
-      analytics = `<link rel="dns-prefetch" href="${origin}" />\n<link rel="preconnect" href="${origin}" crossorigin />\n<script defer src="${config.analytics.scriptUrl}" data-website-id="${config.analytics.websiteId}"></script>`;
+      const origin = new URL(config.umami.scriptUrl).origin;
+      analytics = `<link rel="dns-prefetch" href="${origin}" />\n<link rel="preconnect" href="${origin}" crossorigin />\n<script defer src="${config.umami.scriptUrl}" data-website-id="${config.umami.websiteId}"></script>`;
     } catch {
-      analytics = `<script defer src="${config.analytics.scriptUrl}" data-website-id="${config.analytics.websiteId}"></script>`;
+      analytics = `<script defer src="${config.umami.scriptUrl}" data-website-id="${config.umami.websiteId}"></script>`;
     }
   }
 

@@ -43,7 +43,7 @@ export class AppError extends Error {
 }
 
 export function isENOENT(err: unknown): boolean {
-  return err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code === "ENOENT";
+  return err instanceof Error && "code" in err && (err as { code?: string }).code === "ENOENT";
 }
 
 export interface ErrorReporter {

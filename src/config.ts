@@ -14,7 +14,7 @@ const config: Config = {
   },
 
   dirs: {
-    pages: "./src/content/pages",
+    pages: "./content/pages",
     public: "./public",
     dist: "./dist",
     layouts: "./layouts",
@@ -28,7 +28,7 @@ const config: Config = {
   collections: [
     {
       name: "blog",
-      srcDir: "./src/content/blog",
+      srcDir: "./content/blog",
       urlPrefix: "blog",
       tags: true,
       layouts: {
@@ -39,7 +39,7 @@ const config: Config = {
     },
     {
       name: "logbook",
-      srcDir: "./src/content/logbook",
+      srcDir: "./content/logbook",
       urlPrefix: "logbook",
       tags: false,
       layouts: {
@@ -63,7 +63,7 @@ const config: Config = {
     marginnote: "MNOTE",
   },
 
-  analytics: {
+  umami: {
     enabled: true,
     scriptUrl: "https://umami.gengyue.site/script.js",
     websiteId: "365406e1-29dc-44b9-895d-ff41a1e21ae1",
@@ -107,8 +107,6 @@ const config: Config = {
     { name: "Blog", path: "/blog", show: true },
     { name: "Logbook", path: "/logbook", show: true },
   ],
-
-  cdn: "",
 };
 
 export default config;

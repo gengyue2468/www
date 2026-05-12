@@ -50,7 +50,7 @@ export async function generateRSS(collection: CollectionOutput): Promise<void> {
   for (const post of rssItems) {
     const postUrl = `${cleanSiteUrl}/${collection.urlPrefix}/${post.slug}`;
     const description = post.summary || post.excerpt || config.site.description;
-    const date = post.date ? new Date(post.date) : new Date();
+    const date = post.date ? new Date(post.date) : new Date(0);
 
     const rendered = renderedMap.get(post.slug);
     let rawHtml = rendered?.html || "";

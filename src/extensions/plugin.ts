@@ -74,11 +74,11 @@ export function getComposedHooks(): BuildHooks {
 
   if (allHooks.length === 0) return {};
 
-  const runAll = async (hookName: keyof BuildHooks, ...args: any[]): Promise<any> => {
+  const runAll = async (hookName: "beforeBuild" | "afterBuild"): Promise<void> => {
     for (const hooks of allHooks) {
       const hook = hooks[hookName];
       if (hook) {
-        await (hook as Function)(...args);
+        await hook();
       }
     }
   };

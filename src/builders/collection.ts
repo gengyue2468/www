@@ -34,7 +34,7 @@ function capitalize(s: string): string {
 
 function getCollectionDefaults(coll: CollectionConfig) {
   return {
-    srcDir: coll.srcDir || `./src/content/${coll.name}`,
+    srcDir: coll.srcDir || `./content/${coll.name}`,
     urlPrefix: coll.urlPrefix || coll.name,
     layouts: {
       index: coll.layouts?.index || `${coll.name}-index`,
@@ -52,11 +52,13 @@ function collectAllTags(posts: Post[]): string[] {
   return allTags;
 }
 
-function sortPostsByDate<T extends { date?: string }>(posts: T[]): T[] {
+function sortPostsByDate<T extends { date?: string; slug: string }>(posts: T[]): T[] {
   return [...posts].sort((a, b) => {
     if (!a.date) return 1;
     if (!b.date) return -1;
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
+    const diff = new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (diff !== 0) return diff;
+    return a.slug.localeCompare(b.slug);
   });
 }
 
