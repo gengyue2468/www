@@ -227,6 +227,12 @@ async function build(): Promise<void> {
   const cacheManager = await createCacheManager(config.dirs);
   const hooks = getComposedHooks();
 
+  const configPath = join(import.meta.dir, "config.ts");
+  if (await cacheManager.hasConfigChanged(configPath)) {
+    console.log("  Config changed, clearing cache");
+    cacheManager.invalidateAll();
+  }
+
   const collectionLayouts = getRequiredLayouts(config.collections);
   const allLayoutNames = ["base", "page", ...collectionLayouts];
   const layoutEntries = await Promise.all(
@@ -280,6 +286,7 @@ async function build(): Promise<void> {
   await copyPublicFiles(config.dirs);
   timer.end("copy-public");
 
+  await cacheManager.updateConfigMtime(configPath);
   await cacheManager.save();
 
   if (hooks.afterBuild) {

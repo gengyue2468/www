@@ -5,10 +5,12 @@ import { readJsonFile } from "./fs.js";
 
 interface BuildCache {
   md: Record<string, number>;
+  config: number;
 }
 
 const DEFAULT_CACHE: BuildCache = {
   md: {},
+  config: 0,
 };
 
 async function getFileMtime(filePath: string): Promise<number | null> {
@@ -33,7 +35,7 @@ export class BuildCacheManager {
   async load(): Promise<void> {
     const loaded = await readJsonFile<BuildCache>(this.cachePath);
     if (loaded) {
-      this.cache = { md: loaded.md ?? {} };
+      this.cache = { md: loaded.md ?? {}, config: loaded.config ?? 0 };
     } else {
       this.cache = { ...DEFAULT_CACHE };
     }
@@ -55,10 +57,29 @@ export class BuildCacheManager {
     return mtime === null || mtime > cached;
   }
 
+  async hasConfigChanged(configPath: string): Promise<boolean> {
+    const cached = this.cache.config;
+    if (cached === 0) return true;
+    const mtime = await getFileMtime(configPath);
+    return mtime === null || mtime > cached;
+  }
+
   async updateMtime(filePath: string): Promise<void> {
     const mtime = await getFileMtime(filePath);
     if (mtime === null) return;
     this.cache.md[filePath] = mtime;
+    this.dirty = true;
+  }
+
+  async updateConfigMtime(configPath: string): Promise<void> {
+    const mtime = await getFileMtime(configPath);
+    if (mtime === null) return;
+    this.cache.config = mtime;
+    this.dirty = true;
+  }
+
+  invalidateAll(): void {
+    this.cache = { ...DEFAULT_CACHE };
     this.dirty = true;
   }
 }

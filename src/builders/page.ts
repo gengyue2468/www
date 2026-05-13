@@ -172,8 +172,12 @@ export async function buildPage(
 ): Promise<void> {
   if (cacheManager) {
     if (!(await cacheManager.hasChanged(filePath))) {
-      console.log(`  (cached) ${route}`);
-      return;
+      const outputPath = route === "/" ? join(config.dirs.dist, "index.html") : join(config.dirs.dist, route.slice(1), "index.html");
+      try {
+        await stat(outputPath);
+        console.log(`  (cached) ${route}`);
+        return;
+      } catch { /* output missing, rebuild */ }
     }
   }
 
