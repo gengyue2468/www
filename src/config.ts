@@ -23,6 +23,9 @@ const config: Config = {
   routes: {
     "/": "index.md",
     "/about": "about.md",
+    "/more": "more.md",
+    "/uses": "uses.md",
+    "/colophon": "colophon.md"
   },
 
   collections: [
@@ -105,7 +108,7 @@ const config: Config = {
     { name: "Home", path: "/", show: true },
     { name: "About", path: "/about", show: true },
     { name: "Blog", path: "/blog", show: true },
-    { name: "Logbook", path: "/logbook", show: true },
+    { name: "More+", path: "/more", show: true },
   ],
 };
 

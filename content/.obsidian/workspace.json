@@ -83,16 +83,44 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "blog/build-fig-via-bun-webview.md",
+                "file": "pages/more.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "build-fig-via-bun-webview"
+              "title": "more"
+            }
+          },
+          {
+            "id": "01db7a6caeb2c1de",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "pages/more.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "more"
+            }
+          },
+          {
+            "id": "92f22521d570ae16",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "pages/more.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "more"
             }
           }
         ],
-        "currentTab": 5
+        "currentTab": 7
       }
     ],
     "direction": "vertical"
@@ -249,8 +277,8 @@
             "state": {
               "type": "git-view",
               "state": {},
-              "icon": "git-pull-request",
-              "title": "Source Control"
+              "icon": "lucide-ghost",
+              "title": "git-view"
             }
           }
         ],
@@ -274,14 +302,18 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "1035cf98c797e794",
+  "active": "92f22521d570ae16",
   "lastOpenFiles": [
-    "logbook/werid-educoder.md",
+    "pages/index.md",
+    "pages/more.md",
+    "pages/uses.md",
+    "pages/colophon.md",
+    "pages/Colophon.md",
+    "pages/about.md",
     "blog/build-fig-via-bun-webview.md",
+    "logbook/werid-educoder.md",
     "logbook/bun-hono-server.md",
     "logbook/test.md",
-    "pages/about.md",
-    "pages/index.md",
     "about.md",
     "blog/on-darkmode.md",
     "blog/webpage-without-css-and-js.md",
@@ -300,10 +332,6 @@
     "blog/hello-world.md",
     "2025-12-12.md",
     "blog/weird-cloudflare-tunnel.md",
-    "blog/nested-inline-parser.md",
-    "blog/ssl-config.md",
-    "blog/tiptap.md",
-    "blog/walk-outside.md",
     "未命名.canvas"
   ]
 }
