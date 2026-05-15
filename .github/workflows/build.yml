@@ -17,4 +17,5 @@ jobs:
           port: ${{ secrets.VPS_PORT || 22 }}
           script: |
             cd /home/gengyue/www
-            ./scripts/deploy.sh
+            git pull
+            bun run build
