@@ -125,12 +125,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "logbook/ai-agent-and-human.md",
+                "file": "pages/index.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ai-agent-and-human"
+              "title": "index"
             }
           }
         ],
@@ -318,8 +318,8 @@
   },
   "active": "f5cb2a589e58eabe",
   "lastOpenFiles": [
-    "d614b394bf04fda224f07de37ec6ab3f_720.png",
     "logbook/ai-agent-and-human.md",
+    "d614b394bf04fda224f07de37ec6ab3f_720.png",
     "pages/more.md",
     "pages/index.md",
     "pages/uses.md",
