@@ -44,7 +44,7 @@ export async function generateRSS(collection: CollectionOutput): Promise<void> {
   });
 
   const renderedMap = new Map(
-    collection.renderedItems.map(r => [r.slug, r])
+    collection.renderedItems.map(r => [r.slug, r.html])
   );
 
   for (const post of rssItems) {
@@ -52,11 +52,7 @@ export async function generateRSS(collection: CollectionOutput): Promise<void> {
     const description = post.summary || post.excerpt || config.site.description;
     const date = post.date ? new Date(post.date) : new Date(0);
 
-    const rendered = renderedMap.get(post.slug);
-    let rawHtml = rendered?.html || "";
-    if (!rawHtml && rendered?._render) {
-      rawHtml = await rendered._render();
-    }
+    const rawHtml = renderedMap.get(post.slug);
     const content = rawHtml ? htmlForRss(rawHtml) : undefined;
 
     feed.addItem({

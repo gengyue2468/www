@@ -9,10 +9,9 @@ import { generateRobotsTxt } from "./generators/robots.js";
 import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
 import { registerPlugin, getComposedHooks } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
-import { createCacheManager } from "./utils/cache.js";
+import { clearContentCache } from "./utils/cache.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
-import type { BuildCacheManager } from "./utils/cache.js";
 import type { CollectionOutput } from "./types.js";
 import config from "./config.js";
 
@@ -58,7 +57,6 @@ async function buildStaticPages(
   pageLayout: string,
   currentYear: number,
   defaultOgImageUrl: string | undefined,
-  cacheManager: BuildCacheManager,
   hooks: ReturnType<typeof getComposedHooks>
 ): Promise<void> {
   const results = await Promise.allSettled(
@@ -74,7 +72,7 @@ async function buildStaticPages(
         await buildPage(
           route, filePath, baseLayout, pageLayout,
           currentYear, defaultOgImageUrl,
-          cacheManager, hooks
+          hooks
         );
         console.log(`✓ Built ${route}`);
       } catch (err) {
@@ -102,7 +100,6 @@ async function buildCollections(
   layoutsMap: Record<string, string>,
   currentYear: number,
   inlinedCss: string,
-  cacheManager: BuildCacheManager,
   hooks: ReturnType<typeof getComposedHooks>,
   timer: PerformanceTimer
 ): Promise<CollectionOutput[]> {
@@ -111,7 +108,7 @@ async function buildCollections(
       timer.start(`collection:${coll.name}`);
       try {
         const output = await buildCollection(
-          coll, baseLayout, layoutsMap, currentYear, inlinedCss, cacheManager, hooks
+          coll, baseLayout, layoutsMap, currentYear, inlinedCss, hooks
         );
         return output;
       } finally {
@@ -182,7 +179,6 @@ async function build404Page(
   pageLayout: string,
   currentYear: number,
   defaultOgImageUrl: string | undefined,
-  cacheManager: BuildCacheManager,
   hooks: ReturnType<typeof getComposedHooks>
 ): Promise<void> {
   const filePath404 = join(config.dirs.pages, "404.md");
@@ -191,7 +187,7 @@ async function build404Page(
     await buildPage(
       "/404", filePath404, baseLayout, pageLayout,
       currentYear, defaultOgImageUrl,
-      cacheManager, hooks,
+      hooks,
       '<meta name="robots" content="noindex, nofollow" />'
     );
 
@@ -224,14 +220,9 @@ async function build(): Promise<void> {
   timer.start("setup");
   await ensureDir(config.dirs.dist);
 
-  const cacheManager = await createCacheManager(config.dirs);
-  const hooks = getComposedHooks();
+  clearContentCache();
 
-  const configPath = join(import.meta.dir, "config.ts");
-  if (await cacheManager.hasConfigChanged(configPath)) {
-    console.log("  Config changed, clearing cache");
-    cacheManager.invalidateAll();
-  }
+  const hooks = getComposedHooks();
 
   const collectionLayouts = getRequiredLayouts(config.collections);
   const allLayoutNames = ["base", "page", ...collectionLayouts];
@@ -259,12 +250,12 @@ async function build(): Promise<void> {
   }
 
   timer.start("static-pages");
-  await buildStaticPages(config.routes, baseLayout, pageLayout, currentYear, defaultOgImageUrl, cacheManager, hooks);
+  await buildStaticPages(config.routes, baseLayout, pageLayout, currentYear, defaultOgImageUrl, hooks);
   timer.end("static-pages");
 
   timer.start("collections");
   const allCollectionOutputs = await buildCollections(
-    config.collections, baseLayout, layoutsMap, currentYear, inlinedCss, cacheManager, hooks, timer
+    config.collections, baseLayout, layoutsMap, currentYear, inlinedCss, hooks, timer
   );
   timer.end("collections");
 
@@ -279,15 +270,12 @@ async function build(): Promise<void> {
   timer.end("llms");
 
   timer.start("404-page");
-  await build404Page(baseLayout, pageLayout, currentYear, defaultOgImageUrl, cacheManager, hooks);
+  await build404Page(baseLayout, pageLayout, currentYear, defaultOgImageUrl, hooks);
   timer.end("404-page");
 
   timer.start("copy-public");
   await copyPublicFiles(config.dirs);
   timer.end("copy-public");
-
-  await cacheManager.updateConfigMtime(configPath);
-  await cacheManager.save();
 
   if (hooks.afterBuild) {
     await hooks.afterBuild();

@@ -6,6 +6,7 @@ import config from "../config.js";
 import { getMarkdownProcessors, getNoteProcessors } from "../extensions/plugin.js";
 import type { NoteProcessor } from "../extensions/plugin.js";
 import { AppError, ErrorCode } from "./errors.js";
+import { getCachedRender, setCachedRender } from "./cache.js";
 
 let md: MarkdownIt | null = null;
 let cachedProcessors: ReturnType<typeof getMarkdownProcessors> | null = null;
@@ -354,6 +355,11 @@ function addLinkOptimization(html: string): string {
 }
 
 export async function renderMarkdown(filePath: string): Promise<RenderedContent> {
+  const cached = await getCachedRender(filePath);
+  if (cached) {
+    return cached;
+  }
+
   let content: string;
   try {
     const file = Bun.file(filePath);
@@ -417,6 +423,8 @@ export async function renderMarkdown(filePath: string): Promise<RenderedContent>
   html = addLinkOptimization(html);
 
   const result = { frontmatter: frontmatter as FrontMatter, html };
+
+  await setCachedRender(filePath, result);
 
   return result;
 }

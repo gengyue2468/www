@@ -1,16 +1,14 @@
 import { join, dirname, extname, basename } from "path";
 import { readdir } from "fs/promises";
-import { ensureDir, writeFileContent, readFileContent } from "../utils/fs.js";
+import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import type { BuildHooks } from "../extensions/plugin.js";
-import type { BuildCacheManager } from "../utils/cache.js";
 import { buildMetaDescription, generateKeywords } from "../utils/seo.js";
 import { AppError, ErrorCode, isENOENT, errorReporter } from "../utils/errors.js";
-import matter from "gray-matter";
 import config from "../config.js";
 import type { CollectionConfig, CollectionOutput, Post } from "../types.js";
 
@@ -18,7 +16,6 @@ interface PostWithContent extends Post {
   html: string;
   filePath: string;
   frontmatter: Record<string, unknown>;
-  changed: boolean;
 }
 
 function getTagSlug(tag: string): string {
@@ -129,8 +126,7 @@ function generatePostsListHTML(posts: Post[], urlPrefix: string): string {
 }
 
 async function loadPostsFromDir(
-  srcDir: string,
-  cacheManager?: BuildCacheManager
+  srcDir: string
 ): Promise<PostWithContent[]> {
   const posts: PostWithContent[] = [];
 
@@ -149,32 +145,7 @@ async function loadPostsFromDir(
 
   const postPromises = mdFiles.map(async (file) => {
     const filePath = join(srcDir, file);
-
-    let changed = true;
-    if (cacheManager) {
-      changed = await cacheManager.hasChanged(filePath);
-    }
-
     const slug = basename(file, ".md");
-
-    if (!changed) {
-      const raw = await readFileContent(filePath);
-      const { data: frontmatter } = matter(raw);
-      return {
-        slug,
-        title: (frontmatter.title as string) || slug,
-        date: (frontmatter.date as string) || "",
-        updated: (frontmatter.updated as string) || "",
-        excerpt: (frontmatter.excerpt as string) || "",
-        summary: (frontmatter.summary as string) || "",
-        tags: (frontmatter.tags as string[]) || [],
-        html: "",
-        filePath,
-        frontmatter,
-        changed,
-      };
-    }
-
     const { frontmatter, html } = await renderMarkdown(filePath);
 
     return {
@@ -188,7 +159,6 @@ async function loadPostsFromDir(
       html,
       filePath,
       frontmatter,
-      changed,
     };
   });
 
@@ -261,15 +231,9 @@ async function buildPostPages(
   postLayout: string,
   css: string,
   year?: number,
-  cacheManager?: BuildCacheManager,
   hooks?: BuildHooks
 ): Promise<void> {
   const buildPromises = posts.map(async (post, i) => {
-    if (cacheManager && !post.changed) {
-      console.log(`  (cached) /${urlPrefix}/${post.slug}`);
-      return;
-    }
-
     let { html, frontmatter } = post;
     const title = (frontmatter.title as string) || post.slug;
 
@@ -375,10 +339,6 @@ async function buildPostPages(
     await ensureDir(dirname(outputPath));
     await writeFileContent(outputPath, output);
 
-    if (cacheManager) {
-      await cacheManager.updateMtime(post.filePath);
-    }
-
     console.log(`✓ Built /${urlPrefix}/${post.slug}`);
   });
 
@@ -421,7 +381,6 @@ async function buildTagPages(
 
   if (tagMap.size === 0) return;
 
-  const anyPostChanged = posts.some(p => p.changed);
   const allTagsGlobal = collectAllTags(posts);
 
   const tagPromises: Promise<void>[] = [];
@@ -429,11 +388,6 @@ async function buildTagPages(
   for (const [tag, taggedPosts] of tagMap) {
     tagPromises.push((async () => {
       const slug = getTagSlug(tag);
-
-      if (!anyPostChanged && !taggedPosts.some(p => p.changed)) {
-        console.log(`  (cached) /${urlPrefix}/tag/${slug}`);
-        return;
-      }
 
       const sortedPosts = sortPostsByDate(taggedPosts);
 
@@ -494,11 +448,6 @@ async function buildTagPages(
   }
 
   await Promise.all(tagPromises);
-
-  if (!anyPostChanged) {
-    console.log(`  (cached) /${urlPrefix}/tag`);
-    return;
-  }
 
   if (allTagsGlobal.length === 0) return;
 
@@ -561,7 +510,6 @@ export async function buildCollection(
   layoutsMap: Record<string, string>,
   year?: number,
   css?: string,
-  cacheManager?: BuildCacheManager,
   hooks?: BuildHooks
 ): Promise<CollectionOutput> {
   const defaults = getCollectionDefaults(coll);
@@ -570,7 +518,7 @@ export async function buildCollection(
   const postLayout = layoutsMap[defaults.layouts.post];
   const tagsLayout = layoutsMap[defaults.layouts.tags];
 
-  const posts = await loadPostsFromDir(srcDir, cacheManager);
+  const posts = await loadPostsFromDir(srcDir);
 
   if (indexLayout) {
     const output = buildCollectionIndex(posts, coll, urlPrefix, baseLayout, indexLayout, css || "", year);
@@ -581,7 +529,7 @@ export async function buildCollection(
   }
 
   if (postLayout) {
-    await buildPostPages(posts, coll, urlPrefix, baseLayout, postLayout, css || "", year, cacheManager, hooks);
+    await buildPostPages(posts, coll, urlPrefix, baseLayout, postLayout, css || "", year, hooks);
   }
 
   if (coll.tags && tagsLayout) {
@@ -604,10 +552,6 @@ export async function buildCollection(
     renderedItems: posts.map(p => ({
       slug: p.slug,
       html: p.html,
-      _render: p.changed ? undefined : async () => {
-        const { html } = await renderMarkdown(p.filePath);
-        return html;
-      },
     })),
   };
 }

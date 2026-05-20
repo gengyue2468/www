@@ -6,7 +6,6 @@ import { renderTemplate } from "../utils/template.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import type { BuildHooks } from "../extensions/plugin.js";
-import type { BuildCacheManager } from "../utils/cache.js";
 import type { FrontMatter } from "../types.js";
 import { buildMetaDescription, generateKeywords } from "../utils/seo.js";
 import { errorReporter } from "../utils/errors.js";
@@ -166,21 +165,9 @@ export async function buildPage(
   contentLayout: string,
   year?: number,
   ogImageUrl?: string,
-  cacheManager?: BuildCacheManager,
   hooks?: BuildHooks,
   robotsMeta?: string
 ): Promise<void> {
-  if (cacheManager) {
-    if (!(await cacheManager.hasChanged(filePath))) {
-      const outputPath = route === "/" ? join(config.dirs.dist, "index.html") : join(config.dirs.dist, route.slice(1), "index.html");
-      try {
-        await stat(outputPath);
-        console.log(`  (cached) ${route}`);
-        return;
-      } catch { /* output missing, rebuild */ }
-    }
-  }
-
   let { frontmatter, html } = await renderMarkdown(filePath);
   const title = frontmatter.title || "Untitled";
 
@@ -225,8 +212,4 @@ export async function buildPage(
   }
 
   await writeFileContent(outputPath, output);
-
-  if (cacheManager) {
-    await cacheManager.updateMtime(filePath);
-  }
 }
