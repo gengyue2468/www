@@ -3,7 +3,7 @@ title: Hi 👋!
 description: 欢迎来到 gengyue 的个人网站，这里记录技术探索、项目实践与生活思考。博客涵盖编程开发、开源项目经验与总结，也分享一些有趣的技术实践与学习心得。欢迎浏览文章，了解成长轨迹与实践积累。
 ---
 
-此地属于 gengyue。目前这个页面应该是被扔到 [Netcup](https://www.netcup.com/en?ref=366353) 的一台 VPS [^ VPS Lite 2 G12s, 4 vCore (x86), 8 GB RAM, 160 GB SSD, Nürnberg, BY, DE <br /> <br /> <iframe src="https://www.gengyue.site/tty/" sandbox="allow-scripts allow-same-origin" style="width: 100%; height: 240px;"></iframe> <br />] 上了，利用 [Cloudflare](https://cloudflare.com/) 回源。
+此地属于 gengyue。目前这个页面应该是被扔到 [Netcup](https://www.netcup.com/en?ref=366353) 的一台 VPS [^ [VPS 500 G12](https://www.netcup.com/en/server/vps/vps-500-g12-iv-12m#vps-500-g12-iv-12m-mnz), 2 vCore (EPYC x86), 4 GB DDR5 ECC RAM, 128 GB NVME SSD, Manassas, USA <br /> <br /> <iframe src="https://www.gengyue.site/tty/" sandbox="allow-scripts allow-same-origin" style="width: 100%; height: 240px;"></iframe> <br />] 上了，利用 [Cloudflare](https://cloudflare.com/) 回源。
 
 您可以通过阅读 [About](/about), [Blog](/blog) 和 [Logbook](/logbook) 页面了解更多信息，下面的链接亦可：
 
