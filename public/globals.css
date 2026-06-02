@@ -90,14 +90,94 @@ nav {
   padding-top: 2rem;
 }
 
-nav a {
+nav a,
+nav .nav-menu-label {
   margin-right: 1rem;
   text-decoration: none;
   padding: 0.2rem 0.5rem;
   font-size: 1.4rem;
+  cursor: pointer;
 }
 
-nav a:hover {
+nav a:hover,
+nav .nav-menu-label:hover {
+  background-color: var(--accent) !important;
+}
+
+.nav-dropdown-wrapper {
+  position: relative;
+  display: inline;
+}
+
+.nav-menu-checkbox {
+  display: none;
+}
+
+.nav-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+}
+
+.nav-menu-checkbox:checked ~ .nav-menu-overlay {
+  display: block;
+}
+
+.nav-menu-label {
+  display: inline;
+  position: relative;
+  z-index: 100;
+  user-select: none;
+}
+
+.nav-menu-label.active {
+  font-weight: bold;
+}
+
+.nav-menu-checkbox:checked ~ .nav-menu-label {
+  background-color: var(--accent);
+}
+
+.nav-menu-checkbox:checked ~ .nav-dropdown-menu {
+  display: block;
+}
+
+nav .nav-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem 0;
+  min-width: 140px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 0.3rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  nav .nav-dropdown-menu {
+    background: var(--bg-color-dark);
+    border-color: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+nav .nav-dropdown-menu a {
+  display: block;
+  margin-right: 0;
+  padding: 0.4rem 1rem;
+  font-size: 1.3rem;
+  white-space: nowrap;
+}
+
+nav .nav-dropdown-menu a:hover {
   background-color: var(--accent) !important;
 }
 
@@ -232,6 +312,7 @@ th {
 
 nav,
 nav a,
+nav summary,
 nav p {
   text-indent: 0;
   letter-spacing: 0.01em;
@@ -526,9 +607,28 @@ pre > code {
     width: 100% !important;
   }
 
+  details.nav-dropdown {
+    width: auto !important;
+  }
+
+  .nav-dropdown-menu {
+    left: 0 !important;
+    right: auto !important;
+  }
+
   /* Keep nav unchanged */
-  nav a {
+  nav a,
+  nav .nav-menu-label {
     font-size: 1.2rem;
+  }
+
+  nav .nav-dropdown-menu {
+    left: 0;
+    min-width: 120px;
+  }
+
+  nav .nav-dropdown-menu a {
+    font-size: 1.1rem;
   }
 
   /* Fullwidth content truly full-width on mobile */

@@ -167,10 +167,20 @@ blockquote footer {
 }
 
 section > p,
-section > footer,
-section > table {
+section > footer {
   width: var(--width-content);
   overflow-wrap: break-word;
+}
+
+section > table {
+  width: var(--width-content);
+  display: block;
+  overflow-x: auto;
+}
+
+section > table td,
+section > table th {
+  white-space: nowrap;
 }
 
 /* 50 + 5 == 55, to be the same width as paragraph */

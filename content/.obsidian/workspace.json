@@ -153,12 +153,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "pages/index.md",
+                "file": "pages/uses.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "index"
+              "title": "uses"
             }
           }
         ],
@@ -346,16 +346,16 @@
   },
   "active": "af323ba9f6625aa3",
   "lastOpenFiles": [
+    "pages/more.md",
+    "pages/uses.md",
+    "pages/index.md",
     "logbook/bingyan-k8s-deployment.md",
     "logbook/ddg-search-mcp.md",
     "Pasted image 20260519231024.png",
     "Pasted image 20260519231016.png",
     "Pasted image 20260519231000.png",
-    "pages/index.md",
     "logbook/ai-agent-and-human.md",
     "d614b394bf04fda224f07de37ec6ab3f_720.png",
-    "pages/more.md",
-    "pages/uses.md",
     "pages/colophon.md",
     "pages/Colophon.md",
     "pages/about.md",

@@ -108,7 +108,17 @@ const config: Config = {
     { name: "Home", path: "/", show: true },
     { name: "About", path: "/about", show: true },
     { name: "Blog", path: "/blog", show: true },
-    { name: "More+", path: "/more", show: true },
+    {
+      name: "More",
+      path: "/more",
+      show: true,
+      children: [
+        { name: "Logbook", path: "/logbook", show: true }, 
+        { name: "Colophon", path: "/colophon", show: true },
+        { name: "Uses", path: "/uses", show: true },
+       
+      ],
+    },
   ],
 };
 

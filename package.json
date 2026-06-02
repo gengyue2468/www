@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "bun run src/index.ts",
-    "dev": "bun run src/index.ts && bunx serve dist",
+    "dev": "bun run src/dev.ts",
     "serve": "bunx serve dist",
     "deploy": "bash scripts/deploy.sh",
     "build-only": "bash scripts/build.sh",

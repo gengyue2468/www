@@ -60,10 +60,34 @@ export function renderNav(navItems: NavItem[], currentPath?: string): string {
           isCurrent = true;
         }
       }
-      const ariaCurrent = isCurrent ? ' aria-current="page"' : "";
-      const safePath = escapeHtmlAttr(item.path);
-      const safeName = escapeHtmlText(item.name);
-      parts.push(`<a href="${safePath}"${ariaCurrent}>${safeName}</a>`);
+
+      if (item.children && item.children.length > 0) {
+        const hasActiveChild = item.children.some((child) => {
+          if (!currentPath) return false;
+          if (child.path === currentPath) return true;
+          if (child.path !== "/" && currentPath.startsWith(child.path + "/")) return true;
+          return false;
+        });
+        const summaryClass = hasActiveChild ? " active" : "";
+        const links: string[] = [];
+        for (const child of item.children) {
+          if (!child.show) continue;
+          const childIsCurrent = currentPath && (child.path === currentPath || (child.path !== "/" && currentPath.startsWith(child.path + "/")));
+          const ariaCurrent = childIsCurrent ? ' aria-current="page"' : "";
+          const safePath = escapeHtmlAttr(child.path);
+          const safeName = escapeHtmlText(child.name);
+          const target = child.external ? ' target="_blank" rel="noopener"' : "";
+          links.push(`<a href="${safePath}"${target}${ariaCurrent}>${safeName}</a>`);
+        }
+        parts.push(
+          `<span class="nav-dropdown-wrapper"><input type="checkbox" id="nav-menu-checkbox" class="nav-menu-checkbox" aria-hidden="true"><label class="nav-menu-overlay" for="nav-menu-checkbox" aria-hidden="true"></label><label class="nav-menu-label${summaryClass}" for="nav-menu-checkbox">${escapeHtmlText(item.name)}</label><div class="nav-dropdown-menu">${links.join("")}</div></span>`
+        );
+      } else {
+        const ariaCurrent = isCurrent ? ' aria-current="page"' : "";
+        const safePath = escapeHtmlAttr(item.path);
+        const safeName = escapeHtmlText(item.name);
+        parts.push(`<a href="${safePath}"${ariaCurrent}>${safeName}</a>`);
+      }
     }
   }
   return parts.join("\n      ");

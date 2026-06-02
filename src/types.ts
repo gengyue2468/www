@@ -30,6 +30,8 @@ export interface NavItem {
   name: string;
   path: string;
   show: boolean;
+  external?: boolean;
+  children?: Omit<NavItem, 'children'>[];
 }
 
 export interface UmamiConfig {
