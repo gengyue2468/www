@@ -45,6 +45,6 @@ description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方
 - [我的 Blog](/blog) - 一些可能比较正式的文章，早期可能混杂了一点生活记录
 - [我的 Logbook](/logbook) - 一些可能比较随意的记录，可能是一些技术实践的流水账，也可能是一些生活记录
 - 我的 GitHub: [@gengyue2468](https://github.com/gengyue2468)
-- 我的 Memos: https://memos.gengyue.site
+- 我的 Memos: https://memos.gy.run
 
-欢迎找我聊天，我的 Email 是 [hi@gengyue.site](mailto:hi@gengyue.site)
+欢迎找我聊天，我的 Email 是 [hi [at] gengyue.dev](mailto:hi@gengyue.dev)
