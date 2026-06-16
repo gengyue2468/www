@@ -21,3 +21,5 @@ description: 我目前使用的设备、VPS 和工具列表——由工人智能
 | Oracle Cloud SGP  |   VPS   |                 4 ARM vCore + 24 GB RAM + 100GB SSD | 2026-06     |
 
 :::
+
+我的小鸡监控： https://st.gy.run

@@ -25,7 +25,7 @@ const config: Config = {
     "/about": "about.md",
     "/more": "more.md",
     "/uses": "uses.md",
-    "/colophon": "colophon.md"
+    "/colophon": "colophon.md",
   },
 
   collections: [
@@ -113,10 +113,10 @@ const config: Config = {
       path: "/more",
       show: true,
       children: [
-        { name: "Logbook", path: "/logbook", show: true }, 
+        { name: "Logbook", path: "/logbook", show: true },
         { name: "Colophon", path: "/colophon", show: true },
         { name: "Uses", path: "/uses", show: true },
-       
+        { name: "Servers", path: "https://st.gy.run", show: true },
       ],
     },
   ],

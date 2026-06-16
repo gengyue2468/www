@@ -361,10 +361,10 @@
   "active": "f31f7443a835ad78",
   "lastOpenFiles": [
     "pages/index.md",
-    "pages/colophon.md",
     "blog/oracle-free-plan.md",
-    "blog/mother-fuck.md",
     "pages/uses.md",
+    "pages/colophon.md",
+    "blog/mother-fuck.md",
     "pages/about.md",
     "pages/404.md",
     "blog/build-fig-via-bun-webview.md",
