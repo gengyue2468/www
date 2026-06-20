@@ -16,7 +16,7 @@ description: 我目前使用的设备、VPS 和工具列表——由工人智能
 | Tencent Cloud CAN |   VPS   |                2 AMD EPYC Core + 2GB RAM + 50GB SSD | 2025-12     |
 | Racknerd LA       |   VPS   |       2 AMD 7950X Core + 2.5 GB RAM + 38GB NVME SSD | 2026-03     |
 | ~~Netcup DE~~     | ~~VPS~~ |       ~~4 AMD Core (QEMU) + 8 GB RAM + 160 GB SSD~~ | ~~2026-05~~ |
-| Netcup MNZ        |   VPS   | 2 AMD EPYC Core + 4GB DDR5 ECC RAM + 128GB NVME SSD | 2026-05     |
+| Netcup MNZ        |   VPS   | 4 AMD EPYC Core + 8GB DDR5 ECC RAM + 256GB NVME SSD | 2026-06     |
 | Alibaba Cloud SEL |   VPS   |               2 Intel vCore + 512 MB RAM + 30GB SSD | 2026-06     |
 | Oracle Cloud SGP  |   VPS   |                 4 ARM vCore + 24 GB RAM + 100GB SSD | 2026-06     |
 

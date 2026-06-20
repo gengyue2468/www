@@ -9,6 +9,7 @@ import { generateRobotsTxt } from "./generators/robots.js";
 import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
 import { registerPlugin, getComposedHooks } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
+import { nodeseekPlugin } from "./extensions/nodeseek.js";
 import { clearContentCache } from "./utils/cache.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
@@ -16,6 +17,7 @@ import type { CollectionOutput } from "./types.js";
 import config from "./config.js";
 
 registerPlugin(mermaidPlugin);
+registerPlugin(nodeseekPlugin);
 
 class PerformanceTimer {
   private times = new Map<string, number>();

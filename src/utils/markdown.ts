@@ -3,7 +3,7 @@ import container from "markdown-it-container";
 import matter from "gray-matter";
 import type { Note, RenderedContent, FrontMatter } from "../types.js";
 import config from "../config.js";
-import { getMarkdownProcessors, getNoteProcessors } from "../extensions/plugin.js";
+import { getMarkdownProcessors, getNoteProcessors, getContainers } from "../extensions/plugin.js";
 import type { NoteProcessor } from "../extensions/plugin.js";
 import { AppError, ErrorCode } from "./errors.js";
 import { getCachedRender, setCachedRender } from "./cache.js";
@@ -59,6 +59,13 @@ function getMarkdownIt(): MarkdownIt {
       return "</div>\n";
     },
   });
+
+  for (const c of getContainers()) {
+    md.use(container, c.type, {
+      validate: c.validate,
+      render: c.render,
+    });
+  }
 
   return md;
 }

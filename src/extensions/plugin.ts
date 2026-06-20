@@ -24,10 +24,17 @@ export interface BuildHooks {
   afterRenderPost?: (slug: string, html: string) => Promise<string> | string;
 }
 
+export interface ContainerConfig {
+  type: string;
+  validate?: (params: string) => RegExpMatchArray | null;
+  render: (tokens: any[], idx: number) => string;
+}
+
 export interface Plugin {
   name: string;
   markdownProcessors?: MarkdownProcessor[];
   noteProcessors?: NoteProcessor[];
+  containers?: ContainerConfig[];
   hooks?: BuildHooks;
 }
 
@@ -52,6 +59,10 @@ export function getMarkdownProcessors(): MarkdownProcessor[] {
 
 export function getNoteProcessors(): NoteProcessor[] {
   return plugins.flatMap(p => p.noteProcessors || []);
+}
+
+export function getContainers(): ContainerConfig[] {
+  return plugins.flatMap(p => p.containers || []);
 }
 
 type HookFn<A, R> = (arg: A) => R | Promise<R>;

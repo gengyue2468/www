@@ -109,4 +109,6 @@ gengyue@changi:~$ fastfetch
 
 :::
 
+[可供参考的 NodeQuality 留档](/logbook/oracle-sgp-nodequality)
+
 嘻嘻，希望大家都能开到龟壳的免费小鸡。不过要注意保活哦。[note: 相比免费号，据说按量付费保活的要求大大降低，不知真假，希望不要被封号]

@@ -181,6 +181,86 @@ nav .nav-dropdown-menu a:hover {
   background-color: var(--accent) !important;
 }
 
+/* Tabs (nodeseek) */
+.tabs {
+  display: flex;
+  flex-direction: column;
+  margin: 1.4rem 0;
+}
+
+.tab-list {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 0;
+  margin-bottom: 0.5rem;
+}
+
+.tab-list > input[type="radio"] {
+  display: none;
+}
+
+.tab-list > label {
+  flex-shrink: 0;
+  cursor: pointer;
+  padding: 0.4rem 1rem;
+  font-size: 1.25rem;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.tab-list > input:checked + label {
+  font-weight: bold;
+  background-color: var(--accent);
+}
+
+.tabs > .tab-content {
+  display: none;
+}
+
+.tabs:has(.tab-list > input:nth-of-type(1):checked) > .tab-content:nth-child(2),
+.tabs:has(.tab-list > input:nth-of-type(2):checked) > .tab-content:nth-child(3),
+.tabs:has(.tab-list > input:nth-of-type(3):checked) > .tab-content:nth-child(4),
+.tabs:has(.tab-list > input:nth-of-type(4):checked) > .tab-content:nth-child(5),
+.tabs:has(.tab-list > input:nth-of-type(5):checked) > .tab-content:nth-child(6) {
+  display: block;
+}
+
+.tabs > .tab-content pre {
+  margin-top: 0;
+}
+
+/* ANSI code blocks */
+.ansi-block {
+  overflow-x: auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  border-radius: 4px;
+  padding: 1rem;
+  background-color: #1a1a1a !important;
+  color: #ccc;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ansi-block {
+    background-color: #111 !important;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .ansi-block {
+    background-color: #f5f5f5 !important;
+    color: #333;
+  }
+}
+
+@media (max-width: 760px) {
+  .tabs > label {
+    font-size: 1.1rem;
+    padding: 0.4rem 0.7rem;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --accent: oklch(26.9% 0 0);
