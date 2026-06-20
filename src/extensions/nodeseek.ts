@@ -197,7 +197,14 @@ function renderTabContent(content: string): string {
       return `<pre class="ansi-block"><code>${parseAnsiToHtml(code)}</code></pre>`;
     }
   );
-  if (hasAnsi) return rendered;
+  if (hasAnsi) {
+    // Replace blank lines inside <pre> with <br> to prevent
+    // markdown-it from ending the HTML block on empty lines
+    return rendered.replace(/<pre class="ansi-block"><code>([\s\S]*?)<\/code><\/pre>/g, (_, inner) => {
+      const fixed = inner.replace(/\n\n+/g, "\n<br>\n");
+      return `<pre class="ansi-block"><code>${fixed}</code></pre>`;
+    });
+  }
   return md.render(rendered);
 }
 
