@@ -19,7 +19,7 @@ description: 这个网站是如何构建的——技术栈、字体、部署等�
         Language   ::  TypeScript 
         Markdown   ::  markdown-it + Custom Syntax
         CSS        ::  Tufte CSS (Content-first minimalism)
-        Hosting    ::  Netcup VM + Caddy Proxy
+        Hosting    ::  Netcup VM
         Fonts      ::  ET Book + Source Han Serif VF
         Analytics  ::  Umami (Self-hosted)
         Updated    ::  2026/06/19

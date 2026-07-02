@@ -257,8 +257,7 @@
               "title": "书签"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -387,14 +386,16 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "b7768facb56829d3",
+  "active": "28c26fbf6a4be1c2",
   "lastOpenFiles": [
-    "blog/oracle-free-plan.md",
+    "pages/Colophon.md",
     "pages/index.md",
-    "logbook/aliyun-kr.md",
-    "logbook/oracle-sgp-nodequality.md",
-    "pages/colophon.md",
     "pages/uses.md",
+    "logbook/azure-student.md",
+    "logbook/oracle-sgp-nodequality.md",
+    "blog/oracle-free-plan.md",
+    "logbook/aliyun-kr.md",
+    "pages/colophon.md",
     "blog/mother-fuck.md",
     "pages/about.md",
     "pages/404.md",
@@ -419,8 +420,6 @@
     "pages/shitposts.md",
     "blog/tailscale.md",
     "pages/now.md",
-    "blog/memos.md",
-    "blog/ink-tui.md",
     "未命名.canvas"
   ]
 }
