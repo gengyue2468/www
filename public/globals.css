@@ -587,6 +587,10 @@ pre > code {
   margin: 0;
 }
 
+ul {
+  list-style-type: square;
+}
+
 .notes-list li {
   margin-bottom: 0.25rem;
 }
