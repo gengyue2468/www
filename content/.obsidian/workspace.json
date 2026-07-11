@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "logbook/alpine-rc-service-with-nginx.md",
+                "file": "pages/colophon.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "alpine-rc-service-with-nginx"
+              "title": "colophon"
             }
           }
         ]
@@ -205,17 +205,16 @@
   },
   "active": "6516b031f650a07e",
   "lastOpenFiles": [
+    "pages/index.md",
+    "pages/colophon.md",
     "logbook/alpine-rc-service-with-nginx.md",
     "blog/cheap-vps-line-into-fast-asia-entry.md",
     "logbook/azure-student-jp-east.md",
     "logbook/azure-student.md",
-    "pages/index.md",
     "logbook/oracle-sgp-nodequality.md",
-    "pages/Colophon.md",
     "pages/uses.md",
     "blog/oracle-free-plan.md",
     "logbook/aliyun-kr.md",
-    "pages/colophon.md",
     "blog/mother-fuck.md",
     "pages/about.md",
     "pages/404.md",
