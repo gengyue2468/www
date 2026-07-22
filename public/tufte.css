@@ -1,6 +1,5 @@
 @charset "UTF-8";
 
-/* Tufte CSS styles */
 html {
   font-size: var(--font-base-size);
 }
@@ -19,7 +18,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Italic elements */
 h2,
 h3,
 blockquote,
@@ -35,7 +33,6 @@ div.epigraph > blockquote > footer > cite {
   color: var(--text-color);
 }
 
-/* Adds dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
@@ -127,7 +124,6 @@ p {
   vertical-align: baseline;
 }
 
-/* Chapter Epigraphs */
 div.epigraph {
   margin: var(--spacing-epigraph) 0;
 }
@@ -149,7 +145,6 @@ div.epigraph > blockquote > footer {
 div.epigraph > blockquote > footer > cite {
   font-style: oblique 6deg;
 }
-/* end chapter epigraphs styles */
 
 blockquote {
   font-size: var(--font-size-body);
@@ -183,7 +178,6 @@ section > table th {
   white-space: nowrap;
 }
 
-/* 50 + 5 == 55, to be the same width as paragraph */
 section > dl,
 section > ol,
 section > ul {
@@ -231,12 +225,11 @@ a:visited {
   text-decoration-thickness: var(--text-decoration-thickness);
 }
 
-/* Sidenotes, margin notes, figures, captions */
 img {
   max-width: 100%;
 }
 
-/* Post navigation - Desktop: like header nav, Mobile: justify-between */
+/* Post nav */
 .post-nav {
   margin-top: 3rem;
   font-size: 1.45rem;
@@ -253,7 +246,6 @@ img {
   margin-right: 0;
 }
 
-/* Mobile: prev left, next right with justify-between */
 @media (max-width: 760px) {
   .post-nav {
     display: flex;
@@ -270,7 +262,7 @@ img {
     margin-right: auto;
   }
 
-  /* When links wrap: keep the first on the left and the second on the right */
+  /* When links wrap */
   .post-nav a:last-child:not(:first-child) {
     margin-left: auto;
   }
@@ -291,15 +283,12 @@ img {
   display: block;
 }
 
-/* Ensure marginnote displays correctly on desktop */
 @media (min-width: 761px) {
   section {
     position: relative;
     overflow: visible;
   }
 
-  /* For standalone marginnotes (direct children of section), don't clear */
-  /* This allows them to float next to their adjacent content */
   section > label.margin-toggle ~ .marginnote,
   section > label.margin-toggle ~ .sidenote {
     clear: none;
@@ -325,7 +314,6 @@ img {
   overflow: hidden;
 }
 
-/* Ensure figures inside sidenotes/marginnotes don't float - override default figure/figcaption styles */
 .sidenote figure,
 .marginnote figure {
   float: none !important;
@@ -417,7 +405,7 @@ pre > code {
   font-family: var(--font-mono);
   font-size: var(--font-size-code);
   line-height: var(--line-height-code);
-  -webkit-text-size-adjust: 100%; /* Prevent adjustments of font size after orientation changes in iOS. See https://github.com/edwardtufte/tufte-css/issues/81#issuecomment-261953409 */
+  -webkit-text-size-adjust: 100%;
 }
 
 .sans > code {
@@ -463,7 +451,7 @@ input.margin-toggle {
 
 label.sidenote-number {
   display: inline-block;
-  max-height: 2rem; /* should be less than or equal to paragraph line-height */
+  max-height: 2rem;
 }
 
 label.margin-toggle:not(.sidenote-number) {
@@ -472,7 +460,7 @@ label.margin-toggle:not(.sidenote-number) {
 
 .iframe-wrapper {
   position: relative;
-  padding-bottom: var(--iframe-padding-bottom); /* 16:9 */
+  padding-bottom: var(--iframe-padding-bottom);
   padding-top: var(--iframe-padding-top);
   height: 0;
 }
@@ -585,7 +573,7 @@ label.margin-toggle:not(.sidenote-number) {
   }
 }
 
-/* Fold blocks (details/summary) */
+/* Fold blocks */
 details {
   margin: 1.4rem 0;
   width: var(--width-content);
@@ -622,7 +610,7 @@ details > *:not(summary) {
   margin-top: 0.5rem;
 }
 
-/* Tags system - Consistent with body text links */
+/* Tags */
 .tags-list,
 .post-tags,
 .tags-cloud {
@@ -648,20 +636,17 @@ details > *:not(summary) {
   margin-right: 0;
 }
 
-/* Tag count styling */
 .tag-count {
   font-style: normal;
   font-size: 0.9em;
   opacity: 0.7;
 }
 
-/* Tag cloud specific */
 .tags-cloud {
   margin: 2rem 0;
   line-height: 2.2;
 }
 
-/* Tag size classes based on count (relative to body text) */
 .tag-size-1 {
   font-size: calc(var(--font-size-body) * 0.9);
 }
@@ -674,7 +659,7 @@ details > *:not(summary) {
   font-size: calc(var(--font-size-body) * 1.3);
 }
 
-/* Fullwidth content container - breaks out of sidenote width constraints */
+/* Fullwidth content */
 .fullwidth-content {
   width: 100%;
   max-width: var(--width-fullwidth);
@@ -696,7 +681,7 @@ details > *:not(summary) {
   width: 100%;
 }
 
-/* Table styling - Tufte CSS style */
+/* Tables */
 table {
   border-collapse: collapse;
   font-family: var(--font-serif);
@@ -741,14 +726,12 @@ table tbody tr:hover {
   background-color: var(--accent);
 }
 
-/* Numeric columns - right aligned with tabular figures */
 table td.numeral,
 table th.numeral {
   font-family: var(--font-serif);
   text-align: right;
 }
 
-/* Dark mode support for tables */
 @media (prefers-color-scheme: dark) {
   table caption {
     color: var(--text-color-dark);

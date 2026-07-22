@@ -182,7 +182,7 @@ nav .nav-dropdown-menu a:hover {
   background-color: var(--accent) !important;
 }
 
-/* Tabs (nodeseek) */
+/* Tabs */
 .tabs {
   display: flex;
   flex-direction: column;
@@ -232,7 +232,7 @@ nav .nav-dropdown-menu a:hover {
   margin-top: 0;
 }
 
-/* ANSI code blocks */
+/* ANSI blocks */
 .ansi-block {
   overflow-x: auto;
   font-size: 1.1rem;
@@ -311,6 +311,14 @@ nav .nav-dropdown-menu a:hover {
   src: url("/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono-latin-500-italic.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
   font-display: swap;
 }
 
@@ -421,12 +429,10 @@ figcaption {
   text-align: center;
 }
 
-/* Main landmark styling */
 main {
   display: block;
 }
 
-/* Blog post date styling */
 .post-date,
 .post-date-inline {
   font-style: italic;
@@ -467,7 +473,6 @@ article > section > h1:first-child {
   font-size: var(--font-size-h2);
 }
 
-/* Dark mode support for post-date */
 @media (prefers-color-scheme: dark) {
   .post-date,
   .post-date-inline {
@@ -512,7 +517,7 @@ pre > code {
   display: block;
 }
 
-/* Mermaid diagram styling - border on parent container, scroll inside */
+/* Mermaid diagrams */
 .mermaid {
   border: 1px solid var(--accent);
   border-radius: 4px;
@@ -534,7 +539,6 @@ pre > code {
   font-size: 16px !important;
 }
 
-/* Ensure text elements use monospace font and larger size */
 .mermaid .nodeLabel,
 .mermaid .edgeLabel,
 .mermaid text,
@@ -543,7 +547,6 @@ pre > code {
   font-size: 16px !important;
 }
 
-/* Node styling - ensure text is fully visible with proper padding */
 .mermaid .label-container,
 .mermaid rect.label-container {
   overflow: visible !important;
@@ -564,19 +567,17 @@ pre > code {
   height: 100% !important;
 }
 
-/* Ensure text elements have proper spacing */
 .mermaid .nodeLabel,
 .mermaid .edgeLabel {
   padding: 4px 6px;
   text-align: center !important;
 }
 
-/* Ensure SVG text elements are not clipped */
 .mermaid text {
   overflow: visible !important;
 }
 
-/* Notes list at end of article */
+/* Notes list */
 .notes-list {
   margin-top: 3rem;
   padding-top: 1.5rem;
@@ -638,8 +639,7 @@ ul {
   }
 }
 
-/* Dark mode support for mermaid */
-@media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme: dark) {
   .mermaid {
     background: var(--bg-color-dark);
   }
@@ -658,13 +658,12 @@ ul {
   }
 }
 
-/* Mobile responsive */
 @media (max-width: 760px) {
   html {
     font-size: 13px;
   }
 
-  /* 移动端微调排版 */
+/* Mobile typography */
   body,
   article,
   p,

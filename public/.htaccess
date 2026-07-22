@@ -1,9 +1,7 @@
-# Enable rewrite engine
 <IfModule mod_rewrite.c>
   RewriteEngine On
 </IfModule>
 
-# Security headers
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "DENY"
@@ -11,7 +9,6 @@
   Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 </IfModule>
 
-# GZIP compression
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html
   AddOutputFilterByType DEFLATE text/css
@@ -23,7 +20,6 @@
   AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
 
-# Cache fonts for 1 year
 <IfModule mod_expires.c>
   ExpiresActive On
   <FilesMatch "\.(woff|woff2|ttf|otf)$">
@@ -40,7 +36,6 @@
   </FilesMatch>
 </IfModule>
 
-# Cache-Control header for fonts and static assets
 <IfModule mod_headers.c>
   <FilesMatch "\.(woff|woff2|ttf|otf)$">
     Header set Cache-Control "public, max-age=31536000, immutable"

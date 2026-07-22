@@ -1,8 +1,5 @@
 import type { Plugin } from "./plugin.js";
 
-/**
- * Decode HTML entities in a string
- */
 function decodeHtmlEntities(text: string): string {
   return text
     .replace(/&amp;/g, "&")
@@ -12,16 +9,10 @@ function decodeHtmlEntities(text: string): string {
     .replace(/&#39;/g, "'");
 }
 
-/**
- * Check if markdown contains mermaid code blocks
- */
 export function hasMermaidCode(markdown: string): boolean {
   return /```mermaid\r?\n[\s\S]*?```/.test(markdown);
 }
 
-/**
- * Post-process HTML to convert mermaid code blocks to renderable divs
- */
 export function processMermaidHtml(html: string): string {
   return html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g, (_, code) => {
     // Decode HTML entities in the mermaid code
@@ -30,9 +21,6 @@ export function processMermaidHtml(html: string): string {
   });
 }
 
-/**
- * Mermaid plugin for markdown-it
- */
 export const mermaidPlugin: Plugin = {
   name: "mermaid",
   markdownProcessors: [
@@ -43,12 +31,9 @@ export const mermaidPlugin: Plugin = {
   ],
 };
 
-/**
- * Mermaid script to be injected for client-side rendering
- */
 export const mermaidScript = `
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+<script src="/js/mermaid.min.js"></script>
+<script>
 
   const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
@@ -79,7 +64,6 @@ export const mermaidScript = `
 
   mermaid.initialize(getThemeConfig(isDark));
 
-  // Decode HTML entities
   function decodeHtml(text) {
     const textarea = document.createElement('textarea');
     textarea.innerHTML = text;

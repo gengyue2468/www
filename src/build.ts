@@ -211,6 +211,20 @@ async function build404Page(
   }
 }
 
+async function downloadMermaidJS(destPath: string): Promise<void> {
+  if (await Bun.file(destPath).exists()) return;
+  const url = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
+  try {
+    console.log("  Downloading mermaid.js...");
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    await Bun.write(destPath, resp);
+    console.log("  ✓ mermaid.js downloaded");
+  } catch (err) {
+    console.warn(`  ⚠ Failed to download mermaid.js: ${(err as Error).message}`);
+  }
+}
+
 const timer = new PerformanceTimer();
 
 export async function build(): Promise<void> {
@@ -221,6 +235,7 @@ export async function build(): Promise<void> {
 
   timer.start("setup");
   await ensureDir(config.dirs.dist);
+  await downloadMermaidJS(join(config.dirs.dist, "js", "mermaid.min.js"));
 
   clearContentCache();
 
