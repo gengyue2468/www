@@ -5,7 +5,7 @@ summary: '一次从 Cloudflare 522 出发的折腾：配置 Origin Certificate�
 tags: ['SSL', 'Cloudflare', '技术']
 ---
 
-前段时间对域名在[腾讯云](https://cloud.tencent.com)上进行了一下 ICP 备案，大概过了半个月左~~右~~[note:哎腾讯云控制台你说大概 12 天还真就 12 天啊，在考思政之前收到了短信...]，然后就准备把博客从 [Vercel](https://vercel.com) 搞到闲置的轻量云服务器上，反正就是十几二十个 HTML 页面，放到服务器上 nginx 反代一配，占不了几个内存和带宽，国内速度还快不少，何乐而不为？[note:静态资源已经美美托管到[EdgeOne](https://edgeone.ai)上了😋，参见[这篇文章](/edgeone-test)]
+前段时间对域名在[腾讯云](https://cloud.tencent.com)上进行了一下 ICP 备案，大概过了半个月左~~右~~[note:哎腾讯云控制台你说大概 12 天还真就 12 天啊，在考思政之前收到了短信...]，然后就准备把博客从 [Vercel](https://vercel.com) 搞到闲置的轻量云服务器上，反正就是十几二十个 HTML 页面，放到服务器上 nginx 反代一配，占不了几个内存和带宽，国内速度还快不少，何乐而不为？[note:静态资源已经美美托管到[EdgeOne](https://edgeone.ai)上了😋，参见[这篇文章](/blog/edgeone-test)]
 
 于是就准备搞搞，打开 [Cloudflare 控制台](https://dash.cloudflare.com) 然后添加一条 `A` 记录指向`ip`地址，噫，这很好。然后打开www.gengyue.site一看，woc，怎么 522 了，原来是 CF 无法访问到源站导致的。
 
@@ -127,4 +127,3 @@ flowchart LR
 哦吼吼，不过折腾一大顿之后发现自己似乎南辕北辙了，CF 的节点在美国，大陆请求到美国代理到美国的 Vercel 服务器和大陆请求到美国的 CF 节点再代理到大陆的轻量云服务器，还真说不准谁的速度块？😂[note:哎，哎，哎]
 
 不过延迟也是从 400ms 降低到 100 ~ 200ms 了，哎，如果不是套一层 CF 何至于这么慢？不过为了安全着想嘛...[note:笑死，就你那破烂垃圾都没有人有攻击的欲望，笑死...(bushi]
-

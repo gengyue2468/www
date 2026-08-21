@@ -1,6 +1,12 @@
 node_modules/
 dist/
+dist.staging-*/
+dist.previous-*/
 dist-build/
+.build-cache/
+.build-lock/
+.build-lock.stale-*/
+.deploy.lock
 docs/
 .DS_Store
 *.log

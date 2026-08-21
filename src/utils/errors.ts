@@ -22,6 +22,14 @@ export class AppError extends Error {
   }
 
   static fromError(err: unknown, code: ErrorCode, context?: Record<string, unknown>): AppError {
+    if (err instanceof AppError) {
+      return new AppError(
+        err.message,
+        err.code,
+        { ...err.context, ...context },
+        err.cause || err
+      );
+    }
     const original = err instanceof Error ? err : new Error(String(err));
     return new AppError(original.message, code, context, original);
   }
@@ -62,6 +70,7 @@ export class ConsoleErrorReporter implements ErrorReporter {
     if (error.context) {
       console.error("  Context:", error.context);
     }
+    if (error.cause?.stack) console.error(error.cause.stack);
   }
 
   reportWarning(message: string, context?: Record<string, unknown>): void {

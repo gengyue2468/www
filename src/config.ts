@@ -1,6 +1,11 @@
 import type { Config } from "./types.js";
+import { dirname, join, resolve } from "path";
+import { fileURLToPath } from "url";
+
+const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const config: Config = {
+  rootDir,
   site: {
     title: "gengyue",
     author: "gengyue",
@@ -14,24 +19,24 @@ const config: Config = {
   },
 
   dirs: {
-    pages: "./content/pages",
-    public: "./public",
-    dist: "./dist",
-    layouts: "./layouts",
+    pages: join(rootDir, "content", "pages"),
+    public: join(rootDir, "public"),
+    dist: join(rootDir, "dist"),
+    layouts: join(rootDir, "layouts"),
   },
 
   routes: {
     "/": "index.md",
     "/about": "about.md",
-    "/more": "more.md",
     "/uses": "uses.md",
     "/colophon": "colophon.md",
+    "/node": "node.md",
   },
 
   collections: [
     {
       name: "blog",
-      srcDir: "./content/blog",
+      srcDir: join(rootDir, "content", "blog"),
       urlPrefix: "blog",
       tags: true,
       layouts: {
@@ -42,7 +47,7 @@ const config: Config = {
     },
     {
       name: "logbook",
-      srcDir: "./content/logbook",
+      srcDir: join(rootDir, "content", "logbook"),
       urlPrefix: "logbook",
       tags: false,
       layouts: {
@@ -116,7 +121,7 @@ const config: Config = {
         { name: "Logbook", path: "/logbook", show: true },
         { name: "Colophon", path: "/colophon", show: true },
         { name: "Uses", path: "/uses", show: true },
-        { name: "Servers", path: "https://st.gy.run", show: true },
+        { name: "Node", path: "/node", show: true },
       ],
     },
   ],

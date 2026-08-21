@@ -1,0 +1,237 @@
+{
+  "main": {
+    "id": "ba32846b9038ae61",
+    "type": "split",
+    "children": [
+      {
+        "id": "f02ee8658558bf6a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2716a342d393cd91",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "content/blog/doh-within-tailnet.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "doh-within-tailnet"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "d0ec95f52d84e938",
+    "type": "split",
+    "children": [
+      {
+        "id": "39bb846b7e85bafe",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "41722eeeee110257",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "48c48dabcb4f03d9",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "7caf03fb0377d5f1",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "e724fda4901fa863",
+    "type": "split",
+    "children": [
+      {
+        "id": "27cd8e9f373d5d25",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "44e89981d808b76d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "content/pages/looking-glass.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "looking-glass 的反向链接列表"
+            }
+          },
+          {
+            "id": "db98cab5ca26b795",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "content/pages/looking-glass.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "looking-glass 的出链列表"
+            }
+          },
+          {
+            "id": "65486efac877cdbd",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "69d37c1e36ef0707",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "84ec38c89f98a94c",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "content/pages/looking-glass.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "looking-glass 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "2716a342d393cd91",
+  "lastOpenFiles": [
+    "dist/about.md.tmp-16144-1787335476427-qda79ovmwyc",
+    "dist/about/index.html.tmp-16144-1787335476422-kbfomt6pqn",
+    "dist/404.html.tmp-16144-1787335476418-zjtj9of1rz",
+    "dist.staging-16144-1787335474518/404.html",
+    "dist.staging-16144-1787335474518/llms.txt",
+    "dist.staging-16144-1787335474518/logbook/werid-educoder.md",
+    "dist.staging-16144-1787335474518/logbook/napcat-multi-clienting.md",
+    "dist.staging-16144-1787335474518/logbook/test.md",
+    "dist.staging-16144-1787335474518/logbook/failed-ssh-service.md",
+    "dist.staging-16144-1787335474518/logbook/bun-hono-server.md",
+    "dist.staging-16144-1787335474518/logbook/cli-proxy-api.md",
+    "dist.staging-16144-1787335474518/logbook/dns-error.md",
+    "dist.staging-16144-1787335474518/logbook/wsl-oom.md",
+    "dist.staging-16144-1787335474518/logbook/miniflux-share-style.md",
+    "dist.staging-16144-1787335474518/logbook/bingyan-k8s-deployment.md",
+    "dist.staging-16144-1787335474518/logbook/cpp-debug.md",
+    "dist.staging-16144-1787335474518/logbook/ai-agent-and-human.md",
+    "dist.staging-16144-1787335474518/logbook/ddg-search-mcp.md",
+    "dist.staging-16144-1787335474518/logbook/aliyun-kr.md",
+    "dist.staging-16144-1787335474518/logbook/cs-app-data-lab-1.md",
+    "dist.staging-16144-1787335474518/logbook/oracle-sgp-nodequality.md",
+    "dist.staging-16144-1787335474518/logbook/azure-student-jp-east.md",
+    "dist.staging-16144-1787335474518/logbook/azure-student.md",
+    "dist.staging-16144-1787335474518/blog/hust-chifan.md",
+    "dist.staging-16144-1787335474518/logbook/netcup-mnz.md",
+    "dist.staging-16144-1787335474518/blog/hello-world.md",
+    "dist.staging-16144-1787335474518/logbook/alpine-rc-service-with-nginx.md",
+    "dist.staging-16144-1787335474518/blog/train.md",
+    "dist.staging-16144-1787335474518/logbook/windows-virtual-memory.md",
+    "dist.staging-16144-1787335474518/blog/baode-story.md",
+    "dist.staging-16144-1787335474518/sitemap.xml",
+    "dist.staging-16144-1787335474518/robots.txt",
+    "dist.staging-16144-1787335474518/rss.xml",
+    "dist.staging-16144-1787335474518/blog/tag/故事/index.html",
+    "dist.staging-16144-1787335474518/blog/tag/项目/index.html",
+    "dist.staging-16144-1787335474518/blog/tag/白嫖/index.html",
+    "dist.staging-16144-1787335474518/static/train/wuhan/IMG_20251213_184210.webp",
+    "dist.staging-16144-1787335474518/static/train/wuhan/IMG_20251213_170152.webp",
+    "dist.staging-16144-1787335474518/static/train/wuhan/IMG_20251213_174524.webp",
+    "dist.staging-16144-1787335474518/static/tech/tiptap.webp",
+    "dist.staging-16144-1787335474518/static/tech/oracle-cloud-success.webp",
+    "dist.staging-16144-1787335474518/static/tech/oracle-cloud-free-tier.webp",
+    "dist.staging-16144-1787335474518/static/tech/neofetch.webp",
+    "dist.staging-16144-1787335474518/static/tech/memos-darkmode.webp",
+    "dist.staging-16144-1787335474518/static/tech/hust-chifan-cli.webp",
+    "dist.staging-16144-1787335474518/static/tech/html.webp"
+  ]
+}

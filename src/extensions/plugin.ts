@@ -1,4 +1,5 @@
 import type { RenderedContent } from "../types.js";
+import { AppError, ErrorCode } from "../utils/errors.js";
 
 export interface MarkdownProcessor {
   name: string;
@@ -39,6 +40,7 @@ export interface Plugin {
 }
 
 const plugins: Plugin[] = [];
+let pluginVersion = 0;
 
 const builtInProcessors: MarkdownProcessor[] = [
   {
@@ -49,8 +51,23 @@ const builtInProcessors: MarkdownProcessor[] = [
 ];
 
 export function registerPlugin(plugin: Plugin): void {
+  for (const processor of plugin.noteProcessors || []) {
+    processor.pattern.lastIndex = 0;
+    if (processor.pattern.test("")) {
+      processor.pattern.lastIndex = 0;
+      throw new AppError(`Note processor '${processor.name}' must not match an empty string`, ErrorCode.PLUGIN_ERROR, {
+        processor: processor.name,
+      });
+    }
+    processor.pattern.lastIndex = 0;
+  }
   plugins.push(plugin);
+  pluginVersion++;
   console.log(`✓ Registered plugin: ${plugin.name}`);
+}
+
+export function getPluginVersion(): number {
+  return pluginVersion;
 }
 
 export function getMarkdownProcessors(): MarkdownProcessor[] {

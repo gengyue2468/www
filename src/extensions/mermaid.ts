@@ -1,23 +1,13 @@
 import type { Plugin } from "./plugin.js";
 
-function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, "\"")
-    .replace(/&#39;/g, "'");
-}
-
 export function hasMermaidCode(markdown: string): boolean {
-  return /```mermaid\r?\n[\s\S]*?```/.test(markdown);
+  return /(?:^|\n) {0,3}(?:`{3,}|~{3,})[ \t]*mermaid(?:[ \t]+[^\r\n]*)?[ \t]*\r?\n/i.test(markdown);
 }
 
 export function processMermaidHtml(html: string): string {
   return html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g, (_, code) => {
-    // Decode HTML entities in the mermaid code
-    const decodedCode = decodeHtmlEntities(code);
-    return `<pre class="mermaid">${decodedCode}</pre>`;
+    // Keep the source escaped until the browser reads it as textContent.
+    return `<pre class="mermaid" role="img" aria-label="Mermaid diagram">${code}</pre>`;
   });
 }
 
@@ -64,20 +54,13 @@ export const mermaidScript = `
 
   mermaid.initialize(getThemeConfig(isDark));
 
-  function decodeHtml(text) {
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = text;
-    return textarea.value;
-  }
-
   // Render all mermaid diagrams
   async function renderMermaidDiagrams() {
     const diagrams = document.querySelectorAll('.mermaid');
 
     for (const el of diagrams) {
-      // Get raw code and decode HTML entities
-      let code = el.textContent || el.innerText;
-      code = decodeHtml(code.trim());
+      // textContent already decodes the escaped Markdown source once.
+      let code = (el.textContent || el.innerText || '').trim();
 
       // Store for dark mode re-renders
       el.dataset.originalCode = code;
@@ -96,8 +79,12 @@ export const mermaidScript = `
         // Insert the SVG
         el.innerHTML = svg;
       } catch (error) {
-        console.error('Mermaid rendering error:', error.message);
-        el.innerHTML = '<div style="padding: 1rem; color: red; border: 1px solid red; border-radius: 4px;">Diagram error: ' + error.message + '</div>';
+        const message = error instanceof Error ? error.message : String(error);
+        console.error('Mermaid rendering error:', message);
+        const errorBox = document.createElement('div');
+        errorBox.style.cssText = 'padding: 1rem; color: red; border: 1px solid red; border-radius: 4px;';
+        errorBox.textContent = 'Diagram error: ' + message;
+        el.replaceChildren(errorBox);
       }
     }
   }

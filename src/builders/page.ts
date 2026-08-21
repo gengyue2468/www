@@ -4,11 +4,13 @@ import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
+import { hasSidenoteConnectors, sidenoteScript } from "../extensions/sidenotes.js";
+import { hasMathHtml, mathStylesheet } from "../extensions/math.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import type { BuildHooks } from "../extensions/plugin.js";
 import type { FrontMatter } from "../types.js";
-import { buildMetaDescription, generateKeywords } from "../utils/seo.js";
-import { errorReporter } from "../utils/errors.js";
+import { buildMetaDescription, escapeHtmlText, generateKeywords } from "../utils/seo.js";
+import { AppError, ErrorCode } from "../utils/errors.js";
 import config from "../config.js";
 
 interface CssCache {
@@ -63,9 +65,9 @@ export async function getInlinedCss(): Promise<string> {
     getFileMtime(globalsPath),
   ]);
 
-  if (cssCache && 
-      cssCache.tufteMtime > tufteMtime && 
-      cssCache.globalsMtime > globalsMtime) {
+  if (cssCache &&
+      cssCache.tufteMtime === tufteMtime &&
+      cssCache.globalsMtime === globalsMtime) {
     return cssCache.content;
   }
 
@@ -87,11 +89,11 @@ export async function getInlinedCss(): Promise<string> {
     cssCache = { content, tufteMtime, globalsMtime };
     return content;
   } catch (err) {
-    errorReporter.reportWarning("Could not read CSS files for inlining", {
+    throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, {
       tuftePath,
       globalsPath,
+      phase: "css-inlining",
     });
-    return "";
   }
 }
 
@@ -111,6 +113,7 @@ function buildPageOutput(
     isArticle?: boolean;
     date?: string;
     updated?: string;
+    headLinks?: string;
   }
 ): string {
   const pageTitle = route === "/" ? config.site.title : `${title} - ${config.site.title}`;
@@ -155,6 +158,7 @@ function buildPageOutput(
           { name: title, url: `${config.site.url}${route}` },
         ],
     year: options.year,
+    headLinks: options.headLinks,
   });
 }
 
@@ -169,16 +173,20 @@ export async function buildPage(
   robotsMeta?: string
 ): Promise<void> {
   let { frontmatter, html } = await renderMarkdown(filePath);
-  const title = frontmatter.title || "Untitled";
+  let title = (frontmatter.title as string) || "Untitled";
 
   const hookResult = await applyHooks(hooks, "page", route, frontmatter as Record<string, unknown>, html);
   frontmatter = hookResult.frontmatter as FrontMatter;
   html = hookResult.html;
+  title = frontmatter.title || "Untitled";
 
   const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
-  const scripts = hasMermaid ? mermaidScript : "";
-
-  const contentData = { title, content: html };
+  const scripts = [
+    hasMermaid ? mermaidScript : "",
+    hasSidenoteConnectors(html) ? sidenoteScript : "",
+  ].filter(Boolean).join("\n");
+  const headLinks = hasMathHtml(html) ? mathStylesheet : "";
+  const contentData = { title: escapeHtmlText(title), content: html };
   const renderedContent = renderTemplate(contentLayout, contentData);
 
   const inlinedCss = await getInlinedCss();
@@ -199,6 +207,7 @@ export async function buildPage(
     robotsMeta,
     ogImageUrl,
     year,
+    headLinks,
   });
 
   output = await applyAfterHooks(hooks, "page", route, output);

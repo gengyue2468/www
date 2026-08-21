@@ -41,6 +41,7 @@ export interface UmamiConfig {
 }
 
 export interface Config {
+  rootDir: string;
   site: SiteConfig;
   dirs: DirsConfig;
   routes: Record<string, string>;

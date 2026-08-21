@@ -8,7 +8,7 @@
     "dev": "bun run src/dev.ts",
     "serve": "bunx serve dist",
     "deploy": "bash scripts/deploy.sh",
-    "build-only": "bash scripts/build.sh",
+    "build-only": "bun run build",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
@@ -21,8 +21,10 @@
   "dependencies": {
     "feed": "^5.1.0",
     "gray-matter": "^4.0.3",
+    "katex": "0.18.4",
     "markdown-it": "^14.1.0",
     "markdown-it-container": "^3.0.0",
+    "markdown-it-texmath": "1.0.0",
     "sitemap": "^9.0.0"
   },
   "devDependencies": {

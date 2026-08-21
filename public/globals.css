@@ -4,7 +4,6 @@
   --bg-color-dark: #181818;
   --text-color-dark: #e8e6e3;
   --border-color: #ccc;
-  --danger-color: red;
   --accent: rgba(0, 0, 0, 0.05);
 
   --font-base-size: 14px;
@@ -12,23 +11,19 @@
     et-book, "Source Han Serif CN VF", ui-serif, Palatino, "Palatino Linotype",
     "Palatino LT STD", "Book Antiqua", Georgia, "Songti", "Songti SC", STSong,
     SimSun, serif;
-  --font-sans: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
   --font-sans-alt: "Trebuchet MS", "Gill Sans", "Gill Sans MT", sans-serif;
   --font-mono:
     "IBM Plex Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  --font-numeral: et-book-roman-old-style;
+  --font-numeral: et-book;
 
   --font-size-h1: 3.2rem;
   --font-size-h2: 2.2rem;
   --font-size-h3: 1.7rem;
-  --font-size-subtitle: 1.8rem;
   --font-size-body: 1.4rem;
   --font-size-sidenote: 1.1rem;
   --font-size-code: 1.3rem;
-  --font-size-code-sans: 1.2rem;
   --font-size-code-small: 1.2rem;
   --font-size-code-heading: 0.8em;
-  --font-size-newthought: 1.2em;
 
   --line-height-base: 1.75;
   --line-height-body: 2.4rem;
@@ -46,8 +41,6 @@
   --spacing-p-bottom: 1.4rem;
   --spacing-section: 1rem;
   --spacing-article: 5rem;
-  --spacing-epigraph: 5em;
-  --spacing-epigraph-quote: 3em;
   --spacing-sidenote-top: 0.3rem;
   --spacing-list-item: 0.25rem;
   --spacing-figure-bottom: 3em;
@@ -61,13 +54,9 @@
   --width-list: 50%;
   --width-list-padding: 5%;
   --width-figcaption: 40%;
-  --width-figcaption-fullwidth: 24%;
-  --width-code: 52.5%;
-  --width-code-margin: 2.5%;
   --width-fullwidth: 90%;
   --width-fullwidth-mobile: 100%;
   --width-list-mobile: 90%;
-  --width-figure-mobile: 90%;
   --width-table-mobile: 85%;
   --width-sidenote: 50%;
   --width-sidenote-mobile: 95%;
@@ -76,14 +65,10 @@
   --width-sidenote-blockquote-min: 59%;
   --max-width-body: 1400px;
 
-  --letter-spacing-sans: 0.03em;
   --text-underline-offset: 0.1em;
   --text-decoration-thickness: 0.05em;
   --sidenote-number-top: -0.5rem;
   --sidenote-number-left: 0.1rem;
-  --iframe-padding-bottom: 56.25%;
-  --iframe-padding-top: 25px;
-  --breakpoint-mobile: 760px;
 }
 
 nav {
@@ -156,7 +141,7 @@ nav .nav-dropdown-menu {
   background: var(--bg-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 0.5rem 0;
+  padding-block: 0;
   min-width: 140px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin-top: 0.3rem;
@@ -197,8 +182,16 @@ nav .nav-dropdown-menu a:hover {
   margin-bottom: 0.5rem;
 }
 
-.tab-list > input[type="radio"] {
-  display: none;
+.tab-list > input.tab-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .tab-list > label {
@@ -208,6 +201,7 @@ nav .nav-dropdown-menu a:hover {
   font-size: 1.25rem;
   user-select: none;
   white-space: nowrap;
+  order: 0;
 }
 
 .tab-list > input:checked + label {
@@ -215,21 +209,68 @@ nav .nav-dropdown-menu a:hover {
   background-color: var(--accent);
 }
 
-.tabs > .tab-content {
+.tab-list > input:focus-visible + label {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+.tab-panels > .tab-content {
   display: none;
 }
 
-.tabs:has(.tab-list > input:nth-of-type(1):checked) > .tab-content:nth-child(2),
-.tabs:has(.tab-list > input:nth-of-type(2):checked) > .tab-content:nth-child(3),
-.tabs:has(.tab-list > input:nth-of-type(3):checked) > .tab-content:nth-child(4),
-.tabs:has(.tab-list > input:nth-of-type(4):checked) > .tab-content:nth-child(5),
-.tabs:has(.tab-list > input:nth-of-type(5):checked)
-  > .tab-content:nth-child(6) {
+.tabs:has(.tab-list > input[data-tab="0"]:checked) .tab-panels > .tab-content[data-tab="0"],
+.tabs:has(.tab-list > input[data-tab="1"]:checked) .tab-panels > .tab-content[data-tab="1"],
+.tabs:has(.tab-list > input[data-tab="2"]:checked) .tab-panels > .tab-content[data-tab="2"],
+.tabs:has(.tab-list > input[data-tab="3"]:checked) .tab-panels > .tab-content[data-tab="3"],
+.tabs:has(.tab-list > input[data-tab="4"]:checked) .tab-panels > .tab-content[data-tab="4"],
+.tabs:has(.tab-list > input[data-tab="5"]:checked) .tab-panels > .tab-content[data-tab="5"],
+.tabs:has(.tab-list > input[data-tab="6"]:checked) .tab-panels > .tab-content[data-tab="6"],
+.tabs:has(.tab-list > input[data-tab="7"]:checked) .tab-panels > .tab-content[data-tab="7"],
+.tabs:has(.tab-list > input[data-tab="8"]:checked) .tab-panels > .tab-content[data-tab="8"],
+.tabs:has(.tab-list > input[data-tab="9"]:checked) .tab-panels > .tab-content[data-tab="9"],
+.tabs:has(.tab-list > input[data-tab="10"]:checked) .tab-panels > .tab-content[data-tab="10"],
+.tabs:has(.tab-list > input[data-tab="11"]:checked) .tab-panels > .tab-content[data-tab="11"],
+.tabs:has(.tab-list > input[data-tab="12"]:checked) .tab-panels > .tab-content[data-tab="12"],
+.tabs:has(.tab-list > input[data-tab="13"]:checked) .tab-panels > .tab-content[data-tab="13"],
+.tabs:has(.tab-list > input[data-tab="14"]:checked) .tab-panels > .tab-content[data-tab="14"],
+.tabs:has(.tab-list > input[data-tab="15"]:checked) .tab-panels > .tab-content[data-tab="15"] {
   display: block;
 }
 
-.tabs > .tab-content pre {
+.tab-panels .tab-content pre {
   margin-top: 0;
+}
+
+/* KaTeX display math should remain readable on narrow screens. */
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
+.sidenote .katex-display,
+.marginnote .katex-display {
+  font-size: 0.9em;
+}
+
+/* Keep the CSS-only note toggle reachable from the keyboard. */
+input.margin-toggle {
+  display: block;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+label.margin-toggle:has(+ input.margin-toggle:focus-visible) {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
 }
 
 /* ANSI blocks */
@@ -257,7 +298,7 @@ nav .nav-dropdown-menu a:hover {
 }
 
 @media (max-width: 760px) {
-  .tabs > label {
+  .tab-list > label {
     font-size: 1.1rem;
     padding: 0.4rem 0.7rem;
   }
@@ -423,6 +464,95 @@ nav p {
   line-height: var(--line-height-sidenote);
 }
 
+.note-connector-source {
+  display: inline-block;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.note-connector-target {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* Start the connector at the source marker and point it into the margin. */
+@media (min-width: 761px) {
+  .sidenote-connectors {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    color: #333;
+    z-index: 0;
+  }
+
+  .sidenote-connectors > path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  label.margin-toggle {
+    position: relative;
+  }
+
+  label.margin-toggle:not(.sidenote-number) {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    color: inherit;
+    font-size: 0;
+    line-height: 0;
+  }
+
+  label.margin-toggle::before {
+    content: "";
+    position: absolute;
+    left: calc(100% + 0.35rem);
+    top: 50%;
+    width: 4.5rem;
+    height: 2.4rem;
+    transform: translateY(-50%) rotate(4deg);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg width='46' height='38' viewBox='0 0 46 38' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 20 C15 20 29 16 42 8' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M33 8 L42 8 L38 17' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg width='46' height='38' viewBox='0 0 46 38' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 20 C15 20 29 16 42 8' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M33 8 L42 8 L38 17' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    background: color-mix(in srgb, currentColor 38%, transparent);
+    pointer-events: none;
+  }
+
+  section.sidenote-connectors-ready label.margin-toggle::before {
+    display: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (min-width: 761px) {
+  .sidenote-connectors {
+    color: #999;
+  }
+}
+
+@media (max-width: 760px) {
+  .sidenote-connectors {
+    display: none;
+  }
+}
+
 figcaption {
   text-indent: 0;
   letter-spacing: 0.02em;
@@ -463,6 +593,114 @@ main {
 
 .md-link:hover {
   opacity: 1;
+}
+
+/* Quiet, static reading aids. */
+.table-of-contents {
+  width: var(--width-content);
+  margin: 0 0 2rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--border-color) 55%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--border-color) 10%, transparent);
+  box-sizing: border-box;
+  font-size: var(--font-size-body);
+}
+
+.table-of-contents summary {
+  padding: 0.2rem 0;
+  cursor: pointer;
+  color: inherit;
+  font-size: 1em;
+  font-weight: 400;
+}
+
+.table-of-contents nav {
+  margin: 0.25rem 0 0;
+  padding-top: 0;
+}
+
+.table-of-contents ol {
+  margin: 0;
+  padding-left: 1.5rem;
+  font-size: inherit;
+  list-style: none;
+  counter-reset: toc-item;
+}
+
+.table-of-contents li {
+  counter-increment: toc-item;
+}
+
+.table-of-contents li::before {
+  content: counters(toc-item, ".") " ";
+  color: var(--border-color);
+  font-variant-numeric: tabular-nums;
+  margin-right: 0.35rem;
+}
+
+.table-of-contents nav a {
+  margin-right: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+.heading-anchor {
+  position: absolute;
+  left: -1.1em;
+  top: 50%;
+  line-height: 1;
+  transform: translateY(-50%);
+  color: var(--border-color);
+  font-size: 0.75em;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+h2,
+h3,
+h4 {
+  position: relative;
+}
+
+.heading-anchor::before {
+  content: "#";
+}
+
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+h4:hover .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.admonition {
+  width: var(--width-content);
+  margin: 1.4rem 0;
+  padding: 0.7rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.admonition-title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-sans-alt);
+  font-size: 0.9em;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+}
+
+.admonition > :last-child {
+  margin-bottom: 0;
+}
+
+.admonition-warning {
+  border-left-color: #b8860b;
+}
+
+.admonition-danger {
+  border-left-color: #a33;
 }
 
 article > section > h1:first-child {
@@ -606,6 +844,23 @@ ul {
   margin-bottom: 0.25rem;
 }
 
+.notes-list .mixed-notes-list {
+  list-style: none;
+  counter-reset: mixed-sidenote-counter;
+}
+
+.notes-list .mixed-notes-list > li.sidenote-item {
+  counter-increment: mixed-sidenote-counter;
+}
+
+.notes-list .mixed-notes-list > li.sidenote-item::before {
+  content: counter(mixed-sidenote-counter) ". ";
+}
+
+.notes-list .mixed-notes-list > li.marginnote-item {
+  list-style: none;
+}
+
 /* Highlight on anchor jump */
 :target {
   animation: highlight 3s ease-out;
@@ -618,6 +873,22 @@ ul {
   }
   15% {
     background: #fff3cd;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -726,7 +997,6 @@ ul {
   }
 
   nav .nav-dropdown-menu {
-    left: 0;
     min-width: 120px;
   }
 
@@ -739,10 +1009,6 @@ ul {
     max-width: 100% !important;
   }
 
-  .mermaid {
-    width: 100%;
-    max-width: 100%;
-  }
 }
 
 @media screen and (max-width: 768px) {
@@ -751,7 +1017,6 @@ ul {
   }
 }
 
-.ascii-art pre,
 pre.ascii-art {
   background-color: #181818 !important;
   color: #e8e6e3 !important;

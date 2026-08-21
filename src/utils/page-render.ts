@@ -87,6 +87,7 @@ export function renderPage(
     }),
     jsonLd: generateJsonLd({
       ...jsonLd,
+      image: jsonLd.image || ogTags.ogImageUrl || ogImageBase,
       siteName: config.site.title,
       authorName: config.site.author,
       siteUrl: config.site.url,

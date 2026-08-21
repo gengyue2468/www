@@ -1,7 +1,7 @@
 import { mkdir, readdir } from "fs/promises";
 import { join } from "path";
 import type { DirsConfig } from "../types.js";
-import { AppError, ErrorCode, isENOENT, errorReporter } from "./errors.js";
+import { AppError, ErrorCode, isENOENT } from "./errors.js";
 
 export async function ensureDir(dir: string): Promise<void> {
   await mkdir(dir, { recursive: true });
@@ -26,8 +26,10 @@ export async function copyDirectory(src: string, dest: string): Promise<void> {
 
     if (entry.isDirectory()) {
       dirs.push({ src: srcPath, dest: destPath });
-    } else {
+    } else if (entry.isFile()) {
       files.push({ src: srcPath, dest: destPath });
+    } else {
+      throw new AppError(`Unsupported filesystem entry: ${srcPath}`, ErrorCode.FILE_READ_ERROR, { src: srcPath });
     }
   }
 
@@ -52,8 +54,7 @@ export async function copyPublicFiles(dirs: DirsConfig): Promise<void> {
     entries = await readdir(publicDir, { withFileTypes: true });
   } catch (err) {
     if (isENOENT(err)) {
-      errorReporter.reportWarning("Public directory not found, skipping", { dir: publicDir });
-      return;
+      throw new AppError(`Public directory not found: ${publicDir}`, ErrorCode.FILE_NOT_FOUND, { dir: publicDir });
     }
     throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, { dir: publicDir });
   }
@@ -66,12 +67,14 @@ export async function copyPublicFiles(dirs: DirsConfig): Promise<void> {
       if (entry.isDirectory()) {
         await ensureDir(destPath);
         await copyDirectory(srcPath, destPath);
-      } else {
+      } else if (entry.isFile()) {
         try {
           await Bun.write(destPath, Bun.file(srcPath));
         } catch (err) {
           throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { src: srcPath, dest: destPath });
         }
+      } else {
+        throw new AppError(`Unsupported filesystem entry: ${srcPath}`, ErrorCode.FILE_READ_ERROR, { src: srcPath });
       }
     })
   );

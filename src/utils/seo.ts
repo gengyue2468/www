@@ -47,10 +47,18 @@ export function normalizeText(text: string): string {
     .trim();
 }
 
+function stringifyJsonLd(value: unknown): string {
+  return JSON.stringify(value, null, 2)
+    .replace(/</g, "\\u003C")
+    .replace(/>/g, "\\u003E")
+    .replace(/&/g, "\\u0026");
+}
+
 export function smartTruncate(text: string, maxLength = DEFAULT_MAX_LENGTH): string {
   if (text.length <= maxLength) return text;
 
-  const cut = text.slice(0, maxLength);
+  const suffix = "...";
+  const cut = text.slice(0, Math.max(0, maxLength - suffix.length));
   const boundaryChars = ["。", "！", "？", ".", "!", "?", "，", ",", "；", ";", " "];
 
   let bestCut = -1;
@@ -65,7 +73,7 @@ export function smartTruncate(text: string, maxLength = DEFAULT_MAX_LENGTH): str
     return cut.slice(0, bestCut + 1).trim();
   }
 
-  return `${cut.trimEnd()}...`;
+  return `${cut.trimEnd()}${suffix}`;
 }
 
 export function buildMetaDescription(options: MetaDescriptionOptions): string {
@@ -179,6 +187,7 @@ export interface JsonLdOptions {
   siteUrl: string;
   date?: string;
   dateModified?: string;
+  image?: string;
   tags?: string[];
   numberOfItems?: number;
   breadcrumbs?: { name: string; url: string }[];
@@ -233,7 +242,7 @@ function buildHomePageJsonLd(options: JsonLdOptions, baseUrl: string): string {
   }
 
   const data = { "@context": "https://schema.org", "@graph": graph };
-  return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+  return `<script type="application/ld+json">\n${stringifyJsonLd(data)}\n</script>`;
 }
 
 function buildRegularPageJsonLd(options: JsonLdOptions, baseUrl: string): string {
@@ -248,10 +257,10 @@ function buildRegularPageJsonLd(options: JsonLdOptions, baseUrl: string): string
 
   if (options.breadcrumbs && options.breadcrumbs.length > 0) {
     const wrapped = { "@context": "https://schema.org", "@graph": [data, buildBreadcrumbLd(options.breadcrumbs)] };
-    return `<script type="application/ld+json">\n${JSON.stringify(wrapped, null, 2)}\n</script>`;
+    return `<script type="application/ld+json">\n${stringifyJsonLd(wrapped)}\n</script>`;
   }
 
-  return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+  return `<script type="application/ld+json">\n${stringifyJsonLd(data)}\n</script>`;
 }
 
 function buildBlogPostingJsonLd(options: JsonLdOptions, baseUrl: string): string {
@@ -271,6 +280,7 @@ function buildBlogPostingJsonLd(options: JsonLdOptions, baseUrl: string): string
 
   data.datePublished = safeToISOString(options.date);
   data.dateModified = safeToISOString(options.dateModified) || safeToISOString(options.date);
+  if (options.image) data.image = options.image;
   if (options.tags && options.tags.length > 0) data.keywords = options.tags.join(", ");
 
   return wrapWithBreadcrumbs(data, options.breadcrumbs);
@@ -299,9 +309,9 @@ function buildCollectionPageJsonLd(options: JsonLdOptions, baseUrl: string): str
 function wrapWithBreadcrumbs(data: Record<string, unknown>, breadcrumbs?: { name: string; url: string }[]): string {
   if (breadcrumbs && breadcrumbs.length > 0) {
     const wrapped = { "@context": "https://schema.org", "@graph": [data, buildBreadcrumbLd(breadcrumbs)] };
-    return `<script type="application/ld+json">\n${JSON.stringify(wrapped, null, 2)}\n</script>`;
+    return `<script type="application/ld+json">\n${stringifyJsonLd(wrapped)}\n</script>`;
   }
-  return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n</script>`;
+  return `<script type="application/ld+json">\n${stringifyJsonLd({ "@context": "https://schema.org", ...data })}\n</script>`;
 }
 
 export function generateJsonLd(options: JsonLdOptions): string {

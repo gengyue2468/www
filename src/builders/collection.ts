@@ -1,16 +1,21 @@
-import { join, dirname, extname, basename } from "path";
+import { join, dirname, extname, basename, resolve } from "path";
 import { readdir } from "fs/promises";
+import type { Dirent } from "fs";
 import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
+import { hasSidenoteConnectors, sidenoteScript } from "../extensions/sidenotes.js";
+import { hasMathHtml, mathStylesheet } from "../extensions/math.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import type { BuildHooks } from "../extensions/plugin.js";
-import { buildMetaDescription, generateKeywords } from "../utils/seo.js";
+import { buildMetaDescription, escapeHtmlText, generateKeywords } from "../utils/seo.js";
+import { assertSafePathSegment, joinUrlPath } from "../utils/url.js";
 import { AppError, ErrorCode, isENOENT, errorReporter } from "../utils/errors.js";
 import config from "../config.js";
 import type { CollectionConfig, CollectionOutput, Post } from "../types.js";
+import { generateTableOfContents } from "../utils/markdown.js";
 
 interface PostWithContent extends Post {
   html: string;
@@ -19,10 +24,22 @@ interface PostWithContent extends Post {
 }
 
 function getTagSlug(tag: string): string {
-  return tag
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+  const normalized = tag.normalize("NFKC").trim().toLowerCase();
+  const slug = normalized
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
     .replace(/^-+|-+$/g, "");
+  if (slug) return slug;
+
+  let hash = 2166136261;
+  for (const char of normalized) {
+    hash ^= char.codePointAt(0) || 0;
+    hash = Math.imul(hash, 16777619);
+  }
+  return `tag-${(hash >>> 0).toString(16)}`;
+}
+
+function postPath(urlPrefix: string, slug: string): string {
+  return joinUrlPath(urlPrefix, slug);
 }
 
 function capitalize(s: string): string {
@@ -30,9 +47,11 @@ function capitalize(s: string): string {
 }
 
 function getCollectionDefaults(coll: CollectionConfig) {
+  const urlPrefix = coll.urlPrefix || coll.name;
+  assertSafePathSegment(urlPrefix, `Collection URL prefix '${coll.name}'`);
   return {
-    srcDir: coll.srcDir || `./content/${coll.name}`,
-    urlPrefix: coll.urlPrefix || coll.name,
+    srcDir: resolve(config.rootDir, coll.srcDir || `./content/${coll.name}`),
+    urlPrefix,
     layouts: {
       index: coll.layouts?.index || `${coll.name}-index`,
       post: coll.layouts?.post || `${coll.name}-post`,
@@ -53,7 +72,7 @@ function sortPostsByDate<T extends { date?: string; slug: string }>(posts: T[]):
   return [...posts].sort((a, b) => {
     if (!a.date) return 1;
     if (!b.date) return -1;
-    const diff = new Date(b.date).getTime() - new Date(a.date).getTime();
+    const diff = Date.parse(`${b.date}T00:00:00Z`) - Date.parse(`${a.date}T00:00:00Z`);
     if (diff !== 0) return diff;
     return a.slug.localeCompare(b.slug);
   });
@@ -75,7 +94,7 @@ function generateTagsHTML(allTags: string[], urlPrefix: string): string {
     const slug = getTagSlug(tag);
     const count = tagCounts[tag];
     const size = Math.min(3, Math.max(1, Math.ceil(count / 2)));
-    parts.push(`<a href="/${urlPrefix}/tag/${slug}" class="tag tag-size-${size}" data-count="${count}">#${tag} <span class="tag-count">(${count})</span></a>`);
+    parts.push(`<a href="${joinUrlPath(urlPrefix, "tag", slug)}" class="tag tag-size-${size}" data-count="${count}">#${escapeHtmlText(tag)} <span class="tag-count">(${count})</span></a>`);
   }
   parts.push("</div>");
   return parts.join("");
@@ -83,13 +102,24 @@ function generateTagsHTML(allTags: string[], urlPrefix: string): string {
 
 function generatePostTagsHTML(tags: string[] | undefined, urlPrefix: string): string {
   if (!tags || tags.length === 0) return "";
-  const parts: string[] = ['<div class="post-tags" style="margin-top: 2rem; margin-bottom: 1rem;">'];
+  const parts: string[] = ['<div class="post-tags">'];
   for (const tag of tags) {
     const slug = getTagSlug(tag);
-    parts.push(`<a href="/${urlPrefix}/tag/${slug}" class="tag">#${tag}</a>`);
+    parts.push(`<a href="${joinUrlPath(urlPrefix, "tag", slug)}" class="tag">#${escapeHtmlText(tag)}</a>`);
   }
   parts.push("</div>");
   return parts.join("");
+}
+
+function generatePostNavigationHTML(prevPost: PostWithContent | null, nextPost: PostWithContent | null, urlPrefix: string): string {
+  if (!prevPost && !nextPost) return "";
+  const previous = prevPost
+    ? `<a class="post-nav-link post-nav-previous" href="${postPath(urlPrefix, prevPost.slug)}"><span>上一篇</span><strong>${escapeHtmlText(prevPost.title)}</strong></a>`
+    : `<span class="post-nav-link post-nav-empty" aria-hidden="true"></span>`;
+  const next = nextPost
+    ? `<a class="post-nav-link post-nav-next" href="${postPath(urlPrefix, nextPost.slug)}"><span>下一篇</span><strong>${escapeHtmlText(nextPost.title)}</strong></a>`
+    : `<span class="post-nav-link post-nav-empty" aria-hidden="true"></span>`;
+  return `<nav class="post-nav" aria-label="文章导航">${previous}${next}</nav>`;
 }
 
 function generatePostsListHTML(posts: Post[], urlPrefix: string): string {
@@ -97,7 +127,7 @@ function generatePostsListHTML(posts: Post[], urlPrefix: string): string {
 
   const postsByYear: Record<string, Post[]> = {};
   for (const post of posts) {
-    const year = post.date ? new Date(post.date).getFullYear().toString() : "";
+    const year = post.date ? post.date.slice(0, 4) : "";
     (postsByYear[year] ??= []).push(post);
   }
 
@@ -114,7 +144,7 @@ function generatePostsListHTML(posts: Post[], urlPrefix: string): string {
     parts.push('<ul class="posts-list">');
     for (const post of yearPosts) {
       parts.push(`<li class="post-item">`);
-      parts.push(`<a href="/${urlPrefix}/${post.slug}">${post.title}</a>`);
+      parts.push(`<a href="${postPath(urlPrefix, post.slug)}">${escapeHtmlText(post.title)}</a>`);
       if (post.date) {
         parts.push(` <span class="post-date-inline">${formatDate(post.date)}</span>`);
       }
@@ -130,22 +160,32 @@ async function loadPostsFromDir(
 ): Promise<PostWithContent[]> {
   const posts: PostWithContent[] = [];
 
-  let files: string[];
+  let files: Dirent[];
   try {
-    files = await readdir(srcDir);
+    files = await readdir(srcDir, { withFileTypes: true });
   } catch (err) {
     if (isENOENT(err)) {
-      errorReporter.reportWarning(`Content directory not found: ${srcDir}`);
-      return posts;
+      throw new AppError(`Content directory not found: ${srcDir}`, ErrorCode.FILE_NOT_FOUND, { dir: srcDir });
     }
     throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, { dir: srcDir });
   }
 
-  const mdFiles = files.filter(file => extname(file) === ".md");
+  const mdFiles = files.filter(file => {
+    if (file.isSymbolicLink()) {
+      throw new AppError(`Symbolic links are not allowed in content directories: ${join(srcDir, file.name)}`, ErrorCode.FILE_READ_ERROR, { dir: srcDir, file: file.name });
+    }
+    return file.isFile() && extname(file.name) === ".md";
+  });
 
-  const postPromises = mdFiles.map(async (file) => {
+  const postPromises = mdFiles.map(async (fileEntry) => {
+    const file = fileEntry.name;
     const filePath = join(srcDir, file);
     const slug = basename(file, ".md");
+    try {
+      assertSafePathSegment(slug, `Post slug '${slug}'`);
+    } catch (err) {
+      throw new AppError((err as Error).message, ErrorCode.CONFIG_ERROR, { filePath, slug });
+    }
     const { frontmatter, html } = await renderMarkdown(filePath);
 
     return {
@@ -235,46 +275,51 @@ async function buildPostPages(
 ): Promise<void> {
   const buildPromises = posts.map(async (post, i) => {
     let { html, frontmatter } = post;
-    const title = (frontmatter.title as string) || post.slug;
+    let title = (frontmatter.title as string) || post.slug;
 
     const hookResult = await applyHooks(hooks, "post", post.slug, frontmatter, html);
     frontmatter = hookResult.frontmatter;
     html = hookResult.html;
+    title = (frontmatter.title as string) || post.slug;
+    const safeTitle = escapeHtmlText(title);
+
+    post.frontmatter = frontmatter;
+    post.html = html;
+    post.title = title;
+    post.date = (frontmatter.date as string) || "";
+    post.updated = (frontmatter.updated as string) || undefined;
+    post.excerpt = (frontmatter.excerpt as string) || "";
+    post.summary = (frontmatter.summary as string) || "";
+    post.tags = (frontmatter.tags as string[]) || [];
 
     const formattedDate = formatDate(frontmatter.date as string);
     const prevPost = i > 0 ? posts[i - 1] : null;
     const nextPost = i < posts.length - 1 ? posts[i + 1] : null;
 
-    let navHtml = "";
-    if (prevPost || nextPost) {
-      const navParts: string[] = [`<nav class="post-nav">`];
-      if (prevPost) navParts.push(`<a href="/${urlPrefix}/${prevPost.slug}">← ${prevPost.title}</a>`);
-      if (nextPost) navParts.push(`<a href="/${urlPrefix}/${nextPost.slug}">${nextPost.title} →</a>`);
-      navParts.push("</nav>");
-      navHtml = navParts.join("");
-    }
+    const navHtml = generatePostNavigationHTML(prevPost, nextPost, urlPrefix);
+    const tocHtml = generateTableOfContents(html);
 
     const headLinkParts: string[] = [];
-    if (prevPost) headLinkParts.push(`<link rel="prev" href="/${urlPrefix}/${prevPost.slug}" />`);
-    if (nextPost) headLinkParts.push(`<link rel="next" href="/${urlPrefix}/${nextPost.slug}" />`);
-    const headLinks = headLinkParts.join("\n    ");
+    if (prevPost) headLinkParts.push(`<link rel="prev" href="${postPath(urlPrefix, prevPost.slug)}" />`);
+    if (nextPost) headLinkParts.push(`<link rel="next" href="${postPath(urlPrefix, nextPost.slug)}" />`);
 
     const postTagsHtml = generatePostTagsHTML(frontmatter.tags as string[], urlPrefix);
     const dateClass = formattedDate ? "" : " hidden";
     const plainText = html.replace(/<[^>]+>/g, "").replace(/\s+/g, "");
     const wordCount = `${plainText.length} 字`;
     const sourceMdLink = config.llms?.enabled
-      ? `<a href="/${urlPrefix}/${post.slug}.md" class="md-link" rel="nofollow">.md</a>`
+      ? `<a href="${postPath(urlPrefix, post.slug)}.md" class="md-link" rel="nofollow">.md</a>`
       : "";
     const dateSeparator = formattedDate ? " · " : "";
 
     const contentData = {
-      title,
+      title: safeTitle,
       date: formattedDate,
       dateClass,
       dateSeparator,
       wordCount,
       content: html,
+      toc: tocHtml,
       tags: postTagsHtml,
       navigation: navHtml,
       sourceMdLink,
@@ -292,12 +337,17 @@ async function buildPostPages(
     });
 
     const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
-    const scripts = hasMermaid ? mermaidScript : "";
+    const scripts = [
+      hasMermaid ? mermaidScript : "",
+      hasSidenoteConnectors(html) ? sidenoteScript : "",
+    ].filter(Boolean).join("\n");
+    if (hasMathHtml(html)) headLinkParts.push(mathStylesheet);
+    const headLinks = headLinkParts.join("\n    ");
     const postTags = frontmatter.tags as string[] | undefined;
     const fullTitle = `${title} - ${config.site.title}`;
 
     let output = renderPage(baseLayout, {
-      route: `/${urlPrefix}/${post.slug}`,
+      route: postPath(urlPrefix, post.slug),
       title: fullTitle,
       description,
       content: renderedContent,
@@ -307,7 +357,7 @@ async function buildPostPages(
       ogTags: {
         title: fullTitle,
         description,
-        url: `${config.site.url}/${urlPrefix}/${post.slug}`,
+        url: `${config.site.url}${postPath(urlPrefix, post.slug)}`,
         type: "article",
         siteName: config.site.title,
         tags: postTags,
@@ -319,7 +369,7 @@ async function buildPostPages(
         type: "BlogPosting",
         title,
         description,
-        url: `${config.site.url}/${urlPrefix}/${post.slug}`,
+        url: `${config.site.url}${postPath(urlPrefix, post.slug)}`,
         date: frontmatter.date as string,
         dateModified: (frontmatter.updated as string) || undefined,
         tags: postTags,
@@ -327,7 +377,7 @@ async function buildPostPages(
       breadcrumbs: [
         { name: config.site.title, url: config.site.url },
         { name: capitalize(coll.name), url: `${config.site.url}/${urlPrefix}` },
-        { name: title, url: `${config.site.url}/${urlPrefix}/${post.slug}` },
+        { name: title, url: `${config.site.url}${postPath(urlPrefix, post.slug)}` },
       ],
       year,
       headLinks,
@@ -381,6 +431,19 @@ async function buildTagPages(
 
   if (tagMap.size === 0) return;
 
+  const tagSlugOwners = new Map<string, string>();
+  for (const tag of tagMap.keys()) {
+    const slug = getTagSlug(tag);
+    const owner = tagSlugOwners.get(slug);
+    if (owner && owner !== tag) {
+      throw new AppError(`Tag slug collision: '${owner}' and '${tag}' both map to '${slug}'`, ErrorCode.CONFIG_ERROR, {
+        collection: coll.name,
+        slug,
+      });
+    }
+    tagSlugOwners.set(slug, tag);
+  }
+
   const allTagsGlobal = collectAllTags(posts);
 
   const tagPromises: Promise<void>[] = [];
@@ -395,7 +458,7 @@ async function buildTagPages(
       const postsListHtml = generatePostsListHTML(sortedPosts, urlPrefix);
 
       const contentData = {
-        title: `Tag: #${tag}`,
+        title: `Tag: #${escapeHtmlText(tag)}`,
         tagsList: tagNavHtml,
         postsList: postsListHtml,
       };

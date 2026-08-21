@@ -1,6 +1,6 @@
 import { join } from "path";
 import { ensureDir, readFileContent, writeFileContent } from "../utils/fs.js";
-import { cleanBaseUrl } from "../utils/url.js";
+import { cleanBaseUrl, joinUrlPath } from "../utils/url.js";
 import config from "../config.js";
 import type { CollectionOutput } from "../types.js";
 
@@ -11,42 +11,29 @@ export async function emitMarkdownFiles(collections: CollectionOutput[]): Promis
     const outDir = join(dist, collection.urlPrefix);
     await ensureDir(outDir);
 
-    const results = await Promise.allSettled(
+    await Promise.all(
       collection.items.map(async (post) => {
         const srcPath = join(collection.srcDir, `${post.slug}.md`);
         const outPath = join(outDir, `${post.slug}.md`);
-        try {
-          const raw = await readFileContent(srcPath);
-          await writeFileContent(outPath, raw);
-          return 1;
-        } catch (err) {
-          console.warn(`⚠ llms: skip ${collection.urlPrefix}/${post.slug}.md:`, (err as Error).message);
-          return 0;
-        }
+        const raw = await readFileContent(srcPath);
+        await writeFileContent(outPath, raw);
       })
     );
-    return results.reduce((sum, r) => sum + (r.status === "fulfilled" ? r.value : 0), 0);
   });
 
-  const pageResults = await Promise.allSettled(
+  await Promise.all(
     Object.entries(config.routes).map(async ([route, file]) => {
       const mdPath = route === "/" ? "index.md" : `${route.slice(1)}.md`;
       const srcPath = join(pagesDir, file);
       const outPath = join(dist, mdPath);
-      try {
-        const raw = await readFileContent(srcPath);
-        await writeFileContent(outPath, raw);
-        return 1;
-      } catch (err) {
-        console.warn(`⚠ llms: skip page md ${file}:`, (err as Error).message);
-        return 0;
-      }
+      const raw = await readFileContent(srcPath);
+      await writeFileContent(outPath, raw);
     })
   );
 
-  const collCounts = await Promise.all(collPromises);
-  const pageCount = pageResults.reduce((sum, r) => sum + (r.status === "fulfilled" ? r.value : 0), 0);
-  const total = collCounts.reduce((a, b) => a + b, 0) + pageCount;
+  await Promise.all(collPromises);
+  const total = collections.reduce((sum, collection) => sum + collection.items.length, 0)
+    + Object.keys(config.routes).length;
   console.log(`✓ Emitted ${total} markdown file(s) for LLMs`);
 }
 
@@ -77,7 +64,7 @@ export async function generateLlmsTxt(collections: CollectionOutput[]): Promise<
     parts.push("", `## ${label}`, "");
 
     for (const post of collection.items) {
-      const url = `${base}/${collection.urlPrefix}/${post.slug}.md`;
+      const url = `${base}${joinUrlPath(collection.urlPrefix, `${post.slug}.md`)}`;
       const desc = post.summary
         ? post.summary.slice(0, 196) + (post.summary.length > 196 ? "…" : "")
         : `${label}文章原文`;
