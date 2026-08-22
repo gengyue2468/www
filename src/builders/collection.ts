@@ -7,10 +7,11 @@ import { renderTemplate } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import { hasSidenoteConnectors, sidenoteScript } from "../extensions/sidenotes.js";
+import { postActionsScript } from "../extensions/post-actions.js";
 import { hasMathHtml, mathStylesheet } from "../extensions/math.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import type { BuildHooks } from "../extensions/plugin.js";
-import { buildMetaDescription, escapeHtmlText, generateKeywords } from "../utils/seo.js";
+import { buildMetaDescription, escapeHtmlAttr, escapeHtmlText, generateKeywords } from "../utils/seo.js";
 import { assertSafePathSegment, joinUrlPath } from "../utils/url.js";
 import { AppError, ErrorCode, isENOENT, errorReporter } from "../utils/errors.js";
 import config from "../config.js";
@@ -120,6 +121,31 @@ function generatePostNavigationHTML(prevPost: PostWithContent | null, nextPost: 
     ? `<a class="post-nav-link post-nav-next" href="${postPath(urlPrefix, nextPost.slug)}"><span>下一篇</span><strong>${escapeHtmlText(nextPost.title)}</strong></a>`
     : `<span class="post-nav-link post-nav-empty" aria-hidden="true"></span>`;
   return `<nav class="post-nav" aria-label="文章导航">${previous}${next}</nav>`;
+}
+
+function generatePostActionsHTML(markdownPath: string, pagePath: string): string {
+  const markdownUrl = `${config.site.url}${markdownPath}`;
+  const pageUrl = `${config.site.url}${pagePath}`;
+  const prompt = `Please read this article and summarize its key points: ${markdownUrl}`;
+  const menuId = "post-actions-menu";
+  const link = (label: string, href: string, attributes = "") =>
+    `<a href="${escapeHtmlAttr(href)}"${attributes}>${escapeHtmlText(label)}</a>`;
+  const external = ' target="_blank" rel="noopener noreferrer"';
+
+  return `<span class="post-actions nav-dropdown-wrapper">
+    <input type="checkbox" id="${menuId}" class="nav-menu-checkbox" aria-label="Actions">
+    <label class="nav-menu-overlay" for="${menuId}" aria-hidden="true"></label>
+    <label class="nav-menu-label post-actions-button" for="${menuId}">Actions</label>
+    <div class="nav-dropdown-menu">
+      ${link("View Markdown", markdownPath)}
+      ${link("Copy Markdown", markdownPath, ' data-copy-markdown rel="nofollow"')}
+      ${link("Copy URL", pageUrl, ' data-copy-url rel="nofollow"')}
+      ${link("Ask ChatGPT", `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`, external)}
+      ${link("Ask Claude", `https://claude.ai/new?q=${encodeURIComponent(prompt)}`, external)}
+      ${link("Ask Gemini", `https://gemini.google.com/app?prompt=${encodeURIComponent(prompt)}`, external)}
+      ${link("Ask DeepSeek", `https://chat.deepseek.com/?q=${encodeURIComponent(prompt)}`, external)}
+    </div>
+  </span>`;
 }
 
 function generatePostsListHTML(posts: Post[], urlPrefix: string): string {
@@ -307,11 +333,11 @@ async function buildPostPages(
     const dateClass = formattedDate ? "" : " hidden";
     const plainText = html.replace(/<[^>]+>/g, "").replace(/\s+/g, "");
     const wordCount = `${plainText.length} 字`;
+    const markdownPath = `${postPath(urlPrefix, post.slug)}.md`;
     const sourceMdLink = config.llms?.enabled
-      ? `<a href="${postPath(urlPrefix, post.slug)}.md" class="md-link" rel="nofollow">.md</a>`
+      ? generatePostActionsHTML(markdownPath, postPath(urlPrefix, post.slug))
       : "";
     const dateSeparator = formattedDate ? " · " : "";
-
     const contentData = {
       title: safeTitle,
       date: formattedDate,
@@ -340,6 +366,7 @@ async function buildPostPages(
     const scripts = [
       hasMermaid ? mermaidScript : "",
       hasSidenoteConnectors(html) ? sidenoteScript : "",
+      config.llms?.enabled ? postActionsScript : "",
     ].filter(Boolean).join("\n");
     if (hasMathHtml(html)) headLinkParts.push(mathStylesheet);
     const headLinks = headLinkParts.join("\n    ");

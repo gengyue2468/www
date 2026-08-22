@@ -132,7 +132,7 @@ nav .nav-menu-label:hover {
   display: block;
 }
 
-nav .nav-dropdown-menu {
+.nav-dropdown-menu {
   display: none;
   position: absolute;
   top: 100%;
@@ -148,23 +148,78 @@ nav .nav-dropdown-menu {
 }
 
 @media (prefers-color-scheme: dark) {
-  nav .nav-dropdown-menu {
+  .nav-dropdown-menu {
     background: var(--bg-color-dark);
     border-color: #333;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 }
 
-nav .nav-dropdown-menu a {
+.nav-dropdown-menu a {
   display: block;
   margin-right: 0;
   padding: 0.4rem 1rem;
   font-size: 1.3rem;
+  text-decoration: none;
   white-space: nowrap;
 }
 
-nav .nav-dropdown-menu a:hover {
+.nav-dropdown-menu a:hover {
   background-color: var(--accent) !important;
+}
+
+.post-actions {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0 0 0 auto;
+  font-style: normal;
+}
+
+.post-actions-button {
+  appearance: none;
+  display: inline-block;
+  position: relative;
+  z-index: 100;
+  cursor: pointer;
+  padding: 0.2rem 0.65rem !important;
+  border: 1px solid color-mix(in srgb, var(--border-color) 75%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--border-color) 8%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 1em;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: normal;
+  list-style: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.post-actions .nav-dropdown-menu,
+.post-actions .nav-dropdown-menu a {
+  line-height: normal;
+}
+
+.post-actions-button:hover,
+.post-actions .nav-menu-checkbox:checked ~ .post-actions-button {
+  border-color: var(--border-color);
+  background: var(--accent);
+}
+
+.post-actions-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .post-actions-button {
+    border-color: color-mix(in srgb, #999 55%, transparent);
+    background: color-mix(in srgb, #999 10%, transparent);
+  }
+
 }
 
 /* Tabs */
@@ -572,17 +627,38 @@ main {
 .post-date {
   margin-top: -1rem;
   margin-bottom: 2rem;
+  width: var(--width-content);
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 1rem;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
 }
 
 .post-date.hidden {
   display: none;
 }
 
+@media (max-width: 760px) {
+  .post-actions .nav-dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+  }
+
+  .post-date {
+    width: 100%;
+  }
+}
+
 .post-date-inline {
   font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.post-meta {
+  flex: 1 1 auto;
+  min-width: 0;
   white-space: nowrap;
 }
 
@@ -996,11 +1072,11 @@ ul {
     font-size: 1.2rem;
   }
 
-  nav .nav-dropdown-menu {
+  .nav-dropdown-menu {
     min-width: 120px;
   }
 
-  nav .nav-dropdown-menu a {
+  .nav-dropdown-menu a {
     font-size: 1.1rem;
   }
 
