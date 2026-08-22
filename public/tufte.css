@@ -207,7 +207,6 @@ img {
 
 .post-nav-link strong {
   font-weight: normal;
-  text-wrap: balance;
   overflow: hidden;
   text-overflow: ellipsis;
 }

@@ -143,6 +143,7 @@ function generatePostActionsHTML(markdownPath: string, pagePath: string): string
       ${link("Ask ChatGPT", `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`, external)}
       ${link("Ask Claude", `https://claude.ai/new?q=${encodeURIComponent(prompt)}`, external)}
       ${link("Ask Gemini", `https://gemini.google.com/app?prompt=${encodeURIComponent(prompt)}`, external)}
+      ${link("Ask Grok", `https://grok.com/?q=${encodeURIComponent(prompt)}`, external)}
       ${link("Ask DeepSeek", `https://chat.deepseek.com/?q=${encodeURIComponent(prompt)}`, external)}
     </div>
   </span>`;

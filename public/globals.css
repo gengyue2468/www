@@ -641,6 +641,10 @@ main {
 }
 
 @media (max-width: 760px) {
+  .post-actions-button {
+    font-size: 1.2rem;
+  }
+
   .post-actions .nav-dropdown-menu {
     right: 0 !important;
     left: auto !important;
