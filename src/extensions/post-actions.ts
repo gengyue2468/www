@@ -1,1 +1,3 @@
-export const postActionsScript = '<script defer src="/js/post-actions.js"></script>';
+export function postActionsScript(src: string): string {
+  return `<script defer src="${src}"></script>`;
+}

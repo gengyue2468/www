@@ -21,8 +21,9 @@ export const mermaidPlugin: Plugin = {
   ],
 };
 
-export const mermaidScript = `
-<script src="/js/mermaid.min.js"></script>
+export function mermaidScript(src: string): string {
+  return `
+<script src="${src}"></script>
 <script>
 
   const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -111,3 +112,4 @@ export const mermaidScript = `
   }
 </script>
 `;
+}

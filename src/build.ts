@@ -1,20 +1,25 @@
 import { join, dirname, relative } from "path";
 import { mkdir, rm, readdir, rename, stat } from "fs/promises";
-import { ensureDir, loadLayout, copyPublicFiles, copyDirectory, writeFileContent } from "./utils/fs.js";
-import { buildPage, getInlinedCss } from "./builders/page.js";
+import { ensureDir, loadLayout, copyPublicFiles, copyDirectory, readFileContent, writeFileContent } from "./utils/fs.js";
+import { buildPage, getMinifiedCss } from "./builders/page.js";
 import { buildCollection, getRequiredLayouts } from "./builders/collection.js";
 import { generateRSS } from "./generators/rss.js";
 import { generateSitemap } from "./generators/sitemap.js";
 import { generateRobotsTxt } from "./generators/robots.js";
 import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
 import { registerPlugin, getComposedHooks } from "./extensions/plugin.js";
-import { mermaidPlugin, hasMermaidCode } from "./extensions/mermaid.js";
+import { mermaidPlugin } from "./extensions/mermaid.js";
 import { nodeseekPlugin } from "./extensions/nodeseek.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
 import { auditDist, type HtmlAuditIssueKind } from "./utils/html-audit.js";
-import type { CollectionOutput } from "./types.js";
+import { contentHash, emitHashedTextAsset } from "./utils/assets.js";
+import type { AssetManifest, CollectionOutput } from "./types.js";
 import config from "./config.js";
+
+export interface BuildOptions {
+  development?: boolean;
+}
 
 registerPlugin(mermaidPlugin);
 registerPlugin(nodeseekPlugin);
@@ -61,6 +66,7 @@ async function buildStaticPages(
   pageLayout: string,
   currentYear: number,
   defaultOgImageUrl: string | undefined,
+  assets: AssetManifest,
   hooks: ReturnType<typeof getComposedHooks>
 ): Promise<void> {
   const results = await Promise.allSettled(
@@ -75,7 +81,7 @@ async function buildStaticPages(
         await stat(filePath);
         await buildPage(
           route, filePath, baseLayout, pageLayout,
-          currentYear, defaultOgImageUrl,
+          assets, currentYear, defaultOgImageUrl,
           hooks
         );
         console.log(`✓ Built ${route}`);
@@ -103,7 +109,7 @@ async function buildCollections(
   baseLayout: string,
   layoutsMap: Record<string, string>,
   currentYear: number,
-  inlinedCss: string,
+  assets: AssetManifest,
   hooks: ReturnType<typeof getComposedHooks>,
   timer: PerformanceTimer
 ): Promise<CollectionOutput[]> {
@@ -112,7 +118,7 @@ async function buildCollections(
       timer.start(`collection:${coll.name}`);
       try {
         const output = await buildCollection(
-          coll, baseLayout, layoutsMap, currentYear, inlinedCss, hooks
+          coll, baseLayout, layoutsMap, assets, currentYear, hooks
         );
         return output;
       } finally {
@@ -179,6 +185,7 @@ async function build404Page(
   pageLayout: string,
   currentYear: number,
   defaultOgImageUrl: string | undefined,
+  assets: AssetManifest,
   hooks: ReturnType<typeof getComposedHooks>
 ): Promise<void> {
   const filePath404 = join(config.dirs.pages, "404.md");
@@ -190,7 +197,7 @@ async function build404Page(
 
   await buildPage(
     "/404", filePath404, baseLayout, pageLayout,
-    currentYear, defaultOgImageUrl,
+    assets, currentYear, defaultOgImageUrl,
     hooks,
     '<meta name="robots" content="noindex, nofollow" />'
   );
@@ -213,13 +220,10 @@ const MERMAID_VERSION = "10.9.3";
 const MERMAID_CACHE_DIR = join(config.rootDir, ".build-cache");
 const BUILD_LOCK_DIR = join(config.rootDir, ".build-lock");
 
-async function downloadMermaidJS(destPath: string): Promise<void> {
-  if (await Bun.file(destPath).exists()) return;
-  await ensureDir(dirname(destPath));
+async function loadMermaidJS(): Promise<string> {
   const cachePath = join(MERMAID_CACHE_DIR, `mermaid-${MERMAID_VERSION}.min.js`);
   if (await Bun.file(cachePath).exists() && (await Bun.file(cachePath).size) > 0) {
-    await Bun.write(destPath, Bun.file(cachePath));
-    return;
+    return readFileContent(cachePath);
   }
 
   const url = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/mermaid.min.js`;
@@ -229,50 +233,16 @@ async function downloadMermaidJS(destPath: string): Promise<void> {
     await ensureDir(MERMAID_CACHE_DIR);
     const resp = await fetch(url, { signal: AbortSignal.timeout(30_000) });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    await Bun.write(temporaryPath, resp);
+    const content = await resp.text();
+    if (!content) throw new Error("Empty response");
+    await Bun.write(temporaryPath, content);
     await rename(temporaryPath, cachePath);
-    await Bun.write(destPath, Bun.file(cachePath));
     console.log("  ✓ mermaid.js downloaded");
+    return content;
   } catch (err) {
     await rm(temporaryPath, { force: true });
-    throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { url, destPath });
+    throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { url, cachePath });
   }
-}
-
-async function directoryContainsPattern(dir: string, pattern: RegExp): Promise<boolean> {
-  let entries;
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch (err) {
-    if (isENOENT(err)) return false;
-    throw err;
-  }
-
-  for (const entry of entries) {
-    const filePath = join(dir, entry.name);
-    if (entry.isDirectory() && await directoryContainsPattern(filePath, pattern)) return true;
-    if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
-    if (pattern.test(await Bun.file(filePath).text())) return true;
-    pattern.lastIndex = 0;
-  }
-
-  return false;
-}
-
-async function hasMermaidSource(): Promise<boolean> {
-  const files = Object.values(config.routes).map(file => join(config.dirs.pages, file));
-  for (const filePath of files) {
-    try {
-      if (await Bun.file(filePath).exists() && hasMermaidCode(await Bun.file(filePath).text())) return true;
-    } catch {
-      // Static route validation reports missing files separately.
-    }
-  }
-
-  for (const collection of config.collections) {
-    if (await directoryContainsPattern(collection.srcDir || join(config.rootDir, "content", collection.name), /(?:^|\n) {0,3}(?:`{3,}|~{3,})[ \t]*mermaid(?:[ \t]+[^\r\n]*)?[ \t]*\r?\n/i)) return true;
-  }
-  return false;
 }
 
 async function requireDirectory(directory: string, label: string): Promise<void> {
@@ -329,16 +299,68 @@ async function validateBuildInputs(): Promise<void> {
   }
 }
 
-async function copyKatexAssets(destDir: string): Promise<void> {
+async function copyKatexAssets(destDir: string): Promise<string> {
   const sourceDir = join(config.rootDir, "node_modules", "katex", "dist");
   await ensureDir(destDir);
-  await Bun.write(join(destDir, "katex.min.css"), Bun.file(join(sourceDir, "katex.min.css")));
-  await copyDirectory(join(sourceDir, "fonts"), join(destDir, "fonts"));
+
+  const sourceCss = await readFileContent(join(sourceDir, "katex.min.css"));
+  const sourceFontsDir = join(sourceDir, "fonts");
+  const packageMetadata = await readFileContent(join(sourceDir, "..", "package.json"));
+  const fontsDirectoryName = `fonts.${contentHash(`${packageMetadata}\0${sourceCss}`)}`;
+  const css = sourceCss.replaceAll("url(fonts/", `url(${fontsDirectoryName}/`);
+  const cssFileName = await emitHashedTextAsset(destDir, "katex", ".css", css);
+  await copyDirectory(sourceFontsDir, join(destDir, fontsDirectoryName));
+  return `/katex/${cssFileName}`;
+}
+
+async function removeUnversionedPageAssets(): Promise<void> {
+  await Promise.all([
+    rm(join(config.dirs.dist, "tufte.css"), { force: true }),
+    rm(join(config.dirs.dist, "globals.css"), { force: true }),
+    rm(join(config.dirs.dist, "js", "post-actions.js"), { force: true }),
+    rm(join(config.dirs.dist, "js", "sidenote-connectors.js"), { force: true }),
+    rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "result.css"), { force: true }),
+    rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "index.html"), { force: true }),
+    rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "index.proto"), { force: true }),
+    rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "reporter.bin"), { force: true }),
+  ]);
+}
+
+async function prepareBuildAssets(): Promise<AssetManifest> {
+  const assetsDir = join(config.dirs.dist, "assets");
+
+  const stylesheet = await getMinifiedCss();
+  const stylesheetFileName = await emitHashedTextAsset(assetsDir, "site", ".css", stylesheet);
+
+  const postActions = await readFileContent(join(config.dirs.public, "js", "post-actions.js"));
+  const postActionsFileName = await emitHashedTextAsset(assetsDir, "post-actions", ".js", postActions);
+
+  const sidenoteConnectors = await readFileContent(join(config.dirs.public, "js", "sidenote-connectors.js"));
+  const sidenoteFileName = await emitHashedTextAsset(assetsDir, "sidenote-connectors", ".js", sidenoteConnectors);
+
+  const fontCssDir = join(config.dirs.dist, "fonts", "source-han-serif-cn-vf");
+  const fontCss = await readFileContent(join(config.dirs.public, "fonts", "source-han-serif-cn-vf", "result.css"));
+  const fontCssFileName = await emitHashedTextAsset(fontCssDir, "result", ".css", fontCss);
+
+  const katexStylesheetHref = await copyKatexAssets(join(config.dirs.dist, "katex"));
+
+  const mermaid = await loadMermaidJS();
+  const mermaidFileName = await emitHashedTextAsset(assetsDir, "mermaid", ".js", mermaid);
+
+  return {
+    stylesheetHref: `/assets/${stylesheetFileName}`,
+    fontStylesheetHref: `/fonts/source-han-serif-cn-vf/${fontCssFileName}`,
+    katexStylesheetHref,
+    postActionsScriptSrc: `/assets/${postActionsFileName}`,
+    sidenoteScriptSrc: `/assets/${sidenoteFileName}`,
+    mermaidScriptSrc: `/assets/${mermaidFileName}`,
+  };
 }
 
 const timer = new PerformanceTimer();
 
-async function buildIntoCurrentDist(): Promise<void> {
+async function buildIntoCurrentDist(options: BuildOptions = {}): Promise<void> {
+  const development = options.development === true;
   console.log("📦 Building site...\n");
   errorReporter.reset();
   timer.reset();
@@ -347,14 +369,17 @@ async function buildIntoCurrentDist(): Promise<void> {
   timer.start("setup");
   await validateBuildInputs();
   await ensureDir(config.dirs.dist);
-  timer.start("copy-public");
-  await copyPublicFiles(config.dirs);
-  timer.end("copy-public");
 
-  if (await hasMermaidSource()) {
-    await downloadMermaidJS(join(config.dirs.dist, "js", "mermaid.min.js"));
+  if (!development) {
+    timer.start("copy-public");
+    await copyPublicFiles(config.dirs);
+    await removeUnversionedPageAssets();
+    timer.end("copy-public");
   }
-  await copyKatexAssets(join(config.dirs.dist, "katex"));
+
+  timer.start("assets");
+  const assets = await prepareBuildAssets();
+  timer.end("assets");
 
   const hooks = getComposedHooks();
 
@@ -372,7 +397,6 @@ async function buildIntoCurrentDist(): Promise<void> {
   const pageLayout = layoutsMap["page"];
 
   const currentYear = new Date().getFullYear();
-  const inlinedCss = await getInlinedCss();
   timer.end("setup");
 
   const defaultOgImageUrl = config.site.ogImage
@@ -384,12 +408,12 @@ async function buildIntoCurrentDist(): Promise<void> {
   }
 
   timer.start("static-pages");
-  await buildStaticPages(config.routes, baseLayout, pageLayout, currentYear, defaultOgImageUrl, hooks);
+  await buildStaticPages(config.routes, baseLayout, pageLayout, currentYear, defaultOgImageUrl, assets, hooks);
   timer.end("static-pages");
 
   timer.start("collections");
   const allCollectionOutputs = await buildCollections(
-    config.collections, baseLayout, layoutsMap, currentYear, inlinedCss, hooks, timer
+    config.collections, baseLayout, layoutsMap, currentYear, assets, hooks, timer
   );
   timer.end("collections");
 
@@ -405,31 +429,33 @@ async function buildIntoCurrentDist(): Promise<void> {
   timer.end("llms");
 
   timer.start("404-page");
-  await build404Page(baseLayout, pageLayout, currentYear, defaultOgImageUrl, hooks);
+  await build404Page(baseLayout, pageLayout, currentYear, defaultOgImageUrl, assets, hooks);
   timer.end("404-page");
 
   if (hooks.afterBuild) {
     await hooks.afterBuild();
   }
 
-  timer.start("html-audit");
-  const htmlAuditIssues = await auditDist(config.dirs.dist);
-  const blockingAuditKinds = new Set<HtmlAuditIssueKind>([
-    "broken-local-link",
-    "broken-fragment",
-    "missing-title",
-  ]);
-  for (const auditIssue of htmlAuditIssues) {
-    const context = { kind: auditIssue.kind, file: auditIssue.file };
-    if (blockingAuditKinds.has(auditIssue.kind)) {
-      errorReporter.report(
-        new AppError(`HTML audit: ${auditIssue.message}`, ErrorCode.BUILD_ERROR, context)
-      );
-    } else {
-      errorReporter.reportWarning(`HTML audit: ${auditIssue.message}`, context);
+  if (!development) {
+    timer.start("html-audit");
+    const htmlAuditIssues = await auditDist(config.dirs.dist);
+    const blockingAuditKinds = new Set<HtmlAuditIssueKind>([
+      "broken-local-link",
+      "broken-fragment",
+      "missing-title",
+    ]);
+    for (const auditIssue of htmlAuditIssues) {
+      const context = { kind: auditIssue.kind, file: auditIssue.file };
+      if (blockingAuditKinds.has(auditIssue.kind)) {
+        errorReporter.report(
+          new AppError(`HTML audit: ${auditIssue.message}`, ErrorCode.BUILD_ERROR, context)
+        );
+      } else {
+        errorReporter.reportWarning(`HTML audit: ${auditIssue.message}`, context);
+      }
     }
+    timer.end("html-audit");
   }
-  timer.end("html-audit");
 
   timer.end("total");
   timer.report();
@@ -457,6 +483,28 @@ async function collectFiles(root: string, current = root): Promise<string[]> {
     }
   }
   return files;
+}
+
+function normalizeRelativePath(filePath: string): string {
+  return filePath.replaceAll("\\", "/");
+}
+
+function isVersionedAsset(filePath: string): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  return /^assets\/.+\.[a-f0-9]{12}\.(?:css|js)$/.test(normalized)
+    || /^katex\/katex\.[a-f0-9]{12}\.css$/.test(normalized)
+    || /^katex\/fonts\.[a-f0-9]{12}\/.+$/.test(normalized)
+    || /^fonts\/source-han-serif-cn-vf\/result\.[a-f0-9]{12}\.css$/.test(normalized)
+    || /^fonts\/source-han-serif-cn-vf\/[a-f0-9]{32}\.woff2$/.test(normalized);
+}
+
+function isLegacyPageAsset(filePath: string): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  return normalized === "js/post-actions.js"
+    || normalized === "js/sidenote-connectors.js"
+    || normalized === "js/mermaid.min.js"
+    || normalized === "katex/katex.min.css"
+    || normalized.startsWith("katex/fonts/");
 }
 
 async function replaceFileAtomically(sourcePath: string, destinationPath: string): Promise<void> {
@@ -491,17 +539,26 @@ async function promoteDist(stagingDist: string, liveDist: string): Promise<void>
   // avoids the directory-level gap between renaming live and staging away.
   await ensureDir(liveDist);
   const stagedFiles = await collectFiles(stagingDist);
+  stagedFiles.sort((left, right) => {
+    const leftIsHtml = left.endsWith(".html");
+    const rightIsHtml = right.endsWith(".html");
+    return Number(leftIsHtml) - Number(rightIsHtml);
+  });
   const stagedSet = new Set(stagedFiles);
 
   for (const relativePath of stagedFiles) {
+    const destinationPath = join(liveDist, relativePath);
+    if (isVersionedAsset(relativePath) && await Bun.file(destinationPath).exists()) continue;
     await replaceFileAtomically(
       join(stagingDist, relativePath),
-      join(liveDist, relativePath)
+      destinationPath
     );
   }
 
   for (const relativePath of await collectFiles(liveDist)) {
-    if (!stagedSet.has(relativePath)) {
+    if (!stagedSet.has(relativePath)
+        && !isVersionedAsset(relativePath)
+        && !isLegacyPageAsset(relativePath)) {
       await rm(join(liveDist, relativePath), { force: true });
     }
   }
@@ -605,9 +662,10 @@ async function acquireBuildLock(): Promise<() => Promise<void>> {
   }
 }
 
-async function buildOnce(): Promise<void> {
+async function buildOnce(options: BuildOptions): Promise<void> {
   const releaseBuildLock = await acquireBuildLock();
   const liveDist = config.dirs.dist;
+
   const stagingDist = `${liveDist}.staging-${process.pid}-${Date.now()}`;
   try {
     await rm(stagingDist, { recursive: true, force: true });
@@ -615,7 +673,7 @@ async function buildOnce(): Promise<void> {
     config.dirs.dist = stagingDist;
     let promoted = false;
     try {
-      await buildIntoCurrentDist();
+      await buildIntoCurrentDist(options);
       await promoteDist(stagingDist, liveDist);
       promoted = true;
       await rm(stagingDist, { recursive: true, force: true });
@@ -630,10 +688,10 @@ async function buildOnce(): Promise<void> {
 
 let activeBuild: Promise<void> | undefined;
 
-export function build(): Promise<void> {
+export function build(options: BuildOptions = {}): Promise<void> {
   if (activeBuild) return activeBuild;
 
-  const currentBuild = buildOnce();
+  const currentBuild = buildOnce(options);
   const guardedBuild = currentBuild.finally(() => {
     if (activeBuild === guardedBuild) activeBuild = undefined;
   });

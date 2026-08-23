@@ -51,7 +51,7 @@
     />
     <link
       rel="preload"
-      href="/fonts/source-han-serif-cn-vf/result.css"
+      href="{{fontStylesheet}}"
       as="style"
       onload="
         this.onload = null;
@@ -59,10 +59,10 @@
       "
     />
     <noscript>
-      <link rel="stylesheet" href="/fonts/source-han-serif-cn-vf/result.css" />
+      <link rel="stylesheet" href="{{fontStylesheet}}" />
     </noscript>
     {{analytics}}
-    {{css}}
+    <link rel="stylesheet" href="{{css}}" />
   </head>
   <body>
     <nav>{{nav}}</nav>

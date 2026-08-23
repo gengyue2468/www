@@ -1,5 +1,4 @@
 import { join, dirname } from "path";
-import { stat } from "fs/promises";
 import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
@@ -8,18 +7,10 @@ import { hasSidenoteConnectors, sidenoteScript } from "../extensions/sidenotes.j
 import { hasMathHtml, mathStylesheet } from "../extensions/math.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import type { BuildHooks } from "../extensions/plugin.js";
-import type { FrontMatter } from "../types.js";
+import type { AssetManifest, FrontMatter } from "../types.js";
 import { buildMetaDescription, escapeHtmlText, generateKeywords } from "../utils/seo.js";
 import { AppError, ErrorCode } from "../utils/errors.js";
 import config from "../config.js";
-
-interface CssCache {
-  content: string;
-  tufteMtime: number;
-  globalsMtime: number;
-}
-
-let cssCache: CssCache | null = null;
 
 function deduplicateFontFaces(css: string): string {
   const fontFaceRegex = /@font-face\s*\{[^}]+\}/g;
@@ -46,30 +37,10 @@ function lightweightCssMinify(css: string): string {
     .trim();
 }
 
-async function getFileMtime(filePath: string): Promise<number> {
-  try {
-    const { mtimeMs } = await stat(filePath);
-    return mtimeMs;
-  } catch {
-    return 0;
-  }
-}
-
-export async function getInlinedCss(): Promise<string> {
+export async function getMinifiedCss(): Promise<string> {
   const { public: publicDir } = config.dirs;
   const tuftePath = join(publicDir, "tufte.css");
   const globalsPath = join(publicDir, "globals.css");
-
-  const [tufteMtime, globalsMtime] = await Promise.all([
-    getFileMtime(tuftePath),
-    getFileMtime(globalsPath),
-  ]);
-
-  if (cssCache &&
-      cssCache.tufteMtime === tufteMtime &&
-      cssCache.globalsMtime === globalsMtime) {
-    return cssCache.content;
-  }
 
   try {
     const [tufteFile, globalsFile] = await Promise.all([
@@ -83,16 +54,12 @@ export async function getInlinedCss(): Promise<string> {
     ]);
 
     const combined = `${tufteCss}\n${globalsCss}`;
-    const minified = lightweightCssMinify(combined);
-    const content = `<style>\n${minified}\n</style>`;
-    
-    cssCache = { content, tufteMtime, globalsMtime };
-    return content;
+    return lightweightCssMinify(combined);
   } catch (err) {
     throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, {
       tuftePath,
       globalsPath,
-      phase: "css-inlining",
+      phase: "css-asset",
     });
   }
 }
@@ -104,7 +71,7 @@ function buildPageOutput(
   description: string,
   renderedContent: string,
   options: {
-    css: string;
+    assets: AssetManifest;
     scripts?: string;
     tags?: string[];
     robotsMeta?: string;
@@ -123,7 +90,8 @@ function buildPageOutput(
     title: pageTitle,
     description,
     content: renderedContent,
-    css: options.css,
+    stylesheetHref: options.assets.stylesheetHref,
+    fontStylesheetHref: options.assets.fontStylesheetHref,
     scripts: options.scripts || "",
     keywords: generateKeywords(options.tags),
     robotsMeta: options.robotsMeta,
@@ -167,6 +135,7 @@ export async function buildPage(
   filePath: string,
   baseLayout: string,
   contentLayout: string,
+  assets: AssetManifest,
   year?: number,
   ogImageUrl?: string,
   hooks?: BuildHooks,
@@ -182,14 +151,13 @@ export async function buildPage(
 
   const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
   const scripts = [
-    hasMermaid ? mermaidScript : "",
-    hasSidenoteConnectors(html) ? sidenoteScript : "",
+    hasMermaid ? mermaidScript(assets.mermaidScriptSrc) : "",
+    hasSidenoteConnectors(html) ? sidenoteScript(assets.sidenoteScriptSrc) : "",
   ].filter(Boolean).join("\n");
-  const headLinks = hasMathHtml(html) ? mathStylesheet : "";
+  const headLinks = hasMathHtml(html) ? mathStylesheet(assets.katexStylesheetHref) : "";
   const contentData = { title: escapeHtmlText(title), content: html };
   const renderedContent = renderTemplate(contentLayout, contentData);
 
-  const inlinedCss = await getInlinedCss();
   const description = buildMetaDescription({
     title,
     primary:
@@ -201,7 +169,7 @@ export async function buildPage(
   });
 
   let output = buildPageOutput(baseLayout, route, title as string, description, renderedContent, {
-    css: inlinedCss,
+    assets,
     scripts,
     tags: frontmatter.tags as string[],
     robotsMeta,

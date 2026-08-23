@@ -13,7 +13,8 @@ export interface RenderPageOptions {
   title: string;
   description: string;
   content: string;
-  css: string;
+  stylesheetHref: string;
+  fontStylesheetHref: string;
   scripts?: string;
   keywords?: string;
   ogTags: OgTagsOptions;
@@ -36,7 +37,8 @@ export function renderPage(
     title,
     description,
     content,
-    css,
+    stylesheetHref,
+    fontStylesheetHref,
     scripts = "",
     keywords = "",
     ogTags,
@@ -55,12 +57,25 @@ export function renderPage(
 
   let analytics = "";
   if (config.umami.enabled && config.umami.scriptUrl) {
-    try {
-      const origin = new URL(config.umami.scriptUrl).origin;
-      analytics = `<link rel="dns-prefetch" href="${origin}" />\n<link rel="preconnect" href="${origin}" crossorigin />\n<script defer src="${config.umami.scriptUrl}" data-website-id="${config.umami.websiteId}"></script>`;
-    } catch {
-      analytics = `<script defer src="${config.umami.scriptUrl}" data-website-id="${config.umami.websiteId}"></script>`;
+    const scriptUrl = JSON.stringify(config.umami.scriptUrl).replaceAll("<", "\\u003c");
+    const websiteId = JSON.stringify(config.umami.websiteId).replaceAll("<", "\\u003c");
+    analytics = `<script>
+  (() => {
+    const loadAnalytics = () => {
+      const script = document.createElement("script");
+      script.src = ${scriptUrl};
+      script.dataset.websiteId = ${websiteId};
+      script.async = true;
+      document.head.appendChild(script);
+    };
+
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(loadAnalytics, { timeout: 2000 });
+    } else {
+      window.setTimeout(loadAnalytics, 2000);
     }
+  })();
+</script>`;
   }
 
   const baseData = {
@@ -70,7 +85,8 @@ export function renderPage(
     author: escapeHtmlAttr(config.site.author),
     year: (year || new Date().getFullYear()).toString(),
     content,
-    css,
+    css: stylesheetHref,
+    fontStylesheet: fontStylesheetHref,
     nav: renderNav(config.nav, route),
     scripts,
     analytics,

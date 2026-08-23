@@ -15,7 +15,7 @@ import { buildMetaDescription, escapeHtmlAttr, escapeHtmlText, generateKeywords 
 import { assertSafePathSegment, joinUrlPath } from "../utils/url.js";
 import { AppError, ErrorCode, isENOENT, errorReporter } from "../utils/errors.js";
 import config from "../config.js";
-import type { CollectionConfig, CollectionOutput, Post } from "../types.js";
+import type { AssetManifest, CollectionConfig, CollectionOutput, Post } from "../types.js";
 import { generateTableOfContents } from "../utils/markdown.js";
 
 interface PostWithContent extends Post {
@@ -241,7 +241,7 @@ function buildCollectionIndex(
   urlPrefix: string,
   baseLayout: string,
   indexLayout: string,
-  css: string,
+  assets: AssetManifest,
   year?: number
 ): string {
   const allTags = collectAllTags(posts);
@@ -267,7 +267,8 @@ function buildCollectionIndex(
     title: indexTitle,
     description: indexDescription,
     content: renderedContent,
-    css: css || "",
+    stylesheetHref: assets.stylesheetHref,
+    fontStylesheetHref: assets.fontStylesheetHref,
     ogTags: { 
       title: indexTitle, 
       description: indexDescription, 
@@ -296,7 +297,7 @@ async function buildPostPages(
   urlPrefix: string,
   baseLayout: string,
   postLayout: string,
-  css: string,
+  assets: AssetManifest,
   year?: number,
   hooks?: BuildHooks
 ): Promise<void> {
@@ -365,11 +366,11 @@ async function buildPostPages(
 
     const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
     const scripts = [
-      hasMermaid ? mermaidScript : "",
-      hasSidenoteConnectors(html) ? sidenoteScript : "",
-      config.llms?.enabled ? postActionsScript : "",
+      hasMermaid ? mermaidScript(assets.mermaidScriptSrc) : "",
+      hasSidenoteConnectors(html) ? sidenoteScript(assets.sidenoteScriptSrc) : "",
+      config.llms?.enabled ? postActionsScript(assets.postActionsScriptSrc) : "",
     ].filter(Boolean).join("\n");
-    if (hasMathHtml(html)) headLinkParts.push(mathStylesheet);
+    if (hasMathHtml(html)) headLinkParts.push(mathStylesheet(assets.katexStylesheetHref));
     const headLinks = headLinkParts.join("\n    ");
     const postTags = frontmatter.tags as string[] | undefined;
     const fullTitle = `${title} - ${config.site.title}`;
@@ -379,7 +380,8 @@ async function buildPostPages(
       title: fullTitle,
       description,
       content: renderedContent,
-      css: css || "",
+      stylesheetHref: assets.stylesheetHref,
+      fontStylesheetHref: assets.fontStylesheetHref,
       scripts,
       keywords: generateKeywords(postTags),
       ogTags: {
@@ -439,7 +441,7 @@ async function buildTagPages(
   urlPrefix: string,
   baseLayout: string,
   tagsLayout: string,
-  css: string,
+  assets: AssetManifest,
   year?: number
 ): Promise<void> {
   const tagMap = new Map<string, PostWithContent[]>();
@@ -505,7 +507,8 @@ async function buildTagPages(
         title: tagPageTitle,
         description: tagDescription,
         content: renderedContent,
-        css: css || "",
+        stylesheetHref: assets.stylesheetHref,
+        fontStylesheetHref: assets.fontStylesheetHref,
         keywords: generateKeywords([tag]),
         robotsMeta: '<meta name="robots" content="noindex, follow" />',
         ogTags: { 
@@ -565,7 +568,8 @@ async function buildTagPages(
     title: tagsIndexTitle,
     description: tagsIndexDescription,
     content: renderedContent,
-    css: css || "",
+    stylesheetHref: assets.stylesheetHref,
+    fontStylesheetHref: assets.fontStylesheetHref,
     robotsMeta: '<meta name="robots" content="noindex, follow" />',
     ogTags: { 
       title: tagsIndexTitle, 
@@ -599,8 +603,8 @@ export async function buildCollection(
   coll: CollectionConfig,
   baseLayout: string,
   layoutsMap: Record<string, string>,
+  assets: AssetManifest,
   year?: number,
-  css?: string,
   hooks?: BuildHooks
 ): Promise<CollectionOutput> {
   const defaults = getCollectionDefaults(coll);
@@ -612,7 +616,7 @@ export async function buildCollection(
   const posts = await loadPostsFromDir(srcDir);
 
   if (indexLayout) {
-    const output = buildCollectionIndex(posts, coll, urlPrefix, baseLayout, indexLayout, css || "", year);
+    const output = buildCollectionIndex(posts, coll, urlPrefix, baseLayout, indexLayout, assets, year);
     const outputPath = join(config.dirs.dist, urlPrefix, "index.html");
     await ensureDir(dirname(outputPath));
     await writeFileContent(outputPath, output);
@@ -620,11 +624,11 @@ export async function buildCollection(
   }
 
   if (postLayout) {
-    await buildPostPages(posts, coll, urlPrefix, baseLayout, postLayout, css || "", year, hooks);
+    await buildPostPages(posts, coll, urlPrefix, baseLayout, postLayout, assets, year, hooks);
   }
 
   if (coll.tags && tagsLayout) {
-    await buildTagPages(posts, coll, urlPrefix, baseLayout, tagsLayout, css || "", year);
+    await buildTagPages(posts, coll, urlPrefix, baseLayout, tagsLayout, assets, year);
   }
 
   return {

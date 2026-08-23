@@ -2,4 +2,6 @@ export function hasMathHtml(html: string): boolean {
   return /class="katex(?:\s|"|-)/.test(html);
 }
 
-export const mathStylesheet = '<link rel="stylesheet" href="/katex/katex.min.css" />';
+export function mathStylesheet(href: string): string {
+  return `<link rel="stylesheet" href="${href}" />`;
+}

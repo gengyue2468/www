@@ -16,6 +16,15 @@ export interface DirsConfig {
   layouts: string;
 }
 
+export interface AssetManifest {
+  stylesheetHref: string;
+  fontStylesheetHref: string;
+  katexStylesheetHref: string;
+  postActionsScriptSrc: string;
+  sidenoteScriptSrc: string;
+  mermaidScriptSrc: string;
+}
+
 export interface DateConfig {
   locale: string;
   options: Intl.DateTimeFormatOptions;

@@ -8,15 +8,24 @@ if (!Number.isInteger(configuredPort) || configuredPort < 1 || configuredPort > 
   throw new Error(`Invalid PORT: ${process.env.PORT}`);
 }
 const PORT = configuredPort;
-const DEBOUNCE_MS = 100;
+const DEBOUNCE_MS = 200;
 
 const watchDirs = [
-  config.dirs.pages,
   config.dirs.public,
   config.dirs.layouts,
   join(config.rootDir, "content"),
   join(config.rootDir, "src"),
 ];
+
+const publicRoot = resolve(config.dirs.public);
+const sourceRoot = resolve(join(config.rootDir, "src"));
+const rebuildFiles = new Set([
+  resolve(join(config.dirs.public, "globals.css")),
+  resolve(join(config.dirs.public, "tufte.css")),
+  resolve(join(config.dirs.public, "js", "post-actions.js")),
+  resolve(join(config.dirs.public, "js", "sidenote-connectors.js")),
+  resolve(join(config.dirs.public, "fonts", "source-han-serif-cn-vf", "result.css")),
+]);
 
 let rebuilding = false;
 let pending = false;
@@ -28,7 +37,7 @@ async function rebuild(): Promise<void> {
   }
   rebuilding = true;
   try {
-    await build();
+    await build({ development: true });
   } catch {
     console.error("✗ Rebuild failed");
   }
@@ -65,6 +74,19 @@ for (const dir of watchDirs) {
       const pathParts = fullPath.split(/[\\/]/);
       if (pathParts.includes("node_modules") || pathParts.includes(".git") || pathParts.includes(".obsidian")) return;
       if (fullPath.endsWith(".map")) return;
+
+      const absolutePath = resolve(fullPath);
+      const sourceRelative = relative(sourceRoot, absolutePath);
+      if (!sourceRelative.startsWith("..") && !isAbsolute(sourceRelative)) {
+        console.log(`\n↻ Source changed: ${relative(config.rootDir, fullPath)} (restart dev server to reload)`);
+        return;
+      }
+
+      const publicRelative = relative(publicRoot, absolutePath);
+      if (!publicRelative.startsWith("..") && !isAbsolute(publicRelative) && !rebuildFiles.has(absolutePath)) {
+        return;
+      }
+
       scheduleRebuild(fullPath);
     });
   } catch {
@@ -86,6 +108,15 @@ Bun.serve({
     }
 
     const root = resolve(distDir);
+    const publicFilePath = resolve(publicRoot, `.${pathname}`);
+    const publicRelativePath = relative(publicRoot, publicFilePath);
+    if (!publicRelativePath.startsWith("..") && !isAbsolute(publicRelativePath)) {
+      const publicFile = Bun.file(publicFilePath);
+      if (await publicFile.exists()) {
+        return new Response(publicFile);
+      }
+    }
+
     const filePath = resolve(root, `.${pathname}`);
     const relativePath = relative(root, filePath);
     if (relativePath.startsWith("..") || isAbsolute(relativePath)) {
