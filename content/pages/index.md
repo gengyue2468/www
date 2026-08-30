@@ -3,7 +3,7 @@ title: Hi 👋!
 description:  gengyue 的个人网站。写一点技术、项目、折腾记录和碎碎念，也放一些不知道有什么用的小玩具。
 ---
 
-此地属于 gengyue。目前这个页面被扔到 [Netcup](https://www.netcup.com/en?ref=366353) 的一台美东 VPS [^ [VPS 1000 G12](https://www.netcup.com/en/server/vps/vps-1000-g12-iv-12m#vps-1000-g12-iv-12m-mnz), 4 vCore (EPYC x86), 8 GB DDR5 ECC RAM, 256 GB NVME SSD, Manassas, USA <br /> <br /> <iframe src="https://www.gengyue.dev/tty/" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width: 100%; height: 400px;"></iframe> <br />] 上了，通过美西的另一台小鸡回源。
+此地属于 gengyue。目前这个页面部署在 [DigitalFyre](https://console.digitalfyre.com/aff.php?aff=50) 的一台 New Jersey VPS [^ [SMALL S2²](https://console.digitalfyre.com/aff.php?aff=50), 8 7950X3D vCore, 8 GB RAM, 65 GB NVME SSD, New Jersey, USA <br /> <br /> <span class="ttyd-terminal"><img class="ttyd-mascot" src="/static/og/ttyd-kanban musume.webp" alt="" aria-hidden="true" /><iframe src="https://www.gengyue.dev/tty/" title="gengyue ttyd terminal" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width: 100%; height: 400px;"></iframe></span> <br />] 上，通过美西的一台优化线路小鸡回源 [^也许有点奢侈]。
 
 您可以通过访问 [About](/about), [Blog](/blog) 和 [Logbook](/logbook) 页面了解更多信息，下面的链接亦可：
 

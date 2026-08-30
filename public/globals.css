@@ -835,6 +835,47 @@ pre > code {
   display: block;
 }
 
+/* Let the ttyd mascot lean over the terminal without affecting other images. */
+.ttyd-terminal {
+  display: block;
+  position: relative;
+  width: 100%;
+  margin: 0.75rem 0 0.25rem;
+  isolation: isolate;
+}
+
+.ttyd-terminal .ttyd-mascot {
+  display: block;
+  position: relative;
+  z-index: 2;
+  width: min(43%, 11.5rem);
+  max-width: none;
+  height: auto;
+  margin: 0 0 -2.75rem auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ttyd-terminal iframe {
+  display: block;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--text-color) 22%, transparent);
+  border-radius: 4px;
+  background: #181818;
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ttyd-terminal iframe {
+    border-color: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.3);
+  }
+}
+
 /* Mermaid diagrams */
 .mermaid {
   border: 1px solid var(--accent);
@@ -1087,6 +1128,11 @@ ul {
   /* Fullwidth content truly full-width on mobile */
   .fullwidth-content {
     max-width: 100% !important;
+  }
+
+  .ttyd-terminal .ttyd-mascot {
+    width: min(36%, 11.5rem);
+    margin-bottom: -2.25rem;
   }
 
 }

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/blog/doh-within-tailnet.md",
+                "file": "content/pages/index.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "doh-within-tailnet"
+              "title": "index"
             }
           }
         ]
@@ -187,6 +187,7 @@
   },
   "active": "2716a342d393cd91",
   "lastOpenFiles": [
+    "content/blog/doh-within-tailnet.md",
     "dist.staging-8324-1787402496064/static/train/wuhan/IMG_20251213_184210.webp",
     "dist.staging-8324-1787402496064/static/train/wuhan/IMG_20251213_174524.webp",
     "dist.staging-8324-1787402496064/static/train/wuhan/IMG_20251213_170152.webp",
@@ -197,7 +198,6 @@
     "dist.staging-8324-1787402496064/static/tech/neofetch.webp",
     "dist.staging-8324-1787402496064/static/tech/hust-chifan-cli.webp",
     "dist.staging-8324-1787402496064/static/tech/html.webp",
-    "dist.staging-8324-1787402496064/static/tech/final-speed.webp",
     "dist.staging-8324-1787402496064/static/train/wuhan",
     "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/aab77d8970faa453a1331341954f0ae7.woff2",
     "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/ab2cb332a5724367ccc6a4f6600e48e3.woff2",
