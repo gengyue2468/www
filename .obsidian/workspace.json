@@ -13,15 +13,30 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/pages/index.md",
+                "file": "content/blog/2025-a-z.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "index"
+              "title": "2025-a-z"
+            }
+          },
+          {
+            "id": "169d834006254dbb",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "content/blog/xiaomi-router-ax3000t-1.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "xiaomi-router-ax3000t-1"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -55,7 +70,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "恢复模式",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -76,7 +91,8 @@
               "title": "书签"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -185,9 +201,45 @@
       "bases:新建数据库": false
     }
   },
-  "active": "2716a342d393cd91",
+  "active": "169d834006254dbb",
   "lastOpenFiles": [
-    "content/blog/doh-within-tailnet.md",
+    "dist.staging-156724-1788623923034/404.html",
+    "dist.staging-156724-1788623923034/llms.txt",
+    "dist.staging-156724-1788623923034/logbook/werid-educoder.md",
+    "dist.staging-156724-1788623923034/logbook/napcat-multi-clienting.md",
+    "dist.staging-156724-1788623923034/logbook/test.md",
+    "dist.staging-156724-1788623923034/logbook/cli-proxy-api.md",
+    "dist.staging-156724-1788623923034/logbook/failed-ssh-service.md",
+    "dist.staging-156724-1788623923034/logbook/dns-error.md",
+    "dist.staging-156724-1788623923034/logbook/wsl-oom.md",
+    "dist.staging-156724-1788623923034/logbook/cpp-debug.md",
+    "dist.staging-156724-1788623923034/logbook/miniflux-share-style.md",
+    "dist.staging-156724-1788623923034/logbook/bingyan-k8s-deployment.md",
+    "dist.staging-156724-1788623923034/logbook/ai-agent-and-human.md",
+    "dist.staging-156724-1788623923034/logbook/oracle-sgp-nodequality.md",
+    "dist.staging-156724-1788623923034/logbook/bun-hono-server.md",
+    "dist.staging-156724-1788623923034/logbook/azure-student.md",
+    "dist.staging-156724-1788623923034/logbook/ddg-search-mcp.md",
+    "dist.staging-156724-1788623923034/logbook/aliyun-kr.md",
+    "dist.staging-156724-1788623923034/logbook/azure-student-jp-east.md",
+    "dist.staging-156724-1788623923034/logbook/netcup-mnz.md",
+    "dist.staging-156724-1788623923034/logbook/alpine-rc-service-with-nginx.md",
+    "dist.staging-156724-1788623923034/blog/hello-world.md",
+    "dist.staging-156724-1788623923034/blog/baode-story.md",
+    "dist.staging-156724-1788623923034/logbook/windows-virtual-memory.md",
+    "dist.staging-156724-1788623923034/blog/hust-chifan.md",
+    "dist.staging-156724-1788623923034/logbook/cs-app-data-lab-1.md",
+    "dist.staging-156724-1788623923034/blog/train.md",
+    "dist.staging-156724-1788623923034/sitemap.xml",
+    "dist.staging-156724-1788623923034/robots.txt",
+    "dist.staging-156724-1788623923034/rss.xml",
+    "dist.staging-156724-1788623923034/blog/tag/index.html",
+    "dist.staging-156724-1788623923034/blog/tag/node-js/index.html",
+    "dist.staging-156724-1788623923034/blog/tag/node-js",
+    "dist.staging-156724-1788623923034/blog/tag/技术/index.html",
+    "dist.staging-156724-1788623923034/blog/tag/路由器/index.html",
+    "dist.staging-156724-1788623923034/blog/tag/博客/index.html",
+    "public/static/tech/xiaomi-ax3000t.webp",
     "dist.staging-8324-1787402496064/static/train/wuhan/IMG_20251213_184210.webp",
     "dist.staging-8324-1787402496064/static/train/wuhan/IMG_20251213_174524.webp",
     "dist.staging-8324-1787402496064/static/train/wuhan/IMG_20251213_170152.webp",
@@ -196,42 +248,6 @@
     "dist.staging-8324-1787402496064/static/tech/oracle-cloud-free-tier.webp",
     "dist.staging-8324-1787402496064/static/tech/memos-darkmode.webp",
     "dist.staging-8324-1787402496064/static/tech/neofetch.webp",
-    "dist.staging-8324-1787402496064/static/tech/hust-chifan-cli.webp",
-    "dist.staging-8324-1787402496064/static/tech/html.webp",
-    "dist.staging-8324-1787402496064/static/train/wuhan",
-    "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/aab77d8970faa453a1331341954f0ae7.woff2",
-    "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/ab2cb332a5724367ccc6a4f6600e48e3.woff2",
-    "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/aa2997d19bb3e0be69f8475dca7a8f32.woff2",
-    "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/aa16585471945c913a2c24d44258b47e.woff2",
-    "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/a93a9898c833d33cba9e4befa00c291b.woff2",
-    "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/a86338bee42dac39f2bc83215e909c05.woff2",
-    "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/a84296dd17bef20efe6c47e97ed028a9.woff2",
-    "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/a839e9b371f49df8fe85cbba66822eca.woff2",
-    "dist.staging-8324-1787402496064/fonts/source-han-serif-cn-vf/a67892b9ff5e26d646c623a0de902610.woff2",
-    "dist.staging-33404-1787402425392/node.md",
-    "dist.staging-33404-1787402425392/uses.md",
-    "dist.staging-33404-1787402425392/colophon.md",
-    "dist.staging-33404-1787402425392/about.md",
-    "dist.staging-33404-1787402425392/index.md",
-    "dist.staging-33404-1787402425392/logbook/wsl-oom.md",
-    "dist.staging-33404-1787402425392/logbook/windows-virtual-memory.md",
-    "dist.staging-33404-1787402425392/logbook/werid-educoder.md",
-    "dist.staging-33404-1787402425392/logbook/test.md",
-    "dist.staging-33404-1787402425392/logbook/oracle-sgp-nodequality.md",
-    "dist.staging-33404-1787402425392/logbook/netcup-mnz.md",
-    "dist.staging-33404-1787402425392/logbook/miniflux-share-style.md",
-    "dist.staging-33404-1787402425392/logbook/napcat-multi-clienting.md",
-    "dist.staging-33404-1787402425392/logbook/failed-ssh-service.md",
-    "dist.staging-33404-1787402425392/logbook/dns-error.md",
-    "dist.staging-33404-1787402425392/logbook/ddg-search-mcp.md",
-    "dist.staging-33404-1787402425392/logbook/cs-app-data-lab-1.md",
-    "dist.staging-33404-1787402425392/logbook/cpp-debug.md",
-    "dist.staging-33404-1787402425392/logbook/cli-proxy-api.md",
-    "dist.staging-33404-1787402425392/logbook/bingyan-k8s-deployment.md",
-    "dist.staging-33404-1787402425392/logbook/bun-hono-server.md",
-    "dist.staging-33404-1787402425392/logbook/azure-student.md",
-    "dist.staging-33404-1787402425392/logbook/azure-student-jp-east.md",
-    "dist.staging-33404-1787402425392/logbook/alpine-rc-service-with-nginx.md",
-    "dist.staging-33404-1787402425392/logbook/aliyun-kr.md"
+    "dist.staging-8324-1787402496064/static/tech/hust-chifan-cli.webp"
   ]
 }
