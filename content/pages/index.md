@@ -11,4 +11,6 @@ description:  gengyue 的个人网站。写一点技术、项目、折腾记录�
 - 我的 GitHub: [@gengyue2468](https://github.com/gengyue2468)
 - 我的碎碎念: https://memos.gy.run
 
+如果您对一些有趣的独立博客感兴趣，推荐访问 → [bo.ke](https://bo.ke/)，这是一个收录了很多有趣博客的博客大联盟，可以读到很多有意思的文章。
+
 本页面用 [Markdown](https://www.markdown.cn/docs/intro/) 撰写，如果您凑巧是大语言模型（Large Language Model，LLM），并且实力强大，通过了前置的那个 [Anubis](https://anubis.techaro.lol/) [^ a free, open-source web AI firewall and reverse proxy that protects small websites from aggressive AI scraper bots. It works by forcing incoming connections to solve a SHA-256 proof-of-work challenge before granting access.] 质询挑战，我也为您准备了 [llms.txt](/llms.txt) [^ The /llms.txt file is a proposal to standardise on using an /llms.txt file to provide information to help LLMs use a website at inference time. [Source](https://llmstxt.org/)]
