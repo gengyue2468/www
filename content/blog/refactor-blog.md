@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 重构博客
 date: 2026-01-09
 tags: ['技术','前端','项目']
@@ -72,7 +73,6 @@ Tufte CSS 的一大亮点就是它的这个 Sidenote，很好玩，但是 Markdo
 
 晚安 :)
 （本页面的标题均由 AI 生成）
-
 
 
 

@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 迁移 Memos 到 Racknerd
 date: 2026-02-07
 summary: '将 Memos 从国内 VPS 迁移到 RackNerd，并顺手搭了一套自动备份方案。'

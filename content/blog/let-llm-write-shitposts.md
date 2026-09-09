@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 让 llm 吐出胡说八道、天马行空的构石文章
 date: 2026-03-16
 tags:

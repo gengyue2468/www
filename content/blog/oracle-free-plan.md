@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 工行星座卡校园版注册甲骨文云免费套餐
 date: 2026-06-08
 tags:

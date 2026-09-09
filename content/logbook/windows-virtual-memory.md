@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 解决 Windows 虚拟内存放在 D 盘无效
 date: 2026-07-23
 ---

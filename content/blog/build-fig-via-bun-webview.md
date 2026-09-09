@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 利用 Bun 的最新内置 API Bun.Webview 搭建轻量网页抓取小玩具
 date: 2026-05-11
 summary: 本文介绍了如何利用 Bun 的实验性 API `Bun.Webview` 构建一个轻量级网页抓取工具 Fig，重点解决了在 Windows 下连接 Chrome 后端的问题（通过远程调试端口和手动启动浏览器），并实现了 HTML 到 Markdown 的转换、自定义 User-Agent 插件绕过微信公众号风控，最终部署为 HTTP 服务，可集成到 QQ 机器人等场景中。

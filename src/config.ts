@@ -31,6 +31,7 @@ const config: Config = {
     "/uses": "uses.md",
     "/colophon": "colophon.md",
     "/node": "node.md",
+    "/guestbook": "guestbook.md",
   },
 
   collections: [
@@ -77,6 +78,18 @@ const config: Config = {
     websiteId: "365406e1-29dc-44b9-895d-ff41a1e21ae1",
   },
 
+  isso: {
+    enabled: true,
+    endpoint: "https://www.gengyue.dev/isso/",
+    scriptUrl: "https://www.gengyue.dev/isso/js/embed.min.js",
+    pageAuthorHashes: "02b0b77186c6",
+    cap: {
+      enabled: true,
+      widgetScriptUrl: "https://www.gengyue.dev/cap/assets/widget.js",
+      apiEndpoint: "https://www.gengyue.dev/cap/46a5d669de/",
+    },
+  },
+
   rss: {
     enabled: true,
     title: "gengyue's blog",
@@ -119,6 +132,7 @@ const config: Config = {
       show: true,
       children: [
         { name: "Logbook", path: "/logbook", show: true },
+        { name: "Guestbook", path: "/guestbook", show: true },
         { name: "Colophon", path: "/colophon", show: true },
         { name: "Uses", path: "/uses", show: true },
         { name: "Node", path: "/node", show: true },

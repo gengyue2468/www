@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 用 Tailscale 组大内网！
 date: 2026-02-10
 summary: '文章记录了作者尝试用 Tailscale 给多台设备组建大内网的过程，从最初尝试 Wireguard 到最终用 Tailscale 解决掉线问题，包括不同操作系统的体验差异，并分享了实际设备状态和使用心得。'

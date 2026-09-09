@@ -1,4 +1,5 @@
 ---
+comment: true
 tags: [故事,生活]
 title: 小故事:我们不说“包的”
 date: 2025-12-16

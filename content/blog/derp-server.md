@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 自建 Tailscale Derp 服务器
 date: 2026-02-22
 summary: CNY 49/年搞定一台香港 KVM VPS，512MB 内存刚好跑 Tailscale 自建 DERP，移动友好又便宜！教程手把手教你配置 Go、下载编译 Derp、用 systemd 持久化，还顺便加上防火墙双重保护，保证只有你 tailnet 的节点能用。实测延迟从广州跑香港节点也相当爽，傻瓜式操作，省钱又安全，完美小鸡升级计划。

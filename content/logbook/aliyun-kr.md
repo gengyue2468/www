@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 阿里云首尔轻量 NQ 留档
 date: 2026-06-07
 ---

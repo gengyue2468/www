@@ -1,4 +1,5 @@
 ---
+comment: true
 title: Azure for Students NQ 留档
 date: 2026-06-22
 ---

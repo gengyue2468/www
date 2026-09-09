@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 原来 Hono 指定端口是通过 Runtime 控制的！
 date: 2026-05-07
 ---

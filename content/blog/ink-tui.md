@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 用 Ink 写 TUI！
 date: 2026-02-24
 summary: 如果你熟悉 React，又想快速搞一个 CLI 应用，Ink 是个超方便的选择。我用它做了 HUST-Chifan 的 TUI CLI，从 Box 布局到 useInput 都像写 React App 一样顺手，轻松搭出能跑就行的交互界面。

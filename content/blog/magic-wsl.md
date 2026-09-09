@@ -1,4 +1,5 @@
 ---
+comment: true
 tags: [技术]
 title: 好神奇的 WSL!
 date: 2025-12-19

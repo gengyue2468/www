@@ -1,4 +1,5 @@
 ---
+comment: true
 tags: [HUST,项目,前端]
 title: 小玩具:HUST 吃饭
 date: 2025-12-15

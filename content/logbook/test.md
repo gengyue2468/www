@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 测试一下 LogBook
 date: 2026-04-18
 ---
@@ -17,4 +18,3 @@ func main(){
 ```
 
 代码块正常吗？也是好的
-

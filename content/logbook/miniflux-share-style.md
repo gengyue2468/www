@@ -1,4 +1,5 @@
 ---
+comment: true
 title: Miniflux 分享页样式美化
 date: 2026-05-02
 ---

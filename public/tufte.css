@@ -224,7 +224,11 @@ img {
   }
 
   .post-nav-link {
-    font-size: 1.05rem;
+    font-size: 1.2rem;
+  }
+
+  .post-nav-link strong {
+    font-size: var(--font-size-body);
   }
 }
 

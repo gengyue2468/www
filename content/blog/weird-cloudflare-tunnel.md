@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 奇怪的 Cloudflare Tunnel
 date: 2026-02-14
 summary: "奇怪的 Cloudflare Tunnel：用 Tunnel + Zero Trust 访问家里的 Mac，通过 SSH，\r  Windows 客户端直接连上，Mac 端用 LaunchDaemon 自启和后台保活，整个流程很神奇，但是能跑！"

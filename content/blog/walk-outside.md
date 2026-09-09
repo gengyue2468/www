@@ -1,4 +1,5 @@
 ---
+comment: true
 tags: [武汉,生活]
 title: 出去走走
 date: 2026-01-02
@@ -37,4 +38,3 @@ summary: 2026 元旦假期的一次武汉城市漫步，打卡汉阳与长江大
 ### 大成路
 
 ![大成路](/static/city-walk/dacheng-rd.webp)
-

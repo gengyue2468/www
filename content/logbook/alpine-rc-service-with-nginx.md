@@ -1,4 +1,5 @@
 ---
+comment: true
 title: Alpine 上的 rc-service 和 nginx 打架
 date: 2026-07-11
 ---

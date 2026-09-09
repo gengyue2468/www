@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 在 Tailnet 里自建 & 使用 DoH
 date: 2026-08-21
 tags:

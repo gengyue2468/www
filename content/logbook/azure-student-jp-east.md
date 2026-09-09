@@ -1,4 +1,5 @@
 ---
+comment: true
 title: Azure for Students JP East NQ 留档
 date: 2026-07-05
 ---

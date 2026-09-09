@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 装一下 Memos
 date: 2026-02-01
 summary: '折腾了一次 Memos 的自部署，从 Docker 镜像拉取、Nginx 反代到 API 接入 QQ Bot，顺手记录了一些踩坑和实现细节。'
@@ -128,6 +129,5 @@ async function uploadImage(url) {
   return res.json();
 }
 ```
-
 
 

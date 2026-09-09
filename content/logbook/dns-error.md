@@ -1,4 +1,5 @@
 ---
+comment: true
 title: DNS 解析问题
 date: 2026-04-26
 ---

@@ -1,4 +1,5 @@
 ---
+comment: true
 title: Duckduckgo 搜索 mcp
 date: 2026-05-17
 ---
@@ -53,5 +54,4 @@ date: 2026-05-17
 哎，仔细想想 MCP 服务器应该还是跑在本机的[^ 本机跑本机用]，但是感觉内网共享一个也不是不行...
 
 好像有了 [viewview](https://github.com/gengyue2468/viewview) 之后完全可以用 TypeScript 自己写一个 MCP 服务器用用，看看有没有时间研究一下子...不过近期~~可能~~绝对是没有时间了...
-
 

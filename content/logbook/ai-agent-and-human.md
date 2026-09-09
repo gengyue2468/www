@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 人工智能和工人智能
 date: 2026-05-15
 ---

@@ -866,6 +866,13 @@ function normalizeFrontMatter(data: Record<string, unknown>, filePath: string): 
     normalized.tags = [...new Set(tags.map(tag => tag.trim()).filter(Boolean))];
   }
 
+  const comment = normalized.comment;
+  if (comment === null || comment === undefined) {
+    delete normalized.comment;
+  } else if (typeof comment !== "boolean") {
+    throw new AppError("Front matter field 'comment' must be a boolean", ErrorCode.PARSE_ERROR, { path: filePath, field: "comment" });
+  }
+
   return normalized as FrontMatter;
 }
 

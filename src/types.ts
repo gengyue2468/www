@@ -49,6 +49,18 @@ export interface UmamiConfig {
   websiteId: string;
 }
 
+export interface IssoConfig {
+  enabled: boolean;
+  endpoint: string;
+  scriptUrl: string;
+  pageAuthorHashes: string;
+  cap: {
+    enabled: boolean;
+    widgetScriptUrl: string;
+    apiEndpoint: string;
+  };
+}
+
 export interface Config {
   rootDir: string;
   site: SiteConfig;
@@ -57,6 +69,7 @@ export interface Config {
   date: DateConfig;
   placeholders: PlaceholdersConfig;
   umami: UmamiConfig;
+  isso: IssoConfig;
   rss: RSSConfig;
   sitemap: SitemapConfig;
   robots: RobotsConfig;
@@ -126,6 +139,7 @@ export interface FrontMatter {
   summary?: string;
   description?: string;
   tags?: string[];
+  comment?: boolean;
   [key: string]: unknown;
 }
 

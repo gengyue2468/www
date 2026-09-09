@@ -249,7 +249,9 @@ nav .nav-menu-label:hover {
   border: 0;
 }
 
-.tab-list > label {
+.tab-list > label,
+#isso-thread .isso-post-action:has(input[name="preview"])::before,
+#isso-thread .isso-post-action:has(input[name="edit"])::before {
   flex-shrink: 0;
   cursor: pointer;
   padding: 0.4rem 1rem;
@@ -259,7 +261,9 @@ nav .nav-menu-label:hover {
   order: 0;
 }
 
-.tab-list > input:checked + label {
+.tab-list > input:checked + label,
+#isso-thread .isso-postbox:not(.isso-preview-mode) .isso-post-action:has(input[name="edit"])::before,
+#isso-thread .isso-postbox.isso-preview-mode .isso-post-action:has(input[name="preview"])::before {
   font-weight: bold;
   background-color: var(--accent);
 }
@@ -353,7 +357,9 @@ label.margin-toggle:has(+ input.margin-toggle:focus-visible) {
 }
 
 @media (max-width: 760px) {
-  .tab-list > label {
+  .tab-list > label,
+  #isso-thread .isso-post-action:has(input[name="preview"])::before,
+  #isso-thread .isso-post-action:has(input[name="edit"])::before {
     font-size: 1.1rem;
     padding: 0.4rem 0.7rem;
   }
@@ -1147,4 +1153,648 @@ pre.ascii-art {
   background-color: #181818 !important;
   color: #e8e6e3 !important;
   color-scheme: dark !important;
+}
+
+/* Isso comments: a quiet editorial block that follows the paper-like article style. */
+:root {
+  --isso-ink: #333;
+  --isso-muted: #707070;
+  --isso-rule: rgba(0, 0, 0, 0.2);
+  --isso-surface: rgba(255, 255, 255, 0.52);
+  --isso-accent: #555;
+  --isso-accent-soft: #e8e8e8;
+  --isso-code-surface: #ededed;
+  --isso-target-fade-background-color: #e8e8e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --isso-ink: #e8e8e8;
+    --isso-muted: #aaa;
+    --isso-rule: rgba(255, 255, 255, 0.22);
+    --isso-surface: rgba(255, 255, 255, 0.045);
+    --isso-accent: #d0d0d0;
+    --isso-accent-soft: #333;
+    --isso-code-surface: #242424;
+    --isso-target-fade-background-color: #333;
+  }
+}
+
+.post-comments {
+  width: var(--width-content);
+  margin: 3rem 0 0;
+  padding: 1.5rem 0 0;
+  border-top: 1px solid var(--isso-rule);
+  color: inherit;
+}
+
+.post-comments > h2 {
+  margin: 0 0 0.5rem;
+  color: inherit;
+  font-size: var(--font-size-h3);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.post-comments-count {
+  margin-right: 0;
+}
+
+#isso-thread,
+#isso-thread * {
+  box-sizing: border-box;
+}
+
+#isso-thread {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  font-family: var(--font-serif);
+}
+
+#isso-thread .isso-thread-heading {
+  order: 2;
+  display: none;
+  margin: 0 0 0.75rem;
+  color: var(--isso-muted);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-body);
+  font-style: italic;
+  font-weight: 400;
+  line-height: var(--line-height-body);
+}
+
+#isso-thread .isso-postbox {
+  order: 1;
+  max-width: none;
+  margin: 0 0 1.25rem;
+}
+
+#isso-thread #isso-root {
+  order: 3;
+}
+
+#isso-thread .isso-feedlink {
+  order: 4;
+}
+
+#isso-thread .isso-form-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+}
+
+#isso-thread .isso-cap-gate {
+  position: absolute;
+  z-index: 1;
+  left: 0.75rem;
+  bottom: 0.75rem;
+}
+
+#isso-thread .isso-cap-gate cap-widget {
+  --cap-background: transparent;
+  --cap-color: var(--isso-ink);
+  --cap-border-color: var(--isso-rule);
+  --cap-border-radius: 4px;
+  --cap-checkbox-border: 1px solid var(--isso-rule);
+  --cap-checkbox-background: transparent;
+  --cap-spinner-color: var(--isso-ink);
+  --cap-spinner-background-color: var(--isso-rule);
+  --cap-checkmark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23333333' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m5 12 5 5L20 7'/%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+  #isso-thread .isso-cap-gate cap-widget {
+    --cap-checkmark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23e8e6e3' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m5 12 5 5L20 7'/%3E%3C/svg%3E");
+  }
+}
+
+#isso-thread .isso-form-wrapper::before {
+  flex-basis: 100%;
+  order: 1;
+  width: 0;
+  height: 0;
+  content: "";
+}
+
+#isso-thread .isso-textarea-wrapper {
+  position: relative;
+  order: 4;
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.65rem;
+}
+
+#isso-thread .isso-textarea,
+#isso-thread .isso-preview {
+  width: 100%;
+  min-height: 10rem;
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--isso-rule);
+  border-radius: 2px;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  resize: vertical;
+}
+
+#isso-thread .isso-textarea {
+  display: block;
+  padding-bottom: 3.75rem;
+}
+
+#isso-thread .isso-preview {
+  display: none;
+  overflow: auto;
+}
+
+#isso-thread .isso-postbox.isso-preview-mode .isso-textarea {
+  display: none;
+}
+
+#isso-thread .isso-postbox.isso-preview-mode .isso-preview {
+  display: block;
+}
+
+#isso-thread .isso-textarea::placeholder {
+  color: var(--isso-muted);
+  opacity: 1;
+}
+
+#isso-thread .isso-auth-section {
+  display: contents;
+}
+
+#isso-thread .isso-input-wrapper {
+  flex: 1 1 0;
+  order: 0;
+  min-width: 0;
+  max-width: none;
+  margin: 0 0.9rem 1rem 0;
+  font-size: var(--font-size-body);
+}
+
+#isso-thread .isso-notification-section {
+  order: 6;
+  flex: 0 0 100%;
+}
+
+#isso-thread .isso-input-wrapper label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+#isso-thread .isso-input-wrapper {
+  position: relative;
+}
+
+#isso-thread .isso-input-wrapper input {
+  display: block;
+  width: 100%;
+  min-width: 12rem;
+  padding: 0.25rem 0.1rem;
+  border: 0;
+  border-bottom: 1px solid var(--isso-rule);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+}
+
+#isso-thread .isso-input-wrapper input::placeholder {
+  color: transparent;
+}
+
+#isso-thread .isso-input-wrapper::before {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.1rem;
+  color: var(--isso-muted);
+  pointer-events: none;
+}
+
+#isso-thread .isso-input-wrapper:has(input[name="author"])::before {
+  content: "您的姓名";
+}
+
+#isso-thread .isso-input-wrapper:has(input[name="email"])::before {
+  content: "您的信箱";
+}
+
+#isso-thread .isso-input-wrapper:has(input[name="website"])::before {
+  content: "您的网站";
+}
+
+#isso-thread .isso-input-wrapper:has(input:not(:placeholder-shown))::before {
+  display: none;
+}
+
+#isso-thread .isso-post-action {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  float: none;
+  order: 5;
+  margin: 0;
+  clear: both;
+}
+
+#isso-thread .isso-post-action > input {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--isso-rule);
+  border-radius: 2px;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-family: var(--font-sans-alt);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+#isso-thread .isso-post-action:has(input[name="preview"]),
+#isso-thread .isso-post-action:has(input[name="edit"]) {
+  order: 2;
+  align-self: center;
+  position: relative;
+  padding: 0;
+  cursor: pointer;
+}
+
+#isso-thread .isso-post-action:has(input[name="preview"])::before,
+#isso-thread .isso-post-action:has(input[name="edit"])::before {
+  display: block;
+  content: "预览";
+}
+
+#isso-thread .isso-post-action:has(input[name="edit"])::before {
+  content: "内容";
+}
+
+#isso-thread .isso-post-action:has(input[name="preview"]) > input,
+#isso-thread .isso-post-action:has(input[name="edit"]) > input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#isso-thread .isso-post-action:has(input[name="preview"]) {
+  order: 3;
+}
+
+#isso-thread .isso-post-action:has(input[name="edit"]) {
+  order: 2;
+}
+
+#isso-thread .isso-post-action:has(input[type="submit"]) {
+  position: relative;
+  order: 5;
+  flex: 0 0 100%;
+  width: 100%;
+  margin-top: 0.65rem;
+  margin-left: 0;
+  text-align: center;
+}
+
+#isso-thread .isso-post-action:has(input[type="submit"])::before {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  content: "发表评论";
+  font: inherit;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  pointer-events: none;
+}
+
+#isso-thread .isso-post-action:has(input[type="submit"]) > input {
+  width: 100%;
+  min-height: 3.2rem;
+  border-color: var(--isso-rule);
+  background: var(--accent);
+  color: transparent;
+  font: inherit;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+#isso-thread .isso-form-wrapper:has(.isso-cap-gate:not([data-state="solved"])) .isso-post-action:has(input[type="submit"]) {
+  cursor: not-allowed;
+}
+
+#isso-thread .isso-form-wrapper:has(.isso-cap-gate:not([data-state="solved"])) .isso-post-action:has(input[type="submit"])::before {
+  color: var(--isso-muted);
+}
+
+#isso-thread .isso-form-wrapper:has(.isso-cap-gate:not([data-state="solved"])) .isso-post-action:has(input[type="submit"]) > input {
+  background: var(--isso-accent-soft);
+  cursor: not-allowed;
+}
+
+#isso-thread .isso-post-action > input:hover {
+  border-color: var(--isso-accent);
+  color: var(--isso-accent);
+}
+
+#isso-thread .isso-post-action:has(input[type="submit"]) > input:hover {
+  color: transparent;
+}
+
+#isso-thread :focus,
+#isso-thread :focus-visible {
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+#isso-thread input:focus,
+#isso-thread input:focus-visible,
+#isso-thread textarea:focus,
+#isso-thread textarea:focus-visible {
+  border-color: var(--isso-rule) !important;
+}
+
+#isso-thread .isso-comment {
+  font-size: var(--font-size-body);
+  max-width: none;
+  margin: 0;
+  line-height: var(--line-height-body);
+}
+
+#isso-thread .isso-text-wrapper {
+  display: block;
+  min-width: 0;
+  padding: 1.1rem 0 1.25rem;
+  border-bottom: 1px solid var(--isso-rule);
+}
+
+#isso-thread .isso-preview .isso-text-wrapper {
+  border-bottom: 0;
+}
+
+#isso-thread .isso-comment-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.45rem;
+  margin-bottom: 0.65rem;
+  color: var(--isso-muted);
+  font-size: inherit;
+  line-height: 1.5;
+}
+
+#isso-thread .isso-comment-header .isso-spacer {
+  display: none;
+}
+
+#isso-thread .isso-comment-header a,
+#isso-thread .isso-comment-footer a {
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.15em;
+}
+
+#isso-thread .isso-author {
+  color: var(--isso-ink);
+  font-weight: 600;
+}
+
+#isso-thread .isso-page-author-suffix {
+  display: inline-block;
+  margin-left: 0.1rem;
+  padding: 0.05rem 0.3rem;
+  border: 1px solid var(--isso-rule);
+  border-radius: 0;
+  background: transparent;
+  color: var(--isso-muted);
+  font-family: inherit;
+  font-size: 0.78em;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.3;
+  vertical-align: baseline;
+}
+
+#isso-thread .isso-spacer,
+#isso-thread .isso-permalink,
+#isso-thread .isso-note,
+#isso-thread .isso-parent {
+  color: var(--isso-muted);
+  font-weight: 400;
+  text-shadow: none;
+}
+
+#isso-thread .isso-spacer:hover,
+#isso-thread .isso-permalink:hover,
+#isso-thread .isso-note:hover,
+#isso-thread .isso-parent:hover {
+  color: var(--isso-accent);
+}
+
+#isso-thread .isso-text {
+  color: inherit;
+  font-family: var(--font-serif);
+  font-size: inherit;
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+#isso-thread .isso-text p {
+  width: auto;
+  margin: 0.55rem 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+#isso-thread .isso-text p:first-child {
+  margin-top: 0.65rem;
+}
+
+#isso-thread .isso-text p:last-child {
+  margin-bottom: 0;
+}
+
+#isso-thread .isso-text a {
+  color: var(--isso-accent);
+}
+
+#isso-thread .isso-text :not(pre) > code {
+  padding: 0.12em 0.35em;
+  border: 1px solid var(--isso-rule);
+  border-radius: 2px;
+  background: var(--isso-code-surface);
+  font-size: 0.88em;
+}
+
+#isso-thread .isso-text pre {
+  width: 100%;
+  max-width: none;
+  margin: 0.85rem 0;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--isso-rule);
+  border-radius: 2px;
+  background: var(--isso-code-surface);
+  color: inherit;
+  line-height: 1.55;
+  overflow: auto;
+}
+
+#isso-thread .isso-comment-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.8rem;
+  margin-top: 1rem;
+  padding-top: 0.7rem;
+  color: var(--isso-muted);
+  font-size: inherit;
+  line-height: 1.5;
+}
+
+#isso-thread .isso-comment-footer .isso-spacer {
+  display: none;
+}
+
+#isso-thread .isso-votes {
+  min-width: 1.25rem;
+  color: inherit;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+#isso-thread .isso-upvote,
+#isso-thread .isso-downvote {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  padding: 0 0.15rem;
+  color: inherit;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+#isso-thread .isso-upvote svg,
+#isso-thread .isso-downvote svg {
+  display: none;
+}
+
+#isso-thread .isso-upvote::before {
+  content: "↑";
+}
+
+#isso-thread .isso-downvote::before {
+  content: "↓";
+}
+
+#isso-thread .isso-comment-footer:has(.isso-reply) .isso-reply,
+#isso-thread .isso-comment-footer:not(:has(.isso-reply)) .isso-edit {
+  margin-left: auto;
+}
+
+#isso-thread .isso-comment-footer a {
+  color: inherit;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+#isso-thread .isso-comment-footer a:hover {
+  color: var(--isso-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+#isso-thread .isso-follow-up {
+  margin-left: 0.75rem;
+  padding-left: 1.25rem;
+}
+
+#isso-thread .isso-follow-up > .isso-comment:first-child {
+  margin-top: 1.25rem;
+}
+
+#isso-thread .isso-follow-up > .isso-comment:not(:has(~ .isso-comment)) {
+  margin-bottom: 1.25rem;
+}
+
+#isso-thread .isso-avatar {
+  display: none;
+}
+
+#isso-thread .isso-feedlink {
+  float: none;
+  margin-left: 0.75rem;
+  padding-left: 0;
+}
+
+#isso-thread .isso-feedlink a {
+  color: var(--isso-muted);
+  font-family: var(--font-sans-alt);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+#isso-thread .isso-feedlink a:hover {
+  color: var(--isso-accent);
+}
+
+#isso-thread .isso-target {
+  background: var(--isso-accent-soft);
+  animation: none !important;
+}
+
+#isso-thread :target {
+  background: transparent !important;
+  animation: none !important;
+}
+
+@media (max-width: 760px) {
+  .post-comments {
+    width: 100%;
+    margin-top: 3rem;
+  }
+
+  .post-comments > h2 {
+    margin-bottom: 1.1rem;
+  }
+
+  #isso-thread .isso-input-wrapper {
+    display: block;
+    flex: 0 0 100%;
+    max-width: none;
+    margin-right: 0;
+  }
+
+  #isso-thread .isso-input-wrapper input {
+    min-width: 0;
+  }
+
+  #isso-thread .isso-follow-up {
+    margin-left: 0.25rem;
+    padding-left: 0.9rem;
+  }
 }

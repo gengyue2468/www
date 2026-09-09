@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 甲骨文云新加坡 NQ 留档
 date: 2026-06-19
 ---

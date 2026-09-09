@@ -5,7 +5,7 @@ description:  gengyue 的个人网站。写一点技术、项目、折腾记录�
 
 此地属于 gengyue。目前这个页面部署在 [DigitalFyre](https://console.digitalfyre.com/aff.php?aff=50) 的一台 New Jersey VPS [^ [SMALL S2²](https://console.digitalfyre.com/aff.php?aff=50), 8 7950X3D vCore, 8 GB RAM, 65 GB NVME SSD, New Jersey, USA <br /> <br /> <span class="ttyd-terminal"><iframe src="https://www.gengyue.dev/tty/" title="gengyue ttyd terminal" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width: 100%; height: 400px;"></iframe></span> <br />] 上，通过美西的一台优化线路小鸡回源 [^也许有点奢侈]。
 
-您可以通过访问 [About](/about), [Blog](/blog) 和 [Logbook](/logbook) 页面了解更多信息，下面的链接亦可：
+您可以通过访问 [About](/about), [Blog](/blog) 和 [Logbook](/logbook) 页面了解更多信息，也可以到 [Guestbook](/guestbook) 留言。当然，下面的链接亦可：
 
 - 我的 Email: [hi [at] gengyue.dev](mailto:hi@gengyue.dev)
 - 我的 GitHub: [@gengyue2468](https://github.com/gengyue2468)

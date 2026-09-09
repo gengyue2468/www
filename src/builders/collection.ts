@@ -149,6 +149,117 @@ function generatePostActionsHTML(markdownPath: string, pagePath: string): string
   </span>`;
 }
 
+export function generateIssoCommentsHTML(route: string, title: string): string {
+  return `<section class="post-comments" aria-labelledby="post-comments-title">
+  <h2 id="post-comments-title"><span class="post-comments-count" aria-live="polite"></span>评论</h2>
+  <div id="isso-thread" data-isso-id="${escapeHtmlAttr(route)}" data-title="${escapeHtmlAttr(title)}">
+    <noscript>需要启用 JavaScript 才能查看和发表评论。</noscript>
+  </div>
+</section>`;
+}
+
+export function generateIssoScript(): string {
+  const capScript = config.isso.cap.enabled
+    ? `<script type="module" src="${escapeHtmlAttr(config.isso.cap.widgetScriptUrl)}"></script>`
+    : "";
+  const capSetup = config.isso.cap.enabled
+    ? `<script>
+(() => {
+  const thread = document.getElementById("isso-thread");
+  if (!thread) return;
+
+  const capEndpoint = ${JSON.stringify(config.isso.cap.apiEndpoint)};
+  const mounted = new WeakSet();
+
+  const mountCap = (postbox) => {
+    if (mounted.has(postbox)) return;
+
+    const textareaWrapper = postbox.querySelector(".isso-textarea-wrapper");
+    if (!textareaWrapper) return;
+    mounted.add(postbox);
+
+    const gate = document.createElement("div");
+    gate.className = "isso-cap-gate";
+    gate.dataset.state = "required";
+    gate.setAttribute("role", "group");
+    gate.setAttribute("aria-label", "发布前人机验证");
+
+    const widget = document.createElement("cap-widget");
+    widget.setAttribute("required", "");
+    widget.setAttribute("data-cap-api-endpoint", capEndpoint);
+    widget.setAttribute("data-cap-disable-haptics", "");
+
+    gate.append(widget);
+    textareaWrapper.append(gate);
+
+    let solved = false;
+    widget.addEventListener("solve", () => {
+      solved = true;
+      gate.dataset.state = "solved";
+    });
+    widget.addEventListener("reset", () => {
+      solved = false;
+      gate.dataset.state = "required";
+    });
+    widget.addEventListener("error", () => {
+      solved = false;
+      gate.dataset.state = "required";
+    });
+
+    // Isso binds directly to the submit input, so capture the click before it reaches Isso.
+    postbox.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement) || target.type !== "submit") return;
+      if (solved) {
+        solved = false;
+        gate.dataset.state = "required";
+        if (typeof widget.reset === "function") widget.reset();
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      widget.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, true);
+  };
+
+  const scan = () => thread.querySelectorAll(".isso-postbox").forEach(mountCap);
+  scan();
+  new MutationObserver(scan).observe(thread, { childList: true, subtree: true });
+})();
+</script>`
+    : "";
+
+  return `${capScript}
+<script
+  data-isso="${escapeHtmlAttr(config.isso.endpoint)}"
+  data-isso-css="false"
+  data-isso-lang="zh_CN"
+  data-isso-sorting="oldest"
+  data-isso-avatar="false"
+  data-isso-vote="true"
+  data-isso-page-author-hashes="${escapeHtmlAttr(config.isso.pageAuthorHashes)}"
+  data-isso-comment-page-author-suffix-text-zh-cn="Owner"
+  src="${escapeHtmlAttr(config.isso.scriptUrl)}"
+ ></script>
+${capSetup}
+<script>
+(() => {
+  const thread = document.getElementById("isso-thread");
+  const count = document.querySelector(".post-comments-count");
+  if (!thread || !count) return;
+
+  const updateCount = () => {
+    const total = thread.querySelectorAll("#isso-root .isso-comment").length;
+    count.textContent = total + " 条";
+  };
+
+  updateCount();
+  new MutationObserver(updateCount).observe(thread, { childList: true, subtree: true });
+})();
+</script>`;
+}
+
 function generatePostsListHTML(posts: Post[], urlPrefix: string): string {
   if (posts.length === 0) return "<p>No posts found.</p>";
 
@@ -340,6 +451,7 @@ async function buildPostPages(
       ? generatePostActionsHTML(markdownPath, postPath(urlPrefix, post.slug))
       : "";
     const dateSeparator = formattedDate ? " · " : "";
+    const commentsEnabled = config.isso.enabled && frontmatter.comment === true;
     const contentData = {
       title: safeTitle,
       date: formattedDate,
@@ -351,6 +463,7 @@ async function buildPostPages(
       tags: postTagsHtml,
       navigation: navHtml,
       sourceMdLink,
+      comments: commentsEnabled ? generateIssoCommentsHTML(postPath(urlPrefix, post.slug), title) : "",
     };
     const renderedContent = renderTemplate(postLayout, contentData);
 
@@ -369,6 +482,7 @@ async function buildPostPages(
       hasMermaid ? mermaidScript(assets.mermaidScriptSrc) : "",
       hasSidenoteConnectors(html) ? sidenoteScript(assets.sidenoteScriptSrc) : "",
       config.llms?.enabled ? postActionsScript(assets.postActionsScriptSrc) : "",
+      commentsEnabled ? generateIssoScript() : "",
     ].filter(Boolean).join("\n");
     if (hasMathHtml(html)) headLinkParts.push(mathStylesheet(assets.katexStylesheetHref));
     const headLinks = headLinkParts.join("\n    ");

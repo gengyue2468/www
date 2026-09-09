@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 小米路由器 AX3000T 折腾记录（一）
 date: 2026-09-05
 tags:

@@ -1,4 +1,5 @@
 ---
+comment: true
 tags: [生活,武汉]
 title: 月入 -1.2k的不精致男大学生如何坐火车？
 date: 2025-12-14

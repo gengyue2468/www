@@ -11,6 +11,7 @@ import type { AssetManifest, FrontMatter } from "../types.js";
 import { buildMetaDescription, escapeHtmlText, generateKeywords } from "../utils/seo.js";
 import { AppError, ErrorCode } from "../utils/errors.js";
 import config from "../config.js";
+import { generateIssoCommentsHTML, generateIssoScript } from "./collection.js";
 
 function deduplicateFontFaces(css: string): string {
   const fontFaceRegex = /@font-face\s*\{[^}]+\}/g;
@@ -150,12 +151,17 @@ export async function buildPage(
   title = frontmatter.title || "Untitled";
 
   const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
+  const commentsEnabled = config.isso.enabled && frontmatter.comment === true;
   const scripts = [
     hasMermaid ? mermaidScript(assets.mermaidScriptSrc) : "",
     hasSidenoteConnectors(html) ? sidenoteScript(assets.sidenoteScriptSrc) : "",
+    commentsEnabled ? generateIssoScript() : "",
   ].filter(Boolean).join("\n");
   const headLinks = hasMathHtml(html) ? mathStylesheet(assets.katexStylesheetHref) : "";
-  const contentData = { title: escapeHtmlText(title), content: html };
+  const contentData = {
+    title: escapeHtmlText(title),
+    content: html + (commentsEnabled ? generateIssoCommentsHTML(route, title) : ""),
+  };
   const renderedContent = renderTemplate(contentLayout, contentData);
 
   const description = buildMetaDescription({

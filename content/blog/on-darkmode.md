@@ -1,4 +1,5 @@
 ---
+comment: true
 title: 为什么您的深色模式看起来不太对劲？
 date: 2026-04-12
 tags:

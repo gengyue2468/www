@@ -1,4 +1,5 @@
 ---
+comment: true
 title: '配置一下 SSL'
 date: '2026-01-19'
 summary: '一次从 Cloudflare 522 出发的折腾：配置 Origin Certificate、Nginx HTTPS、ufw 防火墙，最后才发现——原来是我自己没开 443。'
