@@ -32,6 +32,7 @@ const config: Config = {
     "/colophon": "colophon.md",
     "/node": "node.md",
     "/guestbook": "guestbook.md",
+    "/friends": "friends.md",
   },
 
   collections: [
@@ -132,6 +133,7 @@ const config: Config = {
       show: true,
       children: [
         { name: "Logbook", path: "/logbook", show: true },
+        { name: "Friends", path: "/friends", show: true },
         { name: "Guestbook", path: "/guestbook", show: true },
         { name: "Colophon", path: "/colophon", show: true },
         { name: "Uses", path: "/uses", show: true },
