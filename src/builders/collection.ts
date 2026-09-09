@@ -229,6 +229,45 @@ export function generateIssoScript(): string {
 })();
 </script>`
     : "";
+  const voteSetup = `<script>
+(() => {
+  const thread = document.getElementById("isso-thread");
+  if (!thread) return;
+
+  const enhanceVotes = () => {
+    thread.querySelectorAll(".isso-comment-footer").forEach((footer) => {
+      const score = footer.querySelector(":scope > .isso-votes");
+      const upvote = footer.querySelector(":scope > .isso-upvote");
+      if (!score || !upvote) return;
+
+      footer.querySelector(":scope > .isso-downvote")?.remove();
+
+      const value = score.textContent?.trim() || "0";
+      if (upvote.dataset.voteIcon !== "true") {
+        upvote.dataset.voteIcon = "true";
+        upvote.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 18.75 7.5-7.5 7.5 7.5" /><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 7.5-7.5 7.5 7.5" /></svg>';
+      }
+
+      let count = upvote.querySelector(":scope > .isso-vote-count");
+      if (!count) {
+        count = document.createElement("span");
+        count.className = "isso-vote-count";
+        upvote.append(count);
+      }
+      if (count.textContent !== value) count.textContent = value;
+
+      score.setAttribute("aria-hidden", "true");
+    });
+  };
+
+  enhanceVotes();
+  new MutationObserver(enhanceVotes).observe(thread, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
+})();
+</script>`;
 
   return `${capScript}
 <script
@@ -243,6 +282,7 @@ export function generateIssoScript(): string {
   src="${escapeHtmlAttr(config.isso.scriptUrl)}"
  ></script>
 ${capSetup}
+${voteSetup}
 <script>
 (() => {
   const thread = document.getElementById("isso-thread");
