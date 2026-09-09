@@ -123,7 +123,7 @@ function generatePostNavigationHTML(prevPost: PostWithContent | null, nextPost: 
   return `<nav class="post-nav" aria-label="文章导航">${previous}${next}</nav>`;
 }
 
-function generatePostActionsHTML(markdownPath: string, pagePath: string): string {
+function generatePostActionsHTML(markdownPath: string, pagePath: string, commentHref?: string): string {
   const markdownUrl = `${config.site.url}${markdownPath}`;
   const pageUrl = `${config.site.url}${pagePath}`;
   const prompt = `Please read this article and summarize its key points: ${markdownUrl}`;
@@ -145,6 +145,7 @@ function generatePostActionsHTML(markdownPath: string, pagePath: string): string
       ${link("Ask Gemini", `https://gemini.google.com/app?prompt=${encodeURIComponent(prompt)}`, external)}
       ${link("Ask Grok", `https://grok.com/?q=${encodeURIComponent(prompt)}`, external)}
       ${link("Ask DeepSeek", `https://chat.deepseek.com/?q=${encodeURIComponent(prompt)}`, external)}
+      ${commentHref ? link("Comment this post", commentHref) : ""}
     </div>
   </span>`;
 }
@@ -274,7 +275,7 @@ export function generateIssoScript(): string {
   data-isso="${escapeHtmlAttr(config.isso.endpoint)}"
   data-isso-css="false"
   data-isso-lang="zh_CN"
-  data-isso-sorting="oldest"
+  data-isso-sorting="newest"
   data-isso-avatar="false"
   data-isso-vote="true"
   data-isso-page-author-hashes="${escapeHtmlAttr(config.isso.pageAuthorHashes)}"
@@ -487,11 +488,15 @@ async function buildPostPages(
     const plainText = html.replace(/<[^>]+>/g, "").replace(/\s+/g, "");
     const wordCount = `${plainText.length} 字`;
     const markdownPath = `${postPath(urlPrefix, post.slug)}.md`;
+    const commentsEnabled = config.isso.enabled && frontmatter.comment === true;
     const sourceMdLink = config.llms?.enabled
-      ? generatePostActionsHTML(markdownPath, postPath(urlPrefix, post.slug))
+      ? generatePostActionsHTML(
+          markdownPath,
+          postPath(urlPrefix, post.slug),
+          commentsEnabled ? "#post-comments-title" : undefined,
+        )
       : "";
     const dateSeparator = formattedDate ? " · " : "";
-    const commentsEnabled = config.isso.enabled && frontmatter.comment === true;
     const contentData = {
       title: safeTitle,
       date: formattedDate,
