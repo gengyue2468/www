@@ -7,6 +7,7 @@ tags:
   - LastFM
   - AppleMusic
 summary: 通过 Scrobbler 将 Apple Music 的播放记录同步到 Last.fm，再利用 Last.fm API 获取最近播放与 Now Playing 状态，并通过简单的 middleware 整理数据，用于博客中的音乐播放展示。
+comment: true
 ---
 [Apple Music](https://music.apple.com/) 确实[提供官方的 API](https://developer.apple.com/documentation/applemusicapi)，不过这需要加入 Apple Developer Program，意味着每年需要交 99 USD 的费用。对于一些简单的需求，例如获取正在播放状态、最近播放列表而言是不划算的。
 

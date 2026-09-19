@@ -1,6 +1,7 @@
 ---
 title: hust-network-login-sh
 date: 2026-09-10
+comment: true
 ---
 在路由器上配[BingyanStudio/hust-network-login-sh: 为非常嵌入的嵌入式设备设计的最小的最小化华中科技大学校园网络认证工具](https://github.com/BingyanStudio/hust-network-login-sh) 遇到的长时间 retry 的问题排查
 
