@@ -48,9 +48,51 @@
               "icon": "lucide-file",
               "title": "friends"
             }
+          },
+          {
+            "id": "f10f86f360502f51",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "content/pages/index.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "index"
+            }
+          },
+          {
+            "id": "8827498ab8649c1f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "content/pages/playlist.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "playlist"
+            }
+          },
+          {
+            "id": "0be3fdc0b249b14a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "content/blog/apple-music-to-lastfm-api.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "apple-music-to-lastfm-api"
+            }
           }
         ],
-        "currentTab": 2
+        "currentTab": 5
       }
     ],
     "direction": "vertical"
@@ -214,53 +256,53 @@
       "bases:新建数据库": false
     }
   },
-  "active": "201265515e2d7621",
+  "active": "0be3fdc0b249b14a",
   "lastOpenFiles": [
-    "dist.staging-46156-1788969355802/404.html",
-    "dist.staging-46156-1788969355802/blog/refactor-blog.md",
-    "dist.staging-46156-1788969355802/blog/walk-outside.md",
-    "dist.staging-46156-1788969355802/blog/hello-world.md",
-    "dist.staging-46156-1788969355802/blog/train.md",
-    "dist.staging-46156-1788969355802/blog/hust-chifan.md",
-    "dist.staging-46156-1788969355802/blog/2025-year-in-review.md",
-    "dist.staging-46156-1788969355802/blog/baode-story.md",
-    "dist.staging-46156-1788969355802/blog/magic-wsl.md",
-    "dist.staging-46156-1788969355802/blog/2025-a-z.md",
-    "dist.staging-46156-1788969355802/blog/tiptap.md",
-    "dist.staging-46156-1788969355802/blog/try-intent-parsing.md",
-    "dist.staging-46156-1788969355802/blog/ssl-config.md",
-    "dist.staging-46156-1788969355802/blog/memos-migration.md",
-    "dist.staging-46156-1788969355802/blog/edgeone-test.md",
-    "dist.staging-46156-1788969355802/blog/memos.md",
-    "dist.staging-46156-1788969355802/blog/ink-tui.md",
-    "dist.staging-46156-1788969355802/blog/tailscale.md",
-    "dist.staging-46156-1788969355802/blog/let-llm-write-shitposts.md",
-    "dist.staging-46156-1788969355802/blog/nested-inline-parser.md",
-    "dist.staging-46156-1788969355802/blog/build-fig-via-bun-webview.md",
-    "dist.staging-46156-1788969355802/blog/weird-cloudflare-tunnel.md",
-    "dist.staging-46156-1788969355802/blog/derp-server.md",
-    "dist.staging-46156-1788969355802/blog/on-darkmode.md",
-    "dist.staging-46156-1788969355802/blog/webpage-without-css-and-js.md",
-    "dist.staging-46156-1788969355802/blog/doh-within-tailnet.md",
-    "dist.staging-46156-1788969355802/sitemap.xml",
-    "dist.staging-46156-1788969355802/robots.txt",
-    "dist.staging-46156-1788969355802/rss.xml",
-    "dist.staging-46156-1788969355802/blog/tag/index.html",
-    "dist.staging-46156-1788969355802/blog/tag/dns/index.html",
-    "dist.staging-46156-1788969355802/blog/tag/cdn/index.html",
-    "dist.staging-46156-1788969355802/blog/tag/tailscale/index.html",
-    "dist.staging-46156-1788969355802/blog/tag/内网组网/index.html",
-    "dist.staging-46156-1788969355802/blog/tag/技术/index.html",
-    "dist.staging-46156-1788969355802/blog/tag/网络/index.html",
-    "public/static/tech/xiaomi-ax3000t.webp",
-    "dist.staging-8324-1787402496064/static/train/wuhan/IMG_20251213_184210.webp",
-    "dist.staging-8324-1787402496064/static/train/wuhan/IMG_20251213_174524.webp",
-    "dist.staging-8324-1787402496064/static/train/wuhan/IMG_20251213_170152.webp",
-    "dist.staging-8324-1787402496064/static/tech/tiptap.webp",
-    "dist.staging-8324-1787402496064/static/tech/oracle-cloud-success.webp",
-    "dist.staging-8324-1787402496064/static/tech/oracle-cloud-free-tier.webp",
-    "dist.staging-8324-1787402496064/static/tech/memos-darkmode.webp",
-    "dist.staging-8324-1787402496064/static/tech/neofetch.webp",
-    "dist.staging-8324-1787402496064/static/tech/hust-chifan-cli.webp"
+    "dist/blog/tag/applemusic/index.html",
+    "dist/blog/tag/applemusic",
+    "dist.staging-3132-1789832280230/404.html",
+    "dist.staging-3132-1789832280230/llms.txt",
+    "dist.staging-3132-1789832280230/logbook/werid-educoder.md",
+    "dist.staging-3132-1789832280230/blog/train.md",
+    "dist.staging-3132-1789832280230/logbook/napcat-multi-clienting.md",
+    "dist.staging-3132-1789832280230/logbook/test.md",
+    "dist.staging-3132-1789832280230/logbook/wsl-oom.md",
+    "dist.staging-3132-1789832280230/logbook/failed-ssh-service.md",
+    "dist.staging-3132-1789832280230/logbook/cli-proxy-api.md",
+    "dist.staging-3132-1789832280230/logbook/dns-error.md",
+    "dist.staging-3132-1789832280230/logbook/miniflux-share-style.md",
+    "dist.staging-3132-1789832280230/logbook/cpp-debug.md",
+    "dist.staging-3132-1789832280230/logbook/oracle-sgp-nodequality.md",
+    "dist.staging-3132-1789832280230/logbook/bun-hono-server.md",
+    "dist.staging-3132-1789832280230/logbook/ai-agent-and-human.md",
+    "dist.staging-3132-1789832280230/logbook/ddg-search-mcp.md",
+    "dist.staging-3132-1789832280230/logbook/bingyan-k8s-deployment.md",
+    "dist.staging-3132-1789832280230/logbook/aliyun-kr.md",
+    "dist.staging-3132-1789832280230/logbook/azure-student.md",
+    "dist.staging-3132-1789832280230/logbook/azure-student-jp-east.md",
+    "dist.staging-3132-1789832280230/logbook/alpine-rc-service-with-nginx.md",
+    "dist.staging-3132-1789832280230/logbook/netcup-mnz.md",
+    "dist.staging-3132-1789832280230/logbook/windows-virtual-memory.md",
+    "dist.staging-3132-1789832280230/blog/hello-world.md",
+    "dist.staging-3132-1789832280230/logbook/hust-network-login-sh.md",
+    "dist.staging-3132-1789832280230/blog/hust-chifan.md",
+    "dist.staging-3132-1789832280230/logbook/cs-app-data-lab-1.md",
+    "dist.staging-3132-1789832280230/sitemap.xml",
+    "dist.staging-3132-1789832280230/robots.txt",
+    "dist.staging-3132-1789832280230/rss.xml",
+    "dist.staging-3132-1789832280230/blog/tag/index.html",
+    "dist.staging-3132-1789832280230/blog/tag/tui/index.html",
+    "dist.staging-3132-1789832280230/blog/tag/ai/index.html",
+    "dist.staging-3132-1789832280230/blog/tag/ink/index.html",
+    "dist/static/train/wuhan/IMG_20251213_184210.webp",
+    "dist/static/train/wuhan/IMG_20251213_174524.webp",
+    "dist/static/train/wuhan/IMG_20251213_170152.webp",
+    "dist/static/story/mother-fuck.webp",
+    "dist/static/story/baode.webp",
+    "dist/static/tech/xiaomi-ax3000t.webp",
+    "dist/static/tech/tiptap.webp",
+    "dist/static/tech/neofetch.webp",
+    "dist/static/tech/oracle-cloud-success.webp",
+    "dist/static/tech/oracle-cloud-free-tier.webp"
   ]
 }

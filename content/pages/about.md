@@ -7,7 +7,7 @@ description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方
 
 摆，比较摆 [^ 摆烂]
 
-有一个~~很大~~的 tailnet [^ 这是一种 SDN 组网技术，基于 Wireguard 和 UDP 穿透。在特定 NAT 类型或有 IPv6 的场景下，组网效果还算不错，但是可能会被封 UDP 或 UDP QoS]内网，[有很多奇怪的小鸡](/node)，感兴趣可以看一下[探针](https://v-ps.net)
+有一个~~很大~~的 tailnet [^ 这是一种 SDN 组网技术，基于 Wireguard 和 UDP 穿透。在特定 NAT 类型或有 IPv6 的场景下，组网效果还算不错，但是可能会被封 UDP 或 UDP QoS]内网，有很多奇怪的小鸡，感兴趣可以看一下[探针](https://v-ps.net)
 
 ~~可能~~在鞭策 Agent 工作，例如：
 

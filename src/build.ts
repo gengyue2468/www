@@ -1,5 +1,6 @@
 import { join, dirname, relative } from "path";
 import { mkdir, rm, readdir, rename, stat } from "fs/promises";
+import type { Dirent } from "fs";
 import { ensureDir, loadLayout, copyPublicFiles, copyDirectory, readFileContent, writeFileContent } from "./utils/fs.js";
 import { buildPage, getMinifiedCss } from "./builders/page.js";
 import { buildCollection, getRequiredLayouts } from "./builders/collection.js";
@@ -10,6 +11,7 @@ import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
 import { registerPlugin, getComposedHooks } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
 import { nodeseekPlugin } from "./extensions/nodeseek.js";
+import { nowPlayingPlugin } from "./extensions/now-playing.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
 import { auditDist, type HtmlAuditIssueKind } from "./utils/html-audit.js";
@@ -23,6 +25,7 @@ export interface BuildOptions {
 
 registerPlugin(mermaidPlugin);
 registerPlugin(nodeseekPlugin);
+registerPlugin(nowPlayingPlugin);
 
 class PerformanceTimer {
   private times = new Map<string, number>();
@@ -556,10 +559,31 @@ async function promoteDist(stagingDist: string, liveDist: string): Promise<void>
   }
 
   for (const relativePath of await collectFiles(liveDist)) {
-    if (!stagedSet.has(relativePath)
-        && !isVersionedAsset(relativePath)
-        && !isLegacyPageAsset(relativePath)) {
+    if (stagedSet.has(relativePath)) continue;
+    // Content-addressed assets from earlier builds are safe to drop: the staged
+    // set already contains everything the current build references.
+    if (isVersionedAsset(relativePath) || !isLegacyPageAsset(relativePath)) {
       await rm(join(liveDist, relativePath), { force: true });
+    }
+  }
+
+  await pruneEmptyDirectories(liveDist);
+}
+
+async function pruneEmptyDirectories(root: string): Promise<void> {
+  let entries: Dirent[];
+  try {
+    entries = await readdir(root, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const childPath = join(root, entry.name);
+    await pruneEmptyDirectories(childPath);
+    const remaining = await readdir(childPath).catch(() => null);
+    if (remaining && remaining.length === 0) {
+      await rm(childPath, { recursive: true, force: true });
     }
   }
 }

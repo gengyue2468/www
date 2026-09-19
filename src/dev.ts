@@ -14,11 +14,9 @@ const watchDirs = [
   config.dirs.public,
   config.dirs.layouts,
   join(config.rootDir, "content"),
-  join(config.rootDir, "src"),
 ];
 
 const publicRoot = resolve(config.dirs.public);
-const sourceRoot = resolve(join(config.rootDir, "src"));
 const rebuildFiles = new Set([
   resolve(join(config.dirs.public, "globals.css")),
   resolve(join(config.dirs.public, "tufte.css")),
@@ -76,12 +74,6 @@ for (const dir of watchDirs) {
       if (fullPath.endsWith(".map")) return;
 
       const absolutePath = resolve(fullPath);
-      const sourceRelative = relative(sourceRoot, absolutePath);
-      if (!sourceRelative.startsWith("..") && !isAbsolute(sourceRelative)) {
-        console.log(`\n↻ Source changed: ${relative(config.rootDir, fullPath)} (restart dev server to reload)`);
-        return;
-      }
-
       const publicRelative = relative(publicRoot, absolutePath);
       if (!publicRelative.startsWith("..") && !isAbsolute(publicRelative) && !rebuildFiles.has(absolutePath)) {
         return;
@@ -105,6 +97,21 @@ Bun.serve({
       pathname = decodeURIComponent(url.pathname);
     } catch {
       return new Response("Bad Request", { status: 400 });
+    }
+
+    if (req.method === "GET" && ["/api/lastfm/now", "/api/lastfm/recent"].includes(pathname)) {
+      try {
+        const upstream = await fetch(`https://www.gengyue.dev${pathname}`);
+        return new Response(upstream.body, {
+          status: upstream.status,
+          headers: {
+            "Content-Type": upstream.headers.get("Content-Type") || "application/json",
+            "Cache-Control": "no-store",
+          },
+        });
+      } catch {
+        return Response.json({ error: "Last.fm API unavailable" }, { status: 502 });
+      }
     }
 
     const root = resolve(distDir);
