@@ -2,6 +2,8 @@ import type { Plugin } from "./plugin.js";
 import { getMarkdownIt } from "../utils/markdown.js";
 import { sanitizeHtml } from "../utils/html.js";
 
+const TABS_COMPONENT_TAG = "content-tabs";
+
 let tabGroupId = -1;
 
 // ── ANSI SGR → HTML ──────────────────────────────────────────────────────────
@@ -357,17 +359,18 @@ export function processNqBlock(raw: string): string {
   tabs.forEach((tab, idx) => {
     const id = `nq-${tabGroupId}-${idx}`;
     const contentId = `${id}-content`;
-    const checked = idx === 0 ? " checked" : "";
+    const selected = idx === 0;
     const content = renderTabContent(tab.content.join("\n"));
     tabsHtml.push(
-      `<input class="tab-input" type="radio" name="nq-${tabGroupId}" id="${id}" data-tab="${idx}"${checked} ` +
-      `aria-controls="${contentId}" aria-label="${escapeHtml(tab.title)}">` +
-      `<label for="${id}">${escapeHtml(tab.title)}</label>`
+      `<button class="tab-button" type="button" id="${id}" role="tab" aria-selected="${selected}" ` +
+      `aria-controls="${contentId}" tabindex="${selected ? 0 : -1}">${escapeHtml(tab.title)}</button>`
     );
-    contentsHtml.push(`<div class="tab-content" id="${contentId}" data-tab="${idx}" role="region" aria-label="${escapeHtml(tab.title)}">${content}</div>`);
+    contentsHtml.push(
+      `<div class="tab-content" id="${contentId}" role="tabpanel" aria-labelledby="${id}"${selected ? "" : " hidden"}>${content}</div>`
+    );
   });
 
-  return `<div class="tabs"><div class="tab-list" role="radiogroup" aria-label="标签页">${tabsHtml.join("\n")}</div><div class="tab-panels">${contentsHtml.join("\n")}</div></div>`;
+  return `<div class="tabs-container"><${TABS_COMPONENT_TAG} class="tabs"><div class="tab-list" role="tablist" aria-label="标签页">${tabsHtml.join("\n")}</div><div class="tab-panels">${contentsHtml.join("\n")}</div></${TABS_COMPONENT_TAG}></div>`;
 }
 
 function renderTabContent(content: string): string {
@@ -444,6 +447,81 @@ function processAnsiCodeBlocks(html: string): string {
   );
 }
 
+export function nodeseekTabsScript(): string {
+  return `<script>
+(() => {
+  const tagName = ${JSON.stringify(TABS_COMPONENT_TAG)};
+  if (customElements.get(tagName)) return;
+
+  class ContentTabs extends HTMLElement {
+    connectedCallback() {
+      if (this.tabController) return;
+
+      const list = this.querySelector(":scope > .tab-list");
+      if (!list) return;
+
+      const tabs = Array.from(list.children).filter(item =>
+        item instanceof HTMLButtonElement && item.getAttribute("role") === "tab"
+      );
+      const panels = new Map(
+        Array.from(this.querySelectorAll(":scope > .tab-panels > [role='tabpanel']"))
+          .map(panel => [panel.id, panel])
+      );
+      if (tabs.length === 0) return;
+
+      const activate = (tab, moveFocus = false) => {
+        for (const item of tabs) {
+          const selected = item === tab;
+          item.setAttribute("aria-selected", String(selected));
+          item.tabIndex = selected ? 0 : -1;
+          const panel = panels.get(item.getAttribute("aria-controls") || "");
+          if (panel) panel.hidden = !selected;
+        }
+        if (moveFocus) tab.focus();
+      };
+
+      const selected = tabs.find(tab => tab.getAttribute("aria-selected") === "true") || tabs[0];
+      activate(selected);
+
+      this.tabController = new AbortController();
+      const options = { signal: this.tabController.signal };
+
+      list.addEventListener("click", event => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const tab = target.closest("[role='tab']");
+        if (tab instanceof HTMLButtonElement && tabs.includes(tab)) activate(tab);
+      }, options);
+
+      list.addEventListener("keydown", event => {
+        const target = event.target;
+        if (!(target instanceof HTMLButtonElement) || !tabs.includes(target)) return;
+
+        const index = tabs.indexOf(target);
+        let next = null;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") next = tabs[(index + 1) % tabs.length];
+        else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = tabs[(index - 1 + tabs.length) % tabs.length];
+        else if (event.key === "Home") next = tabs[0];
+        else if (event.key === "End") next = tabs[tabs.length - 1];
+
+        if (next) {
+          event.preventDefault();
+          activate(next, true);
+        }
+      }, options);
+    }
+
+    disconnectedCallback() {
+      this.tabController?.abort();
+      this.tabController = null;
+    }
+  }
+
+  customElements.define(tagName, ContentTabs);
+})();
+</script>`;
+}
+
 // ── Plugin export ─────────────────────────────────────────────────────────────
 
 export const nodeseekPlugin: Plugin = {
@@ -452,4 +530,8 @@ export const nodeseekPlugin: Plugin = {
     { name: "nodeseek-nq", process: processNqBlocks },
     { name: "nodeseek-ansi", postProcess: processAnsiCodeBlocks },
   ],
+  webComponents: [{
+    tagName: TABS_COMPONENT_TAG,
+    script: () => nodeseekTabsScript(),
+  }],
 };

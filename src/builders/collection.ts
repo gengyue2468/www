@@ -7,12 +7,12 @@ import { renderTemplate } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import { hasSidenoteConnectors, sidenoteScript } from "../extensions/sidenotes.js";
-import { postActionsScript } from "../extensions/post-actions.js";
 import { hasMathHtml, mathStylesheet } from "../extensions/math.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
-import type { BuildHooks } from "../extensions/plugin.js";
+import { injectWebComponentScripts, type BuildHooks } from "../extensions/plugin.js";
 import { buildMetaDescription, escapeHtmlAttr, escapeHtmlText, generateKeywords } from "../utils/seo.js";
 import { assertSafePathSegment, joinUrlPath } from "../utils/url.js";
+import { contentHash } from "../utils/assets.js";
 import { AppError, ErrorCode, isENOENT, errorReporter } from "../utils/errors.js";
 import config from "../config.js";
 import type { AssetManifest, CollectionConfig, CollectionOutput, Post } from "../types.js";
@@ -127,12 +127,12 @@ function generatePostActionsHTML(markdownPath: string, pagePath: string, comment
   const markdownUrl = `${config.site.url}${markdownPath}`;
   const pageUrl = `${config.site.url}${pagePath}`;
   const prompt = `Please read this article and summarize its key points: ${markdownUrl}`;
-  const menuId = "post-actions-menu";
+  const menuId = `post-actions-menu-${contentHash(pagePath)}`;
   const link = (label: string, href: string, attributes = "") =>
     `<a href="${escapeHtmlAttr(href)}"${attributes}>${escapeHtmlText(label)}</a>`;
   const external = ' target="_blank" rel="noopener noreferrer"';
 
-  return `<span class="post-actions nav-dropdown-wrapper">
+  return `<post-actions class="post-actions nav-dropdown-wrapper">
     <input type="checkbox" id="${menuId}" class="nav-menu-checkbox" aria-label="Actions">
     <label class="nav-menu-overlay" for="${menuId}" aria-hidden="true"></label>
     <label class="nav-menu-label post-actions-button" for="${menuId}">Actions</label>
@@ -147,7 +147,7 @@ function generatePostActionsHTML(markdownPath: string, pagePath: string, comment
       ${link("Ask DeepSeek", `https://chat.deepseek.com/?q=${encodeURIComponent(prompt)}`, external)}
       ${commentHref ? link("Comment this post", commentHref) : ""}
     </div>
-  </span>`;
+  </post-actions>`;
 }
 
 export function generateIssoCommentsHTML(route: string, title: string): string {
@@ -526,7 +526,6 @@ async function buildPostPages(
     const scripts = [
       hasMermaid ? mermaidScript(assets.mermaidScriptSrc) : "",
       hasSidenoteConnectors(html) ? sidenoteScript(assets.sidenoteScriptSrc) : "",
-      config.llms?.enabled ? postActionsScript(assets.postActionsScriptSrc) : "",
       commentsEnabled ? generateIssoScript() : "",
     ].filter(Boolean).join("\n");
     if (hasMathHtml(html)) headLinkParts.push(mathStylesheet(assets.katexStylesheetHref));
@@ -573,6 +572,7 @@ async function buildPostPages(
     });
 
     output = await applyAfterHooks(hooks, "post", post.slug, output);
+    output = injectWebComponentScripts(output, assets);
 
     const outputPath = join(config.dirs.dist, urlPrefix, post.slug, "index.html");
     await ensureDir(dirname(outputPath));

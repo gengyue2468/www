@@ -237,19 +237,7 @@ nav .nav-menu-label:hover {
   margin-bottom: 0.5rem;
 }
 
-.tab-list > input.tab-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.tab-list > label,
+.tab-list > [role="tab"],
 #isso-thread .isso-post-action:has(input[name="preview"])::before,
 #isso-thread .isso-post-action:has(input[name="edit"])::before {
   flex-shrink: 0;
@@ -261,39 +249,24 @@ nav .nav-menu-label:hover {
   order: 0;
 }
 
-.tab-list > input:checked + label,
+.tab-list > [role="tab"] {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.tab-list > [role="tab"][aria-selected="true"],
 #isso-thread .isso-postbox:not(.isso-preview-mode) .isso-post-action:has(input[name="edit"])::before,
 #isso-thread .isso-postbox.isso-preview-mode .isso-post-action:has(input[name="preview"])::before {
   font-weight: bold;
   background-color: var(--accent);
 }
 
-.tab-list > input:focus-visible + label {
+.tab-list > [role="tab"]:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: -2px;
-}
-
-.tab-panels > .tab-content {
-  display: none;
-}
-
-.tabs:has(.tab-list > input[data-tab="0"]:checked) .tab-panels > .tab-content[data-tab="0"],
-.tabs:has(.tab-list > input[data-tab="1"]:checked) .tab-panels > .tab-content[data-tab="1"],
-.tabs:has(.tab-list > input[data-tab="2"]:checked) .tab-panels > .tab-content[data-tab="2"],
-.tabs:has(.tab-list > input[data-tab="3"]:checked) .tab-panels > .tab-content[data-tab="3"],
-.tabs:has(.tab-list > input[data-tab="4"]:checked) .tab-panels > .tab-content[data-tab="4"],
-.tabs:has(.tab-list > input[data-tab="5"]:checked) .tab-panels > .tab-content[data-tab="5"],
-.tabs:has(.tab-list > input[data-tab="6"]:checked) .tab-panels > .tab-content[data-tab="6"],
-.tabs:has(.tab-list > input[data-tab="7"]:checked) .tab-panels > .tab-content[data-tab="7"],
-.tabs:has(.tab-list > input[data-tab="8"]:checked) .tab-panels > .tab-content[data-tab="8"],
-.tabs:has(.tab-list > input[data-tab="9"]:checked) .tab-panels > .tab-content[data-tab="9"],
-.tabs:has(.tab-list > input[data-tab="10"]:checked) .tab-panels > .tab-content[data-tab="10"],
-.tabs:has(.tab-list > input[data-tab="11"]:checked) .tab-panels > .tab-content[data-tab="11"],
-.tabs:has(.tab-list > input[data-tab="12"]:checked) .tab-panels > .tab-content[data-tab="12"],
-.tabs:has(.tab-list > input[data-tab="13"]:checked) .tab-panels > .tab-content[data-tab="13"],
-.tabs:has(.tab-list > input[data-tab="14"]:checked) .tab-panels > .tab-content[data-tab="14"],
-.tabs:has(.tab-list > input[data-tab="15"]:checked) .tab-panels > .tab-content[data-tab="15"] {
-  display: block;
 }
 
 .tab-panels .tab-content pre {
@@ -357,7 +330,7 @@ label.margin-toggle:has(+ input.margin-toggle:focus-visible) {
 }
 
 @media (max-width: 760px) {
-  .tab-list > label,
+  .tab-list > [role="tab"],
   #isso-thread .isso-post-action:has(input[name="preview"])::before,
   #isso-thread .isso-post-action:has(input[name="edit"])::before {
     font-size: 1.1rem;

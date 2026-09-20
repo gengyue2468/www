@@ -1,26 +1,66 @@
+import type { Plugin } from "./plugin.js";
+
+const COMPONENT_TAG = "recent-tracks-loader";
+
 export function recentTracksScript(): string {
   return `<script>
 (() => {
-  const marker = document.querySelector("[data-recent-tracks-loading]");
-  const body = marker?.closest("tbody");
-  if (!body) return;
+  const tagName = ${JSON.stringify(COMPONENT_TAG)};
+  if (customElements.get(tagName)) return;
 
-  const showMessage = (message) => {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-    cell.colSpan = 4;
-    cell.textContent = message;
-    row.append(cell);
-    body.replaceChildren(row);
-  };
+  class RecentTracksLoader extends HTMLElement {
+    connectedCallback() {
+      if (this.controller) return;
 
-  fetch("/api/lastfm/recent", { cache: "no-store" })
-    .then((response) => response.ok ? response.json() : Promise.reject())
-    .then((tracks) => {
-      if (!Array.isArray(tracks) || tracks.length === 0) {
-        showMessage("No recent tracks.");
-        return;
+      const body = this.closest("tbody");
+      if (!body) return;
+
+      this.body = body;
+      this.controller = new AbortController();
+      void this.load(this.controller.signal);
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+      this.controller = null;
+      this.body = null;
+    }
+
+    async load(signal) {
+      try {
+        const response = await fetch("/api/lastfm/recent", {
+          cache: "no-store",
+          signal,
+        });
+        if (!response.ok) throw new Error("Recent tracks request failed");
+
+        const tracks = await response.json();
+        if (!Array.isArray(tracks) || tracks.length === 0) {
+          this.showMessage("No recent tracks.");
+          return;
+        }
+
+        this.showTracks(tracks);
+      } catch (error) {
+        if (error?.name !== "AbortError") {
+          this.showMessage("Recent tracks could not be loaded.");
+        }
       }
+    }
+
+    showMessage(message) {
+      if (!this.body) return;
+
+      const row = document.createElement("tr");
+      const cell = document.createElement("td");
+      cell.colSpan = 4;
+      cell.textContent = message;
+      row.append(cell);
+      this.body.replaceChildren(row);
+    }
+
+    showTracks(tracks) {
+      if (!this.body) return;
 
       const rows = document.createDocumentFragment();
       for (const track of tracks) {
@@ -61,10 +101,20 @@ export function recentTracksScript(): string {
         rows.append(row);
       }
 
-      if (rows.childNodes.length === 0) showMessage("No recent tracks.");
-      else body.replaceChildren(rows);
-    })
-    .catch(() => showMessage("Recent tracks could not be loaded."));
+      if (rows.childNodes.length === 0) this.showMessage("No recent tracks.");
+      else this.body.replaceChildren(rows);
+    }
+  }
+
+  customElements.define(tagName, RecentTracksLoader);
 })();
 </script>`;
 }
+
+export const recentTracksPlugin: Plugin = {
+  name: "recent-tracks",
+  webComponents: [{
+    tagName: COMPONENT_TAG,
+    script: () => recentTracksScript(),
+  }],
+};

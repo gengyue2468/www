@@ -5,9 +5,8 @@ import { renderTemplate } from "../utils/template.js";
 import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
 import { hasSidenoteConnectors, sidenoteScript } from "../extensions/sidenotes.js";
 import { hasMathHtml, mathStylesheet } from "../extensions/math.js";
-import { recentTracksScript } from "../extensions/recent-tracks.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
-import type { BuildHooks } from "../extensions/plugin.js";
+import { injectWebComponentScripts, type BuildHooks } from "../extensions/plugin.js";
 import type { AssetManifest, FrontMatter } from "../types.js";
 import { buildMetaDescription, escapeHtmlText, generateKeywords } from "../utils/seo.js";
 import { AppError, ErrorCode } from "../utils/errors.js";
@@ -156,7 +155,6 @@ export async function buildPage(
   const scripts = [
     hasMermaid ? mermaidScript(assets.mermaidScriptSrc) : "",
     hasSidenoteConnectors(html) ? sidenoteScript(assets.sidenoteScriptSrc) : "",
-    route === "/playlist" ? recentTracksScript() : "",
     commentsEnabled ? generateIssoScript() : "",
   ].filter(Boolean).join("\n");
   const headLinks = hasMathHtml(html) ? mathStylesheet(assets.katexStylesheetHref) : "";
@@ -187,6 +185,7 @@ export async function buildPage(
   });
 
   output = await applyAfterHooks(hooks, "page", route, output);
+  output = injectWebComponentScripts(output, assets);
 
   let outputPath: string;
   if (route === "/") {

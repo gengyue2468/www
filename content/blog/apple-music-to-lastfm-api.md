@@ -95,3 +95,56 @@ All done，It works!
 我根据上述思路制作了[首页的 Now Playing 卡片](/)，至少它工作了。我自认为这个很酷，如果您也感兴趣的话，或许可以试试看。下面是一个 demo：
 
 <now-playing-card></now-playing-card>
+
+---
+
+**结束了吗？** 并没有
+
+想必聪明的读者已经发现了，从 Apple Music 到 Last.fm 的 Scrobble 过程中，我们能够稳定依赖的主要还是歌曲名、歌手和专辑等文本元数据，而专辑封面则依赖 Last.fm 自己的匹配机制。Last.fm 的封面匹配并不总是可靠：它可能匹配到错误的封面，也可能完全匹配不到，最终 fallback 到默认封面。对于追求效果的我们而言肯定是 Unacceptable [^ 不可接受的，译者注]。
+
+幸运的是，苹果留下了一个 iTunes 搜索接口，不需要 API Key 鉴权。可以使用类似下方的方式调用：
+
+```typescript
+const data = await httpClient<ITunesSearchResponse>({
+            method: "GET",
+            url: "https://itunes.apple.com/search",
+            params: {
+              term,
+              country,
+              media: "music",
+              entity: "song",
+              limit: 25,
+            },
+          });
+```
+
+Bingo，既然这些歌曲原本就来自 Apple Music，利用 Apple 自己的 iTunes Search 接口回查 metadata，通常能够拿到更准确的 Album Cover。我在前文中提到，推荐构造一个 Middleware 来处理数据，在这里又一次印证了这个想法。这个中间件可以完成：
+- Last.fm 原始数据的清洗
+- iTunes 封面的补全与 Last.fm 元数据修正
+- 缓存构建 [^ 我认为这是很重要的一环，对于限流十分重要，同时能够减轻对中间件的压力。]
+
+当然，实际操作过程中可能会遇到一些问题。请注意上文请求中的 `country` 这个 parameter，如果不传默认返回 `US` 区的结果。而一些歌曲或专辑在不同地区的 `catalog` 中存在差异，例如 `CN` `HK` `SG`。这个参数实际上决定了查询的 `storefront`。
+
+> 结论是这里的搜索接口仍然不能作为**精确搜索**来看待，而仍应该作为**模糊搜索**接口看待。推测原因有：1. Scrobble 过程中 Album Artist 等参数可能已经取错 2. Apple 接口设计如此。不管怎么样，不建议设置十分严苛的搜索参数。
+
+最终我们可以得到一个层层 fallback 的架构：
+1. Cover 的来源
+:::fullwidth
+
+```mermaid
+flowchart LR
+    A[iTunes API] --> B[Last.fm API] --> C[Default Fallback]
+```
+:::
+
+当然，这里强调的是*优先级*而非*数据流*。[^ 即优先尝试使用 iTunes Search 获取封面；匹配失败时使用 Last.fm 提供的封面，仍不可用时才使用默认封面。]
+
+2. `country` 这个 parameter 的选择，层层 fallback
+:::fullwidth
+```mermaid
+flowchart LR
+    CN[CN] --> HK[HK] --> SG[SG] --> JP[JP] --> US["US (Default)"]
+```
+:::
+
+好哦，至此感觉流程已经比较完整，效果不戳。

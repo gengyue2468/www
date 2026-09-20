@@ -184,10 +184,6 @@ const COMPONENT_TEMPLATE = `
   </a>
 </p>`;
 
-export function hasNowPlayingCard(html: string): boolean {
-  return /<now-playing-card(?:\s|>)/i.test(html);
-}
-
 export function nowPlayingScript(): string {
   const templateHtml = JSON.stringify(COMPONENT_TEMPLATE).replaceAll("<", "\\u003c");
 
@@ -365,18 +361,10 @@ export function nowPlayingScript(): string {
 </script>`;
 }
 
-function injectNowPlayingScript(html: string): string {
-  if (!hasNowPlayingCard(html)) return html;
-  const script = nowPlayingScript();
-  const bodyEnd = html.lastIndexOf("</body>");
-  if (bodyEnd === -1) return `${html}\n${script}`;
-  return `${html.slice(0, bodyEnd)}${script}\n${html.slice(bodyEnd)}`;
-}
-
 export const nowPlayingPlugin: Plugin = {
   name: "now-playing-card",
-  hooks: {
-    afterRenderPage: (_route, html) => injectNowPlayingScript(html),
-    afterRenderPost: (_slug, html) => injectNowPlayingScript(html),
-  },
+  webComponents: [{
+    tagName: COMPONENT_TAG,
+    script: () => nowPlayingScript(),
+  }],
 };

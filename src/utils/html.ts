@@ -10,7 +10,6 @@ const REMOVED_ELEMENTS = new Set([
   "style",
   "template",
   "textarea",
-  "button",
   "animate",
   "animatemotion",
   "animatetransform",

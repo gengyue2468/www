@@ -12,6 +12,8 @@ import { registerPlugin, getComposedHooks } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
 import { nodeseekPlugin } from "./extensions/nodeseek.js";
 import { nowPlayingPlugin } from "./extensions/now-playing.js";
+import { recentTracksPlugin } from "./extensions/recent-tracks.js";
+import { postActionsPlugin } from "./extensions/post-actions.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
 import { auditDist, type HtmlAuditIssueKind } from "./utils/html-audit.js";
@@ -26,6 +28,8 @@ export interface BuildOptions {
 registerPlugin(mermaidPlugin);
 registerPlugin(nodeseekPlugin);
 registerPlugin(nowPlayingPlugin);
+registerPlugin(recentTracksPlugin);
+registerPlugin(postActionsPlugin);
 
 class PerformanceTimer {
   private times = new Map<string, number>();

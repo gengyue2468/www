@@ -1,4 +1,4 @@
-import type { RenderedContent } from "../types.js";
+import type { AssetManifest, RenderedContent } from "../types.js";
 import { AppError, ErrorCode } from "../utils/errors.js";
 
 export interface MarkdownProcessor {
@@ -25,6 +25,11 @@ export interface BuildHooks {
   afterRenderPost?: (slug: string, html: string) => Promise<string> | string;
 }
 
+export interface WebComponentDefinition {
+  tagName: string;
+  script: (assets: AssetManifest) => string;
+}
+
 export interface ContainerConfig {
   type: string;
   validate?: (params: string) => RegExpMatchArray | null;
@@ -36,6 +41,7 @@ export interface Plugin {
   markdownProcessors?: MarkdownProcessor[];
   noteProcessors?: NoteProcessor[];
   containers?: ContainerConfig[];
+  webComponents?: WebComponentDefinition[];
   hooks?: BuildHooks;
 }
 
@@ -61,6 +67,20 @@ export function registerPlugin(plugin: Plugin): void {
     }
     processor.pattern.lastIndex = 0;
   }
+  for (const component of plugin.webComponents || []) {
+    if (!/^[a-z][.\d_a-z-]*-[.\d_a-z-]*$/.test(component.tagName)) {
+      throw new AppError(`Invalid custom element name '${component.tagName}'`, ErrorCode.PLUGIN_ERROR, {
+        plugin: plugin.name,
+        tagName: component.tagName,
+      });
+    }
+    if (plugins.some(existing => existing.webComponents?.some(({ tagName }) => tagName === component.tagName))) {
+      throw new AppError(`Custom element '${component.tagName}' is already registered`, ErrorCode.PLUGIN_ERROR, {
+        plugin: plugin.name,
+        tagName: component.tagName,
+      });
+    }
+  }
   plugins.push(plugin);
   pluginVersion++;
   console.log(`✓ Registered plugin: ${plugin.name}`);
@@ -80,6 +100,21 @@ export function getNoteProcessors(): NoteProcessor[] {
 
 export function getContainers(): ContainerConfig[] {
   return plugins.flatMap(p => p.containers || []);
+}
+
+export function injectWebComponentScripts(html: string, assets: AssetManifest): string {
+  const scripts = plugins
+    .flatMap(plugin => plugin.webComponents || [])
+    .filter(component => new RegExp(`<${component.tagName}(?=[\\s>/])`, "i").test(html))
+    .map(component => component.script(assets))
+    .filter(Boolean);
+
+  if (scripts.length === 0) return html;
+
+  const injected = scripts.join("\n");
+  const bodyEnd = html.lastIndexOf("</body>");
+  if (bodyEnd === -1) return `${html}\n${injected}`;
+  return `${html.slice(0, bodyEnd)}${injected}\n${html.slice(bodyEnd)}`;
 }
 
 type HookFn<A, R> = (arg: A) => R | Promise<R>;
