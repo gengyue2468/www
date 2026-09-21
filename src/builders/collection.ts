@@ -5,8 +5,7 @@ import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
-import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
-import { hasSidenoteConnectors, sidenoteScript } from "../extensions/sidenotes.js";
+import { addSidenoteConnector } from "../extensions/sidenotes.js";
 import { hasMathHtml, mathStylesheet } from "../extensions/math.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import { injectWebComponentScripts, type BuildHooks } from "../extensions/plugin.js";
@@ -151,15 +150,25 @@ function generatePostActionsHTML(markdownPath: string, pagePath: string, comment
 }
 
 export function generateIssoCommentsHTML(route: string, title: string): string {
+  const capAttributes = config.isso.cap.enabled
+    ? ` data-cap-enabled="true" data-cap-script="${escapeHtmlAttr(config.isso.cap.widgetScriptUrl)}" data-cap-endpoint="${escapeHtmlAttr(config.isso.cap.apiEndpoint)}"`
+    : "";
   return `<section class="post-comments" aria-labelledby="post-comments-title">
   <h2 id="post-comments-title"><span class="post-comments-count" aria-live="polite"></span>评论</h2>
-  <div id="isso-thread" data-isso-id="${escapeHtmlAttr(route)}" data-title="${escapeHtmlAttr(title)}">
-    <noscript>需要启用 JavaScript 才能查看和发表评论。</noscript>
-  </div>
+  <isso-comments
+    data-isso-script="${escapeHtmlAttr(config.isso.scriptUrl)}"
+    data-isso-endpoint="${escapeHtmlAttr(config.isso.endpoint)}"
+    data-isso-page-author-hashes="${escapeHtmlAttr(config.isso.pageAuthorHashes)}"${capAttributes}
+  >
+    <div id="isso-thread" data-isso-id="${escapeHtmlAttr(route)}" data-title="${escapeHtmlAttr(title)}">
+      <noscript>需要启用 JavaScript 才能查看和发表评论。</noscript>
+    </div>
+  </isso-comments>
 </section>`;
 }
 
 export function generateIssoScript(): string {
+  /*
   const capScript = config.isso.cap.enabled
     ? `<script type="module" src="${escapeHtmlAttr(config.isso.cap.widgetScriptUrl)}"></script>`
     : "";
@@ -299,6 +308,8 @@ ${voteSetup}
   new MutationObserver(updateCount).observe(thread, { childList: true, subtree: true });
 })();
 </script>`;
+  */
+  return "";
 }
 
 function generatePostsListHTML(posts: Post[], urlPrefix: string): string {
@@ -414,7 +425,7 @@ function buildCollectionIndex(
     siteDescription: config.site.description,
   });
 
-  return renderPage(baseLayout, {
+  const output = renderPage(baseLayout, {
     route: `/${urlPrefix}`,
     title: indexTitle,
     description: indexDescription,
@@ -441,6 +452,7 @@ function buildCollectionIndex(
     ],
     year,
   });
+  return injectWebComponentScripts(output, assets);
 }
 
 async function buildPostPages(
@@ -461,6 +473,7 @@ async function buildPostPages(
     frontmatter = hookResult.frontmatter;
     html = hookResult.html;
     title = (frontmatter.title as string) || post.slug;
+    html = addSidenoteConnector(html);
     const safeTitle = escapeHtmlText(title);
 
     post.frontmatter = frontmatter;
@@ -522,12 +535,6 @@ async function buildPostPages(
       siteDescription: config.site.description,
     });
 
-    const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
-    const scripts = [
-      hasMermaid ? mermaidScript(assets.mermaidScriptSrc) : "",
-      hasSidenoteConnectors(html) ? sidenoteScript(assets.sidenoteScriptSrc) : "",
-      commentsEnabled ? generateIssoScript() : "",
-    ].filter(Boolean).join("\n");
     if (hasMathHtml(html)) headLinkParts.push(mathStylesheet(assets.katexStylesheetHref));
     const headLinks = headLinkParts.join("\n    ");
     const postTags = frontmatter.tags as string[] | undefined;
@@ -540,7 +547,6 @@ async function buildPostPages(
       content: renderedContent,
       stylesheetHref: assets.stylesheetHref,
       fontStylesheetHref: assets.fontStylesheetHref,
-      scripts,
       keywords: generateKeywords(postTags),
       ogTags: {
         title: fullTitle,
@@ -661,7 +667,7 @@ async function buildTagPages(
         siteDescription: config.site.description,
       });
 
-      const output = renderPage(baseLayout, {
+      const output = injectWebComponentScripts(renderPage(baseLayout, {
         route: `/${urlPrefix}/tag/${slug}`,
         title: tagPageTitle,
         description: tagDescription,
@@ -691,7 +697,7 @@ async function buildTagPages(
           { name: `#${tag}`, url: `${config.site.url}/${urlPrefix}/tag/${slug}` },
         ],
         year,
-      });
+      }), assets);
 
       const outputPath = join(config.dirs.dist, urlPrefix, "tag", slug, "index.html");
       await ensureDir(dirname(outputPath));
@@ -722,7 +728,7 @@ async function buildTagPages(
     siteDescription: config.site.description,
   });
 
-  const output = renderPage(baseLayout, {
+  const output = injectWebComponentScripts(renderPage(baseLayout, {
     route: `/${urlPrefix}/tag`,
     title: tagsIndexTitle,
     description: tagsIndexDescription,
@@ -750,7 +756,7 @@ async function buildTagPages(
       { name: "Tags", url: `${config.site.url}/${urlPrefix}/tag` },
     ],
     year,
-  });
+  }), assets);
 
   const outputPath = join(config.dirs.dist, urlPrefix, "tag", "index.html");
   await ensureDir(dirname(outputPath));

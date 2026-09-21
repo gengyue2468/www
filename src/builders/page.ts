@@ -2,8 +2,7 @@ import { join, dirname } from "path";
 import { ensureDir, writeFileContent } from "../utils/fs.js";
 import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
-import { hasMermaidCode as checkMermaidCode, mermaidScript } from "../extensions/mermaid.js";
-import { hasSidenoteConnectors, sidenoteScript } from "../extensions/sidenotes.js";
+import { addSidenoteConnector } from "../extensions/sidenotes.js";
 import { hasMathHtml, mathStylesheet } from "../extensions/math.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import { injectWebComponentScripts, type BuildHooks } from "../extensions/plugin.js";
@@ -11,7 +10,7 @@ import type { AssetManifest, FrontMatter } from "../types.js";
 import { buildMetaDescription, escapeHtmlText, generateKeywords } from "../utils/seo.js";
 import { AppError, ErrorCode } from "../utils/errors.js";
 import config from "../config.js";
-import { generateIssoCommentsHTML, generateIssoScript } from "./collection.js";
+import { generateIssoCommentsHTML } from "./collection.js";
 
 function deduplicateFontFaces(css: string): string {
   const fontFaceRegex = /@font-face\s*\{[^}]+\}/g;
@@ -150,13 +149,8 @@ export async function buildPage(
   html = hookResult.html;
   title = frontmatter.title || "Untitled";
 
-  const hasMermaid = html.includes('class="mermaid"') || checkMermaidCode(html);
+  html = addSidenoteConnector(html);
   const commentsEnabled = config.isso.enabled && frontmatter.comment === true;
-  const scripts = [
-    hasMermaid ? mermaidScript(assets.mermaidScriptSrc) : "",
-    hasSidenoteConnectors(html) ? sidenoteScript(assets.sidenoteScriptSrc) : "",
-    commentsEnabled ? generateIssoScript() : "",
-  ].filter(Boolean).join("\n");
   const headLinks = hasMathHtml(html) ? mathStylesheet(assets.katexStylesheetHref) : "";
   const contentData = {
     title: escapeHtmlText(title),
@@ -176,7 +170,6 @@ export async function buildPage(
 
   let output = buildPageOutput(baseLayout, route, title as string, description, renderedContent, {
     assets,
-    scripts,
     tags: frontmatter.tags as string[],
     robotsMeta,
     ogImageUrl,

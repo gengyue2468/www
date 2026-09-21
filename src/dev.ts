@@ -22,6 +22,7 @@ const rebuildFiles = new Set([
   resolve(join(config.dirs.public, "tufte.css")),
   resolve(join(config.dirs.public, "js", "post-actions.js")),
   resolve(join(config.dirs.public, "js", "sidenote-connectors.js")),
+  resolve(join(config.dirs.public, "js", "comments.js")),
   resolve(join(config.dirs.public, "fonts", "source-han-serif-cn-vf", "result.css")),
 ]);
 

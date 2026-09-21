@@ -1,5 +1,6 @@
 import type { AssetManifest, RenderedContent } from "../types.js";
 import { AppError, ErrorCode } from "../utils/errors.js";
+import { escapeHtmlAttr } from "../utils/seo.js";
 
 export interface MarkdownProcessor {
   name: string;
@@ -25,9 +26,16 @@ export interface BuildHooks {
   afterRenderPost?: (slug: string, html: string) => Promise<string> | string;
 }
 
+export interface ClientScriptDefinition {
+  key: string;
+  fileName: string;
+  source?: (assets: AssetManifest) => string | Promise<string>;
+  sourcePath?: string;
+}
+
 export interface WebComponentDefinition {
   tagName: string;
-  script: (assets: AssetManifest) => string;
+  scriptKey: string;
 }
 
 export interface ContainerConfig {
@@ -41,6 +49,7 @@ export interface Plugin {
   markdownProcessors?: MarkdownProcessor[];
   noteProcessors?: NoteProcessor[];
   containers?: ContainerConfig[];
+  clientScripts?: ClientScriptDefinition[];
   webComponents?: WebComponentDefinition[];
   hooks?: BuildHooks;
 }
@@ -67,6 +76,24 @@ export function registerPlugin(plugin: Plugin): void {
     }
     processor.pattern.lastIndex = 0;
   }
+  const scriptKeys = new Set<string>();
+  for (const script of plugin.clientScripts || []) {
+    if (!/^[a-z][a-z0-9-]*$/.test(script.key) || scriptKeys.has(script.key)) {
+      throw new AppError(`Invalid or duplicate client script key '${script.key}'`, ErrorCode.PLUGIN_ERROR, {
+        plugin: plugin.name,
+        key: script.key,
+      });
+    }
+    if (!script.source && !script.sourcePath) {
+      throw new AppError(`Client script '${script.key}' needs a source or sourcePath`, ErrorCode.PLUGIN_ERROR, {
+        plugin: plugin.name,
+        key: script.key,
+      });
+    }
+    scriptKeys.add(script.key);
+  }
+
+  const componentTags = new Set<string>();
   for (const component of plugin.webComponents || []) {
     if (!/^[a-z][.\d_a-z-]*-[.\d_a-z-]*$/.test(component.tagName)) {
       throw new AppError(`Invalid custom element name '${component.tagName}'`, ErrorCode.PLUGIN_ERROR, {
@@ -80,6 +107,22 @@ export function registerPlugin(plugin: Plugin): void {
         tagName: component.tagName,
       });
     }
+    if (componentTags.has(component.tagName)) {
+      throw new AppError(`Custom element '${component.tagName}' is duplicated`, ErrorCode.PLUGIN_ERROR, {
+        plugin: plugin.name,
+        tagName: component.tagName,
+      });
+    }
+    if (!scriptKeys.has(component.scriptKey) && !plugins.some(existing =>
+      existing.clientScripts?.some(({ key }) => key === component.scriptKey)
+    )) {
+      throw new AppError(`Custom element '${component.tagName}' references missing script '${component.scriptKey}'`, ErrorCode.PLUGIN_ERROR, {
+        plugin: plugin.name,
+        tagName: component.tagName,
+        scriptKey: component.scriptKey,
+      });
+    }
+    componentTags.add(component.tagName);
   }
   plugins.push(plugin);
   pluginVersion++;
@@ -102,12 +145,29 @@ export function getContainers(): ContainerConfig[] {
   return plugins.flatMap(p => p.containers || []);
 }
 
+export function getClientScriptDefinitions(): ClientScriptDefinition[] {
+  return plugins.flatMap(plugin => plugin.clientScripts || []);
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export function injectWebComponentScripts(html: string, assets: AssetManifest): string {
-  const scripts = plugins
+  const scriptKeys = new Set(
+    plugins
     .flatMap(plugin => plugin.webComponents || [])
-    .filter(component => new RegExp(`<${component.tagName}(?=[\\s>/])`, "i").test(html))
-    .map(component => component.script(assets))
-    .filter(Boolean);
+    .filter(component => new RegExp(`<${escapeRegExp(component.tagName)}(?=[\\s>/])`, "i").test(html))
+    .map(component => component.scriptKey)
+  );
+
+  const scripts = [...scriptKeys].map(key => {
+    const src = assets.scripts[key];
+    if (!src) {
+      throw new AppError(`Missing emitted client script '${key}'`, ErrorCode.BUILD_ERROR, { key });
+    }
+    return `<script type="module" src="${escapeHtmlAttr(src)}"></script>`;
+  });
 
   if (scripts.length === 0) return html;
 

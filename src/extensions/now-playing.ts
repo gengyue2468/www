@@ -187,7 +187,7 @@ const COMPONENT_TEMPLATE = `
 export function nowPlayingScript(): string {
   const templateHtml = JSON.stringify(COMPONENT_TEMPLATE).replaceAll("<", "\\u003c");
 
-  return `<script>
+  return `
 (() => {
   const tagName = ${JSON.stringify(COMPONENT_TAG)};
   if (customElements.get(tagName)) return;
@@ -357,14 +357,18 @@ export function nowPlayingScript(): string {
   });
 
   customElements.define(tagName, NowPlayingCard);
-})();
-</script>`;
+})();`;
 }
 
 export const nowPlayingPlugin: Plugin = {
   name: "now-playing-card",
+  clientScripts: [{
+    key: "now-playing-card",
+    fileName: "now-playing-card",
+    source: () => nowPlayingScript(),
+  }],
   webComponents: [{
     tagName: COMPONENT_TAG,
-    script: () => nowPlayingScript(),
+    scriptKey: "now-playing-card",
   }],
 };

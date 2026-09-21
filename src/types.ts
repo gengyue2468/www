@@ -20,9 +20,7 @@ export interface AssetManifest {
   stylesheetHref: string;
   fontStylesheetHref: string;
   katexStylesheetHref: string;
-  postActionsScriptSrc: string;
-  sidenoteScriptSrc: string;
-  mermaidScriptSrc: string;
+  scripts: Record<string, string>;
 }
 
 export interface DateConfig {

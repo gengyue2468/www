@@ -1,5 +1,6 @@
 (() => {
-  "use strict";
+  const tagName = "sidenote-connectors";
+  if (customElements.get(tagName)) return;
 
   const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
   const DESKTOP_QUERY = "(min-width: 761px)";
@@ -57,13 +58,11 @@
     const handle = clamp(Math.abs(dx) * handleRatio, 28, 124);
     const bendLimit = clamp(length * 0.12, 8, 32);
     const bend = (random() * 2 - 1) * bendLimit;
-    const bendFrom = bend;
     const bendTo = bend * (0.65 + random() * 0.2);
     const controlRise = dy * (0.08 + random() * 0.08);
-
     const controlFrom = {
-      x: from.x + direction * handle + normal.x * bendFrom,
-      y: from.y + controlRise + normal.y * bendFrom,
+      x: from.x + direction * handle + normal.x * bend,
+      y: from.y + controlRise + normal.y * bend,
     };
     const controlTo = {
       x: to.x - direction * handle + normal.x * bendTo,
@@ -73,13 +72,36 @@
     return `M ${formatPoint(from)} C ${formatPoint(controlFrom)}, ${formatPoint(controlTo)}, ${formatPoint(to)}`;
   }
 
-  function createSvgElement(tagName) {
-    return document.createElementNS(SVG_NAMESPACE, tagName);
+  function svgElement(tag) {
+    return document.createElementNS(SVG_NAMESPACE, tag);
   }
 
-  function createArrowHead() {
-    const defs = createSvgElement("defs");
-    const marker = createSvgElement("marker");
+  function renderConnectors(section, svg) {
+    const rootRect = section.getBoundingClientRect();
+    const paths = [];
+
+    for (const source of section.querySelectorAll(sourceSelector)) {
+      const targetId = source.dataset.noteTarget;
+      const target = targetId ? section.querySelector(`#${CSS.escape(targetId)}`) : null;
+      const targetAnchor = target?.querySelector(".note-connector-target");
+      if (!targetAnchor) continue;
+
+      const sourceRect = source.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      if ((!sourceRect.width && !sourceRect.height) || (!targetRect.width && !targetRect.height)) continue;
+
+      const path = svgElement("path");
+      path.setAttribute("d", createPath(
+        pointFromRect(sourceRect, rootRect, "right"),
+        pointFromRect(targetRect, rootRect, "left"),
+        hashSeed(targetId),
+      ));
+      path.setAttribute("marker-end", "url(#sidenote-arrowhead)");
+      paths.push(path);
+    }
+
+    const defs = svgElement("defs");
+    const marker = svgElement("marker");
     marker.setAttribute("id", "sidenote-arrowhead");
     marker.setAttribute("viewBox", "0 0 10 10");
     marker.setAttribute("refX", "9");
@@ -88,87 +110,63 @@
     marker.setAttribute("markerHeight", "10");
     marker.setAttribute("markerUnits", "userSpaceOnUse");
     marker.setAttribute("orient", "auto");
-
-    const head = createSvgElement("path");
+    const head = svgElement("path");
     head.setAttribute("d", "M 0 0 L 10 5 L 0 10 Z");
     head.setAttribute("fill", "currentColor");
-    head.setAttribute("stroke", "none");
+    marker.append(head);
+    defs.append(marker);
 
-    marker.appendChild(head);
-    defs.appendChild(marker);
-    return defs;
-  }
-
-  function renderConnectors(section, svg) {
-    const rootRect = section.getBoundingClientRect();
-    const sources = Array.from(section.querySelectorAll(sourceSelector));
-    const paths = [];
-
-    for (const source of sources) {
-      const targetId = source.dataset.noteTarget;
-      if (!targetId) continue;
-
-      const target = document.getElementById(targetId);
-      const targetAnchor = target?.querySelector(".note-connector-target");
-      if (!targetAnchor) continue;
-
-      const sourceRect = source.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-      if (!sourceRect.width && !sourceRect.height) continue;
-      if (!targetRect.width && !targetRect.height) continue;
-
-      const from = pointFromRect(sourceRect, rootRect, "right");
-      const to = pointFromRect(targetRect, rootRect, "left");
-      const path = createSvgElement("path");
-      path.setAttribute("d", createPath(from, to, hashSeed(targetId)));
-      path.setAttribute("marker-end", "url(#sidenote-arrowhead)");
-      paths.push(path);
-    }
-
-    svg.replaceChildren(createArrowHead(), ...paths);
+    svg.replaceChildren(defs, ...paths);
     svg.setAttribute("viewBox", `0 0 ${Math.max(rootRect.width, 1)} ${Math.max(rootRect.height, 1)}`);
     section.classList.toggle("sidenote-connectors-ready", paths.length > 0);
   }
 
-  function setup() {
-    const section = document.querySelector("main article section");
-    const media = window.matchMedia(DESKTOP_QUERY);
-    if (!section || !section.querySelector(sourceSelector)) return;
+  class SidenoteConnectors extends HTMLElement {
+    connectedCallback() {
+      if (this.section) return;
+      const section = this.closest("main article section");
+      if (!section || !section.querySelector(sourceSelector)) return;
 
-    const svg = createSvgElement("svg");
-    svg.classList.add("sidenote-connectors");
-    svg.setAttribute("aria-hidden", "true");
-    svg.setAttribute("focusable", "false");
-    section.appendChild(svg);
+      this.section = section;
+      this.media = window.matchMedia(DESKTOP_QUERY);
+      this.svg = svgElement("svg");
+      this.svg.classList.add("sidenote-connectors");
+      this.svg.setAttribute("aria-hidden", "true");
+      this.svg.setAttribute("focusable", "false");
+      section.append(this.svg);
 
-    let frame = 0;
-    const schedule = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        if (media.matches) {
-          renderConnectors(section, svg);
-        } else {
-          svg.replaceChildren();
-          section.classList.remove("sidenote-connectors-ready");
-        }
-      });
-    };
+      this.schedule = () => {
+        if (this.frame) return;
+        this.frame = requestAnimationFrame(() => {
+          this.frame = 0;
+          if (this.media.matches) renderConnectors(section, this.svg);
+          else {
+            this.svg.replaceChildren();
+            section.classList.remove("sidenote-connectors-ready");
+          }
+        });
+      };
 
-    schedule();
-    window.addEventListener("resize", schedule, { passive: true });
-    window.addEventListener("load", schedule, { once: true });
-    media.addEventListener("change", schedule);
-
-    if (typeof ResizeObserver !== "undefined") {
-      const observer = new ResizeObserver(schedule);
-      observer.observe(section);
-      for (const source of section.querySelectorAll(sourceSelector)) observer.observe(source);
-      for (const target of section.querySelectorAll(".note-connector-target")) observer.observe(target);
+      this.mediaChange = this.schedule;
+      this.media.addEventListener("change", this.mediaChange);
+      if (typeof ResizeObserver === "function") {
+        this.resizeObserver = new ResizeObserver(this.schedule);
+        this.resizeObserver.observe(section);
+      }
+      document.fonts?.ready?.then(this.schedule);
+      this.schedule();
     }
 
-    if (document.fonts?.ready) document.fonts.ready.then(schedule);
+    disconnectedCallback() {
+      if (!this.section) return;
+      this.media.removeEventListener("change", this.mediaChange);
+      this.resizeObserver?.disconnect();
+      cancelAnimationFrame(this.frame);
+      this.svg?.remove();
+      this.section.classList.remove("sidenote-connectors-ready");
+      this.section = null;
+    }
   }
 
-  setup();
+  customElements.define(tagName, SidenoteConnectors);
 })();

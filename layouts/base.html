@@ -53,14 +53,8 @@
       rel="preload"
       href="{{fontStylesheet}}"
       as="style"
-      onload="
-        this.onload = null;
-        this.rel = 'stylesheet';
-      "
     />
-    <noscript>
-      <link rel="stylesheet" href="{{fontStylesheet}}" />
-    </noscript>
+    <link rel="stylesheet" href="{{fontStylesheet}}" />
     {{analytics}}
     <link rel="stylesheet" href="{{css}}" />
   </head>

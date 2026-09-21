@@ -856,7 +856,8 @@ pre > code {
 }
 
 /* Mermaid diagrams */
-.mermaid {
+mermaid-diagram {
+  display: block;
   border: 1px solid var(--accent);
   border-radius: 4px;
   margin: 1.4rem 0;
@@ -868,7 +869,13 @@ pre > code {
   max-width: 100%;
 }
 
-.mermaid svg {
+mermaid-diagram .mermaid-source {
+  margin: 0;
+  max-width: none;
+  white-space: pre;
+}
+
+mermaid-diagram .mermaid-output svg {
   font-family: var(--font-mono) !important;
   color: var(--text-color);
   display: block;
@@ -877,27 +884,27 @@ pre > code {
   font-size: 16px !important;
 }
 
-.mermaid .nodeLabel,
-.mermaid .edgeLabel,
-.mermaid text,
-.mermaid tspan {
+mermaid-diagram .nodeLabel,
+mermaid-diagram .edgeLabel,
+mermaid-diagram text,
+mermaid-diagram tspan {
   font-family: var(--font-mono) !important;
   font-size: 16px !important;
 }
 
-.mermaid .label-container,
-.mermaid rect.label-container {
+mermaid-diagram .label-container,
+mermaid-diagram rect.label-container {
   overflow: visible !important;
 }
 
-.mermaid foreignObject {
+mermaid-diagram foreignObject {
   overflow: visible !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
 }
 
-.mermaid foreignObject > div {
+mermaid-diagram foreignObject > div {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
@@ -905,13 +912,13 @@ pre > code {
   height: 100% !important;
 }
 
-.mermaid .nodeLabel,
-.mermaid .edgeLabel {
+mermaid-diagram .nodeLabel,
+mermaid-diagram .edgeLabel {
   padding: 4px 6px;
   text-align: center !important;
 }
 
-.mermaid text {
+mermaid-diagram text {
   overflow: visible !important;
 }
 
@@ -1010,20 +1017,20 @@ ul {
   }
 }
 
-  @media (prefers-color-scheme: dark) {
-  .mermaid {
+@media (prefers-color-scheme: dark) {
+  mermaid-diagram {
     background: var(--bg-color-dark);
   }
 
-  .mermaid svg {
+  mermaid-diagram .mermaid-output svg {
     color: var(--text-color-dark);
   }
 
   /* Override text colors for dark mode */
-  .mermaid svg text,
-  .mermaid svg tspan,
-  .mermaid svg .nodeLabel,
-  .mermaid svg .edgeLabel {
+  mermaid-diagram .mermaid-output svg text,
+  mermaid-diagram .mermaid-output svg tspan,
+  mermaid-diagram .mermaid-output svg .nodeLabel,
+  mermaid-diagram .mermaid-output svg .edgeLabel {
     fill: var(--text-color-dark) !important;
     color: var(--text-color-dark) !important;
   }

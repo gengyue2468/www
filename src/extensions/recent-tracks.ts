@@ -3,7 +3,7 @@ import type { Plugin } from "./plugin.js";
 const COMPONENT_TAG = "recent-tracks-loader";
 
 export function recentTracksScript(): string {
-  return `<script>
+  return `
 (() => {
   const tagName = ${JSON.stringify(COMPONENT_TAG)};
   if (customElements.get(tagName)) return;
@@ -107,14 +107,18 @@ export function recentTracksScript(): string {
   }
 
   customElements.define(tagName, RecentTracksLoader);
-})();
-</script>`;
+})();`;
 }
 
 export const recentTracksPlugin: Plugin = {
   name: "recent-tracks",
+  clientScripts: [{
+    key: "recent-tracks",
+    fileName: "recent-tracks",
+    source: () => recentTracksScript(),
+  }],
   webComponents: [{
     tagName: COMPONENT_TAG,
-    script: () => recentTracksScript(),
+    scriptKey: "recent-tracks",
   }],
 };

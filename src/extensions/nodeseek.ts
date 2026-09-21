@@ -4,8 +4,6 @@ import { sanitizeHtml } from "../utils/html.js";
 
 const TABS_COMPONENT_TAG = "content-tabs";
 
-let tabGroupId = -1;
-
 // ── ANSI SGR → HTML ──────────────────────────────────────────────────────────
 
 const ANSI256_PALETTE = [
@@ -288,7 +286,7 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-export function processNqBlock(raw: string): string {
+export function processNqBlock(raw: string, groupId = 0): string {
   const lines = raw.split("\n");
   const tabs: Array<{ title: string; content: string[] }> = [];
   let currentTitle = "";
@@ -353,16 +351,15 @@ export function processNqBlock(raw: string): string {
     return `<div class="nq-container">${escapeHtml(raw)}</div>`;
   }
 
-  tabGroupId++;
   const tabsHtml: string[] = [];
   const contentsHtml: string[] = [];
   tabs.forEach((tab, idx) => {
-    const id = `nq-${tabGroupId}-${idx}`;
+    const id = `nq-${groupId}-${idx}`;
     const contentId = `${id}-content`;
     const selected = idx === 0;
     const content = renderTabContent(tab.content.join("\n"));
     tabsHtml.push(
-      `<button class="tab-button" type="button" id="${id}" role="tab" aria-selected="${selected}" ` +
+      `<button class="tab-button" type="button" id="nq-${groupId}-${idx}" role="tab" aria-selected="${selected}" ` +
       `aria-controls="${contentId}" tabindex="${selected ? 0 : -1}">${escapeHtml(tab.title)}</button>`
     );
     contentsHtml.push(
@@ -402,6 +399,7 @@ function processNqBlocks(markdown: string): string {
   const lines = markdown.split("\n");
   const result: string[] = [];
   let i = 0;
+  let groupId = 0;
 
   while (i < lines.length) {
     if (/^:::\s*nq\s*$/.test(lines[i].trim())) {
@@ -420,7 +418,7 @@ function processNqBlocks(markdown: string): string {
         block.push(lines[i]);
         i++;
       }
-      result.push(processNqBlock(block.join("\n")));
+      result.push(processNqBlock(block.join("\n"), groupId++));
     } else {
       result.push(lines[i]);
       i++;
@@ -448,7 +446,7 @@ function processAnsiCodeBlocks(html: string): string {
 }
 
 export function nodeseekTabsScript(): string {
-  return `<script>
+  return `
 (() => {
   const tagName = ${JSON.stringify(TABS_COMPONENT_TAG)};
   if (customElements.get(tagName)) return;
@@ -518,8 +516,7 @@ export function nodeseekTabsScript(): string {
   }
 
   customElements.define(tagName, ContentTabs);
-})();
-</script>`;
+})();`;
 }
 
 // ── Plugin export ─────────────────────────────────────────────────────────────
@@ -532,6 +529,11 @@ export const nodeseekPlugin: Plugin = {
   ],
   webComponents: [{
     tagName: TABS_COMPONENT_TAG,
-    script: () => nodeseekTabsScript(),
+    scriptKey: "content-tabs",
+  }],
+  clientScripts: [{
+    key: "content-tabs",
+    fileName: "content-tabs",
+    source: () => nodeseekTabsScript(),
   }],
 };
