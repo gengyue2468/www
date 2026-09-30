@@ -2,6 +2,8 @@ import { join, relative, resolve, isAbsolute } from "path";
 import { watch } from "fs";
 import { build } from "./build.js";
 import config from "./config.js";
+import { getClientScriptDefinitions } from "./extensions/plugin.js";
+import { SITE_STYLESHEETS } from "./utils/stylesheets.js";
 
 const configuredPort = Number(process.env.PORT || 3000);
 if (!Number.isInteger(configuredPort) || configuredPort < 1 || configuredPort > 65535) {
@@ -18,11 +20,10 @@ const watchDirs = [
 
 const publicRoot = resolve(config.dirs.public);
 const rebuildFiles = new Set([
-  resolve(join(config.dirs.public, "globals.css")),
-  resolve(join(config.dirs.public, "tufte.css")),
-  resolve(join(config.dirs.public, "js", "post-actions.js")),
-  resolve(join(config.dirs.public, "js", "sidenote-connectors.js")),
-  resolve(join(config.dirs.public, "js", "comments.js")),
+  ...SITE_STYLESHEETS.map(file => resolve(join(config.dirs.public, file))),
+  ...getClientScriptDefinitions().flatMap(({ sourcePath }) =>
+    sourcePath ? [resolve(join(config.dirs.public, sourcePath))] : []
+  ),
   resolve(join(config.dirs.public, "fonts", "source-han-serif-cn-vf", "result.css")),
 ]);
 

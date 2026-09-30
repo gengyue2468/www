@@ -2,9 +2,7 @@
 comment: true
 title: 为什么您的深色模式看起来不太对劲？
 date: 2026-04-12
-tags:
-  - 前端
-  - 技术
+tags: [Web]
 summary: "探讨 prefers-color-scheme 与 .dark 类在实际开发中的冲突，指出 color-scheme: light dark 会导致浏览器原生控件与页面主题不一致的问题，并给出以 .dark 控制 color-scheme 的解决方案，同时反思主题切换在产品设计中的必要性。"
 ---
 [根据 MDN 的说法](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme)  `prefers-color-scheme` 能够侦测到用户在操作系统上的主题偏好，也就是浅色和深色模式。

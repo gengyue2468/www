@@ -3,7 +3,7 @@ comment: true
 title: 迁移 Memos 到 Racknerd
 date: 2026-02-07
 summary: '将 Memos 从国内 VPS 迁移到 RackNerd，并顺手搭了一套自动备份方案。'
-tags: ['技术','Docker','Memos']
+tags: [Ops, Cloud]
 ---
 
 昨天购置了一台 [RackNerd](https://www.racknerd.com/) 的黑色星期五的特价小鸡，年付 USD $18.66，配置如下：[note: located at Seattle, Washington]

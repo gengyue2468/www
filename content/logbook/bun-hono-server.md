@@ -1,6 +1,7 @@
 ---
 comment: true
 title: 原来 Hono 指定端口是通过 Runtime 控制的！
+tags: [Code]
 date: 2026-05-07
 ---
 **Hono 本身只是路由框架**，不负责监听端口。

@@ -8,6 +8,7 @@ dist-build/
 .build-lock.stale-*/
 .deploy.lock
 docs/
+tests
 .DS_Store
 *.log
 bun.lockb

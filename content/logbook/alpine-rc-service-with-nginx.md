@@ -1,6 +1,7 @@
 ---
 comment: true
 title: Alpine 上的 rc-service 和 nginx 打架
+tags: [System, Ops]
 date: 2026-07-11
 ---
 最近在两台 1c 0.5g 的小鸡上装了 Alpine Linux 配了 nginx 并加了缓存，但是发现内存似乎会一点点漏，几个小时之后小鸡就 OOM 然后探针和 ssh 直接被杀掉了只能去面板重启。

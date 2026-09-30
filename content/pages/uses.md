@@ -7,12 +7,13 @@ description: 我目前使用的设备、VPS 和工具列表——由工人智能
 
 :::fullwidth
 
-| 设备                |   类型    |                                                  配置 | 起始          |
-| :---------------- | :-----: | --------------------------------------------------: | :---------- |
-| OMEN 11           | Laptop  |           Intel Core i9 + 32 GB DDR5 + 1TB NVME SSD | 2025-07     |
-| Honor GT Pro      |  Phone  |         Snapdragon 8 Elite + 12 GB RAM + 256 GB ROM | 2025-06     |
-| Honor Tablet 10   | Tablet  |           Snapdragon 7 Gen3 + 12 GB RAM + 256GB ROM | 2025-08     |
-| Honor Watch 5     |  Watch  |                                                 N/A | 2025-09     |
+| 设备                    |   类型   |                                          配置 | 起始      |
+| :-------------------- | :----: | ------------------------------------------: | :------ |
+| OMEN 11               | Laptop |   Intel Core i9 + 32 GB DDR5 + 1TB NVME SSD | 2025-07 |
+| Honor GT Pro          | Phone  | Snapdragon 8 Elite + 12 GB RAM + 256 GB ROM | 2025-06 |
+| Honor Tablet 10       | Tablet |   Snapdragon 7 Gen3 + 12 GB RAM + 256GB ROM | 2025-08 |
+| Honor Watch 5         | Watch  |                                         N/A | 2025-09 |
+| Xiaomi Router AX3000T | Router |                                         N/A | 2026-09 |
 
 :::
 

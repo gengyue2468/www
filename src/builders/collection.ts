@@ -6,12 +6,15 @@ import { renderMarkdown } from "../utils/markdown.js";
 import { renderTemplate } from "../utils/template.js";
 import { formatDate } from "../utils/date.js";
 import { addSidenoteConnector } from "../extensions/sidenotes.js";
+import { generateIssoCommentsHTML } from "../extensions/comments.js";
 import { hasMathHtml, mathStylesheet } from "../extensions/math.js";
 import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js";
 import { injectWebComponentScripts, type BuildHooks } from "../extensions/plugin.js";
 import { buildMetaDescription, escapeHtmlAttr, escapeHtmlText, generateKeywords } from "../utils/seo.js";
 import { assertSafePathSegment, joinUrlPath } from "../utils/url.js";
 import { contentHash } from "../utils/assets.js";
+import { buildTagIndex, getTagDefinition, sortPostsByDate, validatePostTags, type TagGroup } from "../utils/tags.js";
+import type { TagName } from "../taxonomy.js";
 import { AppError, ErrorCode, isENOENT, errorReporter } from "../utils/errors.js";
 import config from "../config.js";
 import type { AssetManifest, CollectionConfig, CollectionOutput, Post } from "../types.js";
@@ -21,21 +24,6 @@ interface PostWithContent extends Post {
   html: string;
   filePath: string;
   frontmatter: Record<string, unknown>;
-}
-
-function getTagSlug(tag: string): string {
-  const normalized = tag.normalize("NFKC").trim().toLowerCase();
-  const slug = normalized
-    .replace(/[^\p{L}\p{N}]+/gu, "-")
-    .replace(/^-+|-+$/g, "");
-  if (slug) return slug;
-
-  let hash = 2166136261;
-  for (const char of normalized) {
-    hash ^= char.codePointAt(0) || 0;
-    hash = Math.imul(hash, 16777619);
-  }
-  return `tag-${(hash >>> 0).toString(16)}`;
 }
 
 function postPath(urlPrefix: string, slug: string): string {
@@ -60,51 +48,21 @@ function getCollectionDefaults(coll: CollectionConfig) {
   };
 }
 
-function collectAllTags(posts: Post[]): string[] {
-  const allTags: string[] = [];
-  for (const post of posts) {
-    if (post.tags && Array.isArray(post.tags)) allTags.push(...post.tags);
-  }
-  return allTags;
-}
-
-function sortPostsByDate<T extends { date?: string; slug: string }>(posts: T[]): T[] {
-  return [...posts].sort((a, b) => {
-    if (!a.date) return 1;
-    if (!b.date) return -1;
-    const diff = Date.parse(`${b.date}T00:00:00Z`) - Date.parse(`${a.date}T00:00:00Z`);
-    if (diff !== 0) return diff;
-    return a.slug.localeCompare(b.slug);
-  });
-}
-
-function generateTagsHTML(allTags: string[], urlPrefix: string): string {
-  const tagCounts: Record<string, number> = {};
-  for (const tag of allTags) {
-    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-  }
-
-  const sortedTags = [...new Set(allTags)].sort((a, b) => {
-    const countDiff = tagCounts[b] - tagCounts[a];
-    return countDiff !== 0 ? countDiff : a.localeCompare(b);
-  });
-
+function generateTagsHTML(tags: readonly TagGroup<Post>[], urlPrefix: string): string {
   const parts: string[] = ['<div class="tags-list">'];
-  for (const tag of sortedTags) {
-    const slug = getTagSlug(tag);
-    const count = tagCounts[tag];
+  for (const { name, slug, count } of tags) {
     const size = Math.min(3, Math.max(1, Math.ceil(count / 2)));
-    parts.push(`<a href="${joinUrlPath(urlPrefix, "tag", slug)}" class="tag tag-size-${size}" data-count="${count}">#${escapeHtmlText(tag)} <span class="tag-count">(${count})</span></a>`);
+    parts.push(`<a href="${joinUrlPath(urlPrefix, "tag", slug)}" class="tag tag-size-${size}" data-count="${count}">#${escapeHtmlText(name)} <span class="tag-count">(${count})</span></a>`);
   }
   parts.push("</div>");
   return parts.join("");
 }
 
-function generatePostTagsHTML(tags: string[] | undefined, urlPrefix: string): string {
+function generatePostTagsHTML(tags: readonly TagName[], urlPrefix: string): string {
   if (!tags || tags.length === 0) return "";
   const parts: string[] = ['<div class="post-tags">'];
   for (const tag of tags) {
-    const slug = getTagSlug(tag);
+    const { slug } = getTagDefinition(tag);
     parts.push(`<a href="${joinUrlPath(urlPrefix, "tag", slug)}" class="tag">#${escapeHtmlText(tag)}</a>`);
   }
   parts.push("</div>");
@@ -147,169 +105,6 @@ function generatePostActionsHTML(markdownPath: string, pagePath: string, comment
       ${commentHref ? link("Comment this post", commentHref) : ""}
     </div>
   </post-actions>`;
-}
-
-export function generateIssoCommentsHTML(route: string, title: string): string {
-  const capAttributes = config.isso.cap.enabled
-    ? ` data-cap-enabled="true" data-cap-script="${escapeHtmlAttr(config.isso.cap.widgetScriptUrl)}" data-cap-endpoint="${escapeHtmlAttr(config.isso.cap.apiEndpoint)}"`
-    : "";
-  return `<section class="post-comments" aria-labelledby="post-comments-title">
-  <h2 id="post-comments-title"><span class="post-comments-count" aria-live="polite"></span>评论</h2>
-  <isso-comments
-    data-isso-script="${escapeHtmlAttr(config.isso.scriptUrl)}"
-    data-isso-endpoint="${escapeHtmlAttr(config.isso.endpoint)}"
-    data-isso-page-author-hashes="${escapeHtmlAttr(config.isso.pageAuthorHashes)}"${capAttributes}
-  >
-    <div id="isso-thread" data-isso-id="${escapeHtmlAttr(route)}" data-title="${escapeHtmlAttr(title)}">
-      <noscript>需要启用 JavaScript 才能查看和发表评论。</noscript>
-    </div>
-  </isso-comments>
-</section>`;
-}
-
-export function generateIssoScript(): string {
-  /*
-  const capScript = config.isso.cap.enabled
-    ? `<script type="module" src="${escapeHtmlAttr(config.isso.cap.widgetScriptUrl)}"></script>`
-    : "";
-  const capSetup = config.isso.cap.enabled
-    ? `<script>
-(() => {
-  const thread = document.getElementById("isso-thread");
-  if (!thread) return;
-
-  const capEndpoint = ${JSON.stringify(config.isso.cap.apiEndpoint)};
-  const mounted = new WeakSet();
-
-  const mountCap = (postbox) => {
-    if (mounted.has(postbox)) return;
-
-    const textareaWrapper = postbox.querySelector(".isso-textarea-wrapper");
-    if (!textareaWrapper) return;
-    mounted.add(postbox);
-
-    const gate = document.createElement("div");
-    gate.className = "isso-cap-gate";
-    gate.dataset.state = "required";
-    gate.setAttribute("role", "group");
-    gate.setAttribute("aria-label", "发布前人机验证");
-
-    const widget = document.createElement("cap-widget");
-    widget.setAttribute("required", "");
-    widget.setAttribute("data-cap-api-endpoint", capEndpoint);
-    widget.setAttribute("data-cap-disable-haptics", "");
-
-    gate.append(widget);
-    textareaWrapper.append(gate);
-
-    let solved = false;
-    widget.addEventListener("solve", () => {
-      solved = true;
-      gate.dataset.state = "solved";
-    });
-    widget.addEventListener("reset", () => {
-      solved = false;
-      gate.dataset.state = "required";
-    });
-    widget.addEventListener("error", () => {
-      solved = false;
-      gate.dataset.state = "required";
-    });
-
-    // Isso binds directly to the submit input, so capture the click before it reaches Isso.
-    postbox.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLInputElement) || target.type !== "submit") return;
-      if (solved) {
-        solved = false;
-        gate.dataset.state = "required";
-        if (typeof widget.reset === "function") widget.reset();
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-      widget.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, true);
-  };
-
-  const scan = () => thread.querySelectorAll(".isso-postbox").forEach(mountCap);
-  scan();
-  new MutationObserver(scan).observe(thread, { childList: true, subtree: true });
-})();
-</script>`
-    : "";
-  const voteSetup = `<script>
-(() => {
-  const thread = document.getElementById("isso-thread");
-  if (!thread) return;
-
-  const enhanceVotes = () => {
-    thread.querySelectorAll(".isso-comment-footer").forEach((footer) => {
-      const score = footer.querySelector(":scope > .isso-votes");
-      const upvote = footer.querySelector(":scope > .isso-upvote");
-      if (!score || !upvote) return;
-
-      footer.querySelector(":scope > .isso-downvote")?.remove();
-
-      const value = score.textContent?.trim() || "0";
-      if (upvote.dataset.voteIcon !== "true") {
-        upvote.dataset.voteIcon = "true";
-        upvote.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 18.75 7.5-7.5 7.5 7.5" /><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 7.5-7.5 7.5 7.5" /></svg>';
-      }
-
-      let count = upvote.querySelector(":scope > .isso-vote-count");
-      if (!count) {
-        count = document.createElement("span");
-        count.className = "isso-vote-count";
-        upvote.append(count);
-      }
-      if (count.textContent !== value) count.textContent = value;
-
-      score.setAttribute("aria-hidden", "true");
-    });
-  };
-
-  enhanceVotes();
-  new MutationObserver(enhanceVotes).observe(thread, {
-    childList: true,
-    characterData: true,
-    subtree: true,
-  });
-})();
-</script>`;
-
-  return `${capScript}
-<script
-  data-isso="${escapeHtmlAttr(config.isso.endpoint)}"
-  data-isso-css="false"
-  data-isso-lang="zh_CN"
-  data-isso-sorting="newest"
-  data-isso-avatar="false"
-  data-isso-vote="true"
-  data-isso-page-author-hashes="${escapeHtmlAttr(config.isso.pageAuthorHashes)}"
-  data-isso-comment-page-author-suffix-text-zh-cn="Owner"
-  src="${escapeHtmlAttr(config.isso.scriptUrl)}"
- ></script>
-${capSetup}
-${voteSetup}
-<script>
-(() => {
-  const thread = document.getElementById("isso-thread");
-  const count = document.querySelector(".post-comments-count");
-  if (!thread || !count) return;
-
-  const updateCount = () => {
-    const total = thread.querySelectorAll("#isso-root .isso-comment").length;
-    count.textContent = total + " 条";
-  };
-
-  updateCount();
-  new MutationObserver(updateCount).observe(thread, { childList: true, subtree: true });
-})();
-</script>`;
-  */
-  return "";
 }
 
 function generatePostsListHTML(posts: Post[], urlPrefix: string): string {
@@ -385,7 +180,7 @@ async function loadPostsFromDir(
       updated: (frontmatter.updated as string) || "",
       excerpt: (frontmatter.excerpt as string) || "",
       summary: (frontmatter.summary as string) || "",
-      tags: (frontmatter.tags as string[]) || [],
+      tags: validatePostTags(frontmatter.tags, filePath),
       html,
       filePath,
       frontmatter,
@@ -407,8 +202,7 @@ function buildCollectionIndex(
   assets: AssetManifest,
   year?: number
 ): string {
-  const allTags = collectAllTags(posts);
-  const tagsHtml = coll.tags ? `<div style="margin-top: 3rem;">${generateTagsHTML(allTags, urlPrefix)}</div>` : "";
+  const tagsHtml = coll.tags ? `<div style="margin-top: 3rem;">${generateTagsHTML(buildTagIndex(posts), urlPrefix)}</div>` : "";
   const postsListHtml = posts.length > 0 ? generatePostsListHTML(posts, urlPrefix) : "<p>No posts yet.</p>";
 
   const contentData = { 
@@ -483,7 +277,7 @@ async function buildPostPages(
     post.updated = (frontmatter.updated as string) || undefined;
     post.excerpt = (frontmatter.excerpt as string) || "";
     post.summary = (frontmatter.summary as string) || "";
-    post.tags = (frontmatter.tags as string[]) || [];
+    post.tags = validatePostTags(frontmatter.tags, post.filePath);
 
     const formattedDate = formatDate(frontmatter.date as string);
     const prevPost = i > 0 ? posts[i - 1] : null;
@@ -496,7 +290,7 @@ async function buildPostPages(
     if (prevPost) headLinkParts.push(`<link rel="prev" href="${postPath(urlPrefix, prevPost.slug)}" />`);
     if (nextPost) headLinkParts.push(`<link rel="next" href="${postPath(urlPrefix, nextPost.slug)}" />`);
 
-    const postTagsHtml = generatePostTagsHTML(frontmatter.tags as string[], urlPrefix);
+    const postTagsHtml = coll.tags ? generatePostTagsHTML(post.tags, urlPrefix) : "";
     const dateClass = formattedDate ? "" : " hidden";
     const plainText = html.replace(/<[^>]+>/g, "").replace(/\s+/g, "");
     const wordCount = `${plainText.length} 字`;
@@ -537,7 +331,7 @@ async function buildPostPages(
 
     if (hasMathHtml(html)) headLinkParts.push(mathStylesheet(assets.katexStylesheetHref));
     const headLinks = headLinkParts.join("\n    ");
-    const postTags = frontmatter.tags as string[] | undefined;
+    const postTags = post.tags;
     const fullTitle = `${title} - ${config.site.title}`;
 
     let output = renderPage(baseLayout, {
@@ -609,48 +403,14 @@ async function buildTagPages(
   assets: AssetManifest,
   year?: number
 ): Promise<void> {
-  const tagMap = new Map<string, PostWithContent[]>();
-
-  for (const post of posts) {
-    if (post.tags && Array.isArray(post.tags)) {
-      for (const tag of post.tags) {
-        const existing = tagMap.get(tag);
-        if (existing) {
-          existing.push(post);
-        } else {
-          tagMap.set(tag, [post]);
-        }
-      }
-    }
-  }
-
-  if (tagMap.size === 0) return;
-
-  const tagSlugOwners = new Map<string, string>();
-  for (const tag of tagMap.keys()) {
-    const slug = getTagSlug(tag);
-    const owner = tagSlugOwners.get(slug);
-    if (owner && owner !== tag) {
-      throw new AppError(`Tag slug collision: '${owner}' and '${tag}' both map to '${slug}'`, ErrorCode.CONFIG_ERROR, {
-        collection: coll.name,
-        slug,
-      });
-    }
-    tagSlugOwners.set(slug, tag);
-  }
-
-  const allTagsGlobal = collectAllTags(posts);
-
+  const tagIndex = buildTagIndex(posts);
+  if (tagIndex.length === 0) return;
+  const tagNavHtml = generateTagsHTML(tagIndex, urlPrefix);
   const tagPromises: Promise<void>[] = [];
 
-  for (const [tag, taggedPosts] of tagMap) {
+  for (const { name: tag, slug, count, posts: taggedPosts } of tagIndex) {
     tagPromises.push((async () => {
-      const slug = getTagSlug(tag);
-
-      const sortedPosts = sortPostsByDate(taggedPosts);
-
-      const tagNavHtml = generateTagsHTML(allTagsGlobal, urlPrefix);
-      const postsListHtml = generatePostsListHTML(sortedPosts, urlPrefix);
+      const postsListHtml = generatePostsListHTML(taggedPosts, urlPrefix);
 
       const contentData = {
         title: `Tag: #${escapeHtmlText(tag)}`,
@@ -675,21 +435,20 @@ async function buildTagPages(
         stylesheetHref: assets.stylesheetHref,
         fontStylesheetHref: assets.fontStylesheetHref,
         keywords: generateKeywords([tag]),
-        robotsMeta: '<meta name="robots" content="noindex, follow" />',
-        ogTags: { 
-          title: tagPageTitle, 
-          description: tagDescription, 
-          url: `${config.site.url}/${urlPrefix}/tag/${slug}`, 
-          type: "website", 
-          siteName: config.site.title, 
-          tags: [tag] 
+        ogTags: {
+          title: tagPageTitle,
+          description: tagDescription,
+          url: `${config.site.url}/${urlPrefix}/tag/${slug}`,
+          type: "website",
+          siteName: config.site.title,
+          tags: [tag]
         },
-        jsonLd: { 
-          type: "CollectionPage", 
-          title: tagPageTitle, 
-          description: tagDescription, 
-          url: `${config.site.url}/${urlPrefix}/tag/${slug}`, 
-          numberOfItems: taggedPosts.length 
+        jsonLd: {
+          type: "CollectionPage",
+          title: tagPageTitle,
+          description: tagDescription,
+          url: `${config.site.url}/${urlPrefix}/tag/${slug}`,
+          numberOfItems: count
         },
         breadcrumbs: [
           { name: config.site.title, url: config.site.url },
@@ -708,10 +467,8 @@ async function buildTagPages(
 
   await Promise.all(tagPromises);
 
-  if (allTagsGlobal.length === 0) return;
-
-  const tagsCloudHtml = generateTagsHTML(allTagsGlobal, urlPrefix);
-  const uniqueTagCount = new Set(allTagsGlobal).size;
+  const tagsCloudHtml = tagNavHtml;
+  const uniqueTagCount = tagIndex.length;
 
   const contentData = {
     title: "All Tags",
@@ -735,19 +492,18 @@ async function buildTagPages(
     content: renderedContent,
     stylesheetHref: assets.stylesheetHref,
     fontStylesheetHref: assets.fontStylesheetHref,
-    robotsMeta: '<meta name="robots" content="noindex, follow" />',
-    ogTags: { 
-      title: tagsIndexTitle, 
-      description: tagsIndexDescription, 
-      url: `${config.site.url}/${urlPrefix}/tag`, 
-      type: "website", 
-      siteName: config.site.title 
+    ogTags: {
+      title: tagsIndexTitle,
+      description: tagsIndexDescription,
+      url: `${config.site.url}/${urlPrefix}/tag`,
+      type: "website",
+      siteName: config.site.title
     },
-    jsonLd: { 
-      type: "CollectionPage", 
-      title: tagsIndexTitle, 
-      description: tagsIndexDescription, 
-      url: `${config.site.url}/${urlPrefix}/tag`, 
+    jsonLd: {
+      type: "CollectionPage",
+      title: tagsIndexTitle,
+      description: tagsIndexDescription,
+      url: `${config.site.url}/${urlPrefix}/tag`,
       numberOfItems: uniqueTagCount
     },
     breadcrumbs: [

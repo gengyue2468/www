@@ -51,7 +51,7 @@ const config: Config = {
       name: "logbook",
       srcDir: join(rootDir, "content", "logbook"),
       urlPrefix: "logbook",
-      tags: false,
+      tags: true,
       layouts: {
         index: "blog-index",
         post: "blog-post",
@@ -96,6 +96,7 @@ const config: Config = {
     title: "gengyue's blog",
     description: "The personal blog of gengyue.",
     language: "zh-CN",
+    additionalLanguages: ["en-US"],
     copyright: "Copyright © 2026 gengyue",
     items: { limit: 200 },
   },
@@ -107,7 +108,8 @@ const config: Config = {
     changefreqPages: "monthly",
     changefreqBlog: "weekly",
     changefreqPosts: "monthly",
-    priority: { home: 1.0, pages: 0.8, blog: 0.9, posts: 0.7 },
+    changefreqTags: "weekly",
+    priority: { home: 1.0, pages: 0.8, blog: 0.9, posts: 0.7, tags: 0.6 },
   },
 
   robots: {
@@ -133,11 +135,11 @@ const config: Config = {
       show: true,
       children: [
         { name: "Logbook", path: "/logbook", show: true },
+        { name: "Playlist", path: "/playlist", show: true },
+        { name: "Uses", path: "/uses", show: true },
         { name: "Friends", path: "/friends", show: true },
         { name: "Guestbook", path: "/guestbook", show: true },
         { name: "Colophon", path: "/colophon", show: true },
-        { name: "Uses", path: "/uses", show: true },
-        { name: "Playlist", path: "/playlist", show: true },
       ],
     },
   ],

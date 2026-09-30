@@ -1,6 +1,7 @@
 ---
 comment: true
 title: Azure for Students JP East NQ 留档
+tags: [Cloud]
 date: 2026-07-05
 ---
 微软的 Azure for Students 免费机器，地域是日本东部，NodeQuality 如下：

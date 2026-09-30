@@ -2,11 +2,12 @@ import { join, dirname, relative } from "path";
 import { mkdir, rm, readdir, rename, stat } from "fs/promises";
 import type { Dirent } from "fs";
 import { ensureDir, loadLayout, copyPublicFiles, copyDirectory, readFileContent, writeFileContent } from "./utils/fs.js";
-import { buildPage, getMinifiedCss } from "./builders/page.js";
+import { buildPage } from "./builders/page.js";
 import { buildCollection, getRequiredLayouts } from "./builders/collection.js";
 import { generateRSS } from "./generators/rss.js";
 import { generateSitemap } from "./generators/sitemap.js";
 import { generateRobotsTxt } from "./generators/robots.js";
+import { generateTagCatalog } from "./generators/tags.js";
 import { emitMarkdownFiles, generateLlmsTxt } from "./generators/llms.js";
 import { registerPlugin, getClientScriptDefinitions, getComposedHooks } from "./extensions/plugin.js";
 import { mermaidPlugin } from "./extensions/mermaid.js";
@@ -20,6 +21,9 @@ import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js"
 import { cleanBaseUrl } from "./utils/url.js";
 import { auditDist, type HtmlAuditIssueKind } from "./utils/html-audit.js";
 import { contentHash, emitHashedTextAsset } from "./utils/assets.js";
+import { loadClientScriptSource } from "./utils/client-scripts.js";
+import { prepareMermaidRuntime } from "./utils/mermaid-assets.js";
+import { getMinifiedCss, SITE_STYLESHEETS } from "./utils/stylesheets.js";
 import type { AssetManifest, CollectionOutput } from "./types.js";
 import config from "./config.js";
 
@@ -227,108 +231,8 @@ async function build404Page(
   console.log("✓ Built /404");
 }
 
-const MERMAID_VERSION = "10.9.3";
 const MERMAID_CACHE_DIR = join(config.rootDir, ".build-cache");
 const BUILD_LOCK_DIR = join(config.rootDir, ".build-lock");
-
-async function fetchCachedBuildAsset(url: string, cachePath: string): Promise<string> {
-  if (await Bun.file(cachePath).exists() && (await Bun.file(cachePath).size) > 0) {
-    return readFileContent(cachePath);
-  }
-
-  const temporaryPath = `${cachePath}.tmp-${process.pid}-${Date.now()}`;
-  try {
-    console.log(`  Downloading ${url}...`);
-    await ensureDir(MERMAID_CACHE_DIR);
-    const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const content = await response.text();
-    if (!content) throw new Error("Empty response");
-    await Bun.write(temporaryPath, content);
-    await rename(temporaryPath, cachePath);
-    return content;
-  } catch (err) {
-    await rm(temporaryPath, { force: true });
-    throw AppError.fromError(err, ErrorCode.FILE_WRITE_ERROR, { url, cachePath });
-  }
-}
-
-async function prepareMermaidRuntime(assetsDir: string): Promise<string> {
-  const entryUrl = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/mermaid.esm.min.mjs`;
-  const dependencyName = "mermaid-5a5980d4.js";
-  const dependencyUrl = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/${dependencyName}`;
-  const [entry, dependency] = await Promise.all([
-    fetchCachedBuildAsset(entryUrl, join(MERMAID_CACHE_DIR, `mermaid-${MERMAID_VERSION}.esm.min.mjs`)),
-    fetchCachedBuildAsset(dependencyUrl, join(MERMAID_CACHE_DIR, `mermaid-${MERMAID_VERSION}.${dependencyName}`)),
-  ]);
-
-  const modules = new Map([[`./${dependencyName}`, dependency]]);
-  const pending = [...modules.keys()];
-  const relativeImports = /(?:import\s*(?:\(\s*)?|from\s*)["'](\.\/[^"']+)["']/g;
-
-  for (let index = 0; index < pending.length; index++) {
-    const moduleName = pending[index];
-    const moduleSource = modules.get(moduleName)!;
-    for (const match of moduleSource.matchAll(relativeImports)) {
-      const importedName = match[1];
-      if (modules.has(importedName)) continue;
-      const importedUrl = new URL(importedName, dependencyUrl).toString();
-      const cacheName = importedName.replace(/^\.\//, "");
-      const importedSource = await fetchCachedBuildAsset(
-        importedUrl,
-        join(MERMAID_CACHE_DIR, `mermaid-${MERMAID_VERSION}.${cacheName}`),
-      );
-      modules.set(importedName, importedSource);
-      pending.push(importedName);
-    }
-  }
-
-  const coreModuleName = `./${dependencyName}`;
-  const emittedModules = new Map<string, string>();
-  const emitted = new Set<string>();
-  const resolvingModules = new Set<string>();
-  // Mermaid diagram chunks import helpers from the core module, while the core
-  // module dynamically imports those chunks. Give the core a stable name to
-  // break that intentional cycle.
-  emittedModules.set(coreModuleName, `mermaid-core-${contentHash(dependency)}.js`);
-
-  const emitModule = async (moduleName: string): Promise<string> => {
-    const existing = emittedModules.get(moduleName);
-    if (moduleName === coreModuleName && resolvingModules.has(moduleName)) {
-      return existing!;
-    }
-    if (emitted.has(moduleName)) return existing!;
-    if (resolvingModules.has(moduleName)) {
-      throw new Error(`Circular Mermaid module dependency: ${moduleName}`);
-    }
-
-    const source = modules.get(moduleName);
-    if (source === undefined) throw new Error(`Missing Mermaid module: ${moduleName}`);
-    resolvingModules.add(moduleName);
-
-    let rewritten = source;
-    for (const match of source.matchAll(relativeImports)) {
-      const importedName = match[1];
-      const importedFileName = await emitModule(importedName);
-      rewritten = rewritten.replaceAll(importedName, `./${importedFileName}`);
-    }
-
-    const baseName = moduleName.split("/").pop()!.replace(/\.[^.]+$/, "");
-    const extension = moduleName.endsWith(".mjs") ? ".mjs" : ".js";
-    const filePrefix = moduleName === coreModuleName ? "mermaid-core" : `mermaid-${baseName}`;
-    const fileName = existing || await emitHashedTextAsset(assetsDir, filePrefix, extension, rewritten);
-    if (existing) await Bun.write(join(assetsDir, fileName), rewritten);
-    emittedModules.set(moduleName, fileName);
-    emitted.add(moduleName);
-    resolvingModules.delete(moduleName);
-    return fileName;
-  };
-
-  const dependencyFileName = await emitModule(coreModuleName);
-  const rewrittenEntry = entry.replaceAll(coreModuleName, `./${dependencyFileName}`);
-  const entryFileName = await emitHashedTextAsset(assetsDir, "mermaid-esm", ".mjs", rewrittenEntry);
-  return `/assets/${entryFileName}`;
-}
 
 async function requireDirectory(directory: string, label: string): Promise<void> {
   try {
@@ -361,7 +265,7 @@ async function validateBuildInputs(): Promise<void> {
     }
   }
 
-  for (const cssFile of ["tufte.css", "globals.css"]) {
+  for (const cssFile of SITE_STYLESHEETS) {
     const cssPath = join(config.dirs.public, cssFile);
     if (!(await Bun.file(cssPath).exists())) {
       throw new AppError(`Required stylesheet not found: ${cssPath}`, ErrorCode.FILE_NOT_FOUND, { cssPath });
@@ -402,9 +306,10 @@ async function removeUnversionedPageAssets(): Promise<void> {
   await Promise.all([
     rm(join(config.dirs.dist, "tufte.css"), { force: true }),
     rm(join(config.dirs.dist, "globals.css"), { force: true }),
-    rm(join(config.dirs.dist, "js", "post-actions.js"), { force: true }),
-    rm(join(config.dirs.dist, "js", "sidenote-connectors.js"), { force: true }),
-    rm(join(config.dirs.dist, "js", "comments.js"), { force: true }),
+    ...SITE_STYLESHEETS.map(file => rm(join(config.dirs.dist, file), { force: true })),
+    ...getClientScriptDefinitions().flatMap(({ sourcePath }) =>
+      sourcePath ? [rm(join(config.dirs.dist, sourcePath), { force: true })] : []
+    ),
     rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "result.css"), { force: true }),
     rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "index.html"), { force: true }),
     rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "index.proto"), { force: true }),
@@ -425,7 +330,7 @@ async function prepareBuildAssets(): Promise<AssetManifest> {
   const katexStylesheetHref = await copyKatexAssets(join(config.dirs.dist, "katex"));
 
   const scripts: Record<string, string> = {
-    "mermaid-runtime": await prepareMermaidRuntime(assetsDir),
+    "mermaid-runtime": await prepareMermaidRuntime(assetsDir, MERMAID_CACHE_DIR),
   };
 
   const assetManifest = {
@@ -436,9 +341,7 @@ async function prepareBuildAssets(): Promise<AssetManifest> {
   } satisfies AssetManifest;
 
   for (const definition of getClientScriptDefinitions()) {
-    const source = definition.sourcePath
-      ? await readFileContent(join(config.dirs.public, definition.sourcePath))
-      : await definition.source!(assetManifest);
+    const source = await loadClientScriptSource(definition, assetManifest, config.dirs.public);
     const fileName = await emitHashedTextAsset(assetsDir, definition.fileName, ".js", source);
     scripts[definition.key] = `/assets/${fileName}`;
   }
@@ -510,6 +413,10 @@ async function buildIntoCurrentDist(options: BuildOptions = {}): Promise<void> {
     config.collections, baseLayout, layoutsMap, currentYear, assets, hooks, timer
   );
   timer.end("collections");
+
+  timer.start("tag-catalog");
+  await generateTagCatalog(allCollectionOutputs);
+  timer.end("tag-catalog");
 
   const primaryCollection = allCollectionOutputs.find(collection => collection.name === "blog")
     || allCollectionOutputs[0];

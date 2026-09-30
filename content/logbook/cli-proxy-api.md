@@ -1,6 +1,7 @@
 ---
 comment: true
 title: 不要给 CliProxyAPI 套上 Cloudflare CDN
+tags: [Net, Models]
 date: 2026-04-30
 ---
 

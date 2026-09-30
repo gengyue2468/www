@@ -1,0 +1,72 @@
+:root {
+  --bg-color: #fdfcf7;
+  --text-color: #1a1a1a;
+  --bg-color-dark: #181818;
+  --text-color-dark: #e8e6e3;
+  --border-color: #ccc;
+  --accent: rgba(0, 0, 0, 0.05);
+
+  --font-base-size: 14px;
+  --font-serif:
+    et-book, "Source Han Serif CN VF", ui-serif, Palatino, "Palatino Linotype",
+    "Palatino LT STD", "Book Antiqua", Georgia, "Songti", "Songti SC", STSong,
+    SimSun, serif;
+  --font-sans-alt: "Trebuchet MS", "Gill Sans", "Gill Sans MT", sans-serif;
+  --font-mono:
+    "IBM Plex Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  --font-numeral: et-book;
+
+  --font-size-h1: 3.2rem;
+  --font-size-h2: 2.2rem;
+  --font-size-h3: 1.7rem;
+  --font-size-body: 1.4rem;
+  --font-size-sidenote: 1.1rem;
+  --font-size-code: 1.3rem;
+  --font-size-code-small: 1.2rem;
+  --font-size-code-heading: 0.8em;
+
+  --line-height-base: 1.75;
+  --line-height-body: 2.4rem;
+  --line-height-sidenote: 1.7;
+  --line-height-code: 1.45;
+  --line-height-caption: 1.75;
+
+  --spacing-h1-top: 4rem;
+  --spacing-h1-bottom: 1.5rem;
+  --spacing-h2-top: 2.1rem;
+  --spacing-h2-bottom: 1.4rem;
+  --spacing-h3-top: 2rem;
+  --spacing-h3-bottom: 1.4rem;
+  --spacing-p-top: 1.4rem;
+  --spacing-p-bottom: 1.4rem;
+  --spacing-section: 1rem;
+  --spacing-article: 5rem;
+  --spacing-sidenote-top: 0.3rem;
+  --spacing-list-item: 0.25rem;
+  --spacing-figure-bottom: 3em;
+  --spacing-blockquote-left: 1.5em;
+
+  --width-body: 87.5%;
+  --width-body-mobile: 84%;
+  --width-padding-left: 12.5%;
+  --width-padding-left-mobile: 8%;
+  --width-content: 55%;
+  --width-list: 50%;
+  --width-list-padding: 5%;
+  --width-figcaption: 40%;
+  --width-fullwidth: 90%;
+  --width-fullwidth-mobile: 100%;
+  --width-list-mobile: 90%;
+  --width-table-mobile: 85%;
+  --width-sidenote: 50%;
+  --width-sidenote-mobile: 95%;
+  --width-sidenote-margin: -60%;
+  --width-sidenote-blockquote-margin: -82%;
+  --width-sidenote-blockquote-min: 59%;
+  --max-width-body: 1400px;
+
+  --text-underline-offset: 0.1em;
+  --text-decoration-thickness: 0.05em;
+  --sidenote-number-top: -0.5rem;
+  --sidenote-number-left: 0.1rem;
+}

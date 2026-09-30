@@ -2,7 +2,7 @@
 comment: true
 title: '试一试 Intent Parsing'
 date: '2026-01-29'
-tags: ['技术','AI']
+tags: [Models, Code]
 summary: 把 LLM 当作自然语言与后端 API 之间的中间层，做一次可控的 Intent Parsing / 语义路由实验。
 ---
 

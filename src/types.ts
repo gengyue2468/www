@@ -1,3 +1,5 @@
+import type { TagName } from "./taxonomy.js";
+
 export interface SiteConfig {
   title: string;
   author: string;
@@ -82,6 +84,7 @@ export interface RSSConfig {
   title: string;
   description: string;
   language: string;
+  additionalLanguages?: string[];
   copyright: string;
   items: { limit: number };
 }
@@ -93,6 +96,7 @@ export interface SitemapConfig {
   changefreqPages?: string;
   changefreqBlog?: string;
   changefreqPosts?: string;
+  changefreqTags?: string;
   priority: Record<string, number>;
 }
 
@@ -154,7 +158,36 @@ export interface Post {
   updated?: string;
   excerpt: string;
   summary: string;
-  tags: string[];
+  tags: TagName[];
+}
+
+export interface TagCatalogPost {
+  id: string;
+  href: string;
+  slug: string;
+  collection: string;
+  title: string;
+  date: string;
+  updated?: string;
+  summary: string;
+  tags: TagName[];
+  primaryTag: TagName;
+}
+
+export interface TagCatalogEntry {
+  name: TagName;
+  slug: string;
+  description: string;
+  count: number;
+  primaryCount: number;
+  postIds: string[];
+}
+
+export interface TagCatalog {
+  version: 1;
+  totalPosts: number;
+  tags: TagCatalogEntry[];
+  posts: TagCatalogPost[];
 }
 
 export interface RenderedContent {

@@ -9,7 +9,8 @@
     "serve": "bunx serve dist",
     "deploy": "bash scripts/deploy.sh",
     "build-only": "bun run build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test ./tests"
   },
   "keywords": [
     "blog",

@@ -1,6 +1,6 @@
 ---
 comment: true
-tags: ["前端", "CDN", "技术"]
+tags: [Net, Cloud]
 title: "折腾一下 EdgeOne"
 date: 2026-01-13
 summary: 一次从 Cloudflare Pages 到 EdgeOne CDN 的折腾实录，踩了 cdn-loop 的坑，试了 SSL、Proxy、回源，最后靠 Vercel 成功白嫖静态加速。

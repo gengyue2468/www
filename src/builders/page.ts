@@ -8,61 +8,8 @@ import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js
 import { injectWebComponentScripts, type BuildHooks } from "../extensions/plugin.js";
 import type { AssetManifest, FrontMatter } from "../types.js";
 import { buildMetaDescription, escapeHtmlText, generateKeywords } from "../utils/seo.js";
-import { AppError, ErrorCode } from "../utils/errors.js";
 import config from "../config.js";
-import { generateIssoCommentsHTML } from "./collection.js";
-
-function deduplicateFontFaces(css: string): string {
-  const fontFaceRegex = /@font-face\s*\{[^}]+\}/g;
-  const seen = new Set<string>();
-  return css.replace(fontFaceRegex, (match) => {
-    const key = match.replace(/\s+/g, " ").trim();
-    if (seen.has(key)) return "";
-    seen.add(key);
-    return match;
-  });
-}
-
-function lightweightCssMinify(css: string): string {
-  return deduplicateFontFaces(css)
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/^\s+/gm, "")
-    .replace(/\n{2,}/g, "\n")
-    .replace(/\s*([{}:;,])\s*/g, "$1")
-    .replace(/;\}/g, "}")
-    .replace(/calc\([^)]+\)/g, (m) => m.replace(/ \+ /g, "§ADD§").replace(/ - /g, "§SUB§"))
-    .replace(/\s+/g, " ")
-    .replace(/§ADD§/g, " + ")
-    .replace(/§SUB§/g, " - ")
-    .trim();
-}
-
-export async function getMinifiedCss(): Promise<string> {
-  const { public: publicDir } = config.dirs;
-  const tuftePath = join(publicDir, "tufte.css");
-  const globalsPath = join(publicDir, "globals.css");
-
-  try {
-    const [tufteFile, globalsFile] = await Promise.all([
-      Bun.file(tuftePath),
-      Bun.file(globalsPath),
-    ]);
-
-    const [tufteCss, globalsCss] = await Promise.all([
-      tufteFile.text(),
-      globalsFile.text(),
-    ]);
-
-    const combined = `${tufteCss}\n${globalsCss}`;
-    return lightweightCssMinify(combined);
-  } catch (err) {
-    throw AppError.fromError(err, ErrorCode.FILE_READ_ERROR, {
-      tuftePath,
-      globalsPath,
-      phase: "css-asset",
-    });
-  }
-}
+import { generateIssoCommentsHTML } from "../extensions/comments.js";
 
 function buildPageOutput(
   baseLayout: string,

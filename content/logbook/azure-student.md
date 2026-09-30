@@ -1,6 +1,7 @@
 ---
 comment: true
 title: Azure for Students NQ 留档
+tags: [Cloud]
 date: 2026-06-22
 ---
 微软的 Azure for Students 免费机器，地域是亚太东部（香港），NodeQuality 如下：

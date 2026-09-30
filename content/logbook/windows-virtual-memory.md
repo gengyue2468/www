@@ -1,6 +1,7 @@
 ---
 comment: true
 title: 解决 Windows 虚拟内存放在 D 盘无效
+tags: [System]
 date: 2026-07-23
 ---
 笔记本的 C 盘之前爆掉了，把虚拟内存从 C 盘移出去改到 D 盘了。当时改完发现 GUI 生效了后面就没再管了。实际上：

@@ -90,9 +90,23 @@
               "icon": "lucide-file",
               "title": "apple-music-to-lastfm-api"
             }
+          },
+          {
+            "id": "107570fa4b7ab677",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "content/pages/index.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "index"
+            }
           }
         ],
-        "currentTab": 5
+        "currentTab": 6
       }
     ],
     "direction": "vertical"
@@ -117,7 +131,7 @@
                 "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
-              "title": "文件列表"
+              "title": "Files"
             }
           },
           {
@@ -247,62 +261,62 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:打开快速切换": false,
-      "graph:查看关系图谱": false,
-      "canvas:新建白板": false,
-      "daily-notes:打开/创建今天的日记": false,
-      "templates:插入模板": false,
-      "command-palette:打开命令面板": false,
-      "bases:新建数据库": false
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
     }
   },
-  "active": "0be3fdc0b249b14a",
+  "active": "107570fa4b7ab677",
   "lastOpenFiles": [
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Typewriter-Regular.woff2",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Typewriter-Regular.ttf",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Typewriter-Regular.woff",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Size4-Regular.woff2",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Size4-Regular.woff",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Size4-Regular.ttf",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Size3-Regular.woff2",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Size3-Regular.woff",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Size3-Regular.ttf",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Size2-Regular.woff2",
-    "dist.staging-14352-1789878972310/katex/fonts.8c95182bda2f/KaTeX_Size2-Regular.woff",
-    "dist.staging-14352-1789878911980/logbook/werid-educoder.md",
-    "dist.staging-14352-1789878911980/logbook/miniflux-share-style.md",
-    "dist.staging-14352-1789878911980/logbook/test.md",
-    "dist.staging-14352-1789878911980/logbook/failed-ssh-service.md",
-    "dist.staging-14352-1789878911980/logbook/wsl-oom.md",
-    "dist.staging-14352-1789878911980/logbook/napcat-multi-clienting.md",
-    "dist.staging-14352-1789878911980/logbook/dns-error.md",
-    "dist.staging-14352-1789878911980/logbook/cli-proxy-api.md",
-    "dist.staging-14352-1789878911980/logbook/cpp-debug.md",
-    "dist.staging-14352-1789878911980/logbook/windows-virtual-memory.md",
-    "dist.staging-14352-1789878911980/logbook/aliyun-kr.md",
-    "dist.staging-14352-1789878911980/logbook/azure-student.md",
-    "dist.staging-14352-1789878911980/logbook/bun-hono-server.md",
-    "dist.staging-14352-1789878911980/logbook/bingyan-k8s-deployment.md",
-    "dist.staging-14352-1789878911980/logbook/oracle-sgp-nodequality.md",
-    "dist.staging-14352-1789878911980/logbook/ddg-search-mcp.md",
-    "dist.staging-14352-1789878911980/logbook/ai-agent-and-human.md",
-    "dist.staging-14352-1789878911980/logbook/azure-student-jp-east.md",
-    "dist.staging-14352-1789878911980/logbook/netcup-mnz.md",
-    "dist.staging-14352-1789878911980/logbook/alpine-rc-service-with-nginx.md",
-    "dist.staging-14352-1789878911980/logbook/hust-network-login-sh.md",
-    "dist.staging-14352-1789878911980/logbook/cs-app-data-lab-1.md",
-    "dist.staging-14352-1789878911980/blog/train.md",
-    "dist.staging-14352-1789878911980/blog/hust-chifan.md",
-    "dist.staging-14352-1789878911980/blog/hello-world.md",
-    "dist/static/train/wuhan/IMG_20251213_184210.webp",
-    "dist/static/train/wuhan/IMG_20251213_174524.webp",
-    "dist/static/train/wuhan/IMG_20251213_170152.webp",
-    "dist/static/story/mother-fuck.webp",
-    "dist/static/story/baode.webp",
-    "dist/static/tech/xiaomi-ax3000t.webp",
-    "dist/static/tech/tiptap.webp",
-    "dist/static/tech/neofetch.webp",
-    "dist/static/tech/oracle-cloud-success.webp",
-    "dist/static/tech/oracle-cloud-free-tier.webp"
+    "dist/fonts/source-han-serif-cn-vf/edf096ac1c5a061ace86af478378832b.woff2",
+    "dist/fonts/source-han-serif-cn-vf/c3057222230978d8be8ad002d299d1cd.woff2",
+    "dist/fonts/source-han-serif-cn-vf/aab77d8970faa453a1331341954f0ae7.woff2",
+    "dist/fonts/source-han-serif-cn-vf/aa2997d19bb3e0be69f8475dca7a8f32.woff2",
+    "dist/fonts/source-han-serif-cn-vf/9f24e7bafbe47b954232dd957d1ef901.woff2",
+    "dist/fonts/source-han-serif-cn-vf/6c662d1c99fd73deec62705a11ef1346.woff2",
+    "dist/fonts/source-han-serif-cn-vf/6bc583fcd5cb13df7cb6df9ea08345f3.woff2",
+    "dist/fonts/source-han-serif-cn-vf/574c9262a9b73e29350446f76dc90e0f.woff2",
+    "dist/fonts/source-han-serif-cn-vf/57286ed0603b6e28670abb2fd9aff6ca.woff2",
+    "dist/fonts/source-han-serif-cn-vf/571c7b3c6f92753307672eb986a36456.woff2",
+    "dist/fonts/source-han-serif-cn-vf/508928408794fdb0b6ff48f5f80bac5a.woff2",
+    "dist.staging-17976-1790767119671/logbook/wsl-oom.md",
+    "dist.staging-17976-1790767119671/logbook/windows-virtual-memory.md",
+    "dist.staging-17976-1790767119671/logbook/werid-educoder.md",
+    "dist.staging-17976-1790767119671/logbook/miniflux-share-style.md",
+    "dist.staging-17976-1790767119671/logbook/test.md",
+    "dist.staging-17976-1790767119671/logbook/oracle-sgp-nodequality.md",
+    "dist.staging-17976-1790767119671/logbook/opencode-v2-upgrade.md",
+    "dist.staging-17976-1790767119671/logbook/netcup-mnz.md",
+    "dist.staging-17976-1790767119671/logbook/napcat-multi-clienting.md",
+    "dist.staging-17976-1790767119671/logbook/hust-network-login-sh.md",
+    "dist.staging-17976-1790767119671/logbook/failed-ssh-service.md",
+    "dist.staging-17976-1790767119671/logbook/cli-proxy-api.md",
+    "dist.staging-17976-1790767119671/logbook/dns-error.md",
+    "dist.staging-17976-1790767119671/logbook/ddg-search-mcp.md",
+    "dist.staging-17976-1790767119671/logbook/cs-app-data-lab-1.md",
+    "dist.staging-17976-1790767119671/logbook/cpp-debug.md",
+    "dist.staging-17976-1790767119671/logbook/bun-hono-server.md",
+    "dist.staging-17976-1790767119671/logbook/bingyan-k8s-deployment.md",
+    "dist.staging-17976-1790767119671/logbook/azure-student.md",
+    "dist.staging-17976-1790767119671/logbook/azure-student-jp-east.md",
+    "dist.staging-17976-1790767119671/logbook/alpine-rc-service-with-nginx.md",
+    "dist.staging-17976-1790767119671/logbook/aliyun-kr.md",
+    "dist.staging-17976-1790767119671/logbook/ai-agent-and-human.md",
+    "dist.staging-17976-1790767119671/static/logo.webp",
+    "dist.staging-35528-1790767091949/blog/xiaomi-router-ax3000t-1.md",
+    "dist.staging-35528-1790767091949/blog/weird-cloudflare-tunnel.md",
+    "dist.staging-31472-1790766883459/static/train/wuhan/IMG_20251213_174524.webp",
+    "dist.staging-31472-1790766883459/static/train/wuhan/IMG_20251213_184210.webp",
+    "dist.staging-31472-1790766883459/static/train/wuhan/IMG_20251213_170152.webp",
+    "dist.staging-31472-1790766883459/static/tech/memos-darkmode.webp",
+    "dist.staging-31472-1790766883459/static/tech/xiaomi-ax3000t.webp",
+    "dist.staging-31472-1790766883459/static/tech/tiptap.webp",
+    "dist.staging-31472-1790766883459/static/tech/oracle-cloud-success.webp",
+    "dist.staging-31472-1790766883459/static/tech/oracle-cloud-free-tier.webp",
+    "dist.staging-31472-1790766883459/static/tech/neofetch.webp"
   ]
 }

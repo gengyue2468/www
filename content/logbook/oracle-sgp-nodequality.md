@@ -1,6 +1,7 @@
 ---
 comment: true
 title: 甲骨文云新加坡 NQ 留档
+tags: [Cloud]
 date: 2026-06-19
 ---
 新加坡可用区，开了两天的 4c/24gb 爽了一下之后就降配到 2c/12gb 了，大悲，磁盘性能拉满后的 NodeQuality 测试结果如下，留档。

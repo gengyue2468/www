@@ -30,7 +30,10 @@ export interface ClientScriptDefinition {
   key: string;
   fileName: string;
   source?: (assets: AssetManifest) => string | Promise<string>;
+  /** JavaScript source file, relative to the public directory. */
   sourcePath?: string;
+  /** Inject build-time configuration before hashing and emitting the script. */
+  transform?: (source: string, assets: AssetManifest) => string | Promise<string>;
 }
 
 export interface WebComponentDefinition {
@@ -78,14 +81,16 @@ export function registerPlugin(plugin: Plugin): void {
   }
   const scriptKeys = new Set<string>();
   for (const script of plugin.clientScripts || []) {
-    if (!/^[a-z][a-z0-9-]*$/.test(script.key) || scriptKeys.has(script.key)) {
+    if (!/^[a-z][a-z0-9-]*$/.test(script.key) || scriptKeys.has(script.key) || plugins.some(existing =>
+      existing.clientScripts?.some(({ key }) => key === script.key)
+    )) {
       throw new AppError(`Invalid or duplicate client script key '${script.key}'`, ErrorCode.PLUGIN_ERROR, {
         plugin: plugin.name,
         key: script.key,
       });
     }
-    if (!script.source && !script.sourcePath) {
-      throw new AppError(`Client script '${script.key}' needs a source or sourcePath`, ErrorCode.PLUGIN_ERROR, {
+    if (!!script.source === !!script.sourcePath) {
+      throw new AppError(`Client script '${script.key}' needs exactly one source or sourcePath`, ErrorCode.PLUGIN_ERROR, {
         plugin: plugin.name,
         key: script.key,
       });

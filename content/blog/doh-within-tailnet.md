@@ -2,11 +2,7 @@
 comment: true
 title: 在 Tailnet 里自建 & 使用 DoH
 date: 2026-08-21
-tags:
-  - 网络
-  - 技术
-  - DNS
-  - Tailscale
+tags: [Net, Ops]
 summary: 在 Tailnet 内自建一套私有 DoH：使用 mosdns 对国内外域名进行分流解析，通过 Caddy 提供 HTTPS 入口，并限制仅 Tailnet 设备访问。文章同时讨论了 ECS 在 Tailscale 场景下无法获取客户端真实公网 IP 的问题，以及使用固定大陆 ECS 改善 CDN 调度并配合缓存的折中方案。
 ---
 ## 首先，什么是 DoH

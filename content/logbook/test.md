@@ -1,6 +1,7 @@
 ---
 comment: true
 title: 测试一下 LogBook
+tags: [Meta]
 date: 2026-04-18
 ---
 我看看好不好使

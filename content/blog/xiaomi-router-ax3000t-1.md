@@ -2,11 +2,7 @@
 comment: true
 title: 小米路由器 AX3000T 折腾记录（一）
 date: 2026-09-05
-tags:
-  - 路由器
-  - 网络
-  - 技术
-  - 内网组网
+tags: [Net, System]
 summary: 记录给小米 AX3000T 刷入 OpenWrt 的过程，以及校园网环境下的基础配置和一些后续折腾。
 ---
 ## 前言

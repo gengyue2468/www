@@ -4,7 +4,7 @@ import config from "../config.js";
 import { writeFileContent } from "../utils/fs.js";
 import { cleanBaseUrl, joinUrlPath } from "../utils/url.js";
 import { parseCalendarDate } from "../utils/date.js";
-import { htmlToPlainText, smartTruncate } from "../utils/seo.js";
+import { escapeHtmlText, htmlToPlainText, smartTruncate } from "../utils/seo.js";
 import type { CollectionOutput } from "../types.js";
 
 function findClosingSpan(html: string, contentStart: number): number {
@@ -64,9 +64,7 @@ export function htmlForRss(html: string): string {
   return content.replace(/(\s(?:href|src)=")\/(?!\/)([^"]*)"/gi, `$1${base}/$2"`);
 }
 
-export async function generateRSS(collection: CollectionOutput): Promise<void> {
-  if (!config.rss.enabled) return;
-
+export function buildRssXml(collection: CollectionOutput): string {
   const rssItems = collection.items.slice(0, config.rss.items.limit);
   const cleanSiteUrl = cleanBaseUrl(config.site.url);
 
@@ -81,7 +79,7 @@ export async function generateRSS(collection: CollectionOutput): Promise<void> {
       const postDate = parseCalendarDate(post.updated) || parseCalendarDate(post.date);
       return postDate && postDate > latest ? postDate : latest;
     }, new Date(0)),
-    generator: "Nofte",
+    generator: "",
     author: { name: config.site.author },
     feedLinks: { rss2: `${cleanSiteUrl}/rss.xml` },
   });
@@ -109,7 +107,26 @@ export async function generateRSS(collection: CollectionOutput): Promise<void> {
     });
   }
 
-  const rssXml = feed.rss2();
+  // feed emits a generator element even for an empty value. Remove only that
+  // channel element, leaving any similarly named markup in item content intact.
+  let rssXml = feed.rss2().replace(/\n[ \t]*<generator(?:\s*\/>|>\s*<\/generator>)/, "");
+
+  // RSS language is single-valued; Dublin Core can describe a bilingual feed.
+  if (config.rss.additionalLanguages?.length) {
+    const languages = [...new Set([config.rss.language, ...config.rss.additionalLanguages])];
+    rssXml = rssXml.replace(/<rss\b(?![^>]*\bxmlns:dc=)/, '<rss xmlns:dc="http://purl.org/dc/elements/1.1/"');
+    rssXml = rssXml.replace(/\n([ \t]*)<language>[^<]*<\/language>/, (element, indent: string) =>
+      `${element}\n${languages.map(language => `${indent}<dc:language>${escapeHtmlText(language)}</dc:language>`).join("\n")}`
+    );
+  }
+
+  return rssXml;
+}
+
+export async function generateRSS(collection: CollectionOutput): Promise<void> {
+  if (!config.rss.enabled) return;
+
+  const rssXml = buildRssXml(collection);
   const rssPath = join(config.dirs.dist, "rss.xml");
   await writeFileContent(rssPath, rssXml);
   console.log(`✓ Generated RSS feed -> ${rssPath}`);

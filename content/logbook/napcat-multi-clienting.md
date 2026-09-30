@@ -1,6 +1,7 @@
 ---
 comment: true
 title: '运行多个 Napcat 实例'
+tags: [Ops]
 date: '2026-04-21'
 ---
 

@@ -863,7 +863,9 @@ function normalizeFrontMatter(data: Record<string, unknown>, filePath: string): 
   } else if (!Array.isArray(tags) || tags.some(tag => typeof tag !== "string")) {
     throw new AppError("Front matter field 'tags' must be an array of strings", ErrorCode.PARSE_ERROR, { path: filePath, field: "tags" });
   } else {
-    normalized.tags = [...new Set(tags.map(tag => tag.trim()).filter(Boolean))];
+    // Preserve spelling and duplicates so collection taxonomy validation can
+    // reject invalid labels instead of silently changing their classification.
+    normalized.tags = [...tags];
   }
 
   const comment = normalized.comment;

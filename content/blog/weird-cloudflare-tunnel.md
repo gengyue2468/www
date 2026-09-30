@@ -3,10 +3,7 @@ comment: true
 title: 奇怪的 Cloudflare Tunnel
 date: 2026-02-14
 summary: "奇怪的 Cloudflare Tunnel：用 Tunnel + Zero Trust 访问家里的 Mac，通过 SSH，\r  Windows 客户端直接连上，Mac 端用 LaunchDaemon 自启和后台保活，整个流程很神奇，但是能跑！"
-tags:
-  - 技术
-  - Cloudflare
-  - 内网组网
+tags: [Net, Ops]
 ---
 前几天用 Tailscale 组了个大内网，想连家里的 iMac 但是不知道为啥这个 Tailscale GUI 每次重启都要重新认证，好麻烦的，于是准备用 [Cloudflare Tunnel](https://www.cloudflare-cn.com/products/tunnel/) [note:**Cloudflare Tunnel** 是一款隧道软件，旨在为应用程序和基础设施提供快速、安全的加密流量传输，同时隐藏 Web 服务器的 IP 地址，防止直接攻击。它特别适用于没有公网 IP 的场景，帮助用户从公网安全访问内网服务。]结合 [Zero Trust](https://www.cloudflare-cn.com/learning/security/glossary/what-is-zero-trust/) 给家宽打个洞，只要能连上 ssh 就行！
 

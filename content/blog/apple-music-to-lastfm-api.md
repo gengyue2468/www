@@ -1,11 +1,7 @@
 ---
 title: 把 Apple Music Scrobble 到 Last.fm
 date: 2026-09-19
-tags:
-  - 技术
-  - API
-  - LastFM
-  - AppleMusic
+tags: [Music, Code]
 summary: 通过 Scrobbler 将 Apple Music 的播放记录同步到 Last.fm，再利用 Last.fm API 获取最近播放与 Now Playing 状态，并通过简单的 middleware 整理数据，用于博客中的音乐播放展示。
 comment: true
 ---

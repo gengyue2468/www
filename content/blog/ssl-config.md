@@ -3,7 +3,7 @@ comment: true
 title: '配置一下 SSL'
 date: '2026-01-19'
 summary: '一次从 Cloudflare 522 出发的折腾：配置 Origin Certificate、Nginx HTTPS、ufw 防火墙，最后才发现——原来是我自己没开 443。'
-tags: ['SSL', 'Cloudflare', '技术']
+tags: [Ops, Net]
 ---
 
 前段时间对域名在[腾讯云](https://cloud.tencent.com)上进行了一下 ICP 备案，大概过了半个月左~~右~~[note:哎腾讯云控制台你说大概 12 天还真就 12 天啊，在考思政之前收到了短信...]，然后就准备把博客从 [Vercel](https://vercel.com) 搞到闲置的轻量云服务器上，反正就是十几二十个 HTML 页面，放到服务器上 nginx 反代一配，占不了几个内存和带宽，国内速度还快不少，何乐而不为？[note:静态资源已经美美托管到[EdgeOne](https://edgeone.ai)上了😋，参见[这篇文章](/blog/edgeone-test)]

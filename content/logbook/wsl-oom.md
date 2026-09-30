@@ -1,6 +1,7 @@
 ---
 comment: true
 title: '我的电脑再也不会因为 WSL 而 OOM 了'
+tags: [System]
 date: '2026-04-24'
 ---
 

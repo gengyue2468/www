@@ -1,6 +1,7 @@
 ---
 comment: true
 title: 阿里云首尔轻量 NQ 留档
+tags: [Cloud]
 date: 2026-06-07
 ---
 用学生计划的 300 赠金开的，配置是 2c 0.5gb 30gb ssd，不知道为啥开不出香港的机器，只能开首尔之流，联通移动还好，电信比较拉，NodeQuality 如下：

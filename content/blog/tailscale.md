@@ -3,7 +3,7 @@ comment: true
 title: 用 Tailscale 组大内网！
 date: 2026-02-10
 summary: '文章记录了作者尝试用 Tailscale 给多台设备组建大内网的过程，从最初尝试 Wireguard 到最终用 Tailscale 解决掉线问题，包括不同操作系统的体验差异，并分享了实际设备状态和使用心得。'
-tags: ['技术','Tailscale','内网组网']
+tags: [Net]
 ---
 
 前天试着用 Wireguard 给手里的两台小鸡和 Laptop 组个大内网，一开始跑的还行，结果昨天晚上莫名奇妙地连不上了，一看 Last handshake 7 hours ago...就这么莫名奇妙地掉线了，哎，于是找了找别的，发现 [Tailscale](https://tailscale.com/) [note: WireGuard 是经典的轻量 VPN，需要手动配置 `Interface` 和 `Peer`，适合对网络控制要求高的场景。Tailscale 则是在 WireGuard 基础上做了零配置优化，多平台设备可以自动连起来，跨 NAT/防火墙也更稳，适合快速组个人或小型实验内网。] 似乎还行，而且不用像 Wireguard 那样手写 `[Interface]` 和 `[Peer]` ，试试看！

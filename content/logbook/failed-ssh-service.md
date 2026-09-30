@@ -1,6 +1,7 @@
 ---
 comment: true
 title: '坏掉的 ssh.service 启动项'
+tags: [System]
 date: '2026-04-19'
 ---
 

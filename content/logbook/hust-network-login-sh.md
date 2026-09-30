@@ -1,5 +1,6 @@
 ---
 title: hust-network-login-sh
+tags: [Net, Code]
 date: 2026-09-10
 comment: true
 ---
