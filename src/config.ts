@@ -135,6 +135,7 @@ const config: Config = {
       show: true,
       children: [
         { name: "Logbook", path: "/logbook", show: true },
+        { name: "Status", path: "https://status.gy.run", show: true },
         { name: "Playlist", path: "/playlist", show: true },
         { name: "Uses", path: "/uses", show: true },
         { name: "Friends", path: "/friends", show: true },

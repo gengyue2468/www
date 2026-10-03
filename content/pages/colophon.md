@@ -2,7 +2,7 @@
 title: Colophon
 description: 这个网站是如何构建的——技术栈、字体、部署等出版信息。
 ---
-此页面使用 [Bun](https://bun.com/) 和 [TypeScript](https://www.typescriptlang.org/) 构建，部署在 [Digitalfyre](https://console.digitalfyre.com/aff.php?aff=50)) 的 VPS 上。
+此页面使用 [Bun](https://bun.com/) 和 [TypeScript](https://www.typescriptlang.org/) 构建，部署在 [Berohost](https://bero-host.de/) 的 VPS 上。
 
 所有博文使用 **Markdown** 格式撰写，使用 `markdown-it` 渲染并支持自定义语法。
 
