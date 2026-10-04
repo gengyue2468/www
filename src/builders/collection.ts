@@ -12,7 +12,7 @@ import { renderPage, applyHooks, applyAfterHooks } from "../utils/page-render.js
 import { injectWebComponentScripts, type BuildHooks } from "../extensions/plugin.js";
 import { buildMetaDescription, escapeHtmlAttr, escapeHtmlText, generateKeywords } from "../utils/seo.js";
 import { assertSafePathSegment, joinUrlPath } from "../utils/url.js";
-import { contentHash } from "../utils/assets.js";
+import { renderDropdown } from "../extensions/dropdown.js";
 import { buildTagIndex, getTagDefinition, sortPostsByDate, validatePostTags, type TagGroup } from "../utils/tags.js";
 import type { TagName } from "../taxonomy.js";
 import { AppError, ErrorCode, isENOENT, errorReporter } from "../utils/errors.js";
@@ -84,27 +84,21 @@ function generatePostActionsHTML(markdownPath: string, pagePath: string, comment
   const markdownUrl = `${config.site.url}${markdownPath}`;
   const pageUrl = `${config.site.url}${pagePath}`;
   const prompt = `Please read this article and summarize its key points: ${markdownUrl}`;
-  const menuId = `post-actions-menu-${contentHash(pagePath)}`;
   const link = (label: string, href: string, attributes = "") =>
     `<a href="${escapeHtmlAttr(href)}"${attributes}>${escapeHtmlText(label)}</a>`;
   const external = ' target="_blank" rel="noopener noreferrer"';
 
-  return `<post-actions class="post-actions nav-dropdown-wrapper">
-    <input type="checkbox" id="${menuId}" class="nav-menu-checkbox" aria-label="Actions">
-    <label class="nav-menu-overlay" for="${menuId}" aria-hidden="true"></label>
-    <label class="nav-menu-label post-actions-button" for="${menuId}">Actions</label>
-    <div class="nav-dropdown-menu">
+  const menu = `
       ${link("View Markdown", markdownPath)}
-      ${link("Copy Markdown", markdownPath, ' data-copy-markdown rel="nofollow"')}
-      ${link("Copy URL", pageUrl, ' data-copy-url rel="nofollow"')}
+      ${link("Copy Markdown", markdownPath, ' data-copy-markdown data-dropdown-keep-open rel="nofollow"')}
+      ${link("Copy URL", pageUrl, ' data-copy-url data-dropdown-keep-open rel="nofollow"')}
       ${link("Ask ChatGPT", `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`, external)}
       ${link("Ask Claude", `https://claude.ai/new?q=${encodeURIComponent(prompt)}`, external)}
       ${link("Ask Gemini", `https://gemini.google.com/app?prompt=${encodeURIComponent(prompt)}`, external)}
       ${link("Ask Grok", `https://grok.com/?q=${encodeURIComponent(prompt)}`, external)}
       ${link("Ask DeepSeek", `https://chat.deepseek.com/?q=${encodeURIComponent(prompt)}`, external)}
-      ${commentHref ? link("Comment this post", commentHref) : ""}
-    </div>
-  </post-actions>`;
+      ${commentHref ? link("Comment this post", commentHref) : ""}`;
+  return `<post-actions class="post-actions">${renderDropdown("Actions", menu, { triggerClass: "post-actions-button" })}</post-actions>`;
 }
 
 function generatePostsListHTML(posts: Post[], urlPrefix: string): string {

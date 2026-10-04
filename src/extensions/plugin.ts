@@ -34,6 +34,8 @@ export interface ClientScriptDefinition {
   sourcePath?: string;
   /** Inject build-time configuration before hashing and emitting the script. */
   transform?: (source: string, assets: AssetManifest) => string | Promise<string>;
+  /** Static HTML template constants to optimize before JS minification. */
+  htmlTemplateConstants?: readonly string[];
 }
 
 export interface WebComponentDefinition {
@@ -44,7 +46,7 @@ export interface WebComponentDefinition {
 export interface ContainerConfig {
   type: string;
   validate?: (params: string) => RegExpMatchArray | null;
-  render: (tokens: any[], idx: number) => string;
+  render: (tokens: any[], idx: number, options: any, env: any) => string;
 }
 
 export interface Plugin {

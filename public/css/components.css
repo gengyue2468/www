@@ -1,0 +1,272 @@
+/* Progressive enhancements: retain the existing Tufte content underneath. */
+
+/* Match the Now Playing card's surface; retain the existing hover highlight. */
+.table-of-contents,
+.post-actions-button {
+  background: transparent;
+  border-color: var(--accent);
+}
+
+.post-actions-button:hover,
+.post-actions .nav-menu-checkbox:checked ~ .post-actions-button {
+  border-color: var(--accent);
+}
+
+/* Native disclosure fallback, with the existing menu palette and typography. */
+site-dropdown {
+  display: inline;
+  position: relative;
+  vertical-align: baseline;
+}
+
+site-dropdown > details {
+  display: inline;
+  position: relative;
+  width: auto !important;
+  margin: 0;
+  padding: 0;
+  vertical-align: baseline;
+}
+
+site-dropdown > details > summary {
+  display: inline;
+  font-weight: 400;
+  line-height: inherit;
+  list-style: none;
+}
+
+site-dropdown > details > summary::before {
+  content: none;
+}
+
+site-dropdown > details > summary.nav-menu-label:focus,
+site-dropdown > details > .nav-dropdown-menu:focus {
+  outline: none;
+  outline-offset: 0;
+}
+
+/* Override the legacy Actions outline without adding a ring outside the box. */
+site-dropdown > details > summary.nav-menu-label:focus-visible,
+site-dropdown > details > .nav-dropdown-menu:focus-visible {
+  outline: 2px solid var(--border-color);
+  outline-offset: -2px;
+}
+
+site-dropdown > details[open] > summary {
+  background: var(--accent);
+}
+
+site-dropdown > details[open] > .nav-dropdown-menu {
+  display: block;
+}
+
+site-dropdown > details > .nav-dropdown-menu {
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  max-height: calc(100dvh - 16px);
+  box-sizing: border-box;
+  color: inherit;
+  padding: 0;
+  margin-left: 0;
+  overflow: auto;
+}
+
+site-dropdown[data-enhanced] > details > .nav-dropdown-menu {
+  position: fixed;
+  inset: auto;
+  /* Override the old mobile left/right anchoring, not its font or palette. */
+  left: var(--dropdown-left, 0px) !important;
+  right: auto !important;
+  top: var(--dropdown-top, 0px);
+  margin: 0;
+  min-width: min(140px, var(--dropdown-max-width, calc(100vw - 16px)));
+  max-width: var(--dropdown-max-width, calc(100vw - 16px));
+  max-height: var(--dropdown-max-height, calc(100dvh - 16px));
+  visibility: hidden;
+}
+
+site-dropdown[data-positioned] > details > .nav-dropdown-menu {
+  visibility: visible;
+}
+
+@media (max-width: 760px) {
+  site-dropdown[data-enhanced] > details > .nav-dropdown-menu {
+    min-width: min(120px, var(--dropdown-max-width, calc(100vw - 16px)));
+  }
+}
+
+/* Native columns stretch to the viewport, or overflow together without wrapping. */
+.table-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 1.4rem 0;
+  overflow-x: auto;
+}
+
+section > .table-scroll {
+  width: var(--width-content);
+}
+
+.fullwidth-content .table-scroll {
+  width: 100%;
+}
+
+.table-scroll > table {
+  display: table;
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.table-scroll th,
+.table-scroll td {
+  white-space: nowrap;
+}
+
+.table-scroll:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+code-block {
+  display: block;
+  position: relative;
+  width: 100%;
+  max-width: var(--width-content);
+  margin: 1.4rem 0;
+  box-sizing: border-box;
+}
+
+code-block > pre {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+code-block:has(> .code-copy) > pre {
+  padding-inline-end: 3rem;
+}
+
+.fullwidth-content code-block {
+  max-width: 100%;
+}
+
+.tab-panels .tab-content code-block {
+  margin-top: 0;
+}
+
+.code-copy {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.code-copy:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+code-block > pre.ansi-block ~ .code-copy {
+  color: #ccc;
+}
+
+@media (prefers-color-scheme: light) {
+  code-block > pre.ansi-block ~ .code-copy {
+    color: #333;
+  }
+}
+
+.code-copy:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.component-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+image-viewer {
+  display: contents;
+}
+
+.image-viewer-link {
+  cursor: zoom-in;
+  text-decoration: none;
+}
+
+.image-viewer-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.image-viewer-dialog {
+  box-sizing: border-box;
+  max-width: 94vw;
+  max-height: 94vh;
+  max-height: 94dvh;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  outline: 0;
+  color: var(--text-color);
+}
+
+.image-viewer-dialog::backdrop {
+  background: rgb(0 0 0 / 75%);
+}
+
+.image-viewer-dialog > img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 94vw;
+  max-height: 94vh;
+  max-height: 94dvh;
+  margin: 0;
+  object-fit: contain;
+}
+
+:root:has(.image-viewer-dialog[open]) {
+  overflow: hidden;
+}
+
+/* All panels remain readable if the tabs script never loads. */
+content-tabs:not(:defined) > .tab-list {
+  display: none;
+}
+
+content-tabs:not(:defined) > .tab-panels > [role="tabpanel"][hidden] {
+  display: block;
+}
+
+@media (max-width: 760px) {
+  section > .table-scroll {
+    width: 100%;
+  }
+
+  code-block {
+    max-width: 100%;
+  }
+}

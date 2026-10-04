@@ -667,7 +667,7 @@ function generateNoteId(prefix: string, index: number): string {
   return `${prefix}-${index}`;
 }
 
-async function renderNoteContent(content: string, filePath: string): Promise<string> {
+async function renderNoteContent(content: string, filePath: string, tabIdPrefix: string): Promise<string> {
   const processors = await getProcessors();
   let processed = content;
   for (const processor of processors) {
@@ -684,7 +684,7 @@ async function renderNoteContent(content: string, filePath: string): Promise<str
     }
   }
 
-  let rendered = getMarkdownIt().render(normalizeMathWhitespace(processed));
+  let rendered = getMarkdownIt().render(normalizeMathWhitespace(processed), { tabIdPrefix });
   for (const processor of processors) {
     if (!processor.postProcess) continue;
     try {
@@ -717,8 +717,8 @@ async function renderNotes(html: string, notes: Note[], filePath: string): Promi
   for (const note of notes) {
     if (note.type !== "sidenote" && note.type !== "marginnote") continue;
 
-    const renderedContent = await renderNoteContent(note.content, filePath);
     const id = generateNoteId("sn", builtinIndex);
+    const renderedContent = await renderNoteContent(note.content, filePath, id);
     const markerId = `ref-marker-${builtinIndex}`;
     const noteNumber = builtinIndex + 1;
     const sourceAnchor = `<span class="note-connector-source" data-note-target="${id}-content" aria-hidden="true"></span>`;
@@ -808,7 +808,7 @@ async function renderPluginNotes(html: string, notes: Note[], filePath: string):
     }
 
     if (!rendered) {
-      const renderedContent = await renderNoteContent(note.content, filePath);
+      const renderedContent = await renderNoteContent(note.content, filePath, id);
       const noteHtml = `<label for="${id}" aria-controls="${id}-content" aria-label="展开插件旁注" class="margin-toggle">&#8853;</label><input type="checkbox" id="${id}" aria-controls="${id}-content" aria-label="展开插件旁注" class="margin-toggle"/><span id="${id}-content" role="note" class="marginnote">${renderedContent}</span>`;
       html = html.replace(note.placeholder, noteHtml);
     }

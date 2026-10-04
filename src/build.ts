@@ -17,6 +17,11 @@ import { recentTracksPlugin } from "./extensions/recent-tracks.js";
 import { postActionsPlugin } from "./extensions/post-actions.js";
 import { sidenotePlugin } from "./extensions/sidenotes.js";
 import { commentsPlugin } from "./extensions/comments.js";
+import { codeBlockPlugin } from "./extensions/code-block.js";
+import { imageViewerPlugin } from "./extensions/image-viewer.js";
+import { contentTabsPlugin } from "./extensions/content-tabs.js";
+import { tablesPlugin } from "./extensions/tables.js";
+import { dropdownPlugin } from "./extensions/dropdown.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
 import { auditDist, type HtmlAuditIssueKind } from "./utils/html-audit.js";
@@ -24,6 +29,7 @@ import { contentHash, emitHashedTextAsset } from "./utils/assets.js";
 import { loadClientScriptSource } from "./utils/client-scripts.js";
 import { prepareMermaidRuntime } from "./utils/mermaid-assets.js";
 import { getMinifiedCss, SITE_STYLESHEETS } from "./utils/stylesheets.js";
+import { minifyCss, minifyHtmlFiles, minifySvgFiles } from "./utils/minify.js";
 import type { AssetManifest, CollectionOutput } from "./types.js";
 import config from "./config.js";
 
@@ -33,11 +39,16 @@ export interface BuildOptions {
 
 registerPlugin(mermaidPlugin);
 registerPlugin(nodeseekPlugin);
+registerPlugin(contentTabsPlugin);
 registerPlugin(nowPlayingPlugin);
 registerPlugin(recentTracksPlugin);
 registerPlugin(postActionsPlugin);
 registerPlugin(sidenotePlugin);
 registerPlugin(commentsPlugin);
+registerPlugin(codeBlockPlugin);
+registerPlugin(imageViewerPlugin);
+registerPlugin(tablesPlugin);
+registerPlugin(dropdownPlugin);
 
 class PerformanceTimer {
   private times = new Map<string, number>();
@@ -296,25 +307,29 @@ async function copyKatexAssets(destDir: string): Promise<string> {
   const sourceFontsDir = join(sourceDir, "fonts");
   const packageMetadata = await readFileContent(join(sourceDir, "..", "package.json"));
   const fontsDirectoryName = `fonts.${contentHash(`${packageMetadata}\0${sourceCss}`)}`;
-  const css = sourceCss.replaceAll("url(fonts/", `url(${fontsDirectoryName}/`);
+  const css = minifyCss(sourceCss.replaceAll("url(fonts/", `url(${fontsDirectoryName}/`), "katex.css");
   const cssFileName = await emitHashedTextAsset(destDir, "katex", ".css", css);
   await copyDirectory(sourceFontsDir, join(destDir, fontsDirectoryName));
   return `/katex/${cssFileName}`;
 }
 
-async function removeUnversionedPageAssets(): Promise<void> {
-  await Promise.all([
-    rm(join(config.dirs.dist, "tufte.css"), { force: true }),
-    rm(join(config.dirs.dist, "globals.css"), { force: true }),
-    ...SITE_STYLESHEETS.map(file => rm(join(config.dirs.dist, file), { force: true })),
+export function getUnversionedPageAssetPaths(): string[] {
+  return [
+    "tufte.css",
+    "globals.css",
+    ...SITE_STYLESHEETS,
     ...getClientScriptDefinitions().flatMap(({ sourcePath }) =>
-      sourcePath ? [rm(join(config.dirs.dist, sourcePath), { force: true })] : []
+      sourcePath ? [sourcePath] : []
     ),
-    rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "result.css"), { force: true }),
-    rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "index.html"), { force: true }),
-    rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "index.proto"), { force: true }),
-    rm(join(config.dirs.dist, "fonts", "source-han-serif-cn-vf", "reporter.bin"), { force: true }),
-  ]);
+    "fonts/source-han-serif-cn-vf/result.css",
+    "fonts/source-han-serif-cn-vf/index.html",
+    "fonts/source-han-serif-cn-vf/index.proto",
+    "fonts/source-han-serif-cn-vf/reporter.bin",
+  ];
+}
+
+async function removeUnversionedPageAssets(): Promise<void> {
+  await Promise.all(getUnversionedPageAssetPaths().map(file => rm(join(config.dirs.dist, file), { force: true })));
 }
 
 async function prepareBuildAssets(): Promise<AssetManifest> {
@@ -325,7 +340,7 @@ async function prepareBuildAssets(): Promise<AssetManifest> {
 
   const fontCssDir = join(config.dirs.dist, "fonts", "source-han-serif-cn-vf");
   const fontCss = await readFileContent(join(config.dirs.public, "fonts", "source-han-serif-cn-vf", "result.css"));
-  const fontCssFileName = await emitHashedTextAsset(fontCssDir, "result", ".css", fontCss);
+  const fontCssFileName = await emitHashedTextAsset(fontCssDir, "result", ".css", minifyCss(fontCss, "fonts.css"));
 
   const katexStylesheetHref = await copyKatexAssets(join(config.dirs.dist, "katex"));
 
@@ -341,10 +356,12 @@ async function prepareBuildAssets(): Promise<AssetManifest> {
   } satisfies AssetManifest;
 
   for (const definition of getClientScriptDefinitions()) {
-    const source = await loadClientScriptSource(definition, assetManifest, config.dirs.public);
+    const source = await loadClientScriptSource(definition, assetManifest, config.dirs.public, true);
     const fileName = await emitHashedTextAsset(assetsDir, definition.fileName, ".js", source);
     scripts[definition.key] = `/assets/${fileName}`;
   }
+
+  await minifySvgFiles(config.dirs.public, config.dirs.dist);
 
   return {
     stylesheetHref: `/assets/${stylesheetFileName}`,
@@ -436,6 +453,13 @@ async function buildIntoCurrentDist(options: BuildOptions = {}): Promise<void> {
   if (hooks.afterBuild) {
     await hooks.afterBuild();
   }
+
+  timer.start("html-minify");
+  const minified = await minifyHtmlFiles(config.dirs.dist);
+  const saved = minified.bytesBefore - minified.bytesAfter;
+  const percent = minified.bytesBefore ? saved / minified.bytesBefore * 100 : 0;
+  console.log(`\n✓ Minified ${minified.files} HTML files: ${(saved / 1024).toFixed(1)} KiB saved (${percent.toFixed(1)}%)`);
+  timer.end("html-minify");
 
   if (!development) {
     timer.start("html-audit");

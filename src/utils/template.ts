@@ -1,5 +1,6 @@
 import type { NavItem } from "../types.js";
 import { escapeHtmlAttr, escapeHtmlText } from "./seo.js";
+import { renderDropdown } from "../extensions/dropdown.js";
 
 const TEMPLATE_TOKEN = /{{([A-Za-z][A-Za-z0-9_-]*)}}/g;
 
@@ -12,7 +13,6 @@ export function renderTemplate(
 
 export function renderNav(navItems: NavItem[], currentPath?: string): string {
   const parts: string[] = [];
-  let dropdownIndex = 0;
   for (const item of navItems) {
     if (item.show) {
       let isCurrent = false;
@@ -25,14 +25,12 @@ export function renderNav(navItems: NavItem[], currentPath?: string): string {
       }
 
       if (item.children && item.children.length > 0) {
-        const menuId = `nav-menu-checkbox-${dropdownIndex++}`;
         const hasActiveChild = item.children.some((child) => {
           if (!currentPath) return false;
           if (child.path === currentPath) return true;
           if (child.path !== "/" && currentPath.startsWith(child.path + "/")) return true;
           return false;
         });
-        const summaryClass = hasActiveChild ? " active" : "";
         const links: string[] = [];
         for (const child of item.children) {
           if (!child.show) continue;
@@ -43,9 +41,7 @@ export function renderNav(navItems: NavItem[], currentPath?: string): string {
           const target = child.external ? ' target="_blank" rel="noopener"' : "";
           links.push(`<a href="${safePath}"${target}${ariaCurrent}>${safeName}</a>`);
         }
-        parts.push(
-          `<span class="nav-dropdown-wrapper"><input type="checkbox" id="${menuId}" class="nav-menu-checkbox" aria-label="${escapeHtmlAttr(item.name)}"><label class="nav-menu-overlay" for="${menuId}" aria-hidden="true"></label><label class="nav-menu-label${summaryClass}" for="${menuId}">${escapeHtmlText(item.name)}</label><div class="nav-dropdown-menu">${links.join("")}</div></span>`
-        );
+        parts.push(renderDropdown(item.name, links.join(""), { active: hasActiveChild }));
       } else {
         const ariaCurrent = isCurrent ? ' aria-current="page"' : "";
         const safePath = escapeHtmlAttr(item.path);

@@ -22,13 +22,18 @@
   "dependencies": {
     "feed": "^5.1.0",
     "gray-matter": "^4.0.3",
+    "html-minifier-terser": "7.2.0",
     "katex": "0.18.4",
+    "lightningcss": "1.33.0",
     "markdown-it": "^14.1.0",
     "markdown-it-container": "^3.0.0",
     "markdown-it-texmath": "1.0.0",
-    "sitemap": "^9.0.0"
+    "sitemap": "^9.0.0",
+    "svgo": "4.1.0",
+    "terser": "5.51.2"
   },
   "devDependencies": {
+    "@types/html-minifier-terser": "7.0.2",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^20.11.0",
     "bun-types": "^1.1.0",

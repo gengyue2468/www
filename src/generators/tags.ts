@@ -42,6 +42,6 @@ export function buildTagCatalog(collections: readonly CollectionOutput[]): TagCa
 
 export async function generateTagCatalog(collections: readonly CollectionOutput[]): Promise<void> {
   const path = join(config.dirs.dist, "tags.json");
-  await writeFileContent(path, `${JSON.stringify(buildTagCatalog(collections), null, 2)}\n`);
+  await writeFileContent(path, JSON.stringify(buildTagCatalog(collections)));
   console.log(`✓ Generated tag catalog -> ${path}`);
 }

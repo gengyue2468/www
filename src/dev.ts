@@ -1,9 +1,10 @@
 import { join, relative, resolve, isAbsolute } from "path";
 import { watch } from "fs";
-import { build } from "./build.js";
+import { build, getUnversionedPageAssetPaths } from "./build.js";
 import config from "./config.js";
 import { getClientScriptDefinitions } from "./extensions/plugin.js";
 import { SITE_STYLESHEETS } from "./utils/stylesheets.js";
+import { createPreviewFileHandler } from "./utils/preview.js";
 
 const configuredPort = Number(process.env.PORT || 3000);
 if (!Number.isInteger(configuredPort) || configuredPort < 1 || configuredPort > 65535) {
@@ -77,7 +78,7 @@ for (const dir of watchDirs) {
 
       const absolutePath = resolve(fullPath);
       const publicRelative = relative(publicRoot, absolutePath);
-      if (!publicRelative.startsWith("..") && !isAbsolute(publicRelative) && !rebuildFiles.has(absolutePath)) {
+      if (!publicRelative.startsWith("..") && !isAbsolute(publicRelative) && !rebuildFiles.has(absolutePath) && !fullPath.endsWith(".svg")) {
         return;
       }
 
@@ -88,7 +89,7 @@ for (const dir of watchDirs) {
   }
 }
 
-const distDir = config.dirs.dist;
+const serveFile = createPreviewFileHandler(config.dirs, getUnversionedPageAssetPaths());
 
 Bun.serve({
   port: PORT,
@@ -116,37 +117,7 @@ Bun.serve({
       }
     }
 
-    const root = resolve(distDir);
-    const publicFilePath = resolve(publicRoot, `.${pathname}`);
-    const publicRelativePath = relative(publicRoot, publicFilePath);
-    if (!publicRelativePath.startsWith("..") && !isAbsolute(publicRelativePath)) {
-      const publicFile = Bun.file(publicFilePath);
-      if (await publicFile.exists()) {
-        return new Response(publicFile);
-      }
-    }
-
-    const filePath = resolve(root, `.${pathname}`);
-    const relativePath = relative(root, filePath);
-    if (relativePath.startsWith("..") || isAbsolute(relativePath)) {
-      return new Response("Forbidden", { status: 403 });
-    }
-
-    const directFile = Bun.file(filePath);
-    if (await directFile.exists()) {
-      return new Response(directFile);
-    }
-
-    const indexFile = Bun.file(join(filePath, "index.html"));
-    if (await indexFile.exists()) {
-      return new Response(indexFile);
-    }
-
-    const notFoundFile = Bun.file(join(root, "404.html"));
-    if (await notFoundFile.exists()) {
-      return new Response(notFoundFile, { status: 404 });
-    }
-    return new Response("Not Found", { status: 404 });
+    return serveFile(pathname);
   },
 });
 

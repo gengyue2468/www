@@ -6,6 +6,7 @@ export const nowPlayingPlugin: Plugin = {
     key: "now-playing-card",
     fileName: "now-playing-card",
     sourcePath: "js/now-playing.js",
+    htmlTemplateConstants: ["COMPONENT_TEMPLATE"],
   }],
   webComponents: [{
     tagName: "now-playing-card",

@@ -16,6 +16,7 @@ const COMPONENT_TEMPLATE = `
     margin: 0;
     font-style: italic;
     line-height: 1.2;
+    overflow-wrap: anywhere;
   }
 
   .card {
@@ -36,8 +37,7 @@ const COMPONENT_TEMPLATE = `
     justify-content: space-between;
     gap: 1.2rem;
     color: inherit;
-    text-underline-offset: var(--text-underline-offset);
-    text-decoration-thickness: var(--text-decoration-thickness);
+    text-decoration: none;
   }
 
   .cover {
@@ -46,6 +46,8 @@ const COMPONENT_TEMPLATE = `
     order: 0;
     width: 5rem;
     height: 5rem;
+    border: 1px solid var(--accent);
+    box-sizing: border-box;
     overflow: hidden;
     border-radius: 2px;
     background-color: var(--accent);
@@ -70,13 +72,51 @@ const COMPONENT_TEMPLATE = `
 
   .copy {
     min-width: 0;
-    flex: 1 1 auto;
+    flex: 1 1 0%;
     order: 1;
   }
 
-  .track,
-  .meta {
-    overflow-wrap: anywhere;
+  .marquee {
+    --marquee-gap: 2rem;
+    --marquee-delay: 1.8s;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .marquee-lane {
+    display: flex;
+    width: max-content;
+    column-gap: var(--marquee-gap);
+  }
+
+  .marquee-text {
+    flex: 0 0 auto;
+  }
+
+  .marquee-clone[hidden] {
+    display: none;
+  }
+
+  .marquee[data-scrolling] .marquee-lane {
+    /* One pass per turn; animationend hands control to the next long line. */
+    animation: now-playing-marquee var(--marquee-duration) linear var(--marquee-delay);
+  }
+
+  .card[data-marquee-paused] .marquee-lane,
+  .link:focus-within .marquee-lane {
+    animation-play-state: paused;
+  }
+
+  @media (hover: hover) {
+    .link:hover .marquee-lane {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes now-playing-marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-1 * var(--marquee-distance))); }
   }
 
   .meta {
@@ -119,8 +159,24 @@ const COMPONENT_TEMPLATE = `
   }
 
   @keyframes now-playing-wave {
-    0%, 100% { transform: scaleY(0.35); }
-    50% { transform: scaleY(1.35); }
+    0%, 100% { transform: scaleY(0.2); }
+    50% { transform: scaleY(1.8); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wave rect,
+    .marquee-lane {
+      animation: none !important;
+    }
+
+    .marquee {
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .marquee-clone {
+      display: none;
+    }
   }
 
   @media (max-width: 560px) {
@@ -145,10 +201,6 @@ const COMPONENT_TEMPLATE = `
       align-self: center;
     }
 
-    .track {
-      display: block;
-    }
-
     .wave {
       grid-area: cover;
       position: absolute;
@@ -165,22 +217,30 @@ const COMPONENT_TEMPLATE = `
     }
   }
 </style>
-<p class="status" data-status>Now playing:</p>
-<p class="card" data-card aria-live="polite" aria-busy="true">
-  <a class="link" data-link target="_blank" rel="noopener noreferrer">
-    <span class="cover" aria-hidden="true"><img data-image alt="" width="80" height="80" loading="eager" hidden></span>
-    <span class="copy">
-      <strong class="track" data-track>Loading...</strong>
-      <span class="meta" data-meta>Fetching...</span>
+<p class="status"><span data-status>Now playing:</span><span data-played-at-caption hidden> (At <time data-played-at></time>):</span></p>
+<a class="card link" data-card data-link target="_blank" rel="noopener noreferrer" aria-live="polite" aria-busy="true">
+  <span class="cover" aria-hidden="true"><img data-image alt="" width="80" height="80" loading="eager" hidden></span>
+  <span class="copy">
+    <strong class="track marquee" data-marquee>
+      <span class="marquee-lane" data-marquee-lane>
+        <span class="marquee-text" data-marquee-source data-track>Loading...</span>
+        <span class="marquee-text marquee-clone" data-marquee-clone aria-hidden="true" hidden></span>
+      </span>
+    </strong>
+    <span class="meta marquee" data-marquee>
+      <span class="marquee-lane" data-marquee-lane>
+        <span class="marquee-text" data-marquee-source data-meta>Fetching...</span>
+        <span class="marquee-text marquee-clone" data-marquee-clone aria-hidden="true" hidden></span>
+      </span>
     </span>
-    <svg class="wave" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
-      <rect x="2.5" y="6" width="2" height="12" rx="0.5"/>
-      <rect x="8.5" y="6" width="2" height="12" rx="0.5"/>
-      <rect x="14.5" y="6" width="2" height="12" rx="0.5"/>
-      <rect x="20.5" y="6" width="2" height="12" rx="0.5"/>
-    </svg>
-  </a>
-</p>`;
+  </span>
+  <svg class="wave" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
+    <rect x="2.5" y="6" width="2" height="12" rx="0.5"/>
+    <rect x="8.5" y="6" width="2" height="12" rx="0.5"/>
+    <rect x="14.5" y="6" width="2" height="12" rx="0.5"/>
+    <rect x="20.5" y="6" width="2" height="12" rx="0.5"/>
+  </svg>
+</a>`;
 
 (() => {
   const tagName = COMPONENT_TAG;
@@ -200,6 +260,11 @@ const COMPONENT_TEMPLATE = `
   const cards = new Set();
   const playingInterval = 60_000;
   const idleInterval = 180_000;
+  const marqueeSpeed = 24; // Pixels per second, regardless of text length.
+  const playedAtFormatter = new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
   let latestTrack = null;
   let hasSuccessfulResult = false;
   let isUnavailable = false;
@@ -268,6 +333,25 @@ const COMPONENT_TEMPLATE = `
       const root = this.attachShadow({ mode: "open" });
       root.append(template.content.cloneNode(true));
       this.root = root;
+      this.marquees = [...root.querySelectorAll("[data-marquee]")].map((element) => ({
+        element,
+        lane: element.querySelector("[data-marquee-lane]"),
+        source: element.querySelector("[data-marquee-source]"),
+        clone: element.querySelector("[data-marquee-clone]"),
+        signature: null,
+        distance: 0,
+      }));
+      this.marqueeQueue = [];
+      this.activeMarquee = null;
+      root.addEventListener("animationend", (event) => this.advanceMarquee(event));
+      this.marqueeFrame = null;
+      this.scheduleMarquees = () => {
+        if (!this.isConnected || this.marqueeFrame !== null) return;
+        this.marqueeFrame = requestAnimationFrame(() => {
+          this.marqueeFrame = null;
+          if (this.isConnected) this.updateMarquees();
+        });
+      };
       this.image = root.querySelector("[data-image]");
       this.image?.addEventListener("error", () => {
         this.image.hidden = true;
@@ -276,6 +360,21 @@ const COMPONENT_TEMPLATE = `
     }
 
     connectedCallback() {
+      this.motionQuery ||= window.matchMedia?.("(prefers-reduced-motion: reduce)");
+      this.motionQuery?.addEventListener("change", this.scheduleMarquees);
+      this.syncMarqueeVisibility();
+      if (typeof ResizeObserver === "function") {
+        this.resizeObserver ||= new ResizeObserver(this.scheduleMarquees);
+        for (const { element, source } of this.marquees) {
+          this.resizeObserver.observe(element);
+          this.resizeObserver.observe(source);
+        }
+      } else {
+        window.addEventListener("resize", this.scheduleMarquees);
+      }
+      document.fonts?.ready?.then(this.scheduleMarquees);
+      this.scheduleMarquees();
+
       const wasEmpty = cards.size === 0;
       cards.add(this);
       if (latestTrack) this.renderTrack(latestTrack);
@@ -284,6 +383,13 @@ const COMPONENT_TEMPLATE = `
     }
 
     disconnectedCallback() {
+      this.resizeObserver?.disconnect();
+      this.motionQuery?.removeEventListener("change", this.scheduleMarquees);
+      window.removeEventListener("resize", this.scheduleMarquees);
+      if (this.marqueeFrame !== null) cancelAnimationFrame(this.marqueeFrame);
+      this.marqueeFrame = null;
+      this.resetMarqueeCycle();
+      this.marqueeQueue = [];
       cards.delete(this);
       if (cards.size === 0) clearTimeout(pollTimer);
     }
@@ -293,13 +399,106 @@ const COMPONENT_TEMPLATE = `
       if (element && element.textContent !== text) element.textContent = text;
     }
 
+    updateMarquees() {
+      let changed = false;
+      for (const marquee of this.marquees) {
+        const { element, lane, source, clone } = marquee;
+        const text = source.textContent;
+        if (element.title !== text) {
+          element.title = text;
+          element.scrollLeft = 0;
+        }
+        const width = source.getBoundingClientRect().width;
+        const available = element.clientWidth;
+        const scrolling = !this.motionQuery?.matches && available > 0 && width > available + 1;
+        const gap = scrolling ? parseFloat(getComputedStyle(lane).columnGap) || 0 : 0;
+        const distance = scrolling ? width + gap : 0;
+        const signature = JSON.stringify([text, distance]);
+        if (signature === marquee.signature) continue;
+
+        changed = true;
+        marquee.signature = signature;
+        marquee.distance = distance;
+
+        if (!scrolling) {
+          clone.hidden = true;
+          clone.textContent = "";
+          lane.style.removeProperty("--marquee-distance");
+          lane.style.removeProperty("--marquee-duration");
+          continue;
+        }
+
+        element.scrollLeft = 0;
+        clone.textContent = text;
+        clone.hidden = false;
+        lane.style.setProperty("--marquee-distance", `${distance}px`);
+        lane.style.setProperty("--marquee-duration", `${distance / marqueeSpeed}s`);
+      }
+
+      this.marqueeQueue = this.marquees.filter(({ distance }) => distance > 0);
+      // Preserve the active turn on unchanged polling results or resizes that
+      // leave the same lines overflowing; changed text or font metrics restart.
+      if (changed) this.resetMarqueeCycle();
+      if (!this.activeMarquee) this.startMarquee(this.marqueeQueue[0]);
+    }
+
+    resetMarqueeCycle() {
+      for (const { element } of this.marquees) element.removeAttribute("data-scrolling");
+      this.activeMarquee = null;
+    }
+
+    startMarquee(marquee) {
+      if (!marquee || !this.isConnected || this.motionQuery?.matches) return;
+      this.activeMarquee = marquee;
+      // Flush the stopped state, including when a single long line repeats.
+      void marquee.lane.offsetWidth;
+      marquee.element.setAttribute("data-scrolling", "");
+    }
+
+    advanceMarquee(event) {
+      const current = this.activeMarquee;
+      if (!this.isConnected || this.motionQuery?.matches || !current
+        || event.animationName !== "now-playing-marquee" || event.target !== current.lane) return;
+
+      const nextIndex = (this.marqueeQueue.indexOf(current) + 1) % this.marqueeQueue.length;
+      current.element.removeAttribute("data-scrolling");
+      this.activeMarquee = null;
+      // The duplicate finishes at the original's starting position, so resetting
+      // is visually seamless. The next CSS animation includes its own read pause.
+      this.startMarquee(this.marqueeQueue[nextIndex]);
+    }
+
+    syncMarqueeVisibility() {
+      this.root.querySelector("[data-card]")?.toggleAttribute(
+        "data-marquee-paused", document.visibilityState !== "visible",
+      );
+    }
+
+    setPlayedAt(timestamp) {
+      const time = this.root.querySelector("[data-played-at]");
+      const caption = this.root.querySelector("[data-played-at-caption]");
+      if (!time || !caption) return false;
+
+      const date = Number.isFinite(timestamp) ? new Date(timestamp * 1000) : null;
+      const iso = date && Number.isFinite(date.getTime()) ? date.toISOString() : "";
+      caption.hidden = !iso;
+      time.textContent = iso ? playedAtFormatter.format(date) : "";
+      if (iso) time.dateTime = iso;
+      else time.removeAttribute("datetime");
+      return !!iso;
+    }
+
     renderTrack(track) {
       const playing = !!track.nowplaying;
-      this.setText("[data-status]", playing ? "Now playing:" : "Offline. Last played:");
+      const hasPlayedAt = this.setPlayedAt(playing ? null : track.playedAt);
+      this.setText(
+        "[data-status]",
+        playing ? "Now playing:" : hasPlayedAt ? "Offline. Last played" : "Offline. Last played:",
+      );
       this.setText("[data-track]", track.name);
       this.setText(
         "[data-meta]",
-        "By " + track.artist + (track.album ? " | " + track.album : ""),
+        "By " + track.artist + (track.album ? " / " + track.album : ""),
       );
 
       const cover = coverUrl(track.image);
@@ -324,10 +523,12 @@ const COMPONENT_TEMPLATE = `
         card.dataset.state = playing ? "playing" : "recent";
         card.setAttribute("aria-busy", "false");
       }
+      this.scheduleMarquees();
     }
 
     renderUnavailable() {
       this.setText("[data-status]", "Offline.");
+      this.setPlayedAt(null);
       this.setText("[data-track]", "Unavailable");
       this.setText("[data-meta]", "Listening activity could not be loaded.");
       if (this.image) {
@@ -342,12 +543,17 @@ const COMPONENT_TEMPLATE = `
         card.dataset.state = "recent";
         card.setAttribute("aria-busy", "false");
       }
+      this.scheduleMarquees();
     }
   }
 
   document.addEventListener("visibilitychange", () => {
     clearTimeout(pollTimer);
-    if (document.visibilityState === "visible" && cards.size > 0) refresh();
+    for (const card of cards) card.syncMarqueeVisibility();
+    if (document.visibilityState === "visible" && cards.size > 0) {
+      for (const card of cards) card.scheduleMarquees();
+      refresh();
+    }
   });
 
   customElements.define(tagName, NowPlayingCard);

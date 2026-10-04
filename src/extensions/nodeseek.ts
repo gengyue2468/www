@@ -1,8 +1,7 @@
 import type { Plugin } from "./plugin.js";
 import { getMarkdownIt } from "../utils/markdown.js";
 import { sanitizeHtml } from "../utils/html.js";
-
-const TABS_COMPONENT_TAG = "content-tabs";
+import { renderContentTabs } from "./content-tabs.js";
 
 // ── ANSI SGR → HTML ──────────────────────────────────────────────────────────
 
@@ -351,26 +350,13 @@ export function processNqBlock(raw: string, groupId = 0): string {
     return `<div class="nq-container">${escapeHtml(raw)}</div>`;
   }
 
-  const tabsHtml: string[] = [];
-  const contentsHtml: string[] = [];
-  tabs.forEach((tab, idx) => {
-    const id = `nq-${groupId}-${idx}`;
-    const contentId = `${id}-content`;
-    const selected = idx === 0;
-    const content = renderTabContent(tab.content.join("\n"));
-    tabsHtml.push(
-      `<button class="tab-button" type="button" id="nq-${groupId}-${idx}" role="tab" aria-selected="${selected}" ` +
-      `aria-controls="${contentId}" tabindex="${selected ? 0 : -1}">${escapeHtml(tab.title)}</button>`
-    );
-    contentsHtml.push(
-      `<div class="tab-content" id="${contentId}" role="tabpanel" aria-labelledby="${id}"${selected ? "" : " hidden"}>${content}</div>`
-    );
-  });
-
-  return `<div class="tabs-container"><${TABS_COMPONENT_TAG} class="tabs"><div class="tab-list" role="tablist" aria-label="标签页">${tabsHtml.join("\n")}</div><div class="tab-panels">${contentsHtml.join("\n")}</div></${TABS_COMPONENT_TAG}></div>`;
+  return renderContentTabs(tabs.map((tab, idx) => ({
+    title: tab.title,
+    html: renderTabContent(tab.content.join("\n"), `nq-${groupId}-${idx}`),
+  })), `nq-${groupId}`);
 }
 
-function renderTabContent(content: string): string {
+function renderTabContent(content: string, tabIdPrefix: string): string {
   const ansiBlocks = new Map<string, string>();
   let ansiIndex = 0;
   const markdown = content.replace(
@@ -386,7 +372,7 @@ function renderTabContent(content: string): string {
     }
   );
 
-  let rendered = getMarkdownIt().render(markdown);
+  let rendered = getMarkdownIt().render(markdown, { tabIdPrefix });
   for (const [index, block] of ansiBlocks) {
     rendered = rendered.replace(`<p>NQ_ANSI_PLACEHOLDER_${index}</p>`, block);
   }
@@ -453,13 +439,4 @@ export const nodeseekPlugin: Plugin = {
     { name: "nodeseek-nq", process: processNqBlocks },
     { name: "nodeseek-ansi", postProcess: processAnsiCodeBlocks },
   ],
-  webComponents: [{
-    tagName: TABS_COMPONENT_TAG,
-    scriptKey: "content-tabs",
-  }],
-  clientScripts: [{
-    key: "content-tabs",
-    fileName: "content-tabs",
-    sourcePath: "js/content-tabs.js",
-  }],
 };
