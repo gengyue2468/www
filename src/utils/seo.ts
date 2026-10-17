@@ -16,7 +16,7 @@ export interface MetaDescriptionOptions {
   maxLength?: number;
 }
 
-const DEFAULT_MIN_LENGTH = 90;
+const DEFAULT_MIN_LENGTH = 0;
 const DEFAULT_MAX_LENGTH = 160;
 
 export function escapeHtmlText(value: string): string {
@@ -88,7 +88,7 @@ export function buildMetaDescription(options: MetaDescriptionOptions): string {
   let description = primary || fallback || siteDescription || title;
 
   const usedSiteDefault = description === siteDescription;
-  if (usedSiteDefault && title) {
+  if (usedSiteDefault && title && !primary) {
     description = `${title} - ${description}`;
   }
 

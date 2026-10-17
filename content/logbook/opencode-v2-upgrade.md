@@ -1,7 +1,10 @@
 ---
 title: OpenCode V2 Upgrade
-tags: [Tools, Models]
+tags:
+  - Tools
+  - Models
 date: 2026-09-25
+comment: true
 ---
 1. 插件会挂掉，这是一个 breaking change，使用了新的 sdk，因此旧插件会因为校验无法通过而爆炸。
 2. 引入了新的 background server 机制，很好啊

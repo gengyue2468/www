@@ -1,6 +1,6 @@
 ---
 title: Colophon
-description: 这个网站是如何构建的——技术栈、字体、部署等出版信息。
+description: 这个网站是怎么搭起来的。
 ---
 此页面使用 [Bun](https://bun.com/) 和 [TypeScript](https://www.typescriptlang.org/) 构建，部署在 [Berohost](https://bero-host.de/) 的 VPS 上。
 

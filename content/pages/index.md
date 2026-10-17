@@ -1,9 +1,9 @@
 ---
 title: Hi 👋!
-description:  gengyue 的个人网站。写一点技术、项目、折腾记录和碎碎念，也放一些不知道有什么用的小玩具。
+description: gengyue 的个人网站。折腾记录，以及一些碎碎念。
 ---
 
-此地属于 gengyue。这个页面目前部署在 [Berohost](https://bero-host.de/) 的 VPS 上。 [^ [10th Anniversary M](https://bero-host.de/server/prepaid-kvm-rootserver-mieten), 4x EPYC Turin vCore, 12 GB DDR5 RAM, 120 GB Nvme SSD. Frankfurt, Germany. <br /> <br /> <span class="ttyd-terminal"><iframe src="https://www.gengyue.dev/tty/" title="gengyue ttyd terminal" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width: 100%; height: 400px;"></iframe></span> <br />] 上。
+此地属于 gengyue。这个页面目前部署在 [Berohost](https://bero-host.de/) 的 VPS 上。 [^ [10th Anniversary M](https://bero-host.de/server/prepaid-kvm-rootserver-mieten), 4x EPYC Turin vCore, 12 GB DDR5 RAM, 120 GB Nvme SSD. Frankfurt, Germany. <br /> <br /> <span class="ttyd-terminal"><iframe src="https://www.gengyue.dev/tty/" title="gengyue ttyd terminal" loading="lazy" sandbox="allow-scripts allow-same-origin" style="width: 100%; height: 400px;"></iframe></span> <br />]
 
 您可以通过访问 [About](/about), [Blog](/blog) 和 [Logbook](/logbook) 页面了解更多信息，也可以到 [Guestbook](/guestbook) 留言。当然，下面的链接亦可：
 

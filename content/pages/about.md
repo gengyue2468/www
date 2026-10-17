@@ -1,6 +1,6 @@
 ---
 title: About
-description: 关于 gengyue —— 热爱开源，持续探索技术与新兴方向，喜欢折腾各种有趣的小玩具与实践项目，也记录学习、成长与一些不太正经的技术思考。
+description: 关于 gengyue：学计算机，比较摆。
 ---
 
 哈喽，我目前就读于 [华中科技大学](https://hust.edu.cn) [计算机科学与技术专业](https://cs.hust.edu.cn/)，是**大二**的小东西。[冰岩作坊](https://www.bingyan.net/) 前端组成员。

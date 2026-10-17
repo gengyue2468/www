@@ -208,7 +208,7 @@ function buildCollectionIndex(
   const indexTitle = `${capitalize(coll.name)} - ${config.site.title}`;
   const indexDescription = buildMetaDescription({
     title: coll.name,
-    primary: config.site.description,
+    primary: coll.description || config.site.description,
     fallbackText: `Latest posts from ${config.site.title}`,
     siteDescription: config.site.description,
   });
@@ -416,7 +416,7 @@ async function buildTagPages(
       const tagPageTitle = `#${tag} - ${config.site.title}`;
       const tagDescription = buildMetaDescription({
         title: `#${tag}`,
-        primary: `Posts tagged with "${tag}" on ${config.site.title}`,
+        primary: `${capitalize(coll.name)} 里和 ${tag} 有关的记录。`,
         fallbackText: config.site.description,
         siteDescription: config.site.description,
       });
@@ -474,7 +474,7 @@ async function buildTagPages(
   const tagsIndexTitle = `Tags - ${config.site.title}`;
   const tagsIndexDescription = buildMetaDescription({
     title: "Tags",
-    primary: `Browse all tags and discover posts on ${config.site.title}`,
+    primary: `${capitalize(coll.name)} 的标签，按话题翻翻。`,
     fallbackText: config.site.description,
     siteDescription: config.site.description,
   });

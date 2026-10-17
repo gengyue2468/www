@@ -9,8 +9,7 @@ const config: Config = {
   site: {
     title: "gengyue",
     author: "gengyue",
-    description:
-      "gengyue 的个人网站与博客 - 华中科技大学计算机专业学生，记录技术探索、开发经验与项目实践。分享技术、开发等文章，以及开源项目和小玩具建设经验。",
+    description: "gengyue 的个人网站。折腾记录，以及一些碎碎念。",
     url: "https://www.gengyue.dev",
     ogImage: "/static/og/og-image.webp",
     ogImageWidth: 1200,
@@ -30,7 +29,6 @@ const config: Config = {
     "/about": "about.md",
     "/uses": "uses.md",
     "/colophon": "colophon.md",
-    "/playlist": "playlist.md",
     "/guestbook": "guestbook.md",
     "/friends": "friends.md",
   },
@@ -38,6 +36,7 @@ const config: Config = {
   collections: [
     {
       name: "blog",
+      description: "写得稍微长一点的东西。",
       srcDir: join(rootDir, "content", "blog"),
       urlPrefix: "blog",
       tags: true,
@@ -49,6 +48,7 @@ const config: Config = {
     },
     {
       name: "logbook",
+      description: "随手记下的折腾过程，免得下次再踩一遍。",
       srcDir: join(rootDir, "content", "logbook"),
       urlPrefix: "logbook",
       tags: true,
@@ -136,7 +136,7 @@ const config: Config = {
       children: [
         { name: "Logbook", path: "/logbook", show: true },
         { name: "Status", path: "https://status.gy.run", show: true },
-        { name: "Playlist", path: "/playlist", show: true },
+        { name: "Track", path: "https://track.gy.run", show: true },
         { name: "Uses", path: "/uses", show: true },
         { name: "Friends", path: "/friends", show: true },
         { name: "Guestbook", path: "/guestbook", show: true },

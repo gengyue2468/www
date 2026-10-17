@@ -115,6 +115,7 @@ export interface LlmsConfig {
 
 export interface CollectionConfig {
   name: string;
+  description?: string;
   srcDir?: string;
   urlPrefix?: string;
   tags?: boolean;
