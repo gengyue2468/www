@@ -110,7 +110,7 @@ const server = Bun.serve({
       return new Response("Bad Request", { status: 400 });
     }
 
-    if (req.method === "GET" && (["/api/spotify/now", "/api/lastfm/now", "/api/lastfm/recent", "/api/memos", "/api/memos/calendar", "/api/uptime/status"].includes(pathname) || pathname.startsWith("/api/memos/attachments/"))) {
+    if (req.method === "GET" && (["/api/spotify/now", "/api/spotify/recent", "/api/lastfm/now", "/api/lastfm/recent", "/api/memos", "/api/memos/calendar", "/api/uptime/status"].includes(pathname) || pathname.startsWith("/api/memos/attachments/"))) {
       try {
         const upstream = await fetch(`https://www.gengyue.dev${pathname}${url.search}`, {
           headers: req.headers.has("Range") ? { Range: req.headers.get("Range")! } : {},

@@ -25,6 +25,7 @@ import { dropdownPlugin } from "./extensions/dropdown.js";
 import { listCollapsePlugin } from "./extensions/list-collapse.js";
 import { memosPlugin } from "./extensions/memos.js";
 import { statusPlugin } from "./extensions/status.js";
+import { trackPlugin } from "./extensions/track.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
 import { auditDist, type HtmlAuditIssueKind } from "./utils/html-audit.js";
@@ -56,6 +57,7 @@ registerPlugin(dropdownPlugin);
 registerPlugin(listCollapsePlugin);
 registerPlugin(memosPlugin);
 registerPlugin(statusPlugin);
+registerPlugin(trackPlugin);
 
 class PerformanceTimer {
   private times = new Map<string, number>();

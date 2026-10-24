@@ -32,6 +32,7 @@ const config: Config = {
     "/friends": "friends.md",
     "/memos": "memos.md",
     "/status": "status.md",
+    "/track": "track.md",
   },
 
   collections: [
@@ -138,7 +139,7 @@ const config: Config = {
         { name: "Logbook", path: "/logbook", show: true },
         { name: "Memos", path: "/memos", show: true },
         { name: "Status", path: "/status", show: true },
-        { name: "Track", path: "https://track.gy.run", show: true },
+        { name: "Track", path: "/track", show: true },
         { name: "Friends", path: "/friends", show: true },
         { name: "Guestbook", path: "/guestbook", show: true },
         { name: "Colophon", path: "/colophon", show: true },
