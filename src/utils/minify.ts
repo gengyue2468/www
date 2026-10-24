@@ -16,14 +16,17 @@ export function minifyCss(source: string, filename = "site.css", inline = false)
   }
 }
 
-/** Mangle local identifiers, never DOM properties, selectors or public APIs. */
-export function minifyJavaScript(source: string, options: { module?: boolean; inline?: boolean } = {}): string {
+/** Property mangling is opt-in and limited to audited internal names. */
+export function minifyJavaScript(source: string, options: { module?: boolean; inline?: boolean; internalProperties?: readonly string[] } = {}): string {
   try {
+    const propertyPattern = options.internalProperties?.length
+      ? new RegExp(`^(?:${options.internalProperties.map(name => name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})$`)
+      : null;
     const result = minify_sync(source, {
       ecma: 2022,
       module: options.module ?? true,
       compress: { passes: 10, unsafe: false },
-      mangle: { properties: false },
+      mangle: { properties: propertyPattern ? { regex: propertyPattern, builtins: false, keep_quoted: true } : false },
       parse: { bare_returns: options.inline === true },
       format: { comments: "some", inline_script: true },
     });

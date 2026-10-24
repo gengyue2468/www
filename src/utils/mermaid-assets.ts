@@ -3,9 +3,30 @@ import { rename, rm } from "fs/promises";
 import { contentHash, emitHashedTextAsset } from "./assets.js";
 import { ensureDir, readFileContent } from "./fs.js";
 import { AppError, ErrorCode } from "./errors.js";
+import { minifyJavaScript } from "./minify.js";
+import terserPackage from "terser/package.json";
 
 const MERMAID_VERSION = "10.9.3";
 const CORE_DEPENDENCY = "mermaid-5a5980d4.js";
+const MINIFIER_PROFILE = contentHash(`${terserPackage.version}\0${minifyJavaScript.toString()}`);
+
+async function minifyCachedModule(source: string, cacheDir: string): Promise<string> {
+  // Separate optimized output from downloaded sources; invalidate on either
+  // source, compressor configuration, or Terser version changes.
+  const cachePath = join(cacheDir, "minified", MINIFIER_PROFILE, `${contentHash(source)}.js`);
+  if (await Bun.file(cachePath).exists()) return readFileContent(cachePath);
+  const optimized = minifyJavaScript(source);
+  const result = Buffer.byteLength(optimized) < Buffer.byteLength(source) ? optimized : source;
+  await ensureDir(dirname(cachePath));
+  const temporaryPath = `${cachePath}.tmp-${process.pid}-${Date.now()}`;
+  try {
+    await Bun.write(temporaryPath, result);
+    await rename(temporaryPath, cachePath);
+  } finally {
+    await rm(temporaryPath, { force: true });
+  }
+  return result;
+}
 
 // The pinned Mermaid distribution uses literal, same-directory ESM imports.
 // Include dynamic imports, named imports, and bare side-effect imports.
@@ -79,12 +100,18 @@ export async function prepareMermaidRuntime(assetsDir: string, cacheDir: string)
     }
   }
 
+  for (const [name, source] of modules) {
+    modules.set(name, await minifyCachedModule(source, cacheDir));
+  }
+  const optimizedEntry = await minifyCachedModule(entry, cacheDir);
   const emittedModules = new Map<string, string>();
   const emitted = new Set<string>();
   const resolvingModules = new Set<string>();
   // Diagram chunks import core helpers, while the core dynamically imports the
-  // diagrams. Keep the existing stable core name to break that intentional cycle.
-  emittedModules.set(coreModuleName, `mermaid-core-${contentHash(dependency)}.js`);
+  // diagrams. A whole-graph fingerprint breaks the naming cycle while ensuring
+  // changed child modules cannot be served behind an unchanged core URL.
+  const graphHash = contentHash(JSON.stringify([optimizedEntry, [...modules].sort(([a], [b]) => a.localeCompare(b))]));
+  emittedModules.set(coreModuleName, `mermaid-core-${graphHash}.js`);
 
   const emitModule = async (moduleName: string): Promise<string> => {
     const existing = emittedModules.get(moduleName);
@@ -116,7 +143,7 @@ export async function prepareMermaidRuntime(assetsDir: string, cacheDir: string)
   };
 
   const dependencyFileName = await emitModule(coreModuleName);
-  const rewrittenEntry = entry.replaceAll(coreModuleName, `./${dependencyFileName}`);
+  const rewrittenEntry = optimizedEntry.replaceAll(coreModuleName, `./${dependencyFileName}`);
   const entryFileName = await emitHashedTextAsset(assetsDir, "mermaid-esm", ".mjs", rewrittenEntry);
   await validateModuleAssets(assetsDir, [...emittedModules.values(), entryFileName]);
   return `/assets/${entryFileName}`;
