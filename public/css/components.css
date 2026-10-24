@@ -480,7 +480,7 @@ track-page {
 .track-marquee-clone[hidden] { display: none; }
 
 .track-marquee[data-scrolling] .track-marquee-lane {
-  animation: track-page-marquee var(--track-marquee-duration) linear 1.8s infinite;
+  animation: track-page-marquee var(--track-marquee-duration) linear 1.8s;
 }
 
 .track-link:focus-within .track-marquee-lane {

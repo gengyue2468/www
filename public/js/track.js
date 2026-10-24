@@ -32,6 +32,7 @@
       this.before = null;
       this.hasMore = true;
       this.noteIndex = 0;
+      this.addEventListener("animationend", event => this.advanceMarquee(event), { signal: this.controller.signal });
       this.marqueeFrame = null;
       this.motionQuery = window.matchMedia?.("(prefers-reduced-motion: reduce)");
       this.handleMotionChange = () => this.scheduleMarquees();
@@ -40,9 +41,6 @@
       if (typeof ResizeObserver === "function") {
         this.marqueeResizeObserver = new ResizeObserver(() => this.scheduleMarquees());
         this.marqueeResizeObserver.observe(this.list);
-        for (const text of this.list.querySelectorAll(".track-marquee-text:not(.track-marquee-clone)")) {
-          this.marqueeResizeObserver.observe(text);
-        }
       } else {
         window.addEventListener("resize", this.handleMotionChange, { signal: this.controller.signal });
       }
@@ -105,7 +103,6 @@
           if (this.seen.has(key)) continue;
           const entry = this.renderTrack(track);
           this.list.append(entry);
-          for (const text of entry.querySelectorAll(".track-marquee-text")) this.marqueeResizeObserver?.observe(text);
           this.seen.add(key);
         }
         this.scheduleMarquees();
@@ -143,7 +140,10 @@
     }
 
     updateMarquees() {
-      for (const marquee of this.list.querySelectorAll(".track-marquee")) {
+      for (const entry of this.list.querySelectorAll(".track-entry")) {
+        let changed = false;
+        const queue = [];
+        for (const marquee of entry.querySelectorAll(".track-marquee")) {
         const lane = marquee.querySelector(".track-marquee-lane");
         const text = marquee.querySelector(".track-marquee-text");
         if (!lane || !text) continue;
@@ -161,6 +161,8 @@
         const scrolling = !this.motionQuery?.matches && available > 0 && width > available + 1;
         const gap = parseFloat(getComputedStyle(lane).columnGap) || 0;
         const distance = scrolling ? width + gap : 0;
+        if (marquee.marqueeDistance !== distance) changed = true;
+        marquee.marqueeDistance = distance;
         marquee.title = text.textContent;
         if (!scrolling) {
           marquee.removeAttribute("data-scrolling");
@@ -175,8 +177,32 @@
         clone.textContent = text.textContent;
         marquee.style.setProperty("--track-marquee-distance", `${distance}px`);
         marquee.style.setProperty("--track-marquee-duration", `${distance / 24}s`);
-        marquee.setAttribute("data-scrolling", "");
+        queue.push(marquee);
+        }
+        entry.marqueeQueue = queue;
+        if (changed) {
+          for (const marquee of entry.querySelectorAll(".track-marquee")) marquee.removeAttribute("data-scrolling");
+          entry.activeMarquee = null;
+        }
+        if (!entry.activeMarquee) this.startMarquee(entry, queue[0]);
       }
+    }
+
+    startMarquee(entry, marquee) {
+      if (!marquee || this.motionQuery?.matches) return;
+      entry.activeMarquee = marquee;
+      void marquee.querySelector(".track-marquee-lane").offsetWidth;
+      marquee.setAttribute("data-scrolling", "");
+    }
+
+    advanceMarquee(event) {
+      if (event.animationName !== "track-page-marquee") return;
+      const entry = event.target.closest(".track-entry");
+      const current = entry?.activeMarquee;
+      if (!current || event.target !== current.querySelector(".track-marquee-lane")) return;
+      current.removeAttribute("data-scrolling");
+      entry.activeMarquee = null;
+      this.startMarquee(entry, entry.marqueeQueue[(entry.marqueeQueue.indexOf(current) + 1) % entry.marqueeQueue.length]);
     }
 
     marquee(text, className = "") {
