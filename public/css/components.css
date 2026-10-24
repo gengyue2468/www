@@ -586,6 +586,158 @@ track-page {
   .track-marquee-clone { display: none; }
 }
 
+/* Speedtest is a small instrument on the page, not a dashboard of cards. */
+speedtest-page {
+  display: grid;
+  grid-template-columns: var(--width-content) calc(var(--width-content) * 0.1) calc(var(--width-content) * 0.5);
+  align-items: start;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+.speedtest-main { grid-column: 1; grid-row: 1; min-width: 0; }
+
+.speedtest-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem 1.5rem;
+  margin-block: 1rem 0;
+}
+.speedtest-controls fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1.2rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.speedtest-controls legend,
+.speedtest-mode input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.speedtest-mode { cursor: pointer; }
+.speedtest-mode span { opacity: 0.5; }
+.speedtest-mode input:checked + span {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.speedtest-mode input:focus-visible + span { outline: 2px solid currentColor; outline-offset: 4px; }
+.speedtest-controls fieldset:disabled { opacity: 0.5; }
+.speedtest-controls .speedtest-budget { display: inline-flex; flex-wrap: wrap; gap: 0.4em; margin-left: auto; }
+.speedtest-budget > span { opacity: 0.6; }
+.speedtest-budget-dropdown {
+  display: inline-block;
+  max-width: 100%;
+}
+.speedtest-budget-dropdown .nav-menu-label {
+  cursor: pointer;
+}
+.speedtest-chevron {
+  display: inline-block;
+  margin-left: 0.25em;
+  vertical-align: -0.15em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 120ms ease;
+}
+.speedtest-budget-dropdown details[open] .speedtest-chevron {
+  transform: rotate(180deg);
+}
+.speedtest-budget-dropdown .nav-dropdown-menu button[aria-selected="true"] {
+  background: var(--accent);
+}
+.speedtest-actions { display: flex; align-items: baseline; }
+.speedtest-actions button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: var(--text-underline-offset);
+  cursor: pointer;
+}
+.speedtest-actions button:disabled { opacity: 0.4; cursor: default; }
+.speedtest-actions button[hidden] { display: none; }
+.speedtest-status { grid-column: 1 / -1; margin: 0; font: inherit; font-style: italic; opacity: 0.65; }
+.speedtest-line { height: 1px; margin-top: 1.5rem; background: var(--border-color); }
+.speedtest-line > span { display: block; width: 0; height: 100%; background: currentColor; }
+.speedtest-latency {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+  margin-block: 0 1.8rem;
+  font-size: inherit;
+}
+.speedtest-latency > div { display: flex; flex-wrap: wrap; gap: 0.4em; }
+.speedtest-latency dt { opacity: 0.6; }
+.speedtest-latency dd { margin: 0; font-variant-numeric: tabular-nums; }
+.speedtest-latency small { font-size: inherit; opacity: 0.65; }
+.speedtest-edge { margin-left: auto; }
+.speedtest-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; margin-block: 0.5rem 1.5rem; }
+.speedtest-direction { min-width: 0; }
+.speedtest-direction h2 { margin: 0; font-size: var(--font-size-h3); }
+.speedtest-reading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2em; margin: 0.5rem 0 0; line-height: var(--line-height-base); }
+.speedtest-reading > [data-speedtest-rate] { font-size: var(--font-size-h1); font-variant-numeric: tabular-nums; }
+.speedtest-unit { opacity: 0.6; }
+.speedtest-chart { display: block; width: 100%; height: 4.5rem; margin-block: 0.8rem; overflow: visible; }
+.speedtest-chart path { fill: none; stroke: currentColor; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.speedtest-chart .speedtest-chart-baseline { opacity: 0.15; stroke-width: 1; }
+.speedtest-caption,
+.speedtest-detail { margin: 0; font-size: inherit; line-height: var(--line-height-sidenote); }
+.speedtest-detail { opacity: 0.6; }
+.speedtest-caption { font-style: italic; opacity: 0.65; }
+.speedtest-notes { margin-block: 2rem; }
+.speedtest-notes summary { cursor: pointer; font-style: italic; }
+.speedtest-notes p { font-size: inherit; }
+.speedtest-client-info {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: 19.5rem;
+  margin-top: var(--spacing-sidenote-top);
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 1.5rem;
+  font-size: calc(var(--font-size-body) * 0.9);
+  line-height: var(--line-height-sidenote);
+  text-indent: 0;
+  letter-spacing: 0.01em;
+}
+.speedtest-client-info dl { margin: 0; }
+.speedtest-client-info dl > div + div { margin-top: 1rem; }
+.speedtest-client-info dt { opacity: 0.6; font-style: italic; }
+.speedtest-client-info dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 760px) {
+  speedtest-page { display: block; }
+  .speedtest-results { gap: 1.2rem; }
+  .speedtest-edge { margin-left: 0; }
+  .speedtest-client-info {
+    position: static;
+    max-width: none;
+    margin: 2rem 0 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .speedtest-results { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .speedtest-controls .speedtest-budget { flex-basis: 100%; margin-left: 0; }
+}
+
 /* Keep real lists, with an understated disclosure after each long list. */
 list-collapse {
   display: block;

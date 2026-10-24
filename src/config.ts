@@ -33,6 +33,7 @@ const config: Config = {
     "/memos": "memos.md",
     "/status": "status.md",
     "/track": "track.md",
+    "/speedtest": "speedtest.md",
   },
 
   collections: [
@@ -140,6 +141,7 @@ const config: Config = {
         { name: "Memos", path: "/memos", show: true },
         { name: "Status", path: "/status", show: true },
         { name: "Track", path: "/track", show: true },
+        { name: "Speedtest", path: "/speedtest", show: true },
         { name: "Friends", path: "/friends", show: true },
         { name: "Guestbook", path: "/guestbook", show: true },
         { name: "Colophon", path: "/colophon", show: true },

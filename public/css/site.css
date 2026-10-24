@@ -82,7 +82,8 @@ nav .nav-menu-label:hover {
   }
 }
 
-.nav-dropdown-menu a {
+.nav-dropdown-menu a,
+.nav-dropdown-menu button {
   display: block;
   margin-right: 0;
   padding: 0.4rem 1rem;
@@ -91,7 +92,20 @@ nav .nav-menu-label:hover {
   white-space: nowrap;
 }
 
-.nav-dropdown-menu a:hover {
+.nav-dropdown-menu button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.3rem;
+  line-height: normal;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nav-dropdown-menu a:hover,
+.nav-dropdown-menu button:hover {
   background-color: var(--accent) !important;
 }
 
@@ -126,7 +140,8 @@ nav .nav-menu-label:hover {
 }
 
 .post-actions .nav-dropdown-menu,
-.post-actions .nav-dropdown-menu a {
+.post-actions .nav-dropdown-menu a,
+.post-actions .nav-dropdown-menu button {
   line-height: normal;
 }
 
@@ -1034,7 +1049,8 @@ ul {
     min-width: 120px;
   }
 
-  .nav-dropdown-menu a {
+  .nav-dropdown-menu a,
+  .nav-dropdown-menu button {
     font-size: 1.1rem;
   }
 
