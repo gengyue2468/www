@@ -600,7 +600,7 @@ speedtest-page {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.5rem 1.5rem;
-  margin-block: 1rem 0;
+  margin-block: 0 0.6rem;
 }
 .speedtest-controls fieldset {
   display: flex;
@@ -672,8 +672,6 @@ speedtest-page {
 .speedtest-actions button:disabled { opacity: 0.4; cursor: default; }
 .speedtest-actions button[hidden] { display: none; }
 .speedtest-status { grid-column: 1 / -1; margin: 0; font: inherit; font-style: italic; opacity: 0.65; }
-.speedtest-line { height: 1px; margin-top: 1.5rem; background: var(--border-color); }
-.speedtest-line > span { display: block; width: 0; height: 100%; background: currentColor; }
 .speedtest-latency {
   display: flex;
   flex-wrap: wrap;

@@ -5,6 +5,7 @@ description: 测速测速
 
 <speedtest-page>
   <div class="speedtest-main">
+  <div data-speedtest-controls></div>
   <dl class="speedtest-latency">
     <div><dt>Latency</dt><dd><span data-speedtest-latency>—</span> <small>ms</small></dd></div>
     <div><dt>Jitter</dt><dd><span data-speedtest-jitter>—</span> <small>ms</small></dd></div>
@@ -32,8 +33,6 @@ description: 测速测速
       <p class="speedtest-detail"><span class="speedtest-transfer"><span data-speedtest-bytes>0 MiB</span> acknowledged</span> · <span class="speedtest-loaded"><span data-speedtest-loaded>—</span> ms loaded</span></p>
     </div>
   </div>
-  <div class="speedtest-line" aria-hidden="true"><span data-speedtest-progress></span></div>
-  <div data-speedtest-controls></div>
   <noscript><p>JavaScript is required. No test runs until you select Start test.</p></noscript>
   </div>
   <aside class="speedtest-client-info" data-speedtest-client-info aria-label="Client information">

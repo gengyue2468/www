@@ -150,7 +150,6 @@ const SPEEDTEST_CONTROLS = `
       this.text("[data-speedtest-latency]", "—");
       this.text("[data-speedtest-jitter]", "—");
       this.text("[data-speedtest-edge]", "Automatic");
-      this.querySelector("[data-speedtest-progress]").style.width = "0%";
       for (const row of this.querySelectorAll("[data-speedtest-direction]")) {
         row.querySelector("[data-speedtest-rate]").textContent = "—";
         row.querySelector("[data-speedtest-bytes]").textContent = "0 MiB";
@@ -164,7 +163,6 @@ const SPEEDTEST_CONTROLS = `
           onUpdate: update => { if (this.testController === controller) this.showUpdate(update, budgetBytes); } });
         if (this.testController !== controller) return;
         this.text("[data-speedtest-status]", "Complete.");
-        this.querySelector("[data-speedtest-progress]").style.width = "100%";
       } catch (error) {
         if (this.testController !== controller || controller.signal.aborted) return;
         this.text("[data-speedtest-status]", error.httpStatus ? error.message : "The test could not finish. Check your connection, VPN or browser blocking, then try again.");
@@ -208,9 +206,6 @@ const SPEEDTEST_CONTROLS = `
         const denominator = update.final ? Math.max(1, values.length - 1) : Math.max(74, values.length - 1);
         row.querySelector(".speedtest-curve").setAttribute("d", values.map((value, i) => `${i ? "L" : "M"}${(i / denominator * 300).toFixed(1)} ${(61 - value / peak * 54).toFixed(1)}`).join(" "));
       }
-      const progress = Math.min(1, Math.max(update.elapsed / 15, (update.reservedBytes || 0) / budgetBytes));
-      const base = update.phase === "download" ? 5 : 52;
-      this.querySelector("[data-speedtest-progress]").style.width = `${base + (update.final ? 1 : Math.min(0.98, progress)) * 47}%`;
     }
   }
   customElements.define(tagName, SpeedtestPage);
