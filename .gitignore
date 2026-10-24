@@ -1,5 +1,7 @@
 node_modules/
+.obsidian/
 dist/
+dist.staging/
 dist.staging-*/
 dist.previous-*/
 dist-build/
@@ -13,4 +15,3 @@ tests
 *.log
 bun.lockb
 .build-cache.json
-

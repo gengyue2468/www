@@ -19,7 +19,20 @@ const COMPONENT_TEMPLATE = `
     overflow-wrap: anywhere;
   }
 
+  .context-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .context-link[href]:hover,
+  .context-link[href]:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+  }
+
   .card {
+    position: relative;
     margin: 0;
     padding: 0.75rem;
     border: 1px solid var(--accent);
@@ -126,10 +139,62 @@ const COMPONENT_TEMPLATE = `
     font-style: italic;
   }
 
-  .wave {
+  .progress {
+    appearance: none;
+    position: absolute;
+    inset-inline-start: -1px;
+    bottom: -1px;
+    display: block;
+    width: calc(100% + 2px);
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: currentColor;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .progress[hidden] { display: none; }
+
+  /* A transformed border fill interpolates consistently across browsers;
+     the invisible native progress element retains accessible values. */
+  .card[data-progress-active]::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: -1px;
+    bottom: -1px;
+    width: calc(100% + 2px);
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(var(--playback-progress, 0));
+    transform-origin: left;
+    transition: transform 1s linear;
+    pointer-events: none;
+  }
+
+  .activity {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
     flex: 0 0 auto;
     order: 2;
     margin-inline-end: 0.4rem;
+  }
+
+  .mode-icon {
+    display: block;
+    flex: none;
+    width: 14px;
+    height: 14px;
+    opacity: 0.5;
+  }
+
+  .mode-icon[hidden] { display: none; }
+
+  .wave {
+    flex: none;
     opacity: 0.4;
   }
 
@@ -164,6 +229,8 @@ const COMPONENT_TEMPLATE = `
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .card[data-progress-active]::after { transition: none; }
+
     .wave rect,
     .marquee-lane {
       animation: none !important;
@@ -201,23 +268,28 @@ const COMPONENT_TEMPLATE = `
       align-self: center;
     }
 
-    .wave {
+    .activity {
       grid-area: cover;
       position: absolute;
       inset: 0;
       z-index: 1;
+      width: fit-content;
+      height: fit-content;
+      gap: 0.15rem;
       margin: auto;
       color: #fff;
-      opacity: 0.8;
       pointer-events: none;
     }
+
+    .mode-icon { width: 12px; height: 12px; }
+    .wave { opacity: 0.8; }
 
     .card[data-state="playing"] .wave {
       opacity: 1;
     }
   }
 </style>
-<p class="status"><span data-status>Now playing:</span><span data-played-at-caption hidden> (At <time data-played-at></time>):</span></p>
+<p class="status"><a class="context-link" data-context-link target="_blank" rel="noopener noreferrer"><span data-status>Now playing:</span></a><span data-played-at-caption hidden> (At <time data-played-at></time>):</span></p>
 <a class="card link" data-card data-link target="_blank" rel="noopener noreferrer" aria-live="polite" aria-busy="true">
   <span class="cover" aria-hidden="true"><img data-image alt="" width="80" height="80" loading="eager" hidden></span>
   <span class="copy">
@@ -234,12 +306,24 @@ const COMPONENT_TEMPLATE = `
       </span>
     </span>
   </span>
-  <svg class="wave" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
+  <progress class="progress" data-playback data-progress max="1" value="0" aria-label="Playback progress" aria-live="off" hidden></progress>
+  <span class="activity">
+    <svg class="mode-icon" data-shuffle role="img" aria-label="Shuffle on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" hidden>
+      <path d="m18 3 3 3-3 3M18 15l3 3-3 3M3 6h3c5 0 7 12 12 12h3M3 18h3c1.8 0 3.2-1.5 4.5-3.5M13.5 9.5C14.8 7.5 16.2 6 18 6h3"/>
+    </svg>
+    <svg class="mode-icon" data-repeat role="img" aria-label="Repeat all" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" hidden>
+      <path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"/>
+    </svg>
+    <svg class="mode-icon" data-repeat-one role="img" aria-label="Repeat one" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" hidden>
+      <path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3m7-8 2-1v6"/>
+    </svg>
+    <svg class="wave" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
     <rect x="2.5" y="6" width="2" height="12" rx="0.5"/>
     <rect x="8.5" y="6" width="2" height="12" rx="0.5"/>
     <rect x="14.5" y="6" width="2" height="12" rx="0.5"/>
     <rect x="20.5" y="6" width="2" height="12" rx="0.5"/>
-  </svg>
+    </svg>
+  </span>
 </a>`;
 
 (() => {
@@ -256,10 +340,21 @@ const COMPONENT_TEMPLATE = `
   ];
   const coverUrl = (url) =>
     url && !placeholderHashes.some((hash) => url.includes(hash)) ? url : null;
+  const artistText = (track) => {
+    const artists = Array.isArray(track.artists)
+      ? track.artists.filter((artist) => typeof artist === "string" && artist.trim()).join(", ")
+      : "";
+    return artists || (typeof track.artist === "string" ? track.artist : "");
+  };
+  const formatDuration = (milliseconds) => {
+    const seconds = Math.floor(milliseconds / 1000);
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+  };
 
   const cards = new Set();
-  const playingInterval = 60_000;
-  const idleInterval = 180_000;
+  const playingInterval = 10_000;
+  const idleInterval = 30_000;
+  const maxErrorInterval = 60_000;
   const marqueeSpeed = 24; // Pixels per second, regardless of text length.
   const playedAtFormatter = new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
@@ -270,6 +365,8 @@ const COMPONENT_TEMPLATE = `
   let isUnavailable = false;
   let pollTimer;
   let pendingRequest = null;
+  let retryNotBefore = 0;
+  let failures = 0;
 
   const notify = () => {
     for (const card of cards) {
@@ -281,40 +378,73 @@ const COMPONENT_TEMPLATE = `
   const schedule = (delay) => {
     clearTimeout(pollTimer);
     if (cards.size > 0 && document.visibilityState === "visible") {
-      pollTimer = setTimeout(refresh, delay);
+      pollTimer = setTimeout(refresh, Math.min(Math.max(0, delay), 2_147_483_647));
     }
   };
 
   const refresh = () => {
     if (cards.size === 0 || document.visibilityState !== "visible" || pendingRequest) return;
+    if (Date.now() < retryNotBefore) {
+      schedule(retryNotBefore - Date.now());
+      return;
+    }
 
     const controller = new AbortController();
     let timedOut = false;
+    let rateLimited = false;
     let nextInterval = idleInterval;
     const timeout = setTimeout(() => {
       timedOut = true;
       controller.abort();
     }, 8000);
 
-    pendingRequest = fetch("/api/lastfm/now", {
+    pendingRequest = fetch("/api/spotify/now", {
       cache: "no-store",
       signal: controller.signal,
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("Last.fm request failed");
+      .then(async (response) => {
+        if (response.status === 429) {
+          rateLimited = true;
+          const header = response.headers.get("Retry-After");
+          const body = header?.trim() ? null : await response.json().catch(() => null);
+          const retryAfter = header?.trim() || body?.retryAfter;
+          const seconds = retryAfter == null || retryAfter === "" ? NaN : Number(retryAfter);
+          const deadline = Number.isFinite(seconds) ? Date.now() + seconds * 1000 : Date.parse(retryAfter);
+          nextInterval = Number.isFinite(deadline) ? Math.max(1000, deadline - Date.now()) : idleInterval;
+          retryNotBefore = Date.now() + nextInterval;
+        }
+        if (!response.ok) throw new Error("Spotify request failed");
+        if (response.status === 204) return null;
         return response.json();
       })
-      .then((tracks) => {
-        const track = Array.isArray(tracks) ? tracks[0] : null;
-        if (!track?.name || !track?.artist) throw new Error("Invalid Last.fm response");
+      .then((track) => {
+        if (track == null || (typeof track === "object" && !track.name)) {
+          latestTrack = null;
+          hasSuccessfulResult = true;
+          isUnavailable = true;
+          failures = 0;
+          retryNotBefore = 0;
+          nextInterval = idleInterval;
+          notify();
+          return;
+        }
+        if (typeof track?.name !== "string" || !track.name.trim() || !artistText(track)) {
+          throw new Error("Invalid Spotify response");
+        }
 
         latestTrack = track;
         hasSuccessfulResult = true;
         isUnavailable = false;
-        nextInterval = track.nowplaying ? playingInterval : idleInterval;
+        failures = 0;
+        retryNotBefore = 0;
+        nextInterval = track.nowplaying && !track.playbackStale ? playingInterval : idleInterval;
         notify();
       })
       .catch(() => {
+        if (!rateLimited) {
+          failures = Math.min(failures + 1, 3);
+          nextInterval = Math.min(maxErrorInterval, idleInterval * 1.5 ** (failures - 1));
+        }
         if (!hasSuccessfulResult && (!controller.signal.aborted || timedOut)) {
           isUnavailable = true;
           notify();
@@ -379,10 +509,13 @@ const COMPONENT_TEMPLATE = `
       cards.add(this);
       if (latestTrack) this.renderTrack(latestTrack);
       else if (isUnavailable) this.renderUnavailable();
+      this.syncProgressClock();
       if (wasEmpty) refresh();
     }
 
     disconnectedCallback() {
+      clearInterval(this.progressTimer);
+      this.progressTimer = null;
       this.resizeObserver?.disconnect();
       this.motionQuery?.removeEventListener("change", this.scheduleMarquees);
       window.removeEventListener("resize", this.scheduleMarquees);
@@ -488,8 +621,83 @@ const COMPONENT_TEMPLATE = `
       return !!iso;
     }
 
+    syncProgressClock() {
+      clearInterval(this.progressTimer);
+      this.progressTimer = null;
+      if (!this.progressSample) return;
+      this.updateProgress();
+      if (this.isConnected && document.visibilityState === "visible"
+        && this.progressSample.position < this.progressSample.duration) {
+        this.progressTimer = setInterval(() => this.updateProgress(), 1000);
+      }
+    }
+
+    updateProgress() {
+      const sample = this.progressSample;
+      const progress = this.root.querySelector("[data-progress]");
+      if (!sample || !progress) return;
+      const position = Math.min(sample.duration, sample.position + Math.max(0, Date.now() - sample.observedAt));
+      progress.max = sample.duration;
+      progress.value = position;
+      this.root.querySelector("[data-card]")?.style.setProperty("--playback-progress", `${position / sample.duration}`);
+      progress.setAttribute("aria-valuetext", `${formatDuration(position)} / ${formatDuration(sample.duration)}`);
+      if (position >= sample.duration) {
+        clearInterval(this.progressTimer);
+        this.progressTimer = null;
+      }
+    }
+
+    setProgress(track, playing) {
+      const container = this.root.querySelector("[data-playback]");
+      const valid = playing && Number.isFinite(track?.progressMs) && track.progressMs >= 0
+        && Number.isFinite(track.durationMs) && track.durationMs > 0;
+      this.progressSample = valid ? {
+        position: Math.min(track.progressMs, track.durationMs),
+        duration: track.durationMs,
+        observedAt: Date.now(),
+      } : null;
+      if (container) container.hidden = !valid;
+      const card = this.root.querySelector("[data-card]");
+      card?.toggleAttribute("data-progress-active", valid);
+      if (!valid) {
+        card?.style.removeProperty("--playback-progress");
+        const progress = this.root.querySelector("[data-progress]");
+        if (progress) {
+          progress.value = 0;
+          progress.removeAttribute("aria-valuetext");
+        }
+      }
+      this.syncProgressClock();
+    }
+
+    setPlaybackExtras(track, playing) {
+      const contextLink = this.root.querySelector("[data-context-link]");
+      const contextUrl = playing && typeof track?.contextUrl === "string"
+        && /^https:\/\/open\.spotify\.com\//.test(track.contextUrl) ? track.contextUrl : null;
+      if (contextLink) {
+        if (contextUrl) {
+          if (contextLink.getAttribute("href") !== contextUrl) contextLink.href = contextUrl;
+          const source = ["playlist", "album", "artist"].includes(track.contextType) ? track.contextType : "source";
+          contextLink.setAttribute("aria-label", `Now playing: open current ${source} on Spotify`);
+        } else {
+          contextLink.removeAttribute("href");
+          contextLink.removeAttribute("aria-label");
+        }
+      }
+      for (const [selector, active] of [
+        ["[data-shuffle]", track?.shuffle === true],
+        ["[data-repeat]", track?.repeat === "context"],
+        ["[data-repeat-one]", track?.repeat === "track"],
+      ]) {
+        const icon = this.root.querySelector(selector);
+        if (icon) icon.hidden = !playing || !active;
+      }
+    }
+
     renderTrack(track) {
-      const playing = !!track.nowplaying;
+      const playing = !!track.nowplaying && !track.playbackStale;
+      this.setPlaybackExtras(track, playing);
+      this.setProgress(track, playing);
       const hasPlayedAt = this.setPlayedAt(playing ? null : track.playedAt);
       this.setText(
         "[data-status]",
@@ -498,7 +706,7 @@ const COMPONENT_TEMPLATE = `
       this.setText("[data-track]", track.name);
       this.setText(
         "[data-meta]",
-        "By " + track.artist + (track.album ? " / " + track.album : ""),
+        "By " + artistText(track) + (track.album ? " / " + track.album : ""),
       );
 
       const cover = coverUrl(track.image);
@@ -527,6 +735,8 @@ const COMPONENT_TEMPLATE = `
     }
 
     renderUnavailable() {
+      this.setPlaybackExtras(null, false);
+      this.setProgress(null, false);
       this.setText("[data-status]", "Offline.");
       this.setPlayedAt(null);
       this.setText("[data-track]", "Unavailable");
@@ -549,7 +759,10 @@ const COMPONENT_TEMPLATE = `
 
   document.addEventListener("visibilitychange", () => {
     clearTimeout(pollTimer);
-    for (const card of cards) card.syncMarqueeVisibility();
+    for (const card of cards) {
+      card.syncMarqueeVisibility();
+      card.syncProgressClock();
+    }
     if (document.visibilityState === "visible" && cards.size > 0) {
       for (const card of cards) card.scheduleMarquees();
       refresh();

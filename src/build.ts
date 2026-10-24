@@ -22,6 +22,9 @@ import { imageViewerPlugin } from "./extensions/image-viewer.js";
 import { contentTabsPlugin } from "./extensions/content-tabs.js";
 import { tablesPlugin } from "./extensions/tables.js";
 import { dropdownPlugin } from "./extensions/dropdown.js";
+import { listCollapsePlugin } from "./extensions/list-collapse.js";
+import { memosPlugin } from "./extensions/memos.js";
+import { statusPlugin } from "./extensions/status.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
 import { auditDist, type HtmlAuditIssueKind } from "./utils/html-audit.js";
@@ -32,6 +35,7 @@ import { getMinifiedCss, SITE_STYLESHEETS } from "./utils/stylesheets.js";
 import { minifyCss, minifyHtmlFiles, minifySvgFiles } from "./utils/minify.js";
 import type { AssetManifest, CollectionOutput } from "./types.js";
 import config from "./config.js";
+import { cleanAbandonedStaging, isProcessAlive } from "./utils/build-staging.js";
 
 export interface BuildOptions {
   development?: boolean;
@@ -49,6 +53,9 @@ registerPlugin(codeBlockPlugin);
 registerPlugin(imageViewerPlugin);
 registerPlugin(tablesPlugin);
 registerPlugin(dropdownPlugin);
+registerPlugin(listCollapsePlugin);
+registerPlugin(memosPlugin);
+registerPlugin(statusPlugin);
 
 class PerformanceTimer {
   private times = new Map<string, number>();
@@ -610,16 +617,6 @@ async function pruneEmptyDirectories(root: string): Promise<void> {
   }
 }
 
-function isProcessAlive(pid: number): boolean {
-  if (pid === process.pid) return true;
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code === "EPERM";
-  }
-}
-
 function wait(milliseconds: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
@@ -712,20 +709,21 @@ async function buildOnce(options: BuildOptions): Promise<void> {
   const releaseBuildLock = await acquireBuildLock();
   const liveDist = config.dirs.dist;
 
-  const stagingDist = `${liveDist}.staging-${process.pid}-${Date.now()}`;
+  // The global build lock makes a single reusable staging directory safe.
+  // A killed process can leave at most one directory, reclaimed on the next build.
+  const stagingDist = `${liveDist}.staging`;
   try {
+    const abandoned = await cleanAbandonedStaging(liveDist);
+    if (abandoned) console.log(`✓ Removed ${abandoned} abandoned staging director${abandoned === 1 ? "y" : "ies"}`);
     await rm(stagingDist, { recursive: true, force: true });
 
     config.dirs.dist = stagingDist;
-    let promoted = false;
     try {
       await buildIntoCurrentDist(options);
       await promoteDist(stagingDist, liveDist);
-      promoted = true;
-      await rm(stagingDist, { recursive: true, force: true });
     } finally {
       config.dirs.dist = liveDist;
-      if (!promoted) await rm(stagingDist, { recursive: true, force: true });
+      await rm(stagingDist, { recursive: true, force: true });
     }
   } finally {
     await releaseBuildLock();

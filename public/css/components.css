@@ -1,5 +1,444 @@
 /* Progressive enhancements: retain the existing Tufte content underneath. */
 
+/* Memos read like dated notes on the same page, not a grid of cards. */
+memos-feed {
+  display: block;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.memos-layout {
+  display: grid;
+  /* Sidenotes normally measure 50% width / 10% gap against the 55% text
+     column, not against the full section. Keep the same geometry explicitly. */
+  grid-template-columns: var(--width-content) calc(var(--width-content) * 0.1) calc(var(--width-content) * 0.5);
+  align-items: start;
+}
+
+.memos-layout > memos-feed {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.memos-layout .memos-list,
+.memos-layout .memos-status,
+.memos-layout .memos-controls { width: 100%; }
+
+.memos-calendar {
+  --calendar-paper: var(--bg-color);
+  --calendar-ink: var(--text-color);
+  display: block;
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: 19.5rem;
+  margin-top: var(--spacing-sidenote-top);
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 1.5rem;
+  z-index: 1;
+  font-size: calc(var(--font-size-body) * 0.9);
+  line-height: var(--line-height-sidenote);
+  text-indent: 0;
+  letter-spacing: 0.01em;
+}
+
+.memos-calendar[hidden] { display: none !important; }
+
+.memos-calendar-header {
+  display: grid;
+  grid-template-columns: 1.8rem minmax(0, 1fr) 1.8rem;
+  align-items: center;
+  gap: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.memos-calendar-month {
+  overflow: hidden;
+  font-size: inherit;
+  font-style: italic;
+  font-weight: 400;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memos-calendar-nav,
+.memos-filter-clear {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.memos-calendar-nav {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  border-radius: 1.5px;
+  font-family: var(--font-sans-alt);
+  font-size: 0.85em;
+  line-height: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .memos-calendar {
+    --calendar-paper: var(--bg-color-dark);
+    --calendar-ink: var(--text-color-dark);
+  }
+}
+
+.memos-calendar-nav:hover:not(:disabled),
+.memos-calendar-nav:focus-visible,
+.memos-filter-clear:hover,
+.memos-filter-clear:focus-visible {
+  background: var(--accent);
+}
+
+.memos-calendar-nav:disabled {
+  cursor: default;
+  opacity: 0.25;
+}
+
+.memos-calendar-nav:focus-visible,
+.memos-filter-clear:focus-visible,
+.memos-calendar-day:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.memos-calendar-weekdays,
+.memos-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.18rem;
+}
+
+.memos-calendar-weekdays {
+  margin-top: 0.55rem;
+  color: color-mix(in srgb, currentColor 56%, transparent);
+  font-size: 0.78em;
+  text-align: center;
+}
+
+.memos-calendar-grid { margin-top: 0.2rem; }
+
+.memos-calendar-day {
+  display: flex;
+  min-width: 0;
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.memos-calendar-day {
+  flex-direction: column;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1.15;
+}
+
+.memos-calendar-day.has-memos {
+  cursor: pointer;
+  border-radius: 1.5px;
+  background: color-mix(in srgb, var(--calendar-ink) var(--memo-day-shade), transparent);
+  font-weight: 600;
+}
+
+.memos-calendar-day.is-outside-month {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.memos-calendar-day.has-memos:hover {
+  outline: 1px solid currentColor;
+  outline-offset: -1px;
+}
+
+.memos-calendar-day.is-selected {
+  background: var(--calendar-ink);
+  color: var(--calendar-paper);
+}
+
+.memos-date-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1.5px;
+  background: var(--accent);
+  font-size: 0.9em;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.memos-date-filter time { font-style: italic; }
+
+.memos-date-filter[hidden] { display: none; }
+
+.memos-filter-clear {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  border-radius: 1.5px;
+  font-family: var(--font-sans-alt);
+  font-style: normal;
+  line-height: 1;
+}
+
+.memos-list,
+.memos-status,
+.memos-controls {
+  width: var(--width-content);
+}
+
+.memo-entry {
+  margin: 2.8rem 0 0;
+  padding: 0;
+  border: 0;
+  overflow-wrap: anywhere;
+}
+
+.memo-entry:first-child { margin-top: 1.8rem; }
+
+.memo-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75em;
+  font-size: inherit;
+  font-style: italic;
+  line-height: var(--line-height-sidenote);
+  opacity: 0.6;
+}
+
+.memo-meta a { text-decoration: none; }
+.memo-meta a:hover,
+.memo-meta a:focus-visible { text-decoration: underline; }
+
+.memo-content > :first-child { margin-top: 0.5rem; }
+.memo-content > :last-child { margin-bottom: 0; }
+.memo-content > p,
+.memo-content > ul,
+.memo-content > ol,
+.memo-content pre,
+.memo-content blockquote,
+.memo-content figure {
+  width: auto;
+  max-width: 100%;
+}
+
+.memo-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.memo-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-block: 1.2rem;
+}
+
+.memo-images > image-viewer {
+  flex: 0 1 calc(50% - 0.3rem);
+  min-width: 0;
+}
+
+.memo-images > image-viewer:only-child { flex-basis: 100%; }
+.memo-images img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 26rem;
+  height: auto;
+  object-fit: contain;
+}
+
+.memo-files { margin-block: 1rem; }
+.memo-files audio,
+.memo-files video {
+  display: block;
+  width: 100%;
+  max-height: 26rem;
+  margin-block: 0.75rem;
+}
+.memo-file { display: block; }
+
+.memo-tags {
+  margin-top: 0.7rem;
+  font-size: inherit;
+  font-style: italic;
+  line-height: var(--line-height-sidenote);
+  opacity: 0.55;
+}
+
+.memos-status { margin-block: 1.5rem; }
+.memos-controls { margin-block: 2rem; }
+.memos-sentinel { height: 1px; }
+.memos-controls:has(button[hidden]),
+.memos-sentinel[hidden],
+.memos-status[hidden],
+.memos-controls button[hidden] { display: none; }
+
+@media (max-width: 760px) {
+  .memos-layout { display: block; }
+  .memos-calendar { display: none !important; }
+
+  .memos-list,
+  .memos-status,
+  .memos-controls { width: 100%; }
+}
+
+/* Status follows the same quiet text stream as Memos. */
+status-page {
+  display: block;
+  width: var(--width-content);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+.status-service-heading,
+.status-service-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.75em;
+}
+
+.status-service-state,
+.status-service-meta,
+.status-empty {
+  font-size: inherit;
+  font-style: italic;
+  line-height: var(--line-height-sidenote);
+  opacity: 0.6;
+}
+
+.status-summary,
+.status-message {
+  font-size: inherit;
+  font-style: normal;
+  line-height: inherit;
+}
+
+.status-notices { margin-top: 1.5rem; }
+.status-notices[hidden] { display: none; }
+
+.status-notice {
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.status-notice-kind,
+.status-notice-title { margin-right: 0.6rem; }
+.status-notice-kind { font-style: italic; }
+.status-notice-description { margin: 0.35rem 0 0; }
+
+.status-group { margin-top: 2.8rem; padding: 0; }
+.status-group-title {
+  margin: 0 0 0.7rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  font-size: var(--font-size-h3);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.status-service {
+  margin-top: 1.8rem;
+  padding: 0;
+  border: 0;
+}
+
+.status-service-name { font-weight: 400; }
+.status-service-heading,
+.status-service-meta { justify-content: space-between; }
+.status-heartbeat {
+  display: block;
+  width: 100%;
+  height: 1.25rem;
+  margin-top: 0.35rem;
+  overflow: hidden;
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  fill: currentColor;
+  white-space: nowrap;
+}
+
+.status-heartbeat-dot {
+  opacity: 0.2;
+}
+.status-heartbeat-dot.is-up { opacity: 0.9; }
+.status-heartbeat-dot.is-pending,
+.status-heartbeat-dot.is-maintenance { opacity: 0.5; }
+.status-heartbeat-dot.is-unknown { opacity: 0.08; }
+
+.status-service-meta { margin-top: 0.25rem; }
+.status-updated {
+  margin-top: 2.8rem;
+  font-size: inherit;
+  opacity: 0.6;
+}
+.status-updated[hidden] { display: none; }
+.status-service-message { margin: 0.4rem 0 0; }
+.status-message { margin: 1.5rem 0; }
+.status-message[hidden],
+.status-retry[hidden] { display: none; }
+.status-retry {
+  appearance: none;
+  margin-top: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-style: italic;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  status-page { width: 100%; }
+}
+
+/* Keep real lists, with an understated disclosure after each long list. */
+list-collapse {
+  display: block;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+section > list-collapse > ul,
+section > list-collapse > ol {
+  width: var(--width-list);
+  padding-inline-start: var(--width-list-padding);
+}
+
+list-collapse > ul > li[hidden],
+list-collapse > ol > li[hidden] {
+  display: none;
+}
+
+.list-collapse-toggle {
+  margin: 0 0 1.4rem var(--width-list-padding);
+}
+
 /* Match the Now Playing card's surface; retain the existing hover highlight. */
 .table-of-contents,
 .post-actions-button {

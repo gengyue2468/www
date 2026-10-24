@@ -27,10 +27,11 @@ const config: Config = {
   routes: {
     "/": "index.md",
     "/about": "about.md",
-    "/uses": "uses.md",
     "/colophon": "colophon.md",
     "/guestbook": "guestbook.md",
     "/friends": "friends.md",
+    "/memos": "memos.md",
+    "/status": "status.md",
   },
 
   collections: [
@@ -135,9 +136,9 @@ const config: Config = {
       show: true,
       children: [
         { name: "Logbook", path: "/logbook", show: true },
-        { name: "Status", path: "https://status.gy.run", show: true },
+        { name: "Memos", path: "/memos", show: true },
+        { name: "Status", path: "/status", show: true },
         { name: "Track", path: "https://track.gy.run", show: true },
-        { name: "Uses", path: "/uses", show: true },
         { name: "Friends", path: "/friends", show: true },
         { name: "Guestbook", path: "/guestbook", show: true },
         { name: "Colophon", path: "/colophon", show: true },
