@@ -40,6 +40,8 @@ export interface NavItem {
   path: string;
   show: boolean;
   external?: boolean;
+  /** Optional dropdown group subtitle. Consecutive visible items are grouped. */
+  group?: string;
   children?: Omit<NavItem, 'children'>[];
 }
 

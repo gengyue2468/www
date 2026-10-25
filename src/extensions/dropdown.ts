@@ -1,6 +1,12 @@
 import type { Plugin } from "./plugin.js";
 import { escapeHtmlAttr, escapeHtmlText } from "../utils/seo.js";
 
+/** Optional labelled groups for any site-dropdown; content is rendered HTML. */
+export function renderDropdownGroup(subtitle: string, content: string): string {
+  if (!content) return "";
+  return `<div class="nav-dropdown-group" role="group" aria-label="${escapeHtmlAttr(subtitle)}"><div class="nav-dropdown-subtitle" aria-hidden="true">${escapeHtmlText(subtitle)}</div>${content}</div>`;
+}
+
 /** The caller provides rendered menu HTML; the trigger is always plain text. */
 export function renderDropdown(label: string, content: string, options: { triggerClass?: string; active?: boolean } = {}): string {
   const classes = `nav-menu-label${options.triggerClass ? ` ${options.triggerClass}` : ""}${options.active ? " active" : ""}`;

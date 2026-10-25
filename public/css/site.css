@@ -116,6 +116,17 @@
   overflow-wrap: anywhere;
 }
 
+.nav-dropdown-group { padding-block: 0.25rem; }
+.nav-dropdown-subtitle {
+  padding: 0.3rem 1rem 0.15rem;
+  font-size: var(--font-size-sidenote);
+  font-weight: 400;
+  font-style: italic;
+  line-height: normal;
+  opacity: 0.55;
+  overflow-wrap: anywhere;
+}
+
 .nav-dropdown-menu button {
   appearance: none;
   border: 0;

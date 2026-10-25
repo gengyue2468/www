@@ -101,7 +101,7 @@ const serveFile = createPreviewFileHandler(config.dirs, getUnversionedPageAssetP
 
 const server = Bun.serve({
   port: PORT,
-  async fetch(req) {
+  async fetch(req, server) {
     const url = new URL(req.url);
     let pathname: string;
     try {
@@ -110,16 +110,19 @@ const server = Bun.serve({
       return new Response("Bad Request", { status: 400 });
     }
 
-    if (req.method === "GET" && (["/api/spotify/now", "/api/spotify/recent", "/api/lastfm/now", "/api/lastfm/recent", "/api/memos", "/api/memos/calendar", "/api/uptime/status"].includes(pathname) || pathname.startsWith("/api/memos/attachments/"))) {
+    if (req.method === "GET" && (["/api/spotify/now", "/api/spotify/recent", "/api/lastfm/now", "/api/lastfm/recent", "/api/memos", "/api/memos/calendar", "/api/uptime/status", "/api/beszel", "/api/beszel/events"].includes(pathname) || pathname.startsWith("/api/memos/attachments/"))) {
+      if (pathname === "/api/beszel/events") server.timeout(req, 0);
       try {
         const upstream = await fetch(`https://www.gengyue.dev${pathname}${url.search}`, {
           headers: req.headers.has("Range") ? { Range: req.headers.get("Range")! } : {},
+          signal: req.signal,
         });
         return new Response(upstream.body, {
           status: upstream.status,
           headers: {
             "Content-Type": upstream.headers.get("Content-Type") || "application/json",
             "Cache-Control": "no-store",
+            ...(pathname === "/api/beszel/events" ? { "X-Accel-Buffering": "no" } : {}),
             ...(upstream.headers.has("Retry-After") ? { "Retry-After": upstream.headers.get("Retry-After")! } : {}),
             ...(upstream.headers.has("Content-Range") ? { "Content-Range": upstream.headers.get("Content-Range")! } : {}),
             ...(upstream.headers.has("Accept-Ranges") ? { "Accept-Ranges": upstream.headers.get("Accept-Ranges")! } : {}),

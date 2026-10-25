@@ -25,6 +25,7 @@ import { dropdownPlugin } from "./extensions/dropdown.js";
 import { listCollapsePlugin } from "./extensions/list-collapse.js";
 import { memosPlugin } from "./extensions/memos.js";
 import { statusPlugin } from "./extensions/status.js";
+import { vpsPlugin } from "./extensions/vps.js";
 import { trackPlugin } from "./extensions/track.js";
 import { speedtestPlugin } from "./extensions/speedtest.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
@@ -58,6 +59,7 @@ registerPlugin(dropdownPlugin);
 registerPlugin(listCollapsePlugin);
 registerPlugin(memosPlugin);
 registerPlugin(statusPlugin);
+registerPlugin(vpsPlugin);
 registerPlugin(trackPlugin);
 registerPlugin(speedtestPlugin);
 

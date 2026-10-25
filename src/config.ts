@@ -7,14 +7,14 @@ const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const config: Config = {
   rootDir,
   site: {
-    title: "gengyue",
+    title: "gengyue's webpage",
     author: "gengyue",
-    description: "gengyue 的个人网站。折腾记录，以及一些碎碎念。",
+    description: "gengyue's webpage",
     url: "https://www.gengyue.dev",
     ogImage: "/static/og/og-image.webp",
     ogImageWidth: 1200,
     ogImageHeight: 630,
-    ogImageAlt: "gengyue - 个人网站与博客",
+    ogImageAlt: "gengyue's webpage",
   },
 
   dirs: {
@@ -34,6 +34,7 @@ const config: Config = {
     "/status": "status.md",
     "/track": "track.md",
     "/speedtest": "speedtest.md",
+    "/vps": "vps.md",
   },
 
   collections: [
@@ -125,7 +126,7 @@ const config: Config = {
 
   llms: {
     enabled: true,
-    summary: "gengyue 的个人网站与博客，以下信息可供 LLM 理解与引用：",
+    summary: "gengyue's webpage summary",
   },
 
   nav: [
@@ -137,14 +138,15 @@ const config: Config = {
       path: "/more",
       show: true,
       children: [
-        { name: "Logbook", path: "/logbook", show: true },
-        { name: "Memos", path: "/memos", show: true },
-        { name: "Status", path: "/status", show: true },
-        { name: "Track", path: "/track", show: true },
-        { name: "Speedtest", path: "/speedtest", show: true },
-        { name: "Friends", path: "/friends", show: true },
-        { name: "Guestbook", path: "/guestbook", show: true },
-        { name: "Colophon", path: "/colophon", show: true },
+        { name: "Logbook", path: "/logbook", show: true, group: "Navigation" },
+        { name: "Memos", path: "/memos", show: true, group: "Navigation" },
+        { name: "Track", path: "/track", show: true, group: "Navigation" },
+        { name: "Colophon", path: "/colophon", show: true, group: "Navigation" },
+        { name: "Friends", path: "/friends", show: true, group: "Interaction" },
+        { name: "Guestbook", path: "/guestbook", show: true, group: "Interaction" },
+        { name: "Status", path: "/status", show: true, group: "Tools" },
+        { name: "VPS", path: "/vps", show: true, group: "Tools" },
+        { name: "Speedtest", path: "/speedtest", show: true, group: "Tools" },
       ],
     },
   ],
