@@ -1,3 +1,5 @@
+import { MarqueeController, createMarquee } from "./marquee.js";
+
 (() => {
   const tagName = "vps-page";
   if (customElements.get(tagName)) return;
@@ -81,7 +83,7 @@
       cursor = view.root.nextElementSibling;
     }
     for (const [key, view] of cache) {
-      if (!keys.has(key)) { view.root.remove(); cache.delete(key); }
+      if (!keys.has(key)) { view.marquee?.disconnect(); view.root.remove(); cache.delete(key); }
     }
   }
 
@@ -133,13 +135,18 @@
     const state = element("span", "vps-state");
     heading.append(name, state);
     const hardware = element("p", "vps-hardware");
+    const hardwareText = createMarquee();
+    hardware.append(hardwareText.root);
     const resources = element("dl", "vps-resources");
     const values = ["CPU", "Memory", "Disk"].map(label => {
       const group = element("div");
-      const value = element("dd", "", "—");
+      const value = element("dd");
+      const content = createMarquee();
+      content.source.textContent = "—";
+      value.append(content.root);
       group.append(element("dt", "", label), value);
       resources.append(group);
-      return value;
+      return content.source;
     });
     const traffic = element("div", "vps-traffic");
     const networkGroup = element("span", "vps-network-group");
@@ -160,9 +167,11 @@
     for (const label of ["OS", "Kernel", "CPU", "Cores / threads", "Load average", "Agent"]) {
       const group = element("div");
       const value = element("dd");
+      const content = createMarquee();
+      value.append(content.root);
       group.append(element("dt", "", label), value);
       systemList.append(group);
-      fields[label] = value;
+      fields[label] = content.source;
     }
     system.append(systemList);
     const network = disclosure(root, "Interfaces");
@@ -175,7 +184,8 @@
     const emptyProbes = element("p", "vps-table-note", "No probes.");
     probes.append(emptyProbes);
     root.append(meta);
-    return { root, name, state, hardware, values, rx, tx, running, uptimeValue, updated, fields,
+    return { root, name, state, hardware: hardwareText.source, values, rx, tx, running, uptimeValue, updated, fields,
+      marquee: new MarqueeController(root, root, { preserveUpdates: true }),
       networkTime, interfaces, interfaceViews: new Map(), monitorRows, monitorViews: new Map(), emptyProbes };
   }
 
@@ -198,6 +208,8 @@
       Array.isArray(node.loadAverage) ? node.loadAverage.map(value => finite(value) ? loadNumber.format(value) : "—").join(" / ") : "—",
       text(node.agentVersion)];
     Object.values(view.fields).forEach((field, index) => write(field, fields[index]));
+    view.marquee.connect();
+    view.marquee.schedule();
     timeLabel(view.networkTime, node.network?.sampledAt, stale(node.network?.sampledAt) ? "Older network sample: " : "Network sample: ");
     const interfaces = node.network?.interfaces && typeof node.network.interfaces === "object" ? Object.entries(node.network.interfaces) : [];
     syncItems(view.interfaces, view.interfaceViews, interfaces, item => item[0], () => tableRow(5), (row, [name, data]) => {
@@ -237,6 +249,7 @@
       if (!this.list || !this.message || !this.retry || !this.summary || !this.updated) return;
       this.controller = new AbortController();
       this.nodeViews ||= new Map();
+      for (const view of this.nodeViews.values()) view.marquee.connect();
       this.sortKey ||= "name-asc";
       this.filterKey ||= "all";
       this.setupChoices("sort", sortChoices);
@@ -249,6 +262,7 @@
     }
 
     disconnectedCallback() {
+      for (const view of this.nodeViews?.values() || []) view.marquee.disconnect();
       this.closeStream();
       this.controller?.abort();
       this.controller = null;

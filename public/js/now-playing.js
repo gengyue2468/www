@@ -1,3 +1,5 @@
+import { MarqueeController } from "./marquee.js";
+
 const COMPONENT_TAG = "now-playing-card";
 
 const COMPONENT_TEMPLATE = `
@@ -33,6 +35,8 @@ const COMPONENT_TEMPLATE = `
 
   .card {
     position: relative;
+    isolation: isolate;
+    overflow: hidden;
     margin: 0;
     padding: 0.75rem;
     border: 1px solid var(--accent);
@@ -117,6 +121,7 @@ const COMPONENT_TEMPLATE = `
   }
 
   .card[data-marquee-paused] .marquee-lane,
+  .marquee[data-marquee-paused] .marquee-lane,
   .link:focus-within .marquee-lane {
     animation-play-state: paused;
   }
@@ -142,10 +147,10 @@ const COMPONENT_TEMPLATE = `
   .progress {
     appearance: none;
     position: absolute;
-    inset-inline-start: -1px;
-    bottom: -1px;
+    inset-inline-start: 0;
+    top: 0;
     display: block;
-    width: calc(100% + 2px);
+    width: 1px;
     height: 1px;
     margin: 0;
     padding: 0;
@@ -158,20 +163,23 @@ const COMPONENT_TEMPLATE = `
 
   .progress[hidden] { display: none; }
 
-  /* A transformed border fill interpolates consistently across browsers;
-     the invisible native progress element retains accessible values. */
+  /* The whole card is the progress surface, below its content. Transforming
+     the tint never changes layout; native progress retains accessible values. */
   .card[data-progress-active]::after {
     content: "";
     position: absolute;
-    inset-inline-start: -1px;
-    bottom: -1px;
-    width: calc(100% + 2px);
-    height: 1px;
-    background: currentColor;
+    inset: 0;
+    z-index: -1;
+    background: rgba(0, 0, 0, 0.045);
     transform: scaleX(var(--playback-progress, 0));
     transform-origin: left;
     transition: transform 1s linear;
     pointer-events: none;
+  }
+  .card[data-progress-reset]::after { transition: none; }
+
+  @media (prefers-color-scheme: dark) {
+    .card[data-progress-active]::after { background: rgba(255, 255, 255, 0.065); }
   }
 
   .activity {
@@ -355,18 +363,39 @@ const COMPONENT_TEMPLATE = `
   const playingInterval = 10_000;
   const idleInterval = 30_000;
   const maxErrorInterval = 60_000;
-  const marqueeSpeed = 24; // Pixels per second, regardless of text length.
   const playedAtFormatter = new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
     timeStyle: "short",
   });
   let latestTrack = null;
+  let latestObservedAt = 0;
+  let boundary = null;
   let hasSuccessfulResult = false;
   let isUnavailable = false;
   let pollTimer;
   let pendingRequest = null;
   let retryNotBefore = 0;
   let failures = 0;
+
+  const trackKey = track => JSON.stringify([track.id || track.url || track.name, artistText(track), track.durationMs]);
+  const updateBoundary = track => {
+    const valid = track?.nowplaying && !track.playbackStale
+      && Number.isFinite(track.progressMs) && track.progressMs >= 0
+      && Number.isFinite(track.durationMs) && track.durationMs > 0;
+    if (!valid) { boundary = null; return; }
+    const key = trackKey(track);
+    // A new track or a real backwards seek/repeat starts a new end boundary.
+    // Repeated cached samples close to the end must not re-arm an instant fetch.
+    if (!boundary || boundary.key !== key || track.progressMs < boundary.position - 2000) {
+      boundary = { key, triggered: false, attempts: 0 };
+    }
+    boundary.position = Math.min(track.progressMs, track.durationMs);
+    boundary.duration = track.durationMs;
+    boundary.observedAt = latestObservedAt;
+  };
+  const remainingPlayback = () => boundary
+    ? Math.max(0, boundary.duration - boundary.position - Math.max(0, performance.now() - boundary.observedAt))
+    : Infinity;
 
   const notify = () => {
     for (const card of cards) {
@@ -378,6 +407,16 @@ const COMPONENT_TEMPLATE = `
   const schedule = (delay) => {
     clearTimeout(pollTimer);
     if (cards.size > 0 && document.visibilityState === "visible") {
+      const cooldown = Math.max(0, retryNotBefore - Date.now());
+      if (cooldown > 0) delay = Math.max(delay, cooldown);
+      else if (boundary && failures === 0) {
+        // The regular poll and track-end refresh share a single timer/request.
+        // Once the boundary was checked, stale responses back off 1/2/4/8/10s.
+        const endDelay = boundary.triggered
+          ? Math.min(playingInterval, 1000 * 2 ** Math.min(4, Math.max(0, boundary.attempts - 1)))
+          : Math.ceil(remainingPlayback()) + 1;
+        delay = Math.min(delay, endDelay);
+      }
       pollTimer = setTimeout(refresh, Math.min(Math.max(0, delay), 2_147_483_647));
     }
   };
@@ -387,6 +426,10 @@ const COMPONENT_TEMPLATE = `
     if (Date.now() < retryNotBefore) {
       schedule(retryNotBefore - Date.now());
       return;
+    }
+    if (boundary && (boundary.triggered || remainingPlayback() <= 0)) {
+      boundary.triggered = true;
+      boundary.attempts++;
     }
 
     const controller = new AbortController();
@@ -420,6 +463,7 @@ const COMPONENT_TEMPLATE = `
       .then((track) => {
         if (track == null || (typeof track === "object" && !track.name)) {
           latestTrack = null;
+          boundary = null;
           hasSuccessfulResult = true;
           isUnavailable = true;
           failures = 0;
@@ -433,6 +477,8 @@ const COMPONENT_TEMPLATE = `
         }
 
         latestTrack = track;
+        latestObservedAt = performance.now();
+        updateBoundary(track);
         hasSuccessfulResult = true;
         isUnavailable = false;
         failures = 0;
@@ -463,25 +509,8 @@ const COMPONENT_TEMPLATE = `
       const root = this.attachShadow({ mode: "open" });
       root.append(template.content.cloneNode(true));
       this.root = root;
-      this.marquees = [...root.querySelectorAll("[data-marquee]")].map((element) => ({
-        element,
-        lane: element.querySelector("[data-marquee-lane]"),
-        source: element.querySelector("[data-marquee-source]"),
-        clone: element.querySelector("[data-marquee-clone]"),
-        signature: null,
-        distance: 0,
-      }));
-      this.marqueeQueue = [];
-      this.activeMarquee = null;
-      root.addEventListener("animationend", (event) => this.advanceMarquee(event));
-      this.marqueeFrame = null;
-      this.scheduleMarquees = () => {
-        if (!this.isConnected || this.marqueeFrame !== null) return;
-        this.marqueeFrame = requestAnimationFrame(() => {
-          this.marqueeFrame = null;
-          if (this.isConnected) this.updateMarquees();
-        });
-      };
+      this.marqueeController = new MarqueeController(root, this);
+      this.scheduleMarquees = this.marqueeController.schedule;
       this.image = root.querySelector("[data-image]");
       this.image?.addEventListener("error", () => {
         this.image.hidden = true;
@@ -490,20 +519,7 @@ const COMPONENT_TEMPLATE = `
     }
 
     connectedCallback() {
-      this.motionQuery ||= window.matchMedia?.("(prefers-reduced-motion: reduce)");
-      this.motionQuery?.addEventListener("change", this.scheduleMarquees);
-      this.syncMarqueeVisibility();
-      if (typeof ResizeObserver === "function") {
-        this.resizeObserver ||= new ResizeObserver(this.scheduleMarquees);
-        for (const { element, source } of this.marquees) {
-          this.resizeObserver.observe(element);
-          this.resizeObserver.observe(source);
-        }
-      } else {
-        window.addEventListener("resize", this.scheduleMarquees);
-      }
-      document.fonts?.ready?.then(this.scheduleMarquees);
-      this.scheduleMarquees();
+      this.marqueeController.connect();
 
       const wasEmpty = cards.size === 0;
       cards.add(this);
@@ -516,13 +532,7 @@ const COMPONENT_TEMPLATE = `
     disconnectedCallback() {
       clearInterval(this.progressTimer);
       this.progressTimer = null;
-      this.resizeObserver?.disconnect();
-      this.motionQuery?.removeEventListener("change", this.scheduleMarquees);
-      window.removeEventListener("resize", this.scheduleMarquees);
-      if (this.marqueeFrame !== null) cancelAnimationFrame(this.marqueeFrame);
-      this.marqueeFrame = null;
-      this.resetMarqueeCycle();
-      this.marqueeQueue = [];
+      this.marqueeController.disconnect();
       cards.delete(this);
       if (cards.size === 0) clearTimeout(pollTimer);
     }
@@ -532,79 +542,8 @@ const COMPONENT_TEMPLATE = `
       if (element && element.textContent !== text) element.textContent = text;
     }
 
-    updateMarquees() {
-      let changed = false;
-      for (const marquee of this.marquees) {
-        const { element, lane, source, clone } = marquee;
-        const text = source.textContent;
-        if (element.title !== text) {
-          element.title = text;
-          element.scrollLeft = 0;
-        }
-        const width = source.getBoundingClientRect().width;
-        const available = element.clientWidth;
-        const scrolling = !this.motionQuery?.matches && available > 0 && width > available + 1;
-        const gap = scrolling ? parseFloat(getComputedStyle(lane).columnGap) || 0 : 0;
-        const distance = scrolling ? width + gap : 0;
-        const signature = JSON.stringify([text, distance]);
-        if (signature === marquee.signature) continue;
-
-        changed = true;
-        marquee.signature = signature;
-        marquee.distance = distance;
-
-        if (!scrolling) {
-          clone.hidden = true;
-          clone.textContent = "";
-          lane.style.removeProperty("--marquee-distance");
-          lane.style.removeProperty("--marquee-duration");
-          continue;
-        }
-
-        element.scrollLeft = 0;
-        clone.textContent = text;
-        clone.hidden = false;
-        lane.style.setProperty("--marquee-distance", `${distance}px`);
-        lane.style.setProperty("--marquee-duration", `${distance / marqueeSpeed}s`);
-      }
-
-      this.marqueeQueue = this.marquees.filter(({ distance }) => distance > 0);
-      // Preserve the active turn on unchanged polling results or resizes that
-      // leave the same lines overflowing; changed text or font metrics restart.
-      if (changed) this.resetMarqueeCycle();
-      if (!this.activeMarquee) this.startMarquee(this.marqueeQueue[0]);
-    }
-
-    resetMarqueeCycle() {
-      for (const { element } of this.marquees) element.removeAttribute("data-scrolling");
-      this.activeMarquee = null;
-    }
-
-    startMarquee(marquee) {
-      if (!marquee || !this.isConnected || this.motionQuery?.matches) return;
-      this.activeMarquee = marquee;
-      // Flush the stopped state, including when a single long line repeats.
-      void marquee.lane.offsetWidth;
-      marquee.element.setAttribute("data-scrolling", "");
-    }
-
-    advanceMarquee(event) {
-      const current = this.activeMarquee;
-      if (!this.isConnected || this.motionQuery?.matches || !current
-        || event.animationName !== "now-playing-marquee" || event.target !== current.lane) return;
-
-      const nextIndex = (this.marqueeQueue.indexOf(current) + 1) % this.marqueeQueue.length;
-      current.element.removeAttribute("data-scrolling");
-      this.activeMarquee = null;
-      // The duplicate finishes at the original's starting position, so resetting
-      // is visually seamless. The next CSS animation includes its own read pause.
-      this.startMarquee(this.marqueeQueue[nextIndex]);
-    }
-
     syncMarqueeVisibility() {
-      this.root.querySelector("[data-card]")?.toggleAttribute(
-        "data-marquee-paused", document.visibilityState !== "visible",
-      );
+      this.marqueeController.syncVisibility();
     }
 
     setPlayedAt(timestamp) {
@@ -624,7 +563,7 @@ const COMPONENT_TEMPLATE = `
     syncProgressClock() {
       clearInterval(this.progressTimer);
       this.progressTimer = null;
-      if (!this.progressSample) return;
+      if (!this.progressSample || document.visibilityState !== "visible") return;
       this.updateProgress();
       if (this.isConnected && document.visibilityState === "visible"
         && this.progressSample.position < this.progressSample.duration) {
@@ -636,10 +575,16 @@ const COMPONENT_TEMPLATE = `
       const sample = this.progressSample;
       const progress = this.root.querySelector("[data-progress]");
       if (!sample || !progress) return;
-      const position = Math.min(sample.duration, sample.position + Math.max(0, Date.now() - sample.observedAt));
+      const position = Math.min(sample.duration, sample.position + Math.max(0, performance.now() - sample.observedAt));
       progress.max = sample.duration;
       progress.value = position;
-      this.root.querySelector("[data-card]")?.style.setProperty("--playback-progress", `${position / sample.duration}`);
+      const card = this.root.querySelector("[data-card]");
+      if (card) {
+        const ratio = position / sample.duration;
+        const previous = Number(card.style.getPropertyValue("--playback-progress"));
+        card.toggleAttribute("data-progress-reset", ratio < previous);
+        card.style.setProperty("--playback-progress", `${ratio}`);
+      }
       progress.setAttribute("aria-valuetext", `${formatDuration(position)} / ${formatDuration(sample.duration)}`);
       if (position >= sample.duration) {
         clearInterval(this.progressTimer);
@@ -654,13 +599,14 @@ const COMPONENT_TEMPLATE = `
       this.progressSample = valid ? {
         position: Math.min(track.progressMs, track.durationMs),
         duration: track.durationMs,
-        observedAt: Date.now(),
+        observedAt: latestObservedAt,
       } : null;
       if (container) container.hidden = !valid;
       const card = this.root.querySelector("[data-card]");
       card?.toggleAttribute("data-progress-active", valid);
       if (!valid) {
         card?.style.removeProperty("--playback-progress");
+        card?.removeAttribute("data-progress-reset");
         const progress = this.root.querySelector("[data-progress]");
         if (progress) {
           progress.value = 0;

@@ -492,16 +492,16 @@ vps-page {
 .vps-node[data-state="down"] .vps-state { text-decoration: underline; text-underline-offset: 0.2em; }
 .vps-hardware { margin: 0; overflow-wrap: anywhere; }
 .vps-resources { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25em 1em; margin: 0.8rem 0 0.4rem; font-size: inherit; }
-.vps-resources > div { display: flex; align-items: baseline; gap: 0.5em; }
-.vps-resources dt { opacity: 0.6; }
-.vps-resources dd { margin: 0; font: inherit; }
+.vps-resources > div { display: flex; align-items: baseline; gap: 0.5em; min-width: 0; max-width: 100%; }
+.vps-resources dt { flex-shrink: 0; white-space: nowrap; opacity: 0.6; }
+.vps-resources dd { min-width: 0; margin: 0; font: inherit; }
 .vps-resources dd,
 .vps-traffic,
 .vps-table { font-variant-numeric: tabular-nums; }
 .vps-traffic { margin-top: 0.5rem; }
 .vps-network-group { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0.5em; }
 .vps-network-label,
-.vps-uptime-label { opacity: 0.6; }
+.vps-uptime-label { white-space: nowrap; flex-shrink: 0; opacity: 0.6; }
 .vps-node-meta { margin-top: 0.8rem; font-size: inherit; line-height: var(--line-height-sidenote); }
 .vps-node-meta > span { font-style: normal; }
 .vps-node-meta > time { opacity: 0.6; }
@@ -513,9 +513,37 @@ vps-page {
 .vps-details > summary::before { opacity: 0.5; }
 .vps-details > .vps-details-content { min-width: 0; margin: 0.6rem 0 1rem; }
 .vps-system { margin: 0; font-size: inherit; }
-.vps-system > div { display: grid; grid-template-columns: minmax(7em, 1fr) minmax(0, 3fr); gap: 1em; }
-.vps-system dt { opacity: 0.6; }
-.vps-system dd { margin: 0; overflow-wrap: anywhere; }
+.vps-system > div { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 1em; }
+.vps-system dt { white-space: nowrap; opacity: 0.6; }
+.vps-system dd { min-width: 0; margin: 0; }
+.vps-marquee {
+  --marquee-gap: 2rem;
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.vps-marquee [data-marquee-lane] { display: flex; width: max-content; column-gap: var(--marquee-gap); }
+.vps-marquee [data-marquee-source],
+.vps-marquee [data-marquee-clone] { flex: none; }
+.vps-marquee [data-marquee-clone][hidden] { display: none; }
+.vps-marquee[data-scrolling] [data-marquee-lane] {
+  animation: vps-marquee var(--marquee-duration) linear 1.8s;
+}
+.vps-marquee[data-marquee-paused] [data-marquee-lane],
+.vps-marquee:focus-within [data-marquee-lane] { animation-play-state: paused; }
+@media (hover: hover) {
+  .vps-marquee:hover [data-marquee-lane] { animation-play-state: paused; }
+}
+@keyframes vps-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-1 * var(--marquee-distance))); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vps-marquee { overflow-x: auto; scrollbar-width: none; }
+  .vps-marquee [data-marquee-lane] { animation: none !important; }
+  .vps-marquee [data-marquee-clone] { display: none; }
+}
 .vps-table-scroll { max-width: 100%; overflow-x: auto; }
 .vps-table {
   width: 100%;
@@ -558,7 +586,7 @@ vps-page {
   }
   .vps-control + .vps-control { margin-top: 0; }
   .vps-resources { gap: 0.6rem; }
-  .vps-system > div { grid-template-columns: minmax(6em, 1fr) minmax(0, 2fr); gap: 0.6em; }
+  .vps-system > div { gap: 0.6em; }
 }
 @media (max-width: 760px) and (prefers-color-scheme: dark) {
   .vps-sidebar { background: var(--bg-color-dark); }
