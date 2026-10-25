@@ -1,5 +1,4 @@
-import "./site-dropdown.js";
-import { MIB, fetchCloudflareClientInfo, runSpeedTest } from "./speedtest-engine.js";
+import { MIB, fetchCloudflareClientInfo, runSpeedTest, speedtestCooldownMs } from "./speedtest-engine.js";
 
 // Trusted static markup: forms in Markdown are deliberately removed by the
 // site's sanitizer. Build the controls here without weakening that policy.
@@ -9,28 +8,12 @@ const SPEEDTEST_CONTROLS = `
     <legend>Test options</legend>
     <label class="speedtest-mode"><input type="radio" name="streams" value="1" aria-label="Single transfer stream" checked><span>Single</span></label>
     <label class="speedtest-mode"><input type="radio" name="streams" value="4" aria-label="Four concurrent transfer streams"><span>Multi</span></label>
-    <span class="speedtest-budget"><span>Limit</span>
-      <input type="hidden" name="budget" value="256" data-speedtest-budget-value>
-      <site-dropdown class="speedtest-budget-dropdown" data-speedtest-budget-dropdown>
-        <details class="nav-dropdown">
-          <summary class="nav-menu-label" data-speedtest-budget-trigger aria-label="Payload limit for each direction">
-            <span data-speedtest-budget-label>256 MiB / way</span>
-            <svg class="speedtest-chevron" aria-hidden="true" focusable="false" width="1em" height="1em" viewBox="0 0 16 16"><path d="m3 6 5 5 5-5"></path></svg>
-          </summary>
-          <div class="nav-dropdown-menu" role="listbox" aria-label="Payload limit for each direction">
-            <button type="button" role="option" data-speedtest-budget-option data-value="64" aria-selected="false">64 MiB / way</button>
-            <button type="button" role="option" data-speedtest-budget-option data-value="256" aria-selected="true">256 MiB / way</button>
-            <button type="button" role="option" data-speedtest-budget-option data-value="512" aria-selected="false">512 MiB / way</button>
-          </div>
-        </details>
-      </site-dropdown>
-    </span>
   </fieldset>
   <div class="speedtest-actions">
     <button type="submit" data-speedtest-start>Start</button>
     <button type="button" data-speedtest-stop hidden>Stop</button>
   </div>
-  <p class="speedtest-status" data-speedtest-status role="status" aria-live="polite"></p>
+  <p class="speedtest-status" data-speedtest-status role="status" aria-live="polite">Ready when you are.</p>
 </form>`;
 
 (() => {
@@ -53,22 +36,9 @@ const SPEEDTEST_CONTROLS = `
       this.controller = new AbortController();
       const options = { signal: this.controller.signal };
       this.form.addEventListener("submit", event => { event.preventDefault(); void this.startTest(); }, options);
-      this.form.addEventListener("click", event => {
-        const target = event.target;
-        if (!(target instanceof Element)) return;
-        const option = target.closest("[data-speedtest-budget-option]");
-        if (!option || this.testController) return;
-        this.setBudget(option.dataset.value, option.textContent.trim());
-      }, options);
-      this.querySelector("[data-speedtest-budget-trigger]")?.addEventListener("click", event => {
-        if (this.testController) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-      }, options);
       this.querySelector("[data-speedtest-stop]").addEventListener("click", () => this.stopTest("Stopped."), { signal: this.controller.signal });
       document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") this.stopTest("Stopped because the page was hidden. Keep this tab visible while testing.");
+        if (document.visibilityState === "hidden") this.stopTest("Paused tab. Test stopped.");
       }, { signal: this.controller.signal });
       window.addEventListener("pagehide", () => this.stopTest("Stopped."), { signal: this.controller.signal });
       void this.loadClientInfo();
@@ -80,7 +50,11 @@ const SPEEDTEST_CONTROLS = `
       this.controller = null;
     }
 
-    text(selector, value) { this.querySelector(selector).textContent = value; }
+    text(selector, value) {
+      const element = this.querySelector(selector);
+      element.textContent = value;
+      element.removeAttribute("title");
+    }
 
     async loadClientInfo() {
       try {
@@ -104,20 +78,7 @@ const SPEEDTEST_CONTROLS = `
       this.querySelector("[data-speedtest-start]").disabled = running;
       this.querySelector("[data-speedtest-start]").hidden = running;
       this.querySelector("[data-speedtest-stop]").hidden = !running;
-      const trigger = this.querySelector("[data-speedtest-budget-trigger]");
-      trigger?.setAttribute("aria-disabled", String(running));
       this.toggleAttribute("data-running", running);
-    }
-
-    setBudget(value, label) {
-      if (!value || !label) return;
-      this.querySelector("[data-speedtest-budget-value]").value = value;
-      const trigger = this.querySelector("[data-speedtest-budget-trigger]");
-      this.querySelector("[data-speedtest-budget-label]").textContent = label;
-      trigger.setAttribute("aria-label", `Payload limit: ${label}`);
-      for (const option of this.querySelectorAll("[data-speedtest-budget-option]")) {
-        option.setAttribute("aria-selected", String(option.dataset.value === value));
-      }
     }
 
     stopTest(message) {
@@ -128,20 +89,24 @@ const SPEEDTEST_CONTROLS = `
       this.text("[data-speedtest-status]", message);
       for (const row of this.querySelectorAll("[data-speedtest-direction][data-active]")) {
         row.removeAttribute("data-active");
-        row.querySelector("[data-speedtest-caption]").textContent = "Incomplete · stopped";
+        row.querySelector("[data-speedtest-caption]").textContent = "Stopped — incomplete";
       }
     }
 
     async startTest() {
       if (this.testController) return;
+      const cooldown = speedtestCooldownMs();
+      if (cooldown) {
+        this.text("[data-speedtest-status]", `Retry in ${Math.ceil(cooldown / 1000)}s.`);
+        return;
+      }
       if (!globalThis.ReadableStream || !globalThis.AbortController || !globalThis.crypto?.getRandomValues) {
-        this.text("[data-speedtest-status]", "This browser does not support the APIs needed for this test.");
+        this.text("[data-speedtest-status]", "Browser unsupported.");
         return;
       }
       const form = new FormData(this.form);
       const streams = Number(form.get("streams"));
-      const budgetBytes = Number(form.get("budget")) * MIB;
-      if (![1, 4].includes(streams) || ![64, 256, 512].includes(budgetBytes / MIB)) return;
+      if (![1, 4].includes(streams)) return;
       const controller = new AbortController();
       this.testController = controller;
       this.trends = { download: [], upload: [] };
@@ -149,7 +114,6 @@ const SPEEDTEST_CONTROLS = `
       this.busy(true);
       this.text("[data-speedtest-latency]", "—");
       this.text("[data-speedtest-jitter]", "—");
-      this.text("[data-speedtest-edge]", "Automatic");
       for (const row of this.querySelectorAll("[data-speedtest-direction]")) {
         row.querySelector("[data-speedtest-rate]").textContent = "—";
         row.querySelector("[data-speedtest-bytes]").textContent = "0 MiB";
@@ -159,15 +123,29 @@ const SPEEDTEST_CONTROLS = `
         row.removeAttribute("data-active");
       }
       try {
-        await runSpeedTest({ streams, budgetBytes, signal: controller.signal,
-          onUpdate: update => { if (this.testController === controller) this.showUpdate(update, budgetBytes); } });
+        const result = await runSpeedTest({ streams, signal: controller.signal,
+          onUpdate: update => { if (this.testController === controller) this.showUpdate(update); } });
         if (this.testController !== controller) return;
-        this.text("[data-speedtest-status]", "Complete.");
+        this.text("[data-speedtest-status]", result.download.reason === "interrupted" || result.upload.reason === "interrupted"
+          ? "Incomplete."
+          : result.download.degraded || result.upload.degraded
+            ? "Complete. Reduced concurrency."
+            : "Complete.");
       } catch (error) {
         if (this.testController !== controller || controller.signal.aborted) return;
-        this.text("[data-speedtest-status]", error.httpStatus ? error.message : "The test could not finish. Check your connection, VPN or browser blocking, then try again.");
+        const detail = error instanceof Error ? error.message : "Test failed.";
+        const phase = /^(Download|Upload)\b/.exec(detail)?.[1];
+        const message = error.httpStatus ? `HTTP ${error.httpStatus}.`
+          : /timeout|timed out|stalled/i.test(detail) ? "Timed out."
+          : /network|cors|fetch/i.test(detail) ? "Connection failed."
+          : /payload|safety limit/i.test(detail) ? "Data limit reached."
+          : /cooldown/i.test(detail) ? "Wait before retrying."
+          : /no .*data/i.test(detail) ? "No data."
+          : "Test failed.";
+        this.text("[data-speedtest-status]", phase ? `${phase}: ${message}` : message);
+        this.querySelector("[data-speedtest-status]").title = detail;
         for (const row of this.querySelectorAll("[data-speedtest-direction][data-active]")) {
-          row.querySelector("[data-speedtest-caption]").textContent = "Incomplete · request failed";
+          row.querySelector("[data-speedtest-caption]").textContent = "Incomplete";
         }
       } finally {
         if (this.testController === controller) {
@@ -178,8 +156,13 @@ const SPEEDTEST_CONTROLS = `
       }
     }
 
-    showUpdate(update, budgetBytes) {
+    showUpdate(update) {
       if (update.server) this.text("[data-speedtest-edge]", update.server);
+      if (update.retrying) {
+        this.text("[data-speedtest-status]", `Rate limited. Retry in ${Math.ceil(update.retryMs / 1000)}s…`);
+        this.phase = null;
+        return;
+      }
       if (this.phase !== update.phase) {
         this.phase = update.phase;
         const captions = { latency: "Measuring latency…", download: "Downloading…", upload: "Uploading…" };
@@ -190,15 +173,25 @@ const SPEEDTEST_CONTROLS = `
         this.text("[data-speedtest-jitter]", format(update.jitter));
         return;
       }
+      if (update.degraded && !update.final) {
+        this.text("[data-speedtest-status]", `${update.phase === "download" ? "Download" : "Upload"}: ${update.streams} stream${update.streams === 1 ? "" : "s"} (reduced).`);
+      }
       const row = this.querySelector(`[data-speedtest-direction="${update.phase}"]`);
+      if (update.elapsed === 0 && !update.final) this.trends[update.phase] = [];
       row.toggleAttribute("data-active", !update.final);
       row.querySelector("[data-speedtest-rate]").textContent = format(update.rate);
       row.querySelector("[data-speedtest-loaded]").textContent = format(update.loadedLatency);
       row.querySelector("[data-speedtest-bytes]").textContent = `${format(update.bytes / MIB)} MiB`;
       const duration = `${format(update.elapsed)}s`;
-      row.querySelector("[data-speedtest-caption]").textContent = update.final
-        ? `${update.qualified ? "Measured" : "Short sample"} · ${duration} · ${{ stable: "settled", time: "time limit", limit: "payload limit" }[update.reason]}`
-        : `${duration} · ${update.elapsed < 1.5 ? "warming up" : "sampling"}`;
+      const state = update.final
+        ? `${update.reason === "interrupted" ? "Incomplete" : update.qualified ? "Measured" : "Short sample"} (${{ stable: "settled", time: "time limit", limit: "payload limit", interrupted: "request failures" }[update.reason]})`
+        : update.elapsed < 1.5 ? "Warming up" : "Sampling";
+      const label = update.degraded ? `${state} / ${update.streams} stream${update.streams === 1 ? "" : "s"}` : state;
+      row.querySelector("[data-speedtest-caption]").replaceChildren(...[label, duration].map(text => {
+        const span = document.createElement("span");
+        span.textContent = text;
+        return span;
+      }));
       if (Number.isFinite(update.rate)) {
         const values = this.trends[update.phase];
         values.push(update.rate);

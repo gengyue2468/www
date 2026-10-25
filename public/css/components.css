@@ -240,6 +240,18 @@ memos-feed {
   max-width: 100%;
 }
 
+/* The feed already occupies the Tufte text column. Nested blocks must not
+   apply the page-level 55% width a second time. */
+.memo-content details {
+  width: auto;
+  max-width: 100%;
+}
+.memo-content blockquote p,
+.memo-content blockquote footer {
+  width: auto;
+  margin-right: 0;
+}
+
 .memo-content table {
   display: block;
   max-width: 100%;
@@ -599,13 +611,14 @@ speedtest-page {
 .speedtest-controls {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   gap: 0.5rem 1.5rem;
   margin-block: 0 0.6rem;
 }
 .speedtest-controls fieldset {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem 1.2rem;
   min-width: 0;
   margin: 0;
@@ -632,33 +645,7 @@ speedtest-page {
 }
 .speedtest-mode input:focus-visible + span { outline: 2px solid currentColor; outline-offset: 4px; }
 .speedtest-controls fieldset:disabled { opacity: 0.5; }
-.speedtest-controls .speedtest-budget { display: inline-flex; flex-wrap: wrap; gap: 0.4em; margin-left: auto; }
-.speedtest-budget > span { opacity: 0.6; }
-.speedtest-budget-dropdown {
-  display: inline-block;
-  max-width: 100%;
-}
-.speedtest-budget-dropdown .nav-menu-label {
-  cursor: pointer;
-}
-.speedtest-chevron {
-  display: inline-block;
-  margin-left: 0.25em;
-  vertical-align: -0.15em;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: transform 120ms ease;
-}
-.speedtest-budget-dropdown details[open] .speedtest-chevron {
-  transform: rotate(180deg);
-}
-.speedtest-budget-dropdown .nav-dropdown-menu button[aria-selected="true"] {
-  background: var(--accent);
-}
-.speedtest-actions { display: flex; align-items: baseline; }
+.speedtest-actions { display: flex; align-items: center; min-inline-size: 4ch; justify-content: flex-end; }
 .speedtest-actions button {
   padding: 0;
   border: 0;
@@ -675,6 +662,8 @@ speedtest-page {
 .speedtest-latency {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
   gap: 0.4rem 1.5rem;
   margin-block: 0 1.8rem;
   font-size: inherit;
@@ -682,8 +671,8 @@ speedtest-page {
 .speedtest-latency > div { display: flex; flex-wrap: wrap; gap: 0.4em; }
 .speedtest-latency dt { opacity: 0.6; }
 .speedtest-latency dd { margin: 0; font-variant-numeric: tabular-nums; }
+.speedtest-latency dd { min-inline-size: 6ch; }
 .speedtest-latency small { font-size: inherit; opacity: 0.65; }
-.speedtest-edge { margin-left: auto; }
 .speedtest-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; margin-block: 0.5rem 1.5rem; }
 .speedtest-direction { min-width: 0; }
 .speedtest-direction h2 { margin: 0; font-size: var(--font-size-h3); }
@@ -695,6 +684,9 @@ speedtest-page {
 .speedtest-chart .speedtest-chart-baseline { opacity: 0.15; stroke-width: 1; }
 .speedtest-caption,
 .speedtest-detail { margin: 0; font-size: inherit; line-height: var(--line-height-sidenote); }
+.speedtest-caption,
+.speedtest-detail { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.2em 1em; }
+.speedtest-detail > span { white-space: nowrap; }
 .speedtest-detail { opacity: 0.6; }
 .speedtest-caption { font-style: italic; opacity: 0.65; }
 .speedtest-notes { margin-block: 2rem; }
@@ -723,7 +715,6 @@ speedtest-page {
 @media (max-width: 760px) {
   speedtest-page { display: block; }
   .speedtest-results { gap: 1.2rem; }
-  .speedtest-edge { margin-left: 0; }
   .speedtest-client-info {
     position: static;
     max-width: none;
@@ -733,7 +724,6 @@ speedtest-page {
 
 @media (max-width: 600px) {
   .speedtest-results { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
-  .speedtest-controls .speedtest-budget { flex-basis: 100%; margin-left: 0; }
 }
 
 /* Keep real lists, with an understated disclosure after each long list. */

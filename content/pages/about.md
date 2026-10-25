@@ -31,3 +31,5 @@ flowchart LR
     A -->|Human is unhappy.<br/>TRY HARDER.| S2
     A -->|Human is unhappy.<br/>TRY HARDER.| S3
 ```
+
+欢迎找我聊天，我的信箱是 admin [at] gy [dot] run，我的 GitHub 首页是 [https://github.com/gengyue2468](https://github.com/gengyue2468)

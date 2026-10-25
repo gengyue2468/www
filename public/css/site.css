@@ -1,19 +1,41 @@
-nav {
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1rem;
   margin-bottom: 2rem;
   padding-top: 2rem;
+  font-size: var(--font-size-body);
+  line-height: normal;
 }
 
-nav a,
-nav .nav-menu-label {
-  margin-right: 1rem;
+.site-nav > a,
+.site-nav site-dropdown > details > summary.nav-menu-label {
+  display: block;
+  margin: 0;
   text-decoration: none;
   padding: 0.2rem 0.5rem;
-  font-size: 1.4rem;
+  font-size: inherit;
+  line-height: inherit;
+  overflow-wrap: anywhere;
   cursor: pointer;
 }
 
-nav a:hover,
-nav .nav-menu-label:hover {
+.site-nav > a,
+.site-nav > site-dropdown {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Browser translation may insert nested font elements. Typography belongs to
+   the link/trigger, while gap belongs to the navigation, not translated text. */
+.site-nav font {
+  font: inherit;
+  color: inherit;
+}
+
+.site-nav > a:hover,
+.site-nav .nav-menu-label:hover {
   background-color: var(--accent) !important;
 }
 
@@ -47,7 +69,8 @@ nav .nav-menu-label:hover {
   user-select: none;
 }
 
-.nav-menu-label.active {
+.nav-menu-label.active,
+.site-nav > a[aria-current="page"] {
   font-weight: bold;
 }
 
@@ -89,7 +112,8 @@ nav .nav-menu-label:hover {
   padding: 0.4rem 1rem;
   font-size: 1.3rem;
   text-decoration: none;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .nav-dropdown-menu button {
@@ -1039,9 +1063,7 @@ ul {
     right: auto !important;
   }
 
-  /* Keep nav unchanged */
-  nav a,
-  nav .nav-menu-label {
+  .site-nav {
     font-size: 1.2rem;
   }
 

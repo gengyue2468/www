@@ -5,7 +5,12 @@ description: 测速测速
 
 <speedtest-page>
   <div class="speedtest-main">
-  <div data-speedtest-controls></div>
+  <div data-speedtest-controls>
+    <div class="speedtest-controls" aria-hidden="true">
+      <div>Single &nbsp; Multi</div><span>Start</span>
+      <p class="speedtest-status">Ready when you are.</p>
+    </div>
+  </div>
   <dl class="speedtest-latency">
     <div><dt>Latency</dt><dd><span data-speedtest-latency>—</span> <small>ms</small></dd></div>
     <div><dt>Jitter</dt><dd><span data-speedtest-jitter>—</span> <small>ms</small></dd></div>
@@ -19,8 +24,8 @@ description: 测速测速
         <path class="speedtest-chart-baseline" d="M0 63 H300"></path>
         <path class="speedtest-curve" d=""></path>
       </svg>
-      <p class="speedtest-caption" data-speedtest-caption></p>
-      <p class="speedtest-detail"><span class="speedtest-transfer"><span data-speedtest-bytes>0 MiB</span> received</span> · <span class="speedtest-loaded"><span data-speedtest-loaded>—</span> ms loaded</span></p>
+      <p class="speedtest-caption" data-speedtest-caption><span>Not started</span><span>— s</span></p>
+      <p class="speedtest-detail"><span class="speedtest-transfer"><span data-speedtest-bytes>0 MiB</span> received</span><span class="speedtest-loaded"><span data-speedtest-loaded>—</span> ms loaded</span></p>
     </div>
     <div class="speedtest-direction" data-speedtest-direction="upload">
       <h2>Upload</h2>
@@ -29,8 +34,8 @@ description: 测速测速
         <path class="speedtest-chart-baseline" d="M0 63 H300"></path>
         <path class="speedtest-curve" d=""></path>
       </svg>
-      <p class="speedtest-caption" data-speedtest-caption></p>
-      <p class="speedtest-detail"><span class="speedtest-transfer"><span data-speedtest-bytes>0 MiB</span> acknowledged</span> · <span class="speedtest-loaded"><span data-speedtest-loaded>—</span> ms loaded</span></p>
+      <p class="speedtest-caption" data-speedtest-caption><span>Not started</span><span>— s</span></p>
+      <p class="speedtest-detail"><span class="speedtest-transfer"><span data-speedtest-bytes>0 MiB</span> acknowledged</span><span class="speedtest-loaded"><span data-speedtest-loaded>—</span> ms loaded</span></p>
     </div>
   </div>
   <noscript><p>JavaScript is required. No test runs until you select Start test.</p></noscript>

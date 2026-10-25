@@ -14,13 +14,17 @@ const DEFAULTS = {
   stableSeconds: 2,
   tolerance: 0.05,
   requestTimeoutMs: 6000,
-  pingIntervalMs: 600,
+  pingIntervalMs: 1500,
+  idlePingIntervalMs: 400,
+  phasePauseMs: 1000,
+  streamStaggerMs: 250,
+  maxRateLimitRetries: 3,
   latencyBudgetMs: 5000,
   downloadInitial: MIB,
-  downloadMaximum: 16 * MIB,
+  downloadMaximum: 8 * MIB,
   uploadInitial: 256 * 1024,
   uploadMaximum: 8 * MIB,
-  targetRequestSeconds: 0.8,
+  targetRequestSeconds: 2,
 };
 const FETCH_OPTIONS = {
   mode: "cors",
@@ -28,6 +32,15 @@ const FETCH_OPTIONS = {
   cache: "no-store",
   referrerPolicy: "no-referrer",
 };
+let cooldownUntil = 0;
+
+export function speedtestCooldownMs() { return Math.max(0, cooldownUntil - Date.now()); }
+
+async function edgeRequest(request, url, options) {
+  checkSignal(options.signal);
+  if (speedtestCooldownMs()) throw new Error("Cloudflare cooldown is active. Please wait before trying again.");
+  return request(url, options);
+}
 
 export function median(values) {
   if (!values.length) return null;
@@ -92,18 +105,37 @@ async function requestScope(parent, timeoutMs, callback) {
   const controller = new AbortController();
   const onAbort = () => controller.abort(parent.reason);
   parent.addEventListener("abort", onAbort, { once: true });
-  const timer = setTimeout(() => controller.abort(new Error("Cloudflare request timed out.")), timeoutMs);
-  try { return await callback(controller.signal); }
+  const transfer = typeof timeoutMs === "object" ? timeoutMs : null;
+  let timer;
+  const arm = (ms, message) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => controller.abort(new Error(message)), ms);
+  };
+  arm(transfer?.responseTimeoutMs ?? timeoutMs, transfer ? "Timed out waiting for the server response." : "Cloudflare request timed out.");
+  const touch = () => {
+    if (transfer && !controller.signal.aborted) arm(transfer.idleTimeoutMs, "Download stalled: no data received before the idle timeout.");
+  };
+  try { return await callback(controller.signal, touch); }
+  catch (error) {
+    if (!parent.aborted && controller.signal.aborted) throw controller.signal.reason;
+    throw error;
+  }
   finally { clearTimeout(timer); parent.removeEventListener("abort", onAbort); }
 }
 
 function checkResponse(response) {
   if (response.ok) return;
   void response.body?.cancel().catch(() => {});
+  const retryAfter = response.headers.get("retry-after");
+  const delay = retryAfter && /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1000 : Date.parse(retryAfter || "") - Date.now();
+  const retryMs = Math.max(1000, Number.isFinite(delay) ? delay : 5000);
   const error = new Error(response.status === 429
-    ? "Cloudflare is limiting requests. Please wait before trying again."
-    : `Cloudflare returned HTTP ${response.status}.`);
+    ? "Cloudflare is limiting requests. Wait at least a minute before retrying."
+    : response.status === 403
+      ? "Cloudflare refused this request. Wait before retrying; your IP or route may be blocked."
+      : `Cloudflare returned HTTP ${response.status}.`);
   error.httpStatus = response.status;
+  error.retryMs = retryMs;
   throw error;
 }
 
@@ -148,7 +180,7 @@ function rdapProvider(data) {
 export async function fetchCloudflareClientInfo({ signal, request = (...args) => fetch(...args) }) {
   checkSignal(signal);
   const trace = await requestScope(signal, 5000, async requestSignal => {
-    const response = await request(CLOUDFLARE_TRACE, { ...FETCH_OPTIONS, signal: requestSignal });
+    const response = await edgeRequest(request, CLOUDFLARE_TRACE, { ...FETCH_OPTIONS, signal: requestSignal });
     checkResponse(response);
     return parseTrace(await response.text());
   });
@@ -165,7 +197,7 @@ export async function fetchCloudflareClientInfo({ signal, request = (...args) =>
   // the trace's canonical client IP and colo fields.
   try {
     await requestScope(signal, 5000, async requestSignal => {
-      const response = await request(`${CLOUDFLARE_DOWNLOAD}?bytes=0&nonce=client-${Date.now()}`, {
+      const response = await edgeRequest(request, `${CLOUDFLARE_DOWNLOAD}?bytes=0&nonce=client-${Date.now()}`, {
         ...FETCH_OPTIONS,
         signal: requestSignal,
       });
@@ -215,17 +247,25 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
   const run = new AbortController();
   const onAbort = () => run.abort(signal.reason);
   checkSignal(signal);
+  if (speedtestCooldownMs()) throw new Error("Please wait for the cooldown before starting another test.");
   signal.addEventListener("abort", onAbort, { once: true });
   let sequence = 0;
   let server = "";
+  let rateLimitRetries = 0;
+  // Shared by lanes and retained across 429 phase retries. A successful small
+  // request must not immediately ramp back into a size that already failed.
+  const policies = Object.fromEntries(["download", "upload"].map(direction => [direction, {
+    maximum: direction === "download" ? settings.downloadMaximum : settings.uploadMaximum,
+    lanes: streams,
+  }]));
   const report = update => { if (!run.signal.aborted) onUpdate({ ...update, server }); };
   const nonce = () => `${Date.now()}-${sequence++}`;
 
-  async function ping(parent) {
+  async function pingOnce(parent) {
     return requestScope(parent, settings.requestTimeoutMs, async requestSignal => {
       const url = `${CLOUDFLARE_DOWNLOAD}?bytes=0&nonce=${nonce()}`;
-      const started = clock();
-      const response = await request(url, { ...FETCH_OPTIONS, signal: requestSignal });
+      let started;
+      const response = await edgeRequest((...args) => { started = clock(); return request(...args); }, url, { ...FETCH_OPTIONS, signal: requestSignal });
       checkResponse(response);
       const headersAt = clock();
       server = responseHeader(response, "cf-meta-colo", "colo") || server;
@@ -238,11 +278,37 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
     });
   }
 
-  async function measure(direction) {
+  async function waitForRateLimit(error, phase) {
+    if (error.httpStatus !== 429 || rateLimitRetries++ >= settings.maxRateLimitRetries) {
+      if (error.httpStatus === 429) cooldownUntil = Math.max(cooldownUntil, Date.now() + Math.max(60000, error.retryMs));
+      throw error;
+    }
+    const retryMs = Math.max(error.retryMs, 5000 * 2 ** (rateLimitRetries - 1));
+    report({ phase, retrying: true, retryMs });
+    await sleep(retryMs, run.signal);
+  }
+
+  async function ping(parent) {
+    let failures = 0;
+    for (;;) {
+      try { return await pingOnce(parent); }
+      catch (error) {
+        checkSignal(parent);
+        if (!error.httpStatus || error.httpStatus === 403 || error.httpStatus >= 500) {
+          if (++failures >= 3) return null;
+          await sleep(500 * failures, parent);
+          continue;
+        }
+        await waitForRateLimit(error, "latency");
+      }
+    }
+  }
+
+  async function measure(direction, budget = new PayloadBudget(budgetBytes), earlierBytes = 0) {
+    const policy = policies[direction];
     const phase = new AbortController();
     const stop = () => phase.abort();
     run.signal.addEventListener("abort", stop, { once: true });
-    const budget = new PayloadBudget(budgetBytes);
     const samples = [];
     const estimates = [];
     const loadedPings = [];
@@ -253,6 +319,8 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
     let workersLeft = streams;
     let reason = "time";
     let failure = null;
+    let lastTransferError = null;
+    const recovering = new Set();
     const payload = direction === "upload" ? randomPayload(Math.min(settings.uploadMaximum, budgetBytes)) : null;
     let snapshot;
     const sample = final => {
@@ -263,26 +331,36 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
       const elapsed = (now - started) / 1000;
       const rate = windowRate(samples, settings.windowSeconds, settings.warmupSeconds);
       estimates.push({ time: elapsed, rate });
-      snapshot = { phase: direction, rate, bytes, reservedBytes: budget.used, elapsed,
-        loadedLatency: median(loadedPings.slice(-20)), qualified: elapsed >= settings.minimumSeconds,
+      snapshot = { phase: direction, rate, bytes: earlierBytes + bytes, reservedBytes: budget.used, elapsed,
+        streams: policy.lanes, degraded: policy.lanes < streams,
+        loadedLatency: median(loadedPings.slice(-20)), qualified: elapsed >= settings.minimumSeconds && recovering.size === 0,
         final, reason: final ? reason : null };
       report(snapshot);
       return elapsed;
     };
 
-    async function worker() {
+    async function worker(index) {
       let wanted = direction === "download" ? settings.downloadInitial : settings.uploadInitial;
       let consecutiveFailures = 0;
       try {
+        if (index) await sleep(index * settings.streamStaggerMs, phase.signal);
         while (!phase.signal.aborted) {
-          const size = budget.take(wanted);
+          if (index >= policy.lanes) { recovering.delete(index); return; }
+          const size = budget.take(Math.min(wanted, policy.maximum));
           if (!size) return;
           try {
-            const began = clock();
-            await requestScope(phase.signal, settings.requestTimeoutMs, async requestSignal => {
+            let began = clock();
+            const transferRequest = (...args) => { began = clock(); return request(...args); };
+            await requestScope(phase.signal, {
+              // Upload acknowledgements arrive after the body is sent. Bound
+              // them by the phase deadline rather than a short TTFB timeout.
+              responseTimeoutMs: direction === "upload" ? settings.maximumSeconds * 1000 : settings.requestTimeoutMs,
+              idleTimeoutMs: settings.requestTimeoutMs,
+            }, async (requestSignal, touch) => {
               if (direction === "download") {
-                const response = await request(`${CLOUDFLARE_DOWNLOAD}?bytes=${size}&nonce=${nonce()}`, { ...FETCH_OPTIONS, signal: requestSignal });
+                const response = await edgeRequest(transferRequest, `${CLOUDFLARE_DOWNLOAD}?bytes=${size}&nonce=${nonce()}`, { ...FETCH_OPTIONS, signal: requestSignal });
                 checkResponse(response);
+                touch();
                 server = responseHeader(response, "cf-meta-colo", "colo") || server;
                 if (!response.body) throw new Error("Streaming downloads are unavailable in this browser.");
                 const reader = response.body.getReader();
@@ -291,6 +369,7 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
                   for (;;) {
                     const chunk = await reader.read();
                     if (chunk.done) break;
+                    touch();
                     checkSignal(requestSignal);
                     received += chunk.value.byteLength;
                     if (received > size) throw new Error("Cloudflare sent an unexpected download size.");
@@ -302,7 +381,7 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
                   reader.releaseLock();
                 }
               } else {
-                const response = await request(CLOUDFLARE_UPLOAD, { ...FETCH_OPTIONS, method: "POST", body: payload.subarray(0, size), signal: requestSignal });
+                const response = await edgeRequest(transferRequest, `${CLOUDFLARE_UPLOAD}?bytes=${size}`, { ...FETCH_OPTIONS, method: "POST", body: payload.subarray(0, size), signal: requestSignal });
                 checkResponse(response);
                 await response.body?.cancel();
                 checkSignal(requestSignal);
@@ -312,14 +391,38 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
               }
             });
             consecutiveFailures = 0;
+            recovering.delete(index);
             const seconds = Math.max(0.001, (clock() - began) / 1000);
-            const maximum = direction === "download" ? settings.downloadMaximum : settings.uploadMaximum;
-            wanted = Math.min(maximum, Math.max(64 * 1024, Math.round(size / seconds * settings.targetRequestSeconds)));
+            const maximum = policy.maximum;
+            // Grow in bounded, power-of-two stages rather than jumping to an
+            // arbitrary large body after one quick request. Hold a size once
+            // it runs long enough, and shrink when a slow path needs it.
+            const target = Math.max(64 * 1024, size / seconds * settings.targetRequestSeconds);
+            wanted = Math.min(maximum, wanted * 2, 2 ** Math.ceil(Math.log2(target)));
+            // Only pace very short requests at the maximum body size. Do not
+            // impose an artificial request-rate ceiling on normal transfers.
+            if (wanted === maximum && seconds < 0.1) await sleep(100, phase.signal);
           } catch (error) {
             if (phase.signal.aborted) return;
-            if (error.httpStatus || ++consecutiveFailures >= 3) throw error;
-            wanted = Math.max(64 * 1024, Math.floor(wanted / 2));
-            await sleep(300, phase.signal);
+            const detail = error instanceof TypeError
+              ? "Network/CORS failure; the browser did not expose an HTTP status."
+              : error.message || "Request failed.";
+            const contextual = new Error(`${direction === "download" ? "Download" : "Upload"} (${(size / MIB).toFixed(2)} MiB): ${detail}`, { cause: error });
+            contextual.httpStatus = error.httpStatus;
+            contextual.retryMs = error.retryMs;
+            if (error.httpStatus && error.httpStatus !== 403 && error.httpStatus < 500) throw contextual;
+            lastTransferError = contextual;
+            recovering.add(index);
+            ++consecutiveFailures;
+            policy.maximum = Math.min(policy.maximum, Math.max(64 * 1024, Math.floor(size / 2)));
+            wanted = Math.min(wanted, policy.maximum);
+            if (consecutiveFailures >= 2 && policy.lanes > 1) {
+              policy.lanes = Math.max(1, Math.ceil(policy.lanes / 2));
+              estimates.length = 0;
+            }
+            // A rejected request is not a measurement. Retry this lane only,
+            // bounded by the existing phase deadline and payload reservations.
+            await sleep(Math.min(4000, 1000 * 2 ** (consecutiveFailures - 1)), phase.signal);
           }
         }
       } catch (error) {
@@ -332,20 +435,23 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
       try {
         while (!phase.signal.aborted) {
           await sleep(settings.pingIntervalMs, phase.signal);
-          try { loadedPings.push(await ping(phase.signal)); }
-          catch (error) { if (error.httpStatus) { failure = error; stop(); } }
+          try { loadedPings.push(await pingOnce(phase.signal)); }
+          catch (error) {
+            if (error.httpStatus === 429) { failure = error; stop(); }
+            // A missing loaded-latency probe does not invalidate transfers.
+          }
         }
       } catch { /* The phase owns this task and aborts it on every exit. */ }
     })();
     const deadline = setTimeout(stop, settings.maximumSeconds * 1000);
-    report({ phase: direction, rate: null, bytes: 0, elapsed: 0, final: false });
-    const workers = Array.from({ length: streams }, worker);
+    report({ phase: direction, rate: null, bytes: earlierBytes, elapsed: 0, final: false });
+    const workers = Array.from({ length: streams }, (_, index) => worker(index));
     try {
       while (!phase.signal.aborted) {
         await sleep(settings.sampleMs, phase.signal);
         const elapsed = sample(false);
         if (workersLeft === 0) { reason = "limit"; break; }
-        if (isStable(estimates, elapsed, settings)) { reason = "stable"; break; }
+        if (recovering.size === 0 && isStable(estimates, elapsed, settings)) { reason = "stable"; break; }
       }
     } catch (error) {
       if (!phase.signal.aborted) throw error;
@@ -356,8 +462,16 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
       run.signal.removeEventListener("abort", stop);
     }
     checkSignal(run.signal);
-    if (failure) throw failure;
-    if (bytes === 0) throw new Error(`No ${direction} data was confirmed. Check your connection and try again.`);
+    if (failure) {
+      // All lanes and probes have been aborted and joined before retrying.
+      // Reuse reservations so failed attempts still consume the safety budget;
+      // restart the sampling window so backoff never masquerades as bandwidth.
+      await waitForRateLimit(failure, direction);
+      if (budget.used >= budget.limit) throw new Error("Payload safety limit reached while retrying. Results are incomplete.");
+      return measure(direction, budget, earlierBytes + bytes);
+    }
+    if (bytes === 0) throw lastTransferError || new Error(`No ${direction} data was confirmed before the time limit.`);
+    if (recovering.size) reason = "interrupted";
     sample(true);
     return snapshot;
   }
@@ -367,16 +481,20 @@ export async function runSpeedTest({ streams = 1, budgetBytes = 256 * MIB, signa
     await ping(run.signal); // Warm up the connection; exclude DNS/TLS setup.
     const points = [];
     const began = clock();
-    while (points.length < 10 && (points.length < 3 || clock() - began < Math.min(2000, settings.latencyBudgetMs))) {
+    while (points.length < 5 && (points.length < 3 || clock() - began < Math.min(2000, settings.latencyBudgetMs))) {
       if (clock() - began >= settings.latencyBudgetMs) break;
-      points.push(await ping(run.signal));
+      await sleep(settings.idlePingIntervalMs, run.signal);
+      const latency = await ping(run.signal);
+      if (Number.isFinite(latency)) points.push(latency);
       report({ phase: "latency", latency: median(points), jitter: jitter(points) });
     }
     const download = await measure("download");
     checkSignal(run.signal);
+    await sleep(settings.phasePauseMs, run.signal);
     const upload = await measure("upload");
     return { latency: median(points), jitter: jitter(points), server, download, upload };
   } finally {
+    cooldownUntil = Math.max(cooldownUntil, Date.now() + 10000);
     run.abort();
     signal.removeEventListener("abort", onAbort);
   }
