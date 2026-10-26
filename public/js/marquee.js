@@ -64,6 +64,27 @@ export class MarqueeController {
 
   measure() {
     let changed = false;
+    // Full snapshots can add/remove probe and interface rows after connect.
+    // Retain existing turns while observing any newly introduced text fields.
+    const elements = [...this.root.querySelectorAll("[data-marquee]")];
+    if (elements.length !== this.items.length || elements.some((element, index) => element !== this.items[index]?.element)) {
+      const previous = new Map(this.items.map(item => [item.element, item]));
+      this.items = elements.map(element => {
+        const existing = previous.get(element);
+        if (existing) { previous.delete(element); return existing; }
+        const item = { element, lane: element.querySelector("[data-marquee-lane]"),
+          source: element.querySelector("[data-marquee-source]"), clone: element.querySelector("[data-marquee-clone]"),
+          signature: null, distance: 0 };
+        if (item.source) { this.observer?.observe(element); this.observer?.observe(item.source); }
+        return item;
+      }).filter(item => item.lane && item.source && item.clone);
+      for (const item of previous.values()) {
+        this.observer?.unobserve(item.element);
+        this.observer?.unobserve(item.source);
+        item.element.removeAttribute("data-scrolling");
+      }
+      changed = true;
+    }
     for (const item of this.items) {
       const { element, lane, source, clone } = item;
       const text = source.textContent;

@@ -336,6 +336,7 @@ export function getUnversionedPageAssetPaths(): string[] {
     ),
     "js/speedtest-engine.js",
     "js/marquee.js",
+    "css/vps-fonts.css",
     "fonts/source-han-serif-cn-vf/result.css",
     "fonts/source-han-serif-cn-vf/index.html",
     "fonts/source-han-serif-cn-vf/index.proto",

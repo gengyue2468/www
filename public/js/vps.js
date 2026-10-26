@@ -11,6 +11,7 @@ import { MarqueeController, createMarquee } from "./marquee.js";
   const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "medium" });
   const finite = value => typeof value === "number" && Number.isFinite(value);
   const text = value => typeof value === "string" && value ? value : "—";
+  const nameSortKey = node => text(node.name).normalize("NFKC").replace(/^[^\p{L}]+/u, "").trim();
   const percent = value => finite(value) ? `${number.format(value)}%` : "—";
   const states = ["up", "down", "paused", "pending", "unknown"];
   const nodeStatus = node => states.includes(node.status) ? node.status : "unknown";
@@ -58,12 +59,13 @@ import { MarqueeController, createMarquee } from "./marquee.js";
   const write = (node, value) => { if (node.textContent !== value) node.textContent = value; };
   const timeLabel = (node, value, prefix = "") => {
     write(node, `${prefix}${age(value)}`);
+    const time = node.closest("time") || node;
     if (Number.isFinite(timestamp(value))) {
-      node.dateTime = value;
-      node.title = dateFormat.format(new Date(value));
+      time.dateTime = value;
+      time.title = dateFormat.format(new Date(value));
     } else {
-      node.removeAttribute("datetime");
-      node.removeAttribute("title");
+      time.removeAttribute("datetime");
+      time.removeAttribute("title");
     }
   };
 
@@ -132,6 +134,8 @@ import { MarqueeController, createMarquee } from "./marquee.js";
     const root = element("article", "vps-node");
     const heading = element("div", "vps-node-heading");
     const name = element("h2");
+    const nameText = createMarquee();
+    name.append(nameText.root);
     const state = element("span", "vps-state");
     heading.append(name, state);
     const hardware = element("p", "vps-hardware");
@@ -150,16 +154,20 @@ import { MarqueeController, createMarquee } from "./marquee.js";
     });
     const traffic = element("div", "vps-traffic");
     const networkGroup = element("span", "vps-network-group");
+    const networkText = createMarquee();
     const rx = element("span");
     const tx = element("span");
-    networkGroup.append(element("span", "vps-network-label", "Network"), rx, tx);
+    networkText.source.append(rx, document.createTextNode(" "), tx);
+    networkGroup.append(element("span", "vps-network-label", "Network"), networkText.root);
     const meta = element("div", "vps-node-meta");
-    const running = element("span");
-    const uptimeValue = element("span");
-    running.append(element("span", "vps-uptime-label", "Uptime "), uptimeValue);
-    const updated = element("time");
+    const running = element("span", "vps-uptime-group");
+    const uptimeText = createMarquee();
+    running.append(element("span", "vps-uptime-label", "Uptime"), uptimeText.root);
+    const updatedContainer = element("time");
+    const updatedText = createMarquee();
+    updatedContainer.append(updatedText.root);
     traffic.append(networkGroup, running);
-    meta.append(updated);
+    meta.append(updatedContainer);
     root.append(heading, hardware, resources, traffic);
     const system = disclosure(root, "System");
     const systemList = element("dl", "vps-system");
@@ -175,8 +183,10 @@ import { MarqueeController, createMarquee } from "./marquee.js";
     }
     system.append(systemList);
     const network = disclosure(root, "Interfaces");
-    const networkTime = element("time", "vps-sample-time");
-    network.append(networkTime);
+    const networkTimeContainer = element("time", "vps-sample-time");
+    const networkTimeText = createMarquee();
+    networkTimeContainer.append(networkTimeText.root);
+    network.append(networkTimeContainer);
     const interfaces = table(network, ["Interface", "Receive", "Send", "Received total", "Sent total"], "Network interfaces");
     network.append(element("p", "vps-table-note", "Totals are cumulative, not monthly."));
     const probes = disclosure(root, "Probes");
@@ -184,9 +194,10 @@ import { MarqueeController, createMarquee } from "./marquee.js";
     const emptyProbes = element("p", "vps-table-note", "No probes.");
     probes.append(emptyProbes);
     root.append(meta);
-    return { root, name, state, hardware: hardwareText.source, values, rx, tx, running, uptimeValue, updated, fields,
+    return { root, name: nameText.source, state, hardware: hardwareText.source, values, rx, tx, running,
+      uptimeValue: uptimeText.source, updated: updatedText.source, updatedContainer, fields,
       marquee: new MarqueeController(root, root, { preserveUpdates: true }),
-      networkTime, interfaces, interfaceViews: new Map(), monitorRows, monitorViews: new Map(), emptyProbes };
+      networkTime: networkTimeText.source, networkTimeContainer, interfaces, interfaceViews: new Map(), monitorRows, monitorViews: new Map(), emptyProbes };
   }
 
   function updateNode(view, node) {
@@ -208,22 +219,33 @@ import { MarqueeController, createMarquee } from "./marquee.js";
       Array.isArray(node.loadAverage) ? node.loadAverage.map(value => finite(value) ? loadNumber.format(value) : "—").join(" / ") : "—",
       text(node.agentVersion)];
     Object.values(view.fields).forEach((field, index) => write(field, fields[index]));
-    view.marquee.connect();
-    view.marquee.schedule();
     timeLabel(view.networkTime, node.network?.sampledAt, stale(node.network?.sampledAt) ? "Older network sample: " : "Network sample: ");
     const interfaces = node.network?.interfaces && typeof node.network.interfaces === "object" ? Object.entries(node.network.interfaces) : [];
-    syncItems(view.interfaces, view.interfaceViews, interfaces, item => item[0], () => tableRow(5), (row, [name, data]) => {
-      [name, rate(data?.rxBytesPerSecond), rate(data?.txBytesPerSecond), bytes(data?.rxBytesTotal), bytes(data?.txBytesTotal)]
-        .forEach((value, index) => write(row.cells[index], value));
+    syncItems(view.interfaces, view.interfaceViews, interfaces, item => item[0], () => {
+      const row = tableRow(5);
+      const label = createMarquee();
+      row.cells[0].append(label.root);
+      row.label = label.source;
+      return row;
+    }, (row, [name, data]) => {
+      write(row.label, name);
+      [rate(data?.rxBytesPerSecond), rate(data?.txBytesPerSecond), bytes(data?.rxBytesTotal), bytes(data?.txBytesTotal)]
+        .forEach((value, index) => write(row.cells[index + 1], value));
     });
     const monitors = Array.isArray(node.monitors) ? node.monitors.filter(item => item && typeof item.id === "string") : [];
     view.emptyProbes.hidden = monitors.length !== 0;
     syncItems(view.monitorRows, view.monitorViews, monitors, item => item.id, () => {
       const row = tableRow(5);
-      row.target = element("span");
-      row.info = element("small", "vps-probe-info");
-      row.sample = element("time", "vps-probe-info");
-      row.cells[0].append(row.target, row.info, row.sample);
+      const target = createMarquee();
+      const info = createMarquee();
+      const sample = createMarquee();
+      info.root.classList.add("vps-probe-info");
+      sample.root.classList.add("vps-probe-info");
+      row.target = target.source;
+      row.info = info.source;
+      row.sample = element("time");
+      sample.source.append(row.sample);
+      row.cells[0].append(target.root, info.root, sample.root);
       return row;
     }, (row, monitor) => {
       write(row.target, text(monitor.target));
@@ -236,6 +258,8 @@ import { MarqueeController, createMarquee } from "./marquee.js";
         `${latency(monitor.minimumResponseMs1h)} – ${latency(monitor.maximumResponseMs1h)}`, percent(monitor.packetLossPercent1h)]
         .forEach((value, index) => write(row.cells[index + 1], value));
     });
+    view.marquee.connect();
+    view.marquee.schedule();
   }
 
   class VpsPage extends HTMLElement {
@@ -357,7 +381,7 @@ import { MarqueeController, createMarquee } from "./marquee.js";
       if (!data || !Array.isArray(data.nodes) || !Number.isFinite(timestamp(data.generatedAt))) throw new Error("Invalid snapshot");
       const nodes = data.nodes.filter(node => node && typeof node.id === "string")
         .sort((a, b) => {
-          const byName = nameOrder.compare(text(a.name), text(b.name)) || nameOrder.compare(a.id, b.id);
+          const byName = nameOrder.compare(nameSortKey(a), nameSortKey(b)) || nameOrder.compare(a.id, b.id);
           if (this.sortKey === "name-desc") return -byName;
           if (this.sortKey === "name-asc") return byName;
           const left = a[this.sortKey];

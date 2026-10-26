@@ -487,7 +487,9 @@ vps-page {
 .vps-updated { font-style: italic; }
 .vps-node { margin: 2.8rem 0 0; padding: 0; overflow-wrap: anywhere; }
 .vps-node:first-child { margin-top: 1.8rem; }
-.vps-node-heading h2 { margin: 0; font: inherit; font-weight: 600; overflow-wrap: anywhere; }
+.vps-node-heading { flex-wrap: nowrap; }
+.vps-node-heading h2 { flex: 1 1 0; min-width: 0; margin: 0; font: inherit; font-weight: 600; }
+.vps-node-heading .vps-state { flex: none; }
 .vps-state { white-space: nowrap; }
 .vps-node[data-state="down"] .vps-state { text-decoration: underline; text-underline-offset: 0.2em; }
 .vps-hardware { margin: 0; overflow-wrap: anywhere; }
@@ -499,12 +501,18 @@ vps-page {
 .vps-traffic,
 .vps-table { font-variant-numeric: tabular-nums; }
 .vps-traffic { margin-top: 0.5rem; }
-.vps-network-group { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0.5em; }
+.vps-network-group,
+.vps-uptime-group { display: inline-flex; align-items: baseline; gap: 0.5em; min-width: 0; max-width: 100%; }
+.vps-network-group { flex: 1 1 15em; }
+.vps-uptime-group { flex: 0 1 auto; }
+.vps-network-group > .vps-marquee,
+.vps-uptime-group > .vps-marquee { flex: 0 1 auto; min-width: 0; }
 .vps-network-label,
 .vps-uptime-label { white-space: nowrap; flex-shrink: 0; opacity: 0.6; }
 .vps-node-meta { margin-top: 0.8rem; font-size: inherit; line-height: var(--line-height-sidenote); }
 .vps-node-meta > span { font-style: normal; }
 .vps-node-meta > time { opacity: 0.6; }
+.vps-node-meta > time { min-width: 0; max-width: 100%; }
 .vps-node-meta { justify-content: flex-start; }
 .vps-node[data-stale] .vps-resources { opacity: 0.6; }
 .vps-details { width: auto; margin: 0.6rem 0; }
@@ -559,6 +567,7 @@ vps-page {
 .vps-table td,
 .vps-table thead th { white-space: nowrap; }
 .vps-table tbody th { min-width: 10em; overflow-wrap: anywhere; }
+.vps-table tbody th > .vps-marquee { width: 12em; }
 .vps-table th:last-child,
 .vps-table td:last-child { padding-right: 0; text-align: right; }
 .vps-table [data-disabled] { opacity: 0.5; }
@@ -581,7 +590,7 @@ vps-page {
     z-index: 2;
     max-width: none;
     margin-top: 1.5rem;
-    padding-block: 0.7rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
+    padding-block: 0.5rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
     background: var(--bg-color);
   }
   .vps-control + .vps-control { margin-top: 0; }
