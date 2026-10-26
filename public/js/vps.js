@@ -7,6 +7,7 @@ import { MarqueeController, createMarquee } from "./marquee.js";
   const STALE_MS = 180000;
   const number = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
   const loadNumber = new Intl.NumberFormat("en", { maximumFractionDigits: 2 });
+  const preciseNumber = new Intl.NumberFormat("en", { maximumFractionDigits: 3 });
   const nameOrder = new Intl.Collator("en", { sensitivity: "base", numeric: true });
   const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "medium" });
   const finite = value => typeof value === "number" && Number.isFinite(value);
@@ -22,6 +23,11 @@ import { MarqueeController, createMarquee } from "./marquee.js";
   ];
   const filterChoices = [["all", "All"], ...states.map(state => [state, state[0].toUpperCase() + state.slice(1)])];
   const latency = value => finite(value) ? `${number.format(value)} ms` : "—";
+  const cpuFields = [
+    ["userPercent", "User"], ["systemPercent", "System"], ["iowaitPercent", "I/O wait"],
+    ["stealPercent", "Steal"], ["idlePercent", "Idle"], ["irqPercent", "IRQ"],
+    ["softirqPercent", "Soft IRQ"], ["nicePercent", "Nice"],
+  ];
   const bytes = value => {
     if (!finite(value) || value < 0) return "—";
     const units = ["B", "KiB", "MiB", "GiB", "TiB", "PiB"];
@@ -34,6 +40,14 @@ import { MarqueeController, createMarquee } from "./marquee.js";
     if (!(finite(used) && used >= 0) && !(finite(total) && total >= 0)) return percent(value);
     return `${bytes(used)} / ${bytes(total)}${finite(value) ? ` (${percent(value)})` : ""}`;
   };
+  const ioFields = [
+    ["readBytesPerSecond", "Read", rate], ["writeBytesPerSecond", "Write", rate],
+    ["readBytesTotal", "Read total", bytes], ["writeBytesTotal", "Written total", bytes],
+    ["utilizationPercent", "Utilization", percent], ["readTimePercent", "Read time", percent],
+    ["writeTimePercent", "Write time", percent], ["readAwaitMs", "Read await", latency],
+    ["writeAwaitMs", "Write await", latency],
+    ["queueDepth", "Queue depth", value => finite(value) ? preciseNumber.format(value) : "—"],
+  ];
   const uptime = value => {
     if (!finite(value) || value < 0) return "—";
     const minutes = Math.floor(value / 60);
@@ -130,6 +144,15 @@ import { MarqueeController, createMarquee } from "./marquee.js";
     return { root, cells };
   }
 
+  function metricRow(label) {
+    const root = element("div");
+    const value = element("dd");
+    const content = createMarquee();
+    value.append(content.root);
+    root.append(element("dt", "", label), value);
+    return { root, value: content.source };
+  }
+
   function createNode() {
     const root = element("article", "vps-node");
     const heading = element("div", "vps-node-heading");
@@ -182,13 +205,49 @@ import { MarqueeController, createMarquee } from "./marquee.js";
       fields[label] = content.source;
     }
     system.append(systemList);
+    const swap = metricRow("Swap");
+    systemList.append(swap.root);
+    const thermal = element("div", "vps-extra");
+    thermal.append(element("p", "vps-subtitle", "Temperatures"));
+    const temperatures = element("dl", "vps-system vps-temperatures");
+    thermal.append(temperatures);
+    system.append(thermal);
+
+    const processor = disclosure(root, "CPU");
+    const breakdown = element("dl", "vps-cpu-breakdown");
+    const breakdownViews = new Map(cpuFields.map(([key, label]) => {
+      const row = metricRow(label);
+      breakdown.append(row.root);
+      return [key, row];
+    }));
+    processor.append(breakdown);
+    const perCpu = element("div", "vps-extra");
+    perCpu.append(element("p", "vps-subtitle", "Per CPU"));
+    const coreList = element("dl", "vps-core-usage");
+    perCpu.append(coreList);
+    processor.append(perCpu);
+
+    const storage = disclosure(root, "Storage");
+    const filesystemGroup = element("div", "vps-extra");
+    const filesystemRows = table(filesystemGroup, ["Filesystem", "Used", "Total", "Usage"], "Filesystems");
+    storage.append(filesystemGroup);
+    const ioGroup = element("div", "vps-extra");
+    ioGroup.append(element("p", "vps-subtitle", "Disk I/O"));
+    const ioList = element("dl", "vps-io-metrics");
+    const ioViews = new Map(ioFields.map(([key, label]) => {
+      const row = metricRow(label);
+      ioList.append(row.root);
+      return [key, row];
+    }));
+    ioGroup.append(ioList);
+    storage.append(ioGroup);
+
     const network = disclosure(root, "Interfaces");
     const networkTimeContainer = element("time", "vps-sample-time");
     const networkTimeText = createMarquee();
     networkTimeContainer.append(networkTimeText.root);
     network.append(networkTimeContainer);
     const interfaces = table(network, ["Interface", "Receive", "Send", "Received total", "Sent total"], "Network interfaces");
-    network.append(element("p", "vps-table-note", "Totals are cumulative, not monthly."));
     const probes = disclosure(root, "Probes");
     const monitorRows = table(probes, ["Target", "Now", "1h avg", "1h min–max", "1h loss"], "Network probes");
     const emptyProbes = element("p", "vps-table-note", "No probes.");
@@ -196,6 +255,8 @@ import { MarqueeController, createMarquee } from "./marquee.js";
     root.append(meta);
     return { root, name: nameText.source, state, hardware: hardwareText.source, values, rx, tx, running,
       uptimeValue: uptimeText.source, updated: updatedText.source, updatedContainer, fields,
+      swap, thermal, temperatures, temperatureViews: new Map(), processor, breakdown, breakdownViews,
+      perCpu, coreList, coreViews: new Map(), storage, filesystemGroup, filesystemRows, filesystemViews: new Map(), ioGroup, ioViews,
       marquee: new MarqueeController(root, root, { preserveUpdates: true }),
       networkTime: networkTimeText.source, networkTimeContainer, interfaces, interfaceViews: new Map(), monitorRows, monitorViews: new Map(), emptyProbes };
   }
@@ -219,6 +280,54 @@ import { MarqueeController, createMarquee } from "./marquee.js";
       Array.isArray(node.loadAverage) ? node.loadAverage.map(value => finite(value) ? loadNumber.format(value) : "—").join(" / ") : "—",
       text(node.agentVersion)];
     Object.values(view.fields).forEach((field, index) => write(field, fields[index]));
+    view.swap.root.hidden = !finite(node.swapUsedBytes) && !finite(node.swapTotalBytes);
+    write(view.swap.value, capacity(node.swapUsedBytes, node.swapTotalBytes, null));
+    const sensors = node.temperaturesCelsius && typeof node.temperaturesCelsius === "object" && !Array.isArray(node.temperaturesCelsius)
+      ? Object.entries(node.temperaturesCelsius).filter(([, value]) => finite(value)) : [];
+    view.thermal.hidden = !sensors.length;
+    syncItems(view.temperatures, view.temperatureViews, sensors, item => item[0], ([name]) => {
+      const row = metricRow("");
+      const label = createMarquee();
+      label.source.textContent = name;
+      row.root.firstElementChild.append(label.root);
+      return row;
+    }, (row, [, value]) => {
+      write(row.value, `${number.format(value)} °C`);
+    });
+
+    const cpu = node.cpuBreakdown || {};
+    const hasBreakdown = cpuFields.some(([key]) => finite(cpu[key]));
+    view.breakdown.hidden = !hasBreakdown;
+    for (const [key, row] of view.breakdownViews) {
+      row.root.hidden = !finite(cpu[key]);
+      write(row.value, percent(cpu[key]));
+    }
+    const cores = Array.isArray(node.cpuCorePercents) ? node.cpuCorePercents.map((value, index) => ({ index, value })) : [];
+    view.perCpu.hidden = !cores.some(core => finite(core.value));
+    view.processor.parentElement.hidden = !hasBreakdown && view.perCpu.hidden;
+    syncItems(view.coreList, view.coreViews, cores, item => item.index, item => metricRow(`CPU ${item.index}`), (row, item) => {
+      write(row.value, percent(item.value));
+    });
+
+    const filesystems = Array.isArray(node.filesystems) ? node.filesystems.filter(fs => fs && typeof fs.name === "string") : [];
+    view.filesystemGroup.hidden = !filesystems.length;
+    syncItems(view.filesystemRows, view.filesystemViews, filesystems, fs => fs.name, () => {
+      const row = tableRow(4);
+      const name = createMarquee();
+      row.cells[0].append(name.root);
+      row.label = name.source;
+      return row;
+    }, (row, fs) => {
+      write(row.label, text(fs.name));
+      const usedPercent = finite(fs.usedBytes) && fs.usedBytes >= 0 && finite(fs.totalBytes) && fs.totalBytes > 0
+        ? fs.usedBytes / fs.totalBytes * 100 : null;
+      [bytes(fs.usedBytes), bytes(fs.totalBytes), percent(usedPercent)].forEach((value, index) => write(row.cells[index + 1], value));
+    });
+    const io = node.diskIo || {};
+    view.ioGroup.hidden = !ioFields.some(([key]) => finite(io[key]));
+    for (const [key, , format] of ioFields) write(view.ioViews.get(key).value, format(io[key]));
+    view.storage.parentElement.hidden = view.filesystemGroup.hidden && view.ioGroup.hidden;
+
     timeLabel(view.networkTime, node.network?.sampledAt, stale(node.network?.sampledAt) ? "Older network sample: " : "Network sample: ");
     const interfaces = node.network?.interfaces && typeof node.network.interfaces === "object" ? Object.entries(node.network.interfaces) : [];
     syncItems(view.interfaces, view.interfaceViews, interfaces, item => item[0], () => {

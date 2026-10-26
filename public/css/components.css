@@ -524,6 +524,41 @@ vps-page {
 .vps-system > div { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 1em; }
 .vps-system dt { white-space: nowrap; opacity: 0.6; }
 .vps-system dd { min-width: 0; margin: 0; }
+.vps-cpu-breakdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4em 1em;
+  margin: 0;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.vps-cpu-breakdown > div { display: flex; align-items: baseline; gap: 0.5em; min-width: 0; }
+.vps-cpu-breakdown dt { white-space: nowrap; flex-shrink: 0; opacity: 0.6; }
+.vps-cpu-breakdown dd { min-width: 0; margin: 0; }
+.vps-io-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4em 1em;
+  margin: 0;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.vps-io-metrics > div { display: flex; align-items: baseline; gap: 0.5em; min-width: 0; }
+.vps-io-metrics dt { flex-shrink: 0; white-space: nowrap; opacity: 0.6; }
+.vps-io-metrics dd { min-width: 0; margin: 0; }
+.vps-extra { margin-top: 0.8rem; }
+.vps-extra:first-child { margin-top: 0; }
+.vps-subtitle { margin: 0 0 0.4rem; font: inherit; font-style: italic; opacity: 0.6; }
+.vps-core-usage { display: grid; grid-template-columns: repeat(auto-fit, minmax(7em, 1fr)); gap: 0.2em 1em; margin: 0; font: inherit; }
+.vps-core-usage > div { display: flex; align-items: baseline; gap: 0.5em; min-width: 0; }
+.vps-core-usage dt { flex-shrink: 0; white-space: nowrap; opacity: 0.6; }
+.vps-core-usage dd { min-width: 0; margin: 0; font: inherit; }
+.vps-temperatures > div { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.vps-temperatures dt { min-width: 0; }
+.vps-system,
+.vps-core-usage { font-variant-numeric: tabular-nums; }
+.vps-details[hidden],
+.vps-details-content [hidden] { display: none; }
 .vps-marquee {
   --marquee-gap: 2rem;
   display: block;
@@ -595,6 +630,8 @@ vps-page {
   }
   .vps-control + .vps-control { margin-top: 0; }
   .vps-resources { gap: 0.6rem; }
+  .vps-cpu-breakdown { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4em 0.8em; }
+  .vps-io-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4em 0.8em; }
   .vps-system > div { gap: 0.6em; }
 }
 @media (max-width: 760px) and (prefers-color-scheme: dark) {
