@@ -1,4 +1,5 @@
 import { MarqueeController, createMarquee } from "./marquee.js";
+import flags from "./vps-flags.json";
 
 (() => {
   const tagName = "vps-page";
@@ -71,6 +72,19 @@ import { MarqueeController, createMarquee } from "./marquee.js";
     return node;
   };
   const write = (node, value) => { if (node.textContent !== value) node.textContent = value; };
+  function writeName(node, value) {
+    if (node.textContent === value) return;
+    const match = value.match(/^([\u{1F1E6}-\u{1F1FF}]{2})/u);
+    const code = match && [...match[1]].map(char => String.fromCharCode(char.codePointAt(0) - 0x1f1e6 + 97)).join("");
+    const flag = code && flags[code];
+    if (!flag) { node.textContent = value; return; }
+    const icon = element("span", "vps-flag", match[1]);
+    icon.style.setProperty("--flag-x", `${flag[0]}px`);
+    icon.style.setProperty("--flag-y", `${flag[1]}px`);
+    icon.style.setProperty("--flag-width", `${flag[2]}px`);
+    icon.style.setProperty("--flag-height", `${flag[3]}px`);
+    node.replaceChildren(icon, document.createTextNode(value.slice(match[1].length)));
+  }
   const timeLabel = (node, value, prefix = "") => {
     write(node, `${prefix}${age(value)}`);
     const time = node.closest("time") || node;
@@ -265,7 +279,7 @@ import { MarqueeController, createMarquee } from "./marquee.js";
     const status = nodeStatus(node);
     view.root.dataset.state = status;
     view.root.toggleAttribute("data-stale", stale(node.updatedAt));
-    write(view.name, text(node.name));
+    writeName(view.name, text(node.name));
     write(view.state, status[0].toUpperCase() + status.slice(1));
     write(view.hardware, text(node.cpuModel));
     [percent(node.cpuPercent), capacity(node.memoryUsedBytes, node.memoryTotalBytes, node.memoryPercent),

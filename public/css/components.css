@@ -489,6 +489,17 @@ vps-page {
 .vps-node:first-child { margin-top: 1.8rem; }
 .vps-node-heading { flex-wrap: nowrap; }
 .vps-node-heading h2 { flex: 1 1 0; min-width: 0; margin: 0; font: inherit; font-weight: 600; }
+.vps-flag {
+  --flag-scale: 1.15;
+  display: inline-block;
+  width: calc(var(--flag-width) * var(--flag-scale));
+  height: calc(var(--flag-height) * var(--flag-scale));
+  background: url("/fonts/country-flags/famfamfam-flags.png") no-repeat;
+  background-position: calc(var(--flag-x) * var(--flag-scale)) calc(var(--flag-y) * var(--flag-scale));
+  background-size: calc(224px * var(--flag-scale)) calc(199px * var(--flag-scale));
+  font-size: 0;
+  vertical-align: middle;
+}
 .vps-node-heading .vps-state { flex: none; }
 .vps-state { white-space: nowrap; }
 .vps-node[data-state="down"] .vps-state { text-decoration: underline; text-underline-offset: 0.2em; }

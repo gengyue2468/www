@@ -96,13 +96,13 @@ export class MarqueeController {
       element.tabIndex = overflowing ? 0 : -1;
       const gap = scrolling ? parseFloat(getComputedStyle(lane).columnGap) || 0 : 0;
       const distance = scrolling ? width + gap : 0;
-      const signature = JSON.stringify([text, distance]);
+      const signature = JSON.stringify([source.innerHTML, distance]);
       if (signature === item.signature) continue;
       changed = true;
       item.signature = signature;
       item.distance = distance;
       clone.hidden = !scrolling;
-      clone.textContent = scrolling ? text : "";
+      clone.replaceChildren(...(scrolling ? [...source.childNodes].map(node => node.cloneNode(true)) : []));
       if (scrolling) {
         lane.style.setProperty("--marquee-distance", `${distance}px`);
         lane.style.setProperty("--marquee-duration", `${distance / 24}s`);
