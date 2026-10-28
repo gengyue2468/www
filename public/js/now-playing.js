@@ -360,9 +360,8 @@ const COMPONENT_TEMPLATE = `
   };
 
   const cards = new Set();
-  const playingInterval = 2_000;
-  const idleInterval = 2_000;
-  const errorInterval = 30_000;
+  const playingInterval = 10_000;
+  const idleInterval = 30_000;
   const maxErrorInterval = 60_000;
   const playedAtFormatter = new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
@@ -412,7 +411,7 @@ const COMPONENT_TEMPLATE = `
       if (cooldown > 0) delay = Math.max(delay, cooldown);
       else if (boundary && failures === 0) {
         // The regular poll and track-end refresh share a single timer/request.
-        // Once the boundary was checked, stale responses back off up to the polling interval.
+        // Once the boundary was checked, stale responses back off 1/2/4/8/10s.
         const endDelay = boundary.triggered
           ? Math.min(playingInterval, 1000 * 2 ** Math.min(4, Math.max(0, boundary.attempts - 1)))
           : Math.ceil(remainingPlayback()) + 1;
@@ -454,7 +453,7 @@ const COMPONENT_TEMPLATE = `
           const retryAfter = header?.trim() || body?.retryAfter;
           const seconds = retryAfter == null || retryAfter === "" ? NaN : Number(retryAfter);
           const deadline = Number.isFinite(seconds) ? Date.now() + seconds * 1000 : Date.parse(retryAfter);
-          nextInterval = Number.isFinite(deadline) ? Math.max(1000, deadline - Date.now()) : errorInterval;
+          nextInterval = Number.isFinite(deadline) ? Math.max(1000, deadline - Date.now()) : idleInterval;
           retryNotBefore = Date.now() + nextInterval;
         }
         if (!response.ok) throw new Error("Spotify request failed");
@@ -490,7 +489,7 @@ const COMPONENT_TEMPLATE = `
       .catch(() => {
         if (!rateLimited) {
           failures = Math.min(failures + 1, 3);
-          nextInterval = Math.min(maxErrorInterval, errorInterval * 1.5 ** (failures - 1));
+          nextInterval = Math.min(maxErrorInterval, idleInterval * 1.5 ** (failures - 1));
         }
         if (!hasSuccessfulResult && (!controller.signal.aborted || timedOut)) {
           isUnavailable = true;
