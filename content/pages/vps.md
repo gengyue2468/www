@@ -34,5 +34,8 @@ description: Servers, resource usage and network probes.
         </details>
       </site-dropdown>
     </div>
+    <figure class="vps-map" data-vps-map hidden>
+      <div data-vps-map-graphic></div>
+    </figure>
   </aside>
 </vps-page>

@@ -1,5 +1,6 @@
 import { MarqueeController, createMarquee } from "./marquee.js";
 import flags from "./vps-flags.json";
+import mapUnits from "./vps-map.json";
 
 (() => {
   const tagName = "vps-page";
@@ -13,6 +14,10 @@ import flags from "./vps-flags.json";
   const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "medium" });
   const finite = value => typeof value === "number" && Number.isFinite(value);
   const text = value => typeof value === "string" && value ? value : "—";
+  const flagCode = value => {
+    const match = typeof value === "string" && value.match(/^([\u{1F1E6}-\u{1F1FF}]{2})/u);
+    return match ? [...match[1]].map(char => String.fromCharCode(char.codePointAt(0) - 0x1f1e6 + 97)).join("") : null;
+  };
   const nameSortKey = node => text(node.name).normalize("NFKC").replace(/^[^\p{L}]+/u, "").trim();
   const percent = value => finite(value) ? `${number.format(value)}%` : "—";
   const states = ["up", "down", "paused", "pending", "unknown"];
@@ -75,7 +80,7 @@ import flags from "./vps-flags.json";
   function writeName(node, value) {
     if (node.textContent === value) return;
     const match = value.match(/^([\u{1F1E6}-\u{1F1FF}]{2})/u);
-    const code = match && [...match[1]].map(char => String.fromCharCode(char.codePointAt(0) - 0x1f1e6 + 97)).join("");
+    const code = flagCode(value);
     const flag = code && flags[code];
     if (!flag) { node.textContent = value; return; }
     const icon = element("span", "vps-flag", match[1]);
@@ -84,6 +89,55 @@ import flags from "./vps-flags.json";
     icon.style.setProperty("--flag-width", `${flag[2]}px`);
     icon.style.setProperty("--flag-height", `${flag[3]}px`);
     node.replaceChildren(icon, document.createTextNode(value.slice(match[1].length)));
+  }
+
+  // Natural Earth map units and label points; points indicate regions, not server locations.
+  function createMap(root) {
+    const namespace = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(namespace, "svg");
+    svg.setAttribute("viewBox", "0 0 360 145");
+    svg.setAttribute("role", "img");
+    const land = new Map();
+    const points = new Map();
+    for (const [code, path, x, y] of mapUnits) {
+      const shape = document.createElementNS(namespace, "path");
+      shape.setAttribute("d", path);
+      shape.setAttribute("class", "vps-map-land");
+      shape.setAttribute("fill-rule", "evenodd");
+      svg.append(shape);
+      if (code) {
+        if (!land.has(code)) land.set(code, []);
+        land.get(code).push(shape);
+        if (!points.has(code) && finite(x) && finite(y)) points.set(code, [x, y]);
+      }
+    }
+    const markers = document.createElementNS(namespace, "g");
+    svg.append(markers);
+    root.querySelector("[data-vps-map-graphic]").replaceChildren(svg);
+    return { root, svg, markers, land, points, signature: null };
+  }
+
+  const regionNames = typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames(["en"], { type: "region" }) : null;
+  function updateMap(map, countries) {
+    const codes = [...countries].sort();
+    const signature = JSON.stringify(codes);
+    map.root.hidden = false;
+    if (signature === map.signature) return;
+    map.signature = signature;
+    for (const [code, shapes] of map.land) for (const shape of shapes) shape.toggleAttribute("data-active", countries.has(code));
+    map.markers.replaceChildren();
+    for (const code of codes) {
+      const point = map.points.get(code);
+      if (!point) continue;
+      const marker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      marker.setAttribute("class", "vps-map-marker");
+      marker.setAttribute("cx", point[0]);
+      marker.setAttribute("cy", point[1]);
+      marker.setAttribute("r", "2");
+      map.markers.append(marker);
+    }
+    const names = codes.map(code => regionNames?.of(code.toUpperCase()) || code.toUpperCase());
+    map.svg.setAttribute("aria-label", names.length ? `Server regions from name flags: ${names.join(", ")}.` : "No country flags in visible server names.");
   }
   const timeLabel = (node, value, prefix = "") => {
     write(node, `${prefix}${age(value)}`);
@@ -395,6 +449,17 @@ import flags from "./vps-flags.json";
       this.summary = this.querySelector("[data-vps-summary]");
       if (!this.list || !this.message || !this.retry || !this.summary || !this.updated) return;
       this.controller = new AbortController();
+      const mapRoot = this.querySelector("[data-vps-map]");
+      if (mapRoot) {
+        this.map ||= createMap(mapRoot);
+        const mobile = window.matchMedia("(max-width: 760px)");
+        const placeMap = () => {
+          if (mobile.matches) this.querySelector(".vps-overview")?.after(mapRoot);
+          else this.querySelector(".vps-sidebar")?.append(mapRoot);
+        };
+        mobile.addEventListener("change", placeMap, { signal: this.controller.signal });
+        placeMap();
+      }
       this.nodeViews ||= new Map();
       for (const view of this.nodeViews.values()) view.marquee.connect();
       this.sortKey ||= "name-asc";
@@ -518,11 +583,17 @@ import flags from "./vps-flags.json";
       write(this.summary, nodes.length ? `${up} of ${nodes.length} servers up.` : "No servers.");
       syncItems(this.list, this.nodeViews, nodes, node => node.id, createNode, updateNode);
       let visible = 0;
+      const countries = new Set();
       for (const node of nodes) {
         const shown = this.filterKey === "all" || nodeStatus(node) === this.filterKey;
         this.nodeViews.get(node.id).root.hidden = !shown;
-        if (shown) visible++;
+        if (shown) {
+          visible++;
+          const code = flagCode(node.name);
+          if (code) countries.add(code);
+        }
       }
+      if (this.map) updateMap(this.map, countries);
       const empty = this.querySelector("[data-vps-empty]");
       if (empty) empty.hidden = !nodes.length || visible !== 0;
       write(this.updated, `Snapshot ${dateFormat.format(new Date(data.generatedAt))}`);

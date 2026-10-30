@@ -337,6 +337,7 @@ export function getUnversionedPageAssetPaths(): string[] {
     "js/speedtest-engine.js",
     "js/marquee.js",
     "js/vps-flags.json",
+    "js/vps-map.json",
     "css/vps-fonts.css",
     "fonts/source-han-serif-cn-vf/result.css",
     "fonts/source-han-serif-cn-vf/index.html",

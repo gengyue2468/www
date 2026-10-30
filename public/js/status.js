@@ -13,6 +13,11 @@
     maximumFractionDigits: 2,
   });
   const latencyFormatter = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
+  const nameOrder = new Intl.Collator("en", { sensitivity: "base", numeric: true });
+  const sortChoices = [["default", "Default"], ["name-asc", "Name A–Z"], ["name-desc", "Name Z–A"],
+    ["uptime", "24h uptime ↓"], ["latency", "Latency ↑"]];
+  const filterChoices = [["all", "All"], ["up", "Operational"], ["down", "Down"],
+    ["pending", "Pending"], ["maintenance", "Maintenance"], ["unknown", "Unknown"]];
 
   const element = (tag, className, text) => {
     const node = document.createElement(tag);
@@ -22,6 +27,7 @@
   };
 
   const stateInfo = status => {
+    if (status == null || status === "") return { className: "unknown", label: "Unknown" };
     switch (Number(status)) {
       case 1: return { className: "up", label: "Operational" };
       case 0: return { className: "down", label: "Down" };
@@ -64,8 +70,13 @@
       this.updated = this.querySelector("[data-status-updated]");
       this.message = this.querySelector("[data-status-message]");
       this.retry = this.querySelector("[data-status-retry]");
+      this.empty = this.querySelector("[data-status-empty]");
       if (!this.overview || !this.notices || !this.groups || !this.message || !this.retry) return;
       this.controller = new AbortController();
+      this.sortKey ||= "default";
+      this.filterKey ||= "all";
+      this.setupChoices("sort", sortChoices);
+      this.setupChoices("filter", filterChoices);
       this.retry.addEventListener("click", () => { void this.load(); }, { signal: this.controller.signal });
       void this.load();
     }
@@ -82,6 +93,26 @@
     setMessage(message) {
       this.message.textContent = message;
       this.message.hidden = !message;
+    }
+
+    setupChoices(kind, choices) {
+      const menu = this.querySelector(`[data-status-${kind}-options]`);
+      const label = this.querySelector(`[data-status-${kind}-label]`);
+      if (!menu || !label) return;
+      label.textContent = choices.find(([key]) => key === this[`${kind}Key`])?.[1] || choices[0][1];
+      menu.replaceChildren(...choices.map(([key, text]) => {
+        const button = element("button", "", text);
+        button.type = "button";
+        button.dataset.value = key;
+        button.setAttribute("aria-pressed", String(key === this[`${kind}Key`]));
+        button.addEventListener("click", () => {
+          this[`${kind}Key`] = key;
+          label.textContent = text;
+          for (const option of menu.querySelectorAll("button")) option.setAttribute("aria-pressed", String(option.dataset.value === key));
+          if (this.data) this.render(this.data);
+        }, { signal: this.controller.signal });
+        return button;
+      }));
     }
 
     scheduleRefresh() {
@@ -136,17 +167,35 @@
       this.renderNotices(data);
       this.groups.replaceChildren();
       const heartbeatList = data.heartbeatList && typeof data.heartbeatList === "object" ? data.heartbeatList : {};
+      let visible = 0;
       for (const groupData of data.publicGroupList) {
+        const allMonitors = Array.isArray(groupData?.monitorList) ? groupData.monitorList : [];
+        const monitors = allMonitors.filter(monitor => this.filterKey === "all" || stateInfo(monitor?.status).className === this.filterKey);
+        if (!monitors.length && this.filterKey !== "all") continue;
+        if (this.sortKey !== "default") monitors.sort((a, b) => {
+          const byName = nameOrder.compare(String(a?.name || ""), String(b?.name || ""));
+          if (this.sortKey === "name-asc") return byName;
+          if (this.sortKey === "name-desc") return -byName;
+          const field = this.sortKey === "uptime" ? "uptime24h" : "ping";
+          const left = a?.[field];
+          const right = b?.[field];
+          const leftValid = typeof left === "number" && Number.isFinite(left) && left >= 0;
+          const rightValid = typeof right === "number" && Number.isFinite(right) && right >= 0;
+          if (!leftValid) return rightValid ? 1 : byName;
+          if (!rightValid) return -1;
+          return (this.sortKey === "uptime" ? right - left : left - right) || byName;
+        });
         const group = element("section", "status-group");
         const heading = element("h2", "status-group-title", typeof groupData?.name === "string" ? groupData.name : "Services");
         group.append(heading);
-        const monitors = Array.isArray(groupData?.monitorList) ? groupData.monitorList : [];
         const list = element("div", "status-service-list");
         for (const monitor of monitors) list.append(this.renderMonitor(monitor, heartbeatList[String(monitor?.id)]));
+        visible += monitors.length;
         if (list.childElementCount) group.append(list);
         else group.append(element("p", "status-empty", "No services to display."));
         this.groups.append(group);
       }
+      if (this.empty) this.empty.hidden = this.filterKey === "all" || visible > 0;
     }
 
     renderOverview(data) {

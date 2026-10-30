@@ -317,12 +317,15 @@ memos-feed {
 
 /* Status follows the same quiet text stream as Memos. */
 status-page {
-  display: block;
-  width: var(--width-content);
+  display: grid;
+  grid-template-columns: var(--width-content) calc(var(--width-content) * 0.1) calc(var(--width-content) * 0.5);
+  align-items: start;
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
   overflow-wrap: anywhere;
 }
+.status-main { grid-column: 1; grid-row: 1; min-width: 0; }
+.status-empty[hidden] { display: none; }
 
 .status-service-heading,
 .status-service-meta {
@@ -425,10 +428,6 @@ status-page {
   cursor: pointer;
 }
 
-@media (max-width: 760px) {
-  status-page { width: 100%; }
-}
-
 /* A server inventory in the same unboxed, editorial column as Status. */
 vps-page {
   display: grid;
@@ -438,7 +437,7 @@ vps-page {
   line-height: var(--line-height-body);
 }
 .vps-main { grid-column: 1; grid-row: 1; min-width: 0; }
-.vps-sidebar {
+:is(.vps-sidebar, .status-sidebar) {
   grid-column: 3;
   grid-row: 1;
   position: sticky;
@@ -449,15 +448,21 @@ vps-page {
   font-size: calc(var(--font-size-body) * 0.9);
   line-height: var(--line-height-sidenote);
 }
-.vps-control { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.3em 1em; }
-.vps-control + .vps-control { margin-top: 0.6rem; }
-.vps-control-label { opacity: 0.6; font-style: italic; }
-.vps-control .nav-menu-label { display: inline-flex; align-items: center; gap: 0.25em; padding: 0; font: inherit; cursor: pointer; }
-.vps-chevron { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-.vps-control details[open] .vps-chevron { transform: rotate(180deg); }
-.vps-control .nav-dropdown-menu button { width: 100%; box-sizing: border-box; }
-.vps-control .nav-dropdown-menu button[aria-pressed="true"] { background: var(--accent); }
+:is(.vps-control, .status-control) { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.3em 1em; }
+:is(.vps-control + .vps-control, .status-control + .status-control) { margin-top: 0.6rem; }
+:is(.vps-control-label, .status-control-label) { opacity: 0.6; font-style: italic; }
+:is(.vps-control, .status-control) .nav-menu-label { display: inline-flex; align-items: center; gap: 0.25em; padding: 0; font: inherit; cursor: pointer; }
+:is(.vps-chevron, .status-chevron) { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+:is(.vps-control, .status-control) details[open] :is(.vps-chevron, .status-chevron) { transform: rotate(180deg); }
+:is(.vps-control, .status-control) .nav-dropdown-menu button { width: 100%; box-sizing: border-box; }
+:is(.vps-control, .status-control) .nav-dropdown-menu button[aria-pressed="true"] { background: var(--accent); }
 .vps-empty { font: inherit; font-style: italic; opacity: 0.6; }
+.vps-map { width: 100%; max-width: 100%; margin: 1.5rem 0 0; font: inherit; }
+.vps-map[hidden] { display: none; }
+.vps-map svg { display: block; width: 100%; height: auto; overflow: hidden; }
+.vps-map-land { fill: currentColor; fill-opacity: 0.12; stroke: var(--bg-color); stroke-width: 0.35; stroke-linejoin: round; }
+.vps-map-land[data-active] { fill-opacity: 0.5; }
+.vps-map-marker { fill: currentColor; stroke: var(--bg-color); stroke-width: 0.8; }
 .vps-empty[hidden],
 .vps-node[hidden] { display: none; }
 .vps-overview,
@@ -625,8 +630,9 @@ vps-page {
 .vps-updated:empty { display: none; }
 .vps-retry { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
 @media (max-width: 760px) {
-  vps-page { display: block; }
-  .vps-sidebar {
+  :is(vps-page, status-page) { display: block; }
+  .vps-map { max-width: 24rem; }
+  :is(.vps-sidebar, .status-sidebar) {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -639,14 +645,17 @@ vps-page {
     padding-block: 0.5rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
     background: var(--bg-color);
   }
-  .vps-control + .vps-control { margin-top: 0; }
+  :is(.vps-control + .vps-control, .status-control + .status-control) { margin-top: 0; }
   .vps-resources { gap: 0.6rem; }
   .vps-cpu-breakdown { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4em 0.8em; }
   .vps-io-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4em 0.8em; }
   .vps-system > div { gap: 0.6em; }
 }
 @media (max-width: 760px) and (prefers-color-scheme: dark) {
-  .vps-sidebar { background: var(--bg-color-dark); }
+  :is(.vps-sidebar, .status-sidebar) { background: var(--bg-color-dark); }
+}
+@media (prefers-color-scheme: dark) {
+  .vps-map-land, .vps-map-marker { stroke: var(--bg-color-dark); }
 }
 
 /* Recently played tracks use the same quiet, unboxed flow as Memos. */
