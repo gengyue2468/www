@@ -37,13 +37,6 @@
     }
   };
 
-  const overallInfo = state => {
-    if (state === "up") return { className: "up", label: "All systems operational" };
-    if (state === "down") return { className: "down", label: "Service outage" };
-    if (state === "degraded") return { className: "degraded", label: "Partially degraded service" };
-    return { className: "unknown", label: "Status unknown" };
-  };
-
   const formatCheckedAt = value => {
     if (typeof value !== "string") return "";
     const date = new Date(value.replace(" ", "T"));
@@ -199,9 +192,9 @@
     }
 
     renderOverview(data) {
-      const overall = overallInfo(data.overall?.state);
+      const label = typeof data.overall?.label === "string" ? data.overall.label.trim() : "";
       const summary = data.summary || {};
-      if (this.heading) this.heading.textContent = overall.label;
+      if (this.heading) this.heading.textContent = label || "Status unknown";
       this.overview.replaceChildren(element("p", "status-summary", `${summary.up || 0} of ${summary.total || 0} services operational.`));
     }
 
@@ -250,7 +243,8 @@
           const ping = Math.max(0, Number(check?.ping) || 0);
           const level = state.className === "up" ? Math.min(7, Math.round(ping / maxPing * 7)) : 0;
           const dot = document.createElementNS(svgNamespace, "text");
-          dot.setAttribute("class", `status-heartbeat-dot is-${state.className}`);
+          dot.setAttribute("class", `status-heartbeat-dot is-${state.className} notranslate`);
+          dot.setAttribute("translate", "no");
           dot.setAttribute("x", String(index * 10));
           dot.setAttribute("y", "14");
           dot.setAttribute("textLength", "10");

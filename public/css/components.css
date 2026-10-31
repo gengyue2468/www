@@ -396,13 +396,11 @@ status-page {
   white-space: nowrap;
 }
 
-.status-heartbeat-dot {
-  opacity: 0.2;
-}
-.status-heartbeat-dot.is-up { opacity: 0.9; }
+.status-heartbeat-dot.is-up { opacity: 0.95; }
+.status-heartbeat-dot.is-down { opacity: 0.3; }
 .status-heartbeat-dot.is-pending,
-.status-heartbeat-dot.is-maintenance { opacity: 0.5; }
-.status-heartbeat-dot.is-unknown { opacity: 0.08; }
+.status-heartbeat-dot.is-maintenance,
+.status-heartbeat-dot.is-unknown { opacity: 0.6; }
 
 .status-service-meta { margin-top: 0.25rem; }
 .status-updated {
