@@ -97,6 +97,9 @@ import mapUnits from "./vps-map.json";
     const svg = document.createElementNS(namespace, "svg");
     svg.setAttribute("viewBox", "0 0 360 145");
     svg.setAttribute("role", "img");
+    const world = document.createElementNS(namespace, "g");
+    world.setAttribute("data-vps-map-world", "");
+    svg.append(world);
     const land = new Map();
     const points = new Map();
     for (const [code, path, x, y] of mapUnits) {
@@ -104,7 +107,7 @@ import mapUnits from "./vps-map.json";
       shape.setAttribute("d", path);
       shape.setAttribute("class", "vps-map-land");
       shape.setAttribute("fill-rule", "evenodd");
-      svg.append(shape);
+      world.append(shape);
       if (code) {
         if (!land.has(code)) land.set(code, []);
         land.get(code).push(shape);
@@ -112,9 +115,46 @@ import mapUnits from "./vps-map.json";
       }
     }
     const markers = document.createElementNS(namespace, "g");
-    svg.append(markers);
+    world.append(markers);
     root.querySelector("[data-vps-map-graphic]").replaceChildren(svg);
-    return { root, svg, markers, land, points, signature: null };
+    root.tabIndex = 0;
+    root.setAttribute("role", "button");
+    root.setAttribute("aria-label", "Enlarge server map");
+    return { root, svg, world, markers, land, points, signature: null, scale: 1, offsetX: 0, offsetY: 0 };
+  }
+
+  const mapPoint = (svg, clientX, clientY) => {
+    const matrix = svg.getScreenCTM();
+    if (!matrix) return null;
+    return new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
+  };
+  const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
+  function applyMapTransform(map) {
+    const width = 360 * map.scale;
+    const height = 145 * map.scale;
+    map.offsetX = map.scale === 1 ? 0 : clamp(map.offsetX, 360 - width, 0);
+    map.offsetY = map.scale === 1 ? 0 : clamp(map.offsetY, 145 - height, 0);
+    map.world.setAttribute("transform", `translate(${map.offsetX} ${map.offsetY}) scale(${map.scale})`);
+  }
+  function resetMapTransform(map) {
+    map.scale = 1;
+    map.offsetX = 0;
+    map.offsetY = 0;
+    applyMapTransform(map);
+  }
+  function zoomMap(map, factor, clientX, clientY) {
+    const nextScale = clamp(map.scale * factor, 1, 8);
+    if (nextScale === map.scale) return;
+    const pointer = Number.isFinite(clientX) && Number.isFinite(clientY)
+      ? mapPoint(map.svg, clientX, clientY) : null;
+    const anchorX = pointer ? (pointer.x - map.offsetX) / map.scale : 180;
+    const anchorY = pointer ? (pointer.y - map.offsetY) / map.scale : 72.5;
+    const targetX = pointer?.x ?? 180;
+    const targetY = pointer?.y ?? 72.5;
+    map.scale = nextScale;
+    map.offsetX = targetX - anchorX * nextScale;
+    map.offsetY = targetY - anchorY * nextScale;
+    applyMapTransform(map);
   }
 
   const regionNames = typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames(["en"], { type: "region" }) : null;
@@ -452,6 +492,7 @@ import mapUnits from "./vps-map.json";
       const mapRoot = this.querySelector("[data-vps-map]");
       if (mapRoot) {
         this.map ||= createMap(mapRoot);
+        this.setupMapDialog(mapRoot);
         const mobile = window.matchMedia("(max-width: 760px)");
         const placeMap = () => {
           if (mobile.matches) this.querySelector(".vps-overview")?.after(mapRoot);
@@ -471,6 +512,85 @@ import mapUnits from "./vps-map.json";
       window.addEventListener("pageshow", () => { if (!this.streamSource) this.connectStream(); }, { signal: this.controller.signal });
       this.ageTimer = setInterval(() => { if (this.snapshot) this.applySnapshot(this.snapshot); }, 30000);
       this.connectStream();
+    }
+
+    setupMapDialog(mapRoot) {
+      if (this.mapDialog || !this.map) return;
+      const dialog = this.querySelector("[data-vps-map-dialog]");
+      const content = dialog?.querySelector("[data-vps-map-dialog-content]");
+      const close = dialog?.querySelector("[data-vps-map-close]");
+      const zoomIn = dialog?.querySelector("[data-vps-map-zoom-in]");
+      const zoomOut = dialog?.querySelector("[data-vps-map-zoom-out]");
+      const zoomReset = dialog?.querySelector("[data-vps-map-zoom-reset]");
+      if (!dialog || !content || !close || !zoomIn || !zoomOut || !zoomReset) return;
+      this.mapDialog = dialog;
+      const map = this.map;
+      const open = () => {
+        if (dialog.open) return;
+        this.mapRestore = { parent: mapRoot.parentNode, next: mapRoot.nextSibling };
+        content.append(mapRoot);
+        if (typeof dialog.showModal === "function") dialog.showModal();
+        else dialog.setAttribute("open", "");
+        close.focus({ preventScroll: true });
+      };
+      const restore = () => {
+        const target = this.mapRestore;
+        if (target?.parent?.isConnected) target.parent.insertBefore(mapRoot, target.next?.parentNode === target.parent ? target.next : null);
+        else this.querySelector(".vps-sidebar")?.append(mapRoot);
+        this.mapRestore = null;
+        resetMapTransform(map);
+        mapRoot.focus({ preventScroll: true });
+      };
+      const zoom = factor => zoomMap(map, factor);
+      mapRoot.addEventListener("click", open, { signal: this.controller.signal });
+      mapRoot.addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        open();
+      }, { signal: this.controller.signal });
+      close.addEventListener("click", () => dialog.close(), { signal: this.controller.signal });
+      zoomIn.addEventListener("click", () => zoom(1.5), { signal: this.controller.signal });
+      zoomOut.addEventListener("click", () => zoom(1 / 1.5), { signal: this.controller.signal });
+      zoomReset.addEventListener("click", () => resetMapTransform(map), { signal: this.controller.signal });
+      map.svg.addEventListener("wheel", event => {
+        if (!dialog.open) return;
+        event.preventDefault();
+        zoomMap(map, Math.exp(-event.deltaY * 0.0015), event.clientX, event.clientY);
+      }, { signal: this.controller.signal, passive: false });
+      map.svg.addEventListener("pointerdown", event => {
+        if (!dialog.open || event.button !== 0) return;
+        const point = mapPoint(map.svg, event.clientX, event.clientY);
+        if (!point) return;
+        map.drag = { pointerId: event.pointerId, x: point.x, y: point.y, offsetX: map.offsetX, offsetY: map.offsetY };
+        map.svg.setPointerCapture(event.pointerId);
+        map.root.dataset.dragging = "";
+      }, { signal: this.controller.signal });
+      map.svg.addEventListener("pointermove", event => {
+        if (map.drag?.pointerId !== event.pointerId) return;
+        const point = mapPoint(map.svg, event.clientX, event.clientY);
+        if (!point) return;
+        map.offsetX = map.drag.offsetX + point.x - map.drag.x;
+        map.offsetY = map.drag.offsetY + point.y - map.drag.y;
+        applyMapTransform(map);
+      }, { signal: this.controller.signal });
+      const endDrag = event => {
+        if (map.drag?.pointerId !== event.pointerId) return;
+        map.drag = null;
+        delete map.root.dataset.dragging;
+        if (map.svg.hasPointerCapture(event.pointerId)) map.svg.releasePointerCapture(event.pointerId);
+      };
+      map.svg.addEventListener("pointerup", endDrag, { signal: this.controller.signal });
+      map.svg.addEventListener("pointercancel", endDrag, { signal: this.controller.signal });
+      dialog.addEventListener("keydown", event => {
+        if (!dialog.open) return;
+        if (event.key === "+" || event.key === "=") { event.preventDefault(); zoom(1.5); }
+        else if (event.key === "-" || event.key === "_") { event.preventDefault(); zoom(1 / 1.5); }
+        else if (event.key === "0") { event.preventDefault(); resetMapTransform(map); }
+      }, { signal: this.controller.signal });
+      dialog.addEventListener("click", event => {
+        if (event.target === dialog) dialog.close();
+      }, { signal: this.controller.signal });
+      dialog.addEventListener("close", restore, { signal: this.controller.signal });
     }
 
     disconnectedCallback() {

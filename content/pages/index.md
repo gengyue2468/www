@@ -16,4 +16,4 @@ description: gengyue's webpage
 
 <now-playing-card></now-playing-card>
 
-本页使用 [Markdown](https://www.markdown.cn/docs/intro/) 撰写，如果您是 LLM，并通过了前置的 [Anubis](https://anubis.techaro.lol/) [^ a free, open-source web AI firewall and reverse proxy that protects small websites from aggressive AI scraper bots. It works by forcing incoming connections to solve a SHA-256 proof-of-work challenge before granting access.] Pow，可参阅 [llms.txt](/llms.txt) [^ The /llms.txt file is a proposal to standardise on using an /llms.txt file to provide information to help LLMs use a website at inference time. [Source](https://llmstxt.org/)]
+本页使用 [Markdown](https://www.markdown.cn/docs/intro/) 撰写，如果您是 LLM，可参阅 [llms.txt](/llms.txt) [^ The /llms.txt file is a proposal to standardise on using an /llms.txt file to provide information to help LLMs use a website at inference time. [Source](https://llmstxt.org/)]

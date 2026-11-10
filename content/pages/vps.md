@@ -38,4 +38,15 @@ description: Servers, resource usage and network probes.
       <div data-vps-map-graphic></div>
     </figure>
   </aside>
+  <dialog class="vps-map-dialog" data-vps-map-dialog aria-label="Expanded server map">
+    <button class="vps-map-close" data-vps-map-close type="button" aria-label="Close map">
+      <svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 16 16"><path d="m3 3 10 10M13 3 3 13"></path></svg>
+    </button>
+    <div class="vps-map-tools" aria-label="Map controls">
+      <button data-vps-map-zoom-in type="button" aria-label="Zoom in"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"></path></svg></button>
+      <button data-vps-map-zoom-out type="button" aria-label="Zoom out"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M3 8h10"></path></svg></button>
+      <button data-vps-map-zoom-reset type="button" aria-label="Reset map zoom"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M3 6V3h3M3.5 3.5A5.5 5.5 0 1 1 2.7 10"></path></svg></button>
+    </div>
+    <div data-vps-map-dialog-content></div>
+  </dialog>
 </vps-page>

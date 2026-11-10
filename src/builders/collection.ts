@@ -205,7 +205,7 @@ function buildCollectionIndex(
   };
   const renderedContent = renderTemplate(indexLayout, contentData);
 
-  const indexTitle = `${capitalize(coll.name)} - ${config.site.title}`;
+  const indexTitle = `${capitalize(coll.name)} / ${config.site.title}`;
   const indexDescription = buildMetaDescription({
     title: coll.name,
     primary: coll.description || config.site.description,
@@ -326,7 +326,7 @@ async function buildPostPages(
     if (hasMathHtml(html)) headLinkParts.push(mathStylesheet(assets.katexStylesheetHref));
     const headLinks = headLinkParts.join("\n    ");
     const postTags = post.tags;
-    const fullTitle = `${title} - ${config.site.title}`;
+    const fullTitle = `${title} / ${config.site.title}`;
 
     let output = renderPage(baseLayout, {
       route: postPath(urlPrefix, post.slug),
@@ -413,7 +413,7 @@ async function buildTagPages(
       };
       const renderedContent = renderTemplate(tagsLayout, contentData);
 
-      const tagPageTitle = `#${tag} - ${config.site.title}`;
+      const tagPageTitle = `#${tag} / ${config.site.title}`;
       const tagDescription = buildMetaDescription({
         title: `#${tag}`,
         primary: `${capitalize(coll.name)} 里和 ${tag} 有关的记录。`,
@@ -471,7 +471,7 @@ async function buildTagPages(
   };
   const renderedContent = renderTemplate(tagsLayout, contentData);
 
-  const tagsIndexTitle = `Tags - ${config.site.title}`;
+  const tagsIndexTitle = `Tags / ${config.site.title}`;
   const tagsIndexDescription = buildMetaDescription({
     title: "Tags",
     primary: `${capitalize(coll.name)} 的标签，按话题翻翻。`,

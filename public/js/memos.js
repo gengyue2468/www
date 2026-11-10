@@ -40,18 +40,18 @@ import "./code-block.js";
     dateStyle: "medium",
     timeStyle: "short",
   });
-  const calendarMonthFormatter = new Intl.DateTimeFormat(undefined, {
+  const calendarMonthFormatter = new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
     timeZone: "UTC",
   });
-  const calendarDateFormatter = new Intl.DateTimeFormat(undefined, {
+  const calendarDateFormatter = new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
     timeZone: "UTC",
   });
-  const calendarWeekdayFormatter = new Intl.DateTimeFormat(undefined, {
+  const calendarWeekdayFormatter = new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     timeZone: "UTC",
   });
@@ -463,7 +463,7 @@ import "./code-block.js";
           );
           dayNode.setAttribute(
             "aria-label",
-            `${calendarDateFormatter.format(new Date(Date.UTC(year, month - 1, day)))}，${count} memo`,
+            `${calendarDateFormatter.format(new Date(Date.UTC(year, month - 1, day)))}, ${count} memo${count === 1 ? "" : "s"}`,
           );
           dayNode.title = `${count} memo`;
           dayNode.style.setProperty(

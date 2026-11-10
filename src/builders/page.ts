@@ -30,7 +30,7 @@ function buildPageOutput(
     headLinks?: string;
   }
 ): string {
-  const pageTitle = route === "/" ? config.site.title : `${title} - ${config.site.title}`;
+  const pageTitle = route === "/" ? config.site.title : `${title} / ${config.site.title}`;
   
   return renderPage(baseLayout, {
     route,

@@ -4,14 +4,14 @@ description: 碎碎念
 ---
 
 <div class="memos-layout">
-<aside class="memos-calendar" data-memos-calendar aria-label="日历" hidden>
+<aside class="memos-calendar" data-memos-calendar aria-label="Calendar" hidden>
   <div class="memos-calendar-header">
-    <button class="memos-calendar-nav" data-calendar-prev type="button" aria-label="上月">←</button>
+    <button class="memos-calendar-nav" data-calendar-prev type="button" aria-label="Previous month">←</button>
     <strong class="memos-calendar-month" data-calendar-month></strong>
-    <button class="memos-calendar-nav" data-calendar-next type="button" aria-label="下月">→</button>
+    <button class="memos-calendar-nav" data-calendar-next type="button" aria-label="Next month">→</button>
   </div>
   <div class="memos-calendar-weekdays" data-calendar-weekdays aria-hidden="true"></div>
-  <div class="memos-calendar-grid" data-calendar-grid role="grid" aria-label="按日期查看"></div>
+  <div class="memos-calendar-grid" data-calendar-grid role="grid" aria-label="View by date"></div>
 </aside>
 
 <memos-feed>
