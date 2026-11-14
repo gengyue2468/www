@@ -9,6 +9,7 @@
     "serve": "bunx serve dist",
     "deploy": "bash scripts/deploy.sh",
     "build-only": "bun run build",
+    "generate:vps-map": "bun run scripts/generate-vps-map.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test ./tests"
   },
@@ -37,6 +38,7 @@
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^20.11.0",
     "bun-types": "^1.1.0",
+    "jsts": "^2.12.1",
     "serve": "^14.2.1",
     "typescript": "^5.3.3"
   }

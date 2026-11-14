@@ -3,6 +3,54 @@
   if (customElements.get(tagName)) return;
 
   const scripts = new Map();
+  let pendingSubmission = null;
+  let transportInstalled = false;
+
+  // Isso sends JSON with XMLHttpRequest rather than submitting the widget's form field.
+  function installCommentTransport(endpoint) {
+    if (transportInstalled) return;
+    const upstream = new URL(endpoint, document.baseURI);
+    const newPath = `${upstream.pathname.replace(/\/+$/, "")}/new`;
+    const open = XMLHttpRequest.prototype.open;
+    const send = XMLHttpRequest.prototype.send;
+    const requests = new WeakSet();
+    XMLHttpRequest.prototype.open = function(method, url, ...args) {
+      const target = new URL(url, document.baseURI);
+      const isComment = String(method).toUpperCase() === "POST" && target.origin === upstream.origin && target.pathname === newPath;
+      requests.delete(this);
+      if (isComment) {
+        requests.add(this);
+        return open.call(this, method, `/api/isso/new${target.search}`, ...args);
+      }
+      return open.call(this, method, url, ...args);
+    };
+    XMLHttpRequest.prototype.send = function(...args) {
+      if (!requests.has(this)) return send.apply(this, args);
+      requests.delete(this);
+      const submission = pendingSubmission;
+      pendingSubmission = null;
+      if (submission?.token) this.setRequestHeader("X-Cap-Token", submission.token);
+      if (submission) {
+        submission.token = null;
+        submission.gate.dataset.state = "required";
+        submission.widget.reset?.();
+        this.addEventListener("loadend", () => {
+          if (this.status >= 200 && this.status < 300) return;
+          let error = "";
+          try { error = JSON.parse(this.responseText)?.error || ""; } catch { /* Isso or a proxy may return non-JSON. */ }
+          submission.message.textContent = this.status === 502 || this.status === 0 || this.status >= 500 && error !== "captcha_unavailable"
+            ? "评论提交结果不确定，请先刷新评论确认是否已发表，再重新验证。"
+            : error === "body_too_large" || this.status === 413
+              ? "评论过长，请缩短后重新验证。"
+              : error === "captcha_unavailable" || this.status === 503
+                ? "验证服务暂时不可用，请稍后重新验证。"
+                : "提交失败，请重新验证后再试。";
+        }, { once: true });
+      }
+      return send.apply(this, args);
+    };
+    transportInstalled = true;
+  }
 
   function loadScript(src, attributes = {}) {
     if (scripts.has(src)) return scripts.get(src);
@@ -35,6 +83,7 @@
       if (!this.thread) return;
 
       this.controller = new AbortController();
+      if (this.dataset.capEnabled) installCommentTransport(this.dataset.issoEndpoint);
 
       if ("IntersectionObserver" in window) {
         this.viewportObserver = new IntersectionObserver(entries => {
@@ -149,16 +198,24 @@
       widget.setAttribute("required", "");
       widget.setAttribute("data-cap-api-endpoint", this.dataset.capEndpoint);
       widget.setAttribute("data-cap-disable-haptics", "");
+      const message = document.createElement("p");
+      message.className = "isso-cap-message";
+      message.setAttribute("role", "status");
       gate.append(widget);
       textareaWrapper.append(gate);
+      textareaWrapper.after(message);
+      gate.capMessage = message;
 
-      widget.addEventListener("solve", () => {
-        gate.dataset.state = "solved";
+      widget.addEventListener("solve", event => {
+        gate.capToken = typeof event.detail?.token === "string" ? event.detail.token : null;
+        gate.dataset.state = gate.capToken ? "solved" : "required";
       });
       widget.addEventListener("reset", () => {
+        gate.capToken = null;
         gate.dataset.state = "required";
       });
       widget.addEventListener("error", () => {
+        gate.capToken = null;
         gate.dataset.state = "required";
       });
     }
@@ -171,7 +228,13 @@
       const postbox = target.closest(".isso-postbox");
       if (!postbox) return;
       const gate = postbox.querySelector(".isso-cap-gate");
-      if (gate?.dataset.state === "solved") return;
+      if (gate?.dataset.state === "solved" && gate.capToken) {
+        gate.capMessage.textContent = "";
+        const submission = { gate, widget: gate.querySelector("cap-widget"), message: gate.capMessage, token: gate.capToken };
+        pendingSubmission = submission;
+        setTimeout(() => { if (pendingSubmission === submission) pendingSubmission = null; }, 0);
+        return;
+      }
 
       event.preventDefault();
       event.stopPropagation();

@@ -97,6 +97,9 @@
   bottom: 0.75rem;
 }
 
+#isso-thread .isso-cap-message { flex-basis: 100%; margin: 0.5rem 0 0; font: inherit; color: var(--isso-muted); }
+#isso-thread .isso-cap-message:empty { display: none; }
+
 #isso-thread .isso-cap-gate cap-widget {
   --cap-background: transparent;
   --cap-color: var(--isso-ink);

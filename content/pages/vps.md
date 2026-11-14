@@ -37,6 +37,36 @@ description: Servers, resource usage and network probes.
     <figure class="vps-map" data-vps-map hidden>
       <div data-vps-map-graphic></div>
     </figure>
+    <div class="vps-fleet" data-vps-fleet hidden aria-label="Fleet overview">
+      <div class="vps-fleet-section">
+        <h2>Resources</h2>
+        <dl>
+          <div><dt>Servers</dt><dd data-vps-fleet-servers></dd></div>
+          <div data-vps-fleet-states-row hidden><dt>Other states</dt><dd data-vps-fleet-states></dd></div>
+          <div><dt title="Regions inferred from flag emoji in server names.">Regions</dt><dd data-vps-fleet-regions></dd></div>
+          <div><dt>CPU cores</dt><dd data-vps-fleet-cores></dd></div>
+          <div><dt>Memory</dt><dd data-vps-fleet-memory></dd></div>
+          <div><dt>Disk</dt><dd data-vps-fleet-disk></dd></div>
+        </dl>
+      </div>
+      <div class="vps-fleet-section">
+        <h2 title="Online servers with recent node data.">Highest usage</h2>
+        <dl>
+          <div><dt>CPU</dt><dd data-vps-fleet-high-cpu></dd></div>
+          <div><dt>Memory</dt><dd data-vps-fleet-high-memory></dd></div>
+          <div><dt>Disk</dt><dd data-vps-fleet-high-disk></dd></div>
+        </dl>
+      </div>
+      <div class="vps-fleet-section">
+        <h2>Traffic</h2>
+        <dl>
+          <div><dt>Inbound</dt><dd data-vps-fleet-inbound></dd></div>
+          <div><dt>Outbound</dt><dd data-vps-fleet-outbound></dd></div>
+          <div><dt title="Sum of reported interface counters, including virtual interfaces; counters can reset.">Interface RX total</dt><dd data-vps-fleet-received></dd></div>
+          <div><dt title="Sum of reported interface counters, including virtual interfaces; counters can reset.">Interface TX total</dt><dd data-vps-fleet-sent></dd></div>
+        </dl>
+      </div>
+    </div>
   </aside>
   <dialog class="vps-map-dialog" data-vps-map-dialog aria-label="Expanded server map">
     <button class="vps-map-close" data-vps-map-close type="button" aria-label="Close map">

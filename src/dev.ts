@@ -110,7 +110,29 @@ const server = Bun.serve({
       return new Response("Bad Request", { status: 400 });
     }
 
-    if (req.method === "GET" && (["/api/spotify/now", "/api/spotify/recent", "/api/lastfm/now", "/api/lastfm/recent", "/api/memos", "/api/memos/calendar", "/api/uptime/status", "/api/beszel", "/api/beszel/events"].includes(pathname) || pathname.startsWith("/api/memos/attachments/"))) {
+    if (req.method === "POST" && pathname === "/api/isso/new") {
+      try {
+        const headers = new Headers();
+        for (const name of ["content-type", "x-cap-token", "cookie"]) {
+          const value = req.headers.get(name);
+          if (value) headers.set(name, value);
+        }
+        const upstream = await fetch(`https://www.gengyue.dev${pathname}${url.search}`, {
+          method: "POST", headers, body: await req.arrayBuffer(), signal: req.signal, redirect: "manual",
+        });
+        const responseHeaders = new Headers({ "Cache-Control": "no-store" });
+        for (const name of ["content-type", "x-set-cookie"]) {
+          const value = upstream.headers.get(name);
+          if (value) responseHeaders.set(name, value);
+        }
+        for (const cookie of upstream.headers.getSetCookie()) responseHeaders.append("set-cookie", cookie);
+        return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
+      } catch {
+        return Response.json({ error: "isso_unavailable" }, { status: 502 });
+      }
+    }
+
+    if (req.method === "GET" && (["/api/spotify/now", "/api/spotify/recent", "/api/lastfm/now", "/api/lastfm/recent", "/api/memos", "/api/memos/calendar", "/api/uptime/status", "/api/uptime/incident", "/api/beszel", "/api/beszel/events"].includes(pathname) || pathname.startsWith("/api/memos/attachments/"))) {
       if (pathname === "/api/beszel/events") server.timeout(req, 0);
       try {
         const upstream = await fetch(`https://www.gengyue.dev${pathname}${url.search}`, {

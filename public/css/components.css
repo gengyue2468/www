@@ -319,12 +319,56 @@ memos-feed {
 status-page {
   display: grid;
   grid-template-columns: var(--width-content) calc(var(--width-content) * 0.1) calc(var(--width-content) * 0.5);
+  grid-template-rows: auto 1fr;
   align-items: start;
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
   overflow-wrap: anywhere;
 }
-.status-main { grid-column: 1; grid-row: 1; min-width: 0; }
+.status-main { grid-column: 1; grid-row: 1 / span 2; min-width: 0; }
+.status-history {
+  grid-column: 3;
+  grid-row: 2;
+  min-width: 0;
+  max-width: 19.5rem;
+  margin-top: 2rem;
+  font-size: calc(var(--font-size-body) * 0.9);
+  line-height: var(--line-height-sidenote);
+}
+.status-history h2, .status-incident-heading {
+  margin: 0 0 0.7rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  font-size: var(--font-size-h3);
+  font-style: italic;
+  font-weight: 400;
+}
+.status-current-incidents { margin-bottom: 2rem; padding: 0; }
+.status-current-incidents[hidden] { display: none; }
+.status-incident { margin: 1rem 0; padding: 0; }
+.status-incident-header { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 0.75em; }
+.status-incident-title { min-width: 0; margin: 0; font-size: inherit; font-weight: 400; }
+.status-incident-style { flex: none; opacity: 0.6; font-style: italic; }
+.status-incident-content { margin: 0.35rem 0; font: inherit; white-space: pre-wrap; }
+.status-incident-meta { margin-top: 0.4rem; opacity: 0.6; font-style: italic; }
+.status-incident-meta > span { display: block; }
+.status-history-message { opacity: 0.6; font-style: italic; }
+.status-history-message { margin: 0.7rem 0; }
+.status-history-message:empty { display: none; }
+.status-history-pagination { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75em; margin-top: 1rem; }
+.status-history-pagination[hidden] { display: none; }
+.status-history-more {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-style: italic;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.status-history-more:disabled { opacity: 0.4; cursor: default; }
+.status-history-more[hidden] { display: none; }
 .status-empty[hidden] { display: none; }
 
 .status-service-heading,
@@ -446,6 +490,7 @@ vps-page {
   font-size: calc(var(--font-size-body) * 0.9);
   line-height: var(--line-height-sidenote);
 }
+.status-sidebar { position: static; }
 :is(.vps-control, .status-control) { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.3em 1em; }
 :is(.vps-control + .vps-control, .status-control + .status-control) { margin-top: 0.6rem; }
 :is(.vps-control-label, .status-control-label) { opacity: 0.6; font-style: italic; }
@@ -455,6 +500,16 @@ vps-page {
 :is(.vps-control, .status-control) .nav-dropdown-menu button { width: 100%; box-sizing: border-box; }
 :is(.vps-control, .status-control) .nav-dropdown-menu button[aria-pressed="true"] { background: var(--accent); }
 .vps-empty { font: inherit; font-style: italic; opacity: 0.6; }
+.vps-fleet { margin-top: 1.5rem; font: inherit; line-height: var(--line-height-sidenote); }
+.vps-fleet[hidden] { display: none; }
+.vps-fleet-section + .vps-fleet-section { margin-top: 1.25rem; }
+.vps-fleet h2 { margin: 0 0 0.5rem; font: inherit; font-style: italic; opacity: 0.6; }
+.vps-fleet dl { margin: 0; font: inherit; }
+.vps-fleet dl > div { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.vps-fleet dl > div[hidden] { display: none; }
+.vps-fleet dt { flex: none; }
+.vps-fleet dd { flex: 1 1 0; min-width: 0; margin: 0; text-align: right; }
+.vps-fleet dd [data-marquee-lane] { margin-left: auto; }
 .vps-map { width: 100%; max-width: 100%; margin: 1.5rem 0 0; font: inherit; }
 .vps-map[hidden] { display: none; }
 .vps-map svg { display: block; width: 100%; height: auto; overflow: hidden; }
@@ -681,6 +736,8 @@ vps-page {
 .vps-retry { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
 @media (max-width: 760px) {
   :is(vps-page, status-page) { display: block; }
+  .status-history { max-width: none; margin-top: 2.8rem; }
+  .status-sidebar { position: sticky; }
   .vps-map { max-width: 24rem; }
   :is(.vps-sidebar, .status-sidebar) {
     display: flex;

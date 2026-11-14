@@ -8,6 +8,10 @@
     hour: "2-digit",
     minute: "2-digit",
   });
+  const incidentDateFormatter = new Intl.DateTimeFormat("en", {
+    year: "numeric", month: "short", day: "numeric",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+  });
   const percentFormatter = new Intl.NumberFormat("en", {
     style: "percent",
     maximumFractionDigits: 2,
@@ -64,6 +68,14 @@
       this.message = this.querySelector("[data-status-message]");
       this.retry = this.querySelector("[data-status-retry]");
       this.empty = this.querySelector("[data-status-empty]");
+      this.currentIncidents = this.querySelector("[data-status-current]");
+      this.history = this.querySelector("[data-status-history]");
+      this.historyMessage = this.querySelector("[data-status-history-message]");
+      this.historyPagination = this.querySelector("[data-status-history-pagination]");
+      this.historyPrev = this.querySelector("[data-status-history-prev]");
+      this.historyNext = this.querySelector("[data-status-history-next]");
+      this.historyPage = this.querySelector("[data-status-history-page]");
+      this.historyRetry = this.querySelector("[data-status-history-retry]");
       if (!this.overview || !this.notices || !this.groups || !this.message || !this.retry) return;
       this.controller = new AbortController();
       this.sortKey ||= "default";
@@ -71,14 +83,19 @@
       this.setupChoices("sort", sortChoices);
       this.setupChoices("filter", filterChoices);
       this.retry.addEventListener("click", () => { void this.load(); }, { signal: this.controller.signal });
+      this.historyPrev?.addEventListener("click", () => this.moveIncidentPage(-1), { signal: this.controller.signal });
+      this.historyNext?.addEventListener("click", () => this.moveIncidentPage(1), { signal: this.controller.signal });
+      this.historyRetry?.addEventListener("click", () => { void this.loadIncidents(this.incidentRetryCursor, this.incidentRetryPage); }, { signal: this.controller.signal });
       void this.load();
     }
 
     disconnectedCallback() {
       this.requestController?.abort();
+      this.incidentRequest?.abort();
       this.controller?.abort();
       this.controller = null;
       this.loading = false;
+      this.incidentLoading = false;
       clearTimeout(this.refreshTimer);
       this.refreshTimer = null;
     }
@@ -115,6 +132,7 @@
 
     async load() {
       if (this.loading || !this.controller) return;
+      void this.loadIncidents();
       const controller = this.controller;
       const request = new AbortController();
       const abort = () => request.abort();
@@ -200,10 +218,8 @@
 
     renderNotices(data) {
       this.notices.replaceChildren();
-      const incidents = Array.isArray(data.incidents) ? data.incidents : [];
       const maintenance = Array.isArray(data.maintenanceList) ? data.maintenanceList : [];
       const notices = [
-        ...incidents.map(item => ({ item, className: "incident", label: "Incident" })),
         ...maintenance.map(item => ({ item, className: "maintenance", label: "Maintenance" })),
       ];
       this.notices.hidden = notices.length === 0;
@@ -216,6 +232,118 @@
         if (description && description !== item.title && description !== item.name) article.append(element("p", "status-notice-description", String(description)));
         this.notices.append(article);
       }
+    }
+
+    moveIncidentPage(direction) {
+      if (this.incidentLoading) return;
+      const index = (this.incidentPageIndex || 0) + direction;
+      if (index < 0) return;
+      if (this.incidentPages?.[index]) {
+        this.incidentPageIndex = index;
+        this.historyRetry.hidden = true;
+        this.renderIncidents();
+      } else {
+        const page = this.incidentPages?.[this.incidentPageIndex || 0];
+        if (direction === 1 && page?.hasMore) void this.loadIncidents(page.nextCursor, index);
+      }
+    }
+
+    async loadIncidents(cursor = null, pageIndex = null) {
+      if (!this.controller || !this.currentIncidents || !this.history || !this.historyMessage || !this.historyPagination || !this.historyPrev || !this.historyNext || !this.historyPage || !this.historyRetry || this.incidentLoading) return;
+      const controller = this.controller;
+      const request = new AbortController();
+      const abort = () => request.abort();
+      controller.signal.addEventListener("abort", abort, { once: true });
+      this.incidentRequest = request;
+      this.incidentLoading = true;
+      this.historyPrev.disabled = true;
+      this.historyNext.disabled = true;
+      this.historyRetry.disabled = true;
+      if (!this.incidentLoaded || pageIndex !== null) this.historyMessage.textContent = "Loading incidents…";
+      try {
+        const query = cursor === null ? "" : `?${new URLSearchParams({ cursor })}`;
+        const response = await fetch(`/api/uptime/incident${query}`, { signal: request.signal, cache: "no-store" });
+        if (!response.ok) throw new Error(`Incidents HTTP ${response.status}`);
+        const data = await response.json();
+        if (request.signal.aborted || this.controller !== controller) return;
+        if (!data || !Array.isArray(data.current) || !Array.isArray(data.history) || typeof data.hasMore !== "boolean" ||
+          (data.hasMore && (typeof data.nextCursor !== "string" || !data.nextCursor || data.nextCursor === cursor))) throw new Error("Invalid incident response");
+        this.incidentCurrent = data.current;
+        this.incidentPages ||= [];
+        if (!this.incidentLoaded || pageIndex !== null) {
+          const index = pageIndex ?? 0;
+          this.incidentPages[index] = { history: data.history, hasMore: data.hasMore, nextCursor: data.nextCursor };
+          this.incidentPageIndex = index;
+        } else if (this.incidentPages.length === 1) {
+          this.incidentPages[0] = { history: data.history, hasMore: data.hasMore, nextCursor: data.nextCursor };
+        }
+        this.incidentLoaded = true;
+        this.historyRetry.hidden = true;
+        this.renderIncidents();
+      } catch {
+        if (request.signal.aborted || this.controller !== controller) return;
+        this.incidentRetryCursor = cursor;
+        this.incidentRetryPage = pageIndex;
+        this.historyMessage.textContent = this.incidentLoaded ? "Could not update incidents. Showing available results." : "Incidents unavailable.";
+        this.historyRetry.hidden = false;
+      } finally {
+        controller.signal.removeEventListener("abort", abort);
+        if (this.incidentRequest === request) this.incidentRequest = null;
+        if (this.controller === controller) {
+          this.incidentLoading = false;
+          this.historyRetry.disabled = false;
+          const page = this.incidentPages?.[this.incidentPageIndex || 0];
+          this.historyPrev.disabled = !this.incidentPageIndex;
+          this.historyNext.disabled = !page?.hasMore;
+        }
+      }
+    }
+
+    renderIncidents() {
+      const current = this.incidentCurrent.filter(item => item && item.id != null);
+      const currentIds = new Set(current.map(item => String(item.id)));
+      this.currentIncidents.hidden = !current.length;
+      this.currentIncidents.replaceChildren();
+      if (current.length) {
+        this.currentIncidents.append(element("h2", "status-incident-heading", "Current incidents"));
+        for (const item of current) this.currentIncidents.append(this.renderIncident(item));
+      }
+      const index = this.incidentPageIndex || 0;
+      const page = this.incidentPages[index];
+      const seen = new Set(currentIds);
+      const history = page.history.filter(item => {
+        if (item?.id == null || seen.has(String(item.id))) return false;
+        seen.add(String(item.id));
+        return true;
+      });
+      this.history.replaceChildren(...history.map(item => this.renderIncident(item)));
+      this.historyMessage.textContent = history.length ? "" : index || page.hasMore ? "No other incidents on this page." : "No past incidents.";
+      this.historyPagination.hidden = index === 0 && !page.hasMore;
+      this.historyPage.textContent = `Page ${index + 1}`;
+      this.historyPrev.disabled = index === 0;
+      this.historyNext.disabled = !page.hasMore;
+    }
+
+    renderIncident(item) {
+      const article = element("article", "status-incident");
+      const heading = element("div", "status-incident-header");
+      heading.append(element("h3", "status-incident-title", typeof item.title === "string" && item.title.trim() ? item.title : "Incident"));
+      if (typeof item.style === "string" && item.style.trim()) heading.append(element("span", "status-incident-style", item.style));
+      article.append(heading);
+      if (typeof item.content === "string" && item.content.trim()) article.append(element("p", "status-incident-content", item.content));
+      const meta = element("div", "status-incident-meta");
+      for (const [label, value] of [["Created", item.createdDate], ["Updated", item.lastUpdatedDate]]) {
+        if (typeof value !== "string" || !value.trim()) continue;
+        const date = new Date(value.replace(" ", "T"));
+        const row = element("span");
+        row.append(document.createTextNode(`${label}: `));
+        const time = element("time", "", Number.isFinite(date.getTime()) ? incidentDateFormatter.format(date) : value);
+        if (Number.isFinite(date.getTime())) time.dateTime = value.replace(" ", "T");
+        row.append(time);
+        meta.append(row);
+      }
+      if (meta.childElementCount) article.append(meta);
+      return article;
     }
 
     renderMonitor(monitor, history) {

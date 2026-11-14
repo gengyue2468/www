@@ -46,6 +46,25 @@ import mapUnits from "./vps-map.json";
     if (!(finite(used) && used >= 0) && !(finite(total) && total >= 0)) return percent(value);
     return `${bytes(used)} / ${bytes(total)}${finite(value) ? ` (${percent(value)})` : ""}`;
   };
+  function fleetValue(nodes, fields, format, eligible = () => true) {
+    const totals = fields.map(() => 0);
+    let count = 0;
+    for (const node of nodes) {
+      const values = fields.map(field => field(node));
+      if (!eligible(node) || !values.every(value => finite(value) && value >= 0)) continue;
+      values.forEach((value, index) => { totals[index] += value; });
+      count++;
+    }
+    const missing = nodes.length - count;
+    return `${count ? totals.map(format).join(" / ") : "—"}${missing ? ` (${missing} not included)` : ""}`;
+  }
+  function interfaceTotal(node, field) {
+    const interfaces = node.network?.interfaces;
+    if (!interfaces || typeof interfaces !== "object" || Array.isArray(interfaces)) return null;
+    const values = Object.values(interfaces).map(item => item?.[field]);
+    if (!values.length || !values.every(value => finite(value) && value >= 0)) return null;
+    return values.reduce((sum, value) => sum + value, 0);
+  }
   const ioFields = [
     ["readBytesPerSecond", "Read", rate], ["writeBytesPerSecond", "Write", rate],
     ["readBytesTotal", "Read total", bytes], ["writeBytesTotal", "Written total", bytes],
@@ -70,6 +89,12 @@ import mapUnits from "./vps-map.json";
       : seconds < 86400 ? `${Math.floor(seconds / 3600)}h ago` : `${Math.floor(seconds / 86400)}d ago`;
   };
   const stale = value => !Number.isFinite(timestamp(value)) || Date.now() - timestamp(value) > STALE_MS;
+  function highestUsage(nodes, field) {
+    const candidates = nodes.filter(node => nodeStatus(node) === "up" && !stale(node.updatedAt) && finite(node[field]) && node[field] >= 0);
+    candidates.sort((a, b) => b[field] - a[field] || nameOrder.compare(nameSortKey(a), nameSortKey(b)) || nameOrder.compare(a.id, b.id));
+    const node = candidates[0];
+    return node ? `${text(node.name)} · ${percent(node[field])}` : "—";
+  }
   const element = (tag, className, value) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -490,13 +515,30 @@ import mapUnits from "./vps-map.json";
       if (!this.list || !this.message || !this.retry || !this.summary || !this.updated) return;
       this.controller = new AbortController();
       const mapRoot = this.querySelector("[data-vps-map]");
+      this.fleet = this.querySelector("[data-vps-fleet]");
+      if (this.fleet) {
+        if (!this.fleetMarquee) {
+          for (const value of this.fleet.querySelectorAll("dd")) {
+            const content = createMarquee();
+            content.source.textContent = value.textContent;
+            value.replaceChildren(content.root);
+          }
+          this.fleetMarquee = new MarqueeController(this.fleet, this.fleet, { preserveUpdates: true });
+        }
+        this.fleetMarquee.connect();
+      }
       if (mapRoot) {
         this.map ||= createMap(mapRoot);
         this.setupMapDialog(mapRoot);
         const mobile = window.matchMedia("(max-width: 760px)");
         const placeMap = () => {
-          if (mobile.matches) this.querySelector(".vps-overview")?.after(mapRoot);
-          else this.querySelector(".vps-sidebar")?.append(mapRoot);
+          if (mobile.matches) {
+            this.querySelector(".vps-overview")?.after(mapRoot);
+            if (this.fleet) mapRoot.after(this.fleet);
+          } else {
+            this.querySelector(".vps-sidebar")?.append(mapRoot);
+            if (this.fleet) this.querySelector(".vps-sidebar")?.append(this.fleet);
+          }
         };
         mobile.addEventListener("change", placeMap, { signal: this.controller.signal });
         placeMap();
@@ -595,6 +637,7 @@ import mapUnits from "./vps-map.json";
 
     disconnectedCallback() {
       for (const view of this.nodeViews?.values() || []) view.marquee.disconnect();
+      this.fleetMarquee?.disconnect();
       this.closeStream();
       this.controller?.abort();
       this.controller = null;
@@ -701,6 +744,36 @@ import mapUnits from "./vps-map.json";
         });
       const up = nodes.filter(node => node.status === "up").length;
       write(this.summary, nodes.length ? `${up} of ${nodes.length} servers up.` : "No servers.");
+      if (this.fleet) {
+        const recent = node => node.status === "up" && !stale(node.network?.sampledAt);
+        const regions = new Set(nodes.map(node => flagCode(node.name)).filter(Boolean));
+        const missingFlags = nodes.filter(node => !flagCode(node.name)).length;
+        const otherStates = states.filter(state => state !== "up").map(state => [state, nodes.filter(node => nodeStatus(node) === state).length]).filter(([, count]) => count);
+        const values = {
+          servers: `${up} / ${nodes.length} online`,
+          states: otherStates.map(([state, count]) => `${count} ${state}`).join(" · "),
+          regions: `${regions.size || "—"}${missingFlags ? ` (${missingFlags} without flags)` : ""}`,
+          "high-cpu": highestUsage(nodes, "cpuPercent"),
+          "high-memory": highestUsage(nodes, "memoryPercent"),
+          "high-disk": highestUsage(nodes, "diskPercent"),
+          cores: fleetValue(nodes, [node => node.cores], value => number.format(value)),
+          memory: fleetValue(nodes, [node => node.memoryUsedBytes, node => node.memoryTotalBytes], bytes),
+          disk: fleetValue(nodes, [node => node.diskUsedBytes, node => node.diskTotalBytes], bytes),
+          inbound: fleetValue(nodes, [node => node.network?.rxBytesPerSecond], rate, recent),
+          outbound: fleetValue(nodes, [node => node.network?.txBytesPerSecond], rate, recent),
+          received: fleetValue(nodes, [node => interfaceTotal(node, "rxBytesTotal")], bytes),
+          sent: fleetValue(nodes, [node => interfaceTotal(node, "txBytesTotal")], bytes),
+        };
+        for (const [key, value] of Object.entries(values)) {
+          const target = this.fleet.querySelector(`[data-vps-fleet-${key}]`);
+          const source = target?.querySelector("[data-marquee-source]");
+          if (source) write(source, value);
+        }
+        const statesRow = this.fleet.querySelector("[data-vps-fleet-states-row]");
+        if (statesRow) statesRow.hidden = otherStates.length === 0;
+        this.fleet.hidden = false;
+        this.fleetMarquee?.schedule();
+      }
       syncItems(this.list, this.nodeViews, nodes, node => node.id, createNode, updateNode);
       let visible = 0;
       const countries = new Set();
