@@ -138,6 +138,14 @@ import "./code-block.js";
         "[data-calendar-weekdays]",
       );
       this.calendarGrid = calendarRoot.querySelector("[data-calendar-grid]");
+      this.tagsRoot = calendarRoot.querySelector("[data-memos-tags]");
+      this.tagsList = calendarRoot.querySelector("[data-memos-tags-list]");
+      this.tagsOpen = calendarRoot.querySelector("[data-memos-tags-open]");
+      this.tagsDialog = calendarRoot.querySelector("[data-memos-tags-dialog]");
+      this.tagsClose = calendarRoot.querySelector("[data-memos-tags-close]");
+      this.tagsAll = calendarRoot.querySelector("[data-memos-tags-all]");
+      this.tagsMessage = calendarRoot.querySelector("[data-memos-tags-message]");
+      this.tagsRetry = calendarRoot.querySelector("[data-memos-tags-retry]");
       this.dateFilter = this.querySelector("[data-memos-date-filter]");
       this.filterDate = this.querySelector("[data-memos-filter-date]");
       this.filterClear = this.querySelector("[data-memos-filter-clear]");
@@ -160,6 +168,33 @@ import "./code-block.js";
       this.calendarNext?.addEventListener("click", () => this.moveCalendar(1), {
         signal: this.controller.signal,
       });
+      this.tagsRetry?.addEventListener("click", () => { void this.loadTags(); }, { signal: this.controller.signal });
+      this.tagsOpen?.addEventListener("click", () => {
+        if (!this.tagsDialog || typeof this.tagsDialog.showModal !== "function" || this.tagsDialog.open) return;
+        this.tagsDialog.showModal();
+        this.scheduleTagFit();
+      }, { signal: this.controller.signal });
+      this.tagsClose?.addEventListener("click", () => this.tagsDialog?.close(), { signal: this.controller.signal });
+      this.tagsDialog?.addEventListener("click", event => {
+        if (event.target === this.tagsDialog) this.tagsDialog.close();
+      }, { signal: this.controller.signal });
+      if (this.tagsList && typeof ResizeObserver === "function") {
+        const widths = new WeakMap();
+        this.tagsResizeObserver = new ResizeObserver(entries => {
+          for (const entry of entries) {
+            const width = entry.contentRect.width;
+            if (width && width !== widths.get(entry.target)) {
+              widths.set(entry.target, width);
+              this.scheduleTagFit();
+            }
+          }
+        });
+        this.tagsResizeObserver.observe(this.tagsList);
+        if (this.tagsAll) this.tagsResizeObserver.observe(this.tagsAll);
+      } else if (this.tagsList) {
+        window.addEventListener("resize", () => this.scheduleTagFit(), { signal: this.controller.signal });
+      }
+      document.fonts?.ready.then(() => this.scheduleTagFit());
       this.filterClear?.addEventListener(
         "click",
         () => this.clearDateFilter(),
@@ -224,6 +259,10 @@ import "./code-block.js";
       }
       this.calendarMedia = null;
       this.handleCalendarMedia = null;
+      this.tagsResizeObserver?.disconnect();
+      this.tagsResizeObserver = null;
+      if (this.tagsFitFrame != null) cancelAnimationFrame(this.tagsFitFrame);
+      this.tagsFitFrame = null;
       this.requestController?.abort();
       this.controller?.abort();
       this.controller = null;
@@ -263,6 +302,11 @@ import "./code-block.js";
       if (!this.calendar) return;
       this.calendarEnabled = true;
       this.calendar.hidden = false;
+      if (this.tagsRoot) {
+        this.tagsRoot.hidden = false;
+        if (!this.tagsLoaded && !this.tagsLoading) void this.loadTags();
+        else if (this.tagsLoaded) this.scheduleTagFit();
+      }
       this.renderCalendarWeekdays();
       this.renderCalendar();
       if (this.calendarCache?.has(this.calendarMonth)) {
@@ -281,8 +325,84 @@ import "./code-block.js";
       this.calendarRequestId = (this.calendarRequestId || 0) + 1;
       this.calendarLoading = false;
       this.calendarRequestController?.abort();
+      this.tagsRequestController?.abort();
+      this.tagsRequestController = null;
+      this.tagsLoading = false;
+      if (this.tagsDialog?.open) this.tagsDialog.close();
       this.calendarRequestController = null;
       if (this.calendar) this.calendar.hidden = true;
+    }
+
+    async loadTags() {
+      if (!this.calendarEnabled || !this.tagsRoot || !this.tagsList || !this.tagsOpen || !this.tagsAll || !this.tagsMessage || !this.tagsRetry || this.tagsLoading) return;
+      const request = new AbortController();
+      this.tagsRequestController = request;
+      this.tagsLoading = true;
+      this.tagsMessage.textContent = "Loading tags…";
+      this.tagsRetry.hidden = true;
+      try {
+        const response = await fetch("/api/memos/tags", { signal: request.signal, cache: "no-store" });
+        if (!response.ok) throw new Error(`Tags HTTP ${response.status}`);
+        const data = await response.json();
+        if (request.signal.aborted || this.tagsRequestController !== request) return;
+        if (!Array.isArray(data?.tags)) throw new Error("Invalid tags response");
+        const hash = name => {
+          let value = 2166136261;
+          for (const char of name) value = Math.imul(value ^ char.codePointAt(0), 16777619);
+          return value >>> 0;
+        };
+        const compare = (a, b) => hash(a.name) - hash(b.name) || a.name.localeCompare(b.name);
+        const tags = data.tags.filter(tag => typeof tag?.name === "string" && tag.name.trim() && Number.isInteger(tag.count) && tag.count > 0);
+        const top = [...tags].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)).slice(0, 32).sort(compare);
+        tags.sort(compare);
+        const max = Math.max(1, ...tags.map(tag => tag.count));
+        const min = Math.min(max, ...tags.map(tag => tag.count));
+        const render = tag => {
+          const item = element("span", "memos-tag", `#${tag.name}`);
+          const weight = max === min ? 0.5 : (Math.log(tag.count) - Math.log(min)) / (Math.log(max) - Math.log(min));
+          item.style.setProperty("--tag-size", `${(0.55 + weight * 1.45).toFixed(3)}em`);
+          item.title = `${tag.count} ${tag.count === 1 ? "memo" : "memos"}`;
+          return item;
+        };
+        this.tagsList.replaceChildren(...top.map(render));
+        this.tagsAll.replaceChildren(...tags.map(render));
+        this.tagsOpen.hidden = !tags.length;
+        this.tagsMessage.textContent = tags.length ? "" : "No tags.";
+        this.tagsLoaded = true;
+        this.scheduleTagFit();
+      } catch {
+        if (request.signal.aborted || this.tagsRequestController !== request) return;
+        this.tagsMessage.textContent = "Tags unavailable.";
+        this.tagsRetry.hidden = false;
+      } finally {
+        if (this.tagsRequestController === request) {
+          this.tagsRequestController = null;
+          this.tagsLoading = false;
+        }
+      }
+    }
+
+    scheduleTagFit() {
+      if (!this.controller || !this.calendarEnabled || !this.tagsList || this.tagsFitFrame != null) return;
+      this.tagsFitFrame = requestAnimationFrame(() => {
+        this.tagsFitFrame = null;
+        if (!this.controller || !this.calendarEnabled) return;
+        for (const list of [this.tagsList, this.tagsDialog?.open ? this.tagsAll : null]) {
+          if (!list?.clientWidth) continue;
+          let low = 0.001;
+          let high = 1;
+          for (let i = 0; i < 14; i++) {
+            const scale = (low + high) / 2;
+            list.style.fontSize = `${scale}em`;
+            if (list.scrollHeight > list.clientHeight) high = scale;
+            else low = scale;
+          }
+          list.style.fontSize = `${low}em`;
+          list.classList.toggle("is-overflowing", list.scrollHeight > list.clientHeight);
+          if (list.classList.contains("is-overflowing") && list === this.tagsAll) list.tabIndex = 0;
+          else list.removeAttribute("tabindex");
+        }
+      });
     }
 
     renderCalendarWeekdays() {

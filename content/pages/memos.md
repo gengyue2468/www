@@ -12,7 +12,18 @@ description: 碎碎念
   </div>
   <div class="memos-calendar-weekdays" data-calendar-weekdays aria-hidden="true"></div>
   <div class="memos-calendar-grid" data-calendar-grid role="grid" aria-label="View by date"></div>
+  <div class="memos-tag-cloud" data-memos-tags hidden>
+    <h2>Tags</h2>
+    <button class="memos-tag-open" data-memos-tags-open type="button" aria-label="View all tags" hidden><span class="memos-tag-list" data-memos-tags-list></span></button>
+    <p class="memos-tag-message" data-memos-tags-message role="status"></p>
+    <button class="memos-tag-retry" data-memos-tags-retry type="button" hidden>Retry</button>
+  </div>
 </aside>
+<dialog class="vps-map-dialog memos-tag-dialog" data-memos-tags-dialog aria-label="All memo tags">
+  <button class="vps-map-close" data-memos-tags-close type="button" aria-label="Close tags"><svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 16 16"><path d="m3 3 10 10M13 3 3 13"></path></svg></button>
+  <h2>Tags</h2>
+  <div class="memos-tag-list memos-tag-dialog-list" data-memos-tags-all></div>
+</dialog>
 
 <memos-feed>
   <div class="memos-date-filter" data-memos-date-filter hidden>

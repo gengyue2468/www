@@ -45,6 +45,8 @@ description: Servers, resource usage and network probes.
           <div data-vps-fleet-states-row hidden><dt>Other states</dt><dd data-vps-fleet-states></dd></div>
           <div><dt title="Regions inferred from flag emoji in server names.">Regions</dt><dd data-vps-fleet-regions></dd></div>
           <div><dt>CPU cores</dt><dd data-vps-fleet-cores></dd></div>
+          <div><dt title="CPU usage weighted by logical CPU threads for online servers with recent data.">CPU usage</dt><dd data-vps-fleet-cpu-usage></dd></div>
+          <div><dt title="1 / 5 / 15 minute load averages per logical CPU, for online servers with recent data.">Load / CPU</dt><dd data-vps-fleet-load></dd></div>
           <div><dt>Memory</dt><dd data-vps-fleet-memory></dd></div>
           <div><dt>Disk</dt><dd data-vps-fleet-disk></dd></div>
         </dl>

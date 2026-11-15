@@ -47,6 +47,21 @@ memos-feed {
 
 .memos-calendar[hidden] { display: none !important; }
 
+.memos-tag-cloud { margin-top: 1.8rem; }
+.memos-tag-cloud[hidden], .memos-tag-open[hidden], .memos-tag-retry[hidden] { display: none; }
+.memos-tag-cloud h2 { margin: 0 0 0.55rem; font: inherit; font-style: italic; opacity: 0.6; }
+.memos-tag-open { display: block; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: zoom-in; }
+.memos-tag-open:focus-visible { outline: 1px solid currentColor; outline-offset: 0.35rem; }
+.memos-tag-list { display: block; max-height: 16rem; overflow: hidden; line-height: 1.2; text-align: justify; }
+.memos-tag-list.is-overflowing { overflow-y: auto; }
+.memos-tag { display: inline; margin-right: 0.5em; font-size: var(--tag-size, 1em); opacity: 0.8; overflow-wrap: anywhere; }
+.memos-tag-dialog h2 { margin: 0 0 1rem; font-size: var(--font-size-h3); font-weight: 400; }
+.memos-tag-dialog .memos-tag-dialog-list { max-height: calc(100dvh - 9rem); }
+.memos-tag-retry { cursor: pointer; font: inherit; font-style: italic; text-decoration: underline; text-underline-offset: 0.15em; }
+.memos-tag-message { margin: 0.5rem 0; font: inherit; font-style: italic; opacity: 0.6; }
+.memos-tag-message:empty { display: none; }
+.memos-tag-retry { padding: 0; border: 0; background: transparent; color: inherit; }
+
 .memos-calendar-header {
   display: grid;
   grid-template-columns: 1.8rem minmax(0, 1fr) 1.8rem;

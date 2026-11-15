@@ -89,6 +89,21 @@ import mapUnits from "./vps-map.json";
       : seconds < 86400 ? `${Math.floor(seconds / 3600)}h ago` : `${Math.floor(seconds / 86400)}d ago`;
   };
   const stale = value => !Number.isFinite(timestamp(value)) || Date.now() - timestamp(value) > STALE_MS;
+  function cpuAggregate(nodes, getValue, weighted) {
+    let sum = 0;
+    let threads = 0;
+    let count = 0;
+    for (const node of nodes) {
+      const value = getValue(node);
+      if (nodeStatus(node) !== "up" || stale(node.updatedAt) || !finite(node.threads) || node.threads <= 0 || !finite(value) || value < 0) continue;
+      sum += weighted ? value * node.threads : value;
+      threads += node.threads;
+      count++;
+    }
+    const missing = nodes.length - count;
+    const value = count ? (weighted ? percent(sum / threads) : loadNumber.format(sum / threads)) : "—";
+    return `${value}${missing ? ` (${missing} not included)` : ""}`;
+  }
   function highestUsage(nodes, field) {
     const candidates = nodes.filter(node => nodeStatus(node) === "up" && !stale(node.updatedAt) && finite(node[field]) && node[field] >= 0);
     candidates.sort((a, b) => b[field] - a[field] || nameOrder.compare(nameSortKey(a), nameSortKey(b)) || nameOrder.compare(a.id, b.id));
@@ -756,6 +771,8 @@ import mapUnits from "./vps-map.json";
           "high-cpu": highestUsage(nodes, "cpuPercent"),
           "high-memory": highestUsage(nodes, "memoryPercent"),
           "high-disk": highestUsage(nodes, "diskPercent"),
+          "cpu-usage": cpuAggregate(nodes, node => node.cpuPercent, true),
+          load: [0, 1, 2].map(index => cpuAggregate(nodes, node => node.loadAverage?.[index], false)).join(" / "),
           cores: fleetValue(nodes, [node => node.cores], value => number.format(value)),
           memory: fleetValue(nodes, [node => node.memoryUsedBytes, node => node.memoryTotalBytes], bytes),
           disk: fleetValue(nodes, [node => node.diskUsedBytes, node => node.diskTotalBytes], bytes),
@@ -767,7 +784,10 @@ import mapUnits from "./vps-map.json";
         for (const [key, value] of Object.entries(values)) {
           const target = this.fleet.querySelector(`[data-vps-fleet-${key}]`);
           const source = target?.querySelector("[data-marquee-source]");
-          if (source) write(source, value);
+          if (source) {
+            if (key.startsWith("high-")) writeName(source, value);
+            else write(source, value);
+          }
         }
         const statesRow = this.fleet.querySelector("[data-vps-fleet-states-row]");
         if (statesRow) statesRow.hidden = otherStates.length === 0;

@@ -132,7 +132,7 @@ const server = Bun.serve({
       }
     }
 
-    if (req.method === "GET" && (["/api/spotify/now", "/api/spotify/recent", "/api/lastfm/now", "/api/lastfm/recent", "/api/memos", "/api/memos/calendar", "/api/uptime/status", "/api/uptime/incident", "/api/beszel", "/api/beszel/events"].includes(pathname) || pathname.startsWith("/api/memos/attachments/"))) {
+    if (req.method === "GET" && (["/api/spotify/now", "/api/spotify/recent", "/api/lastfm/now", "/api/lastfm/recent", "/api/memos", "/api/memos/calendar", "/api/memos/tags", "/api/uptime/status", "/api/uptime/incident", "/api/beszel", "/api/beszel/events"].includes(pathname) || pathname.startsWith("/api/memos/attachments/"))) {
       if (pathname === "/api/beszel/events") server.timeout(req, 0);
       try {
         const upstream = await fetch(`https://www.gengyue.dev${pathname}${url.search}`, {
