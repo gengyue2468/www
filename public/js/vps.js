@@ -55,8 +55,7 @@ import mapUnits from "./vps-map.json";
       values.forEach((value, index) => { totals[index] += value; });
       count++;
     }
-    const missing = nodes.length - count;
-    return `${count ? totals.map(format).join(" / ") : "—"}${missing ? ` (${missing} not included)` : ""}`;
+    return count ? totals.map(format).join(" / ") : "—";
   }
   function interfaceTotal(node, field) {
     const interfaces = node.network?.interfaces;
@@ -100,9 +99,8 @@ import mapUnits from "./vps-map.json";
       threads += node.threads;
       count++;
     }
-    const missing = nodes.length - count;
     const value = count ? (weighted ? percent(sum / threads) : loadNumber.format(sum / threads)) : "—";
-    return `${value}${missing ? ` (${missing} not included)` : ""}`;
+    return value;
   }
   function highestUsage(nodes, field) {
     const candidates = nodes.filter(node => nodeStatus(node) === "up" && !stale(node.updatedAt) && finite(node[field]) && node[field] >= 0);
