@@ -59,13 +59,28 @@ export function renderPage(
   if (config.umami.enabled && config.umami.scriptUrl) {
     const scriptUrl = JSON.stringify(config.umami.scriptUrl).replaceAll("<", "\\u003c");
     const websiteId = JSON.stringify(config.umami.websiteId).replaceAll("<", "\\u003c");
+    const allowedOrigin = JSON.stringify(config.umami.allowedOrigin).replaceAll("<", "\\u003c");
+    const domains = JSON.stringify(new URL(config.umami.allowedOrigin).hostname).replaceAll("<", "\\u003c");
+    const recorderUrl = JSON.stringify(config.umami.recorderScriptUrl).replaceAll("<", "\\u003c");
+    const release = JSON.stringify(config.umami.release).replaceAll("<", "\\u003c");
     analytics = `<script>
   (() => {
+    if (window.location.origin !== ${allowedOrigin}) return;
     const loadAnalytics = () => {
       const script = document.createElement("script");
       script.src = ${scriptUrl};
       script.dataset.websiteId = ${websiteId};
+      script.dataset.domains = ${domains};
       ${config.umami.errorTracking ? 'script.dataset.errors = "true";' : ""}
+      ${config.umami.performance ? 'script.dataset.performance = "true";' : ""}
+      ${config.umami.errorTracking && config.umami.release ? `script.dataset.release = ${release};` : ""}
+      ${config.umami.recorderScriptUrl ? `script.addEventListener("load", () => {
+        const recorder = document.createElement("script");
+        recorder.src = ${recorderUrl};
+        recorder.dataset.websiteId = ${websiteId};
+        recorder.async = true;
+        document.head.appendChild(recorder);
+      }, { once: true });` : ""}
       script.async = true;
       document.head.appendChild(script);
     };

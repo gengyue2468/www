@@ -1,8 +1,13 @@
 import type { Config } from "./types.js";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
+import { execFileSync } from "node:child_process";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const release = process.env.BUILD_RELEASE || process.env.GITHUB_SHA || (() => {
+  try { return execFileSync("git", ["rev-parse", "--short=12", "HEAD"], { cwd: rootDir, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); }
+  catch { return ""; }
+})();
 
 const config: Config = {
   rootDir,
@@ -82,6 +87,10 @@ const config: Config = {
     scriptUrl: "https://u.gy.run/script.js?v=3.5.0",
     websiteId: "365406e1-29dc-44b9-895d-ff41a1e21ae1",
     errorTracking: true,
+    performance: true,
+    allowedOrigin: "https://www.gengyue.dev",
+    recorderScriptUrl: "https://u.gy.run/recorder.js?v=3.5.0",
+    release,
   },
 
   isso: {

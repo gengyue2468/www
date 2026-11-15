@@ -50,6 +50,10 @@ export interface UmamiConfig {
   scriptUrl: string;
   websiteId: string;
   errorTracking: boolean;
+  performance: boolean;
+  allowedOrigin: string;
+  recorderScriptUrl: string;
+  release: string;
 }
 
 export interface IssoConfig {
