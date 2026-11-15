@@ -49,6 +49,7 @@ export interface UmamiConfig {
   enabled: boolean;
   scriptUrl: string;
   websiteId: string;
+  errorTracking: boolean;
 }
 
 export interface IssoConfig {

@@ -79,8 +79,9 @@ const config: Config = {
 
   umami: {
     enabled: true,
-    scriptUrl: "https://u.gy.run/script.js",
+    scriptUrl: "https://u.gy.run/script.js?v=3.5.0",
     websiteId: "365406e1-29dc-44b9-895d-ff41a1e21ae1",
+    errorTracking: true,
   },
 
   isso: {

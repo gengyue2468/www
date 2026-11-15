@@ -65,6 +65,7 @@ export function renderPage(
       const script = document.createElement("script");
       script.src = ${scriptUrl};
       script.dataset.websiteId = ${websiteId};
+      ${config.umami.errorTracking ? 'script.dataset.errors = "true";' : ""}
       script.async = true;
       document.head.appendChild(script);
     };
