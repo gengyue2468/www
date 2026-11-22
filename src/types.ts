@@ -14,6 +14,7 @@ export interface SiteConfig {
 export interface DirsConfig {
   pages: string;
   public: string;
+  components: string;
   dist: string;
   layouts: string;
 }

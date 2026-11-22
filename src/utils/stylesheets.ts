@@ -3,15 +3,15 @@ import config from "../config.js";
 import { AppError, ErrorCode } from "./errors.js";
 import { minifyCss } from "./minify.js";
 
-// Preserve the original tufte.css + globals.css cascade order. Splitting the
-// sources must not reorder rules or introduce extra stylesheets in the browser.
+// Layered stylesheet assembly: tokens -> base typography -> UI primitives ->
+// site chrome & content blocks -> comments -> feature pages.
 export const SITE_STYLESHEETS = [
-  "css/tufte.css",
-  "css/content-blocks.css",
   "css/tokens.css",
+  "css/tufte.css",
+  "css/primitives.css",
   "css/site.css",
   "css/comments.css",
-  "css/components.css",
+  "css/pages.css",
 ] as const;
 
 export async function loadSiteCss(publicDir = config.dirs.public): Promise<string> {

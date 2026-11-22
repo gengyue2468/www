@@ -7,9 +7,9 @@ export const nowPlayingPlugin: Plugin = {
   clientScripts: [{
     key: "now-playing-card",
     fileName: "now-playing-card",
-    sourcePath: "js/now-playing.js",
+    sourcePath: "widgets/now-playing.js",
     async transform(source) {
-      return bundleClientScript(await minifyHtmlTemplateConstant(source, "COMPONENT_TEMPLATE"), "now-playing.js");
+      return bundleClientScript(await minifyHtmlTemplateConstant(source, "COMPONENT_TEMPLATE"), "widgets/now-playing.js");
     },
   }],
   webComponents: [{

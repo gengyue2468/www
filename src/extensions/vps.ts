@@ -7,7 +7,7 @@ import { join } from "path";
 export const vpsPlugin: Plugin = {
   name: "vps-page",
   webComponents: [{ tagName: "vps-page", scriptKey: "vps-page" }],
-  clientScripts: [{ key: "vps-page", fileName: "vps-page", sourcePath: "js/vps.js", transform: source => bundleClientScript(source, "vps.js") }],
+  clientScripts: [{ key: "vps-page", fileName: "vps-page", sourcePath: "pages/vps/index.js", transform: source => bundleClientScript(source, "pages/vps/index.js") }],
   hooks: {
     async afterRenderPage(route, html) {
       if (route !== "/vps") return html;

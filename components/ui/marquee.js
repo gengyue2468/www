@@ -93,13 +93,16 @@ export class MarqueeController {
       const width = source.getBoundingClientRect().width;
       const overflowing = available > 0 && width > available + 1;
       const scrolling = !this.motion.matches && overflowing;
+      element.toggleAttribute("data-overflowing", overflowing);
       element.tabIndex = overflowing ? 0 : -1;
       const gap = scrolling ? parseFloat(getComputedStyle(lane).columnGap) || 0 : 0;
       const distance = scrolling ? width + gap : 0;
-      const signature = JSON.stringify([source.innerHTML, distance]);
-      if (signature === item.signature) continue;
+      const html = source.innerHTML;
+      const sameText = html === item.html;
+      const sameState = scrolling === (item.distance > 0);
+      if (sameText && sameState && Math.abs(distance - item.distance) < 1) continue;
       changed = true;
-      item.signature = signature;
+      item.html = html;
       item.distance = distance;
       clone.hidden = !scrolling;
       clone.replaceChildren(...(scrolling ? [...source.childNodes].map(node => node.cloneNode(true)) : []));
@@ -143,14 +146,15 @@ export class MarqueeController {
   }
 }
 
-export function createMarquee() {
-  const root = document.createElement("span");
-  root.className = "vps-marquee";
+export function createMarquee({ tag = "span", className = "", text } = {}) {
+  const root = document.createElement(tag);
+  root.className = className ? `ui-marquee ${className}` : "ui-marquee";
   root.setAttribute("data-marquee", "");
   const lane = document.createElement("span");
   lane.setAttribute("data-marquee-lane", "");
   const source = document.createElement("span");
   source.setAttribute("data-marquee-source", "");
+  if (text !== undefined) source.textContent = text;
   const clone = document.createElement("span");
   clone.setAttribute("data-marquee-clone", "");
   clone.setAttribute("aria-hidden", "true");

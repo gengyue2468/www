@@ -2,7 +2,6 @@ import { join, relative, resolve, isAbsolute } from "path";
 import { watch } from "fs";
 import { getUnversionedPageAssetPaths } from "./build.js";
 import config from "./config.js";
-import { getClientScriptDefinitions } from "./extensions/plugin.js";
 import { SITE_STYLESHEETS } from "./utils/stylesheets.js";
 import { createPreviewFileHandler } from "./utils/preview.js";
 
@@ -15,6 +14,7 @@ const DEBOUNCE_MS = 200;
 
 const watchDirs = [
   config.dirs.public,
+  config.dirs.components,
   config.dirs.layouts,
   join(config.rootDir, "content"),
 ];
@@ -22,9 +22,6 @@ const watchDirs = [
 const publicRoot = resolve(config.dirs.public);
 const rebuildFiles = new Set([
   ...SITE_STYLESHEETS.map(file => resolve(join(config.dirs.public, file))),
-  ...getClientScriptDefinitions().flatMap(({ sourcePath }) =>
-    sourcePath ? [resolve(join(config.dirs.public, sourcePath))] : []
-  ),
   resolve(join(config.dirs.public, "fonts", "source-han-serif-cn-vf", "result.css")),
 ]);
 

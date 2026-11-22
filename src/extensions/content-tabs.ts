@@ -65,5 +65,5 @@ export const contentTabsPlugin: Plugin = {
     },
   ],
   webComponents: [{ tagName: "content-tabs", scriptKey: "content-tabs" }],
-  clientScripts: [{ key: "content-tabs", fileName: "content-tabs", sourcePath: "js/content-tabs.js" }],
+  clientScripts: [{ key: "content-tabs", fileName: "content-tabs", sourcePath: "content/content-tabs.js" }],
 };

@@ -1,4 +1,5 @@
 import type { Plugin } from "./plugin.js";
+import { bundleClientScript } from "../utils/bundle-client.js";
 
 export const statusPlugin: Plugin = {
   name: "status-page",
@@ -6,6 +7,7 @@ export const statusPlugin: Plugin = {
   clientScripts: [{
     key: "status-page",
     fileName: "status-page",
-    sourcePath: "js/status.js",
+    sourcePath: "pages/status/index.js",
+    transform: source => bundleClientScript(source, "pages/status/index.js"),
   }],
 };

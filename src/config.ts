@@ -25,6 +25,7 @@ const config: Config = {
   dirs: {
     pages: join(rootDir, "content", "pages"),
     public: join(rootDir, "public"),
+    components: join(rootDir, "components"),
     dist: join(rootDir, "dist"),
     layouts: join(rootDir, "layouts"),
   },

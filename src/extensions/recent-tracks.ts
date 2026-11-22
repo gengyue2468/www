@@ -5,7 +5,7 @@ export const recentTracksPlugin: Plugin = {
   clientScripts: [{
     key: "recent-tracks",
     fileName: "recent-tracks",
-    sourcePath: "js/recent-tracks.js",
+    sourcePath: "widgets/recent-tracks.js",
   }],
   webComponents: [{
     tagName: "recent-tracks-loader",

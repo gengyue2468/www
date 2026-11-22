@@ -53,5 +53,5 @@ export const imageViewerPlugin: Plugin = {
   name: "image-viewer",
   hooks: { beforeRenderPage: enhanceContent, beforeRenderPost: enhanceContent },
   webComponents: [{ tagName: "image-viewer", scriptKey: "image-viewer" }],
-  clientScripts: [{ key: "image-viewer", fileName: "image-viewer", sourcePath: "js/image-viewer.js" }],
+  clientScripts: [{ key: "image-viewer", fileName: "image-viewer", sourcePath: "content/image-viewer.js" }],
 };

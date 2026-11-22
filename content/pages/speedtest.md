@@ -3,8 +3,8 @@ title: Speedtest
 description: 测速测速
 ---
 
-<speedtest-page>
-  <div class="speedtest-main">
+<speedtest-page class="ui-editorial">
+  <div class="ui-editorial-main">
   <div data-speedtest-controls>
     <div class="speedtest-controls" aria-hidden="true">
       <div>Single &nbsp; Multi</div><span>Start</span>
@@ -40,7 +40,7 @@ description: 测速测速
   </div>
   <noscript><p>JavaScript is required. No test runs until you select Start test.</p></noscript>
   </div>
-  <aside class="speedtest-client-info" data-speedtest-client-info aria-label="Client information">
+  <aside class="ui-editorial-aside ui-editorial-aside--sticky speedtest-client-info" data-speedtest-client-info aria-label="Client information">
     <dl>
       <div><dt>IP address</dt><dd data-speedtest-client-ip>—</dd></div>
       <div><dt>Location</dt><dd data-speedtest-client-location>—</dd></div>

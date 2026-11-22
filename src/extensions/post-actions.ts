@@ -7,7 +7,7 @@ export const postActionsPlugin: Plugin = {
   clientScripts: [{
     key: "post-actions",
     fileName: "post-actions",
-    sourcePath: "js/post-actions.js",
+    sourcePath: "article/post-actions.js",
   }],
   webComponents: [{
     tagName: COMPONENT_TAG,

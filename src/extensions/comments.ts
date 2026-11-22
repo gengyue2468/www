@@ -27,7 +27,7 @@ export const commentsPlugin: Plugin = {
   clientScripts: [{
     key: "isso-comments",
     fileName: "isso-comments",
-    sourcePath: "js/comments.js",
+    sourcePath: "article/comments.js",
   }],
   webComponents: [{
     tagName: COMPONENT_TAG,

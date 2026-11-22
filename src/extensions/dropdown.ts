@@ -16,5 +16,5 @@ export function renderDropdown(label: string, content: string, options: { trigge
 export const dropdownPlugin: Plugin = {
   name: "site-dropdown",
   webComponents: [{ tagName: "site-dropdown", scriptKey: "site-dropdown" }],
-  clientScripts: [{ key: "site-dropdown", fileName: "site-dropdown", sourcePath: "js/site-dropdown.js" }],
+  clientScripts: [{ key: "site-dropdown", fileName: "site-dropdown", sourcePath: "ui/site-dropdown.js" }],
 };

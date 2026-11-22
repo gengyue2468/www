@@ -17,7 +17,7 @@ export const sidenotePlugin: Plugin = {
   clientScripts: [{
     key: "sidenote-connectors",
     fileName: "sidenote-connectors",
-    sourcePath: "js/sidenote-connectors.js",
+    sourcePath: "article/sidenote-connectors.js",
   }],
   webComponents: [{
     tagName: COMPONENT_TAG,

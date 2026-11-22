@@ -1,26 +1,12 @@
-/* Isso comments: a quiet editorial block that follows the paper-like article style. */
+/* Isso comments: a quiet editorial block mapped to site design tokens. */
 :root {
-  --isso-ink: #333;
-  --isso-muted: #707070;
-  --isso-rule: rgba(0, 0, 0, 0.2);
-  --isso-surface: rgba(255, 255, 255, 0.52);
-  --isso-accent: #555;
-  --isso-accent-soft: #e8e8e8;
-  --isso-code-surface: #ededed;
-  --isso-target-fade-background-color: #e8e8e8;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --isso-ink: #e8e8e8;
-    --isso-muted: #aaa;
-    --isso-rule: rgba(255, 255, 255, 0.22);
-    --isso-surface: rgba(255, 255, 255, 0.045);
-    --isso-accent: #d0d0d0;
-    --isso-accent-soft: #333;
-    --isso-code-surface: #242424;
-    --isso-target-fade-background-color: #333;
-  }
+  --isso-ink: var(--ink);
+  --isso-muted: var(--ink-muted);
+  --isso-rule: var(--border-subtle);
+  --isso-accent: color-mix(in srgb, var(--ink) 78%, transparent);
+  --isso-accent-soft: var(--surface-hover);
+  --isso-code-surface: var(--surface-code);
+  --isso-target-fade-background-color: var(--surface-hover);
 }
 
 .post-comments {
@@ -110,7 +96,7 @@
   --cap-checkbox-background: transparent;
   --cap-spinner-color: var(--isso-ink);
   --cap-spinner-background-color: var(--isso-rule);
-  --cap-checkmark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23333333' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m5 12 5 5L20 7'/%3E%3C/svg%3E");
+  --cap-checkmark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%231f1d18' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m5 12 5 5L20 7'/%3E%3C/svg%3E");
 }
 
 #isso-thread .isso-cap-gate cap-widget::part(label) {

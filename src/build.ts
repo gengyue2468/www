@@ -22,6 +22,7 @@ import { imageViewerPlugin } from "./extensions/image-viewer.js";
 import { contentTabsPlugin } from "./extensions/content-tabs.js";
 import { tablesPlugin } from "./extensions/tables.js";
 import { dropdownPlugin } from "./extensions/dropdown.js";
+import { dialogPlugin } from "./extensions/dialog.js";
 import { listCollapsePlugin } from "./extensions/list-collapse.js";
 import { memosPlugin } from "./extensions/memos.js";
 import { statusPlugin } from "./extensions/status.js";
@@ -56,6 +57,7 @@ registerPlugin(codeBlockPlugin);
 registerPlugin(imageViewerPlugin);
 registerPlugin(tablesPlugin);
 registerPlugin(dropdownPlugin);
+registerPlugin(dialogPlugin);
 registerPlugin(listCollapsePlugin);
 registerPlugin(memosPlugin);
 registerPlugin(statusPlugin);
@@ -272,6 +274,7 @@ async function requireDirectory(directory: string, label: string): Promise<void>
 async function validateBuildInputs(): Promise<void> {
   await requireDirectory(config.dirs.pages, "pages");
   await requireDirectory(config.dirs.public, "public");
+  await requireDirectory(config.dirs.components, "components");
   await requireDirectory(config.dirs.layouts, "layouts");
 
   for (const [route, file] of Object.entries(config.routes)) {
@@ -328,16 +331,7 @@ async function copyKatexAssets(destDir: string): Promise<string> {
 
 export function getUnversionedPageAssetPaths(): string[] {
   return [
-    "tufte.css",
-    "globals.css",
     ...SITE_STYLESHEETS,
-    ...getClientScriptDefinitions().flatMap(({ sourcePath }) =>
-      sourcePath ? [sourcePath] : []
-    ),
-    "js/speedtest-engine.js",
-    "js/marquee.js",
-    "js/vps-flags.json",
-    "js/vps-map.json",
     "css/vps-fonts.css",
     "fonts/source-han-serif-cn-vf/result.css",
     "fonts/source-han-serif-cn-vf/index.html",
@@ -348,13 +342,17 @@ export function getUnversionedPageAssetPaths(): string[] {
 
 async function removeUnversionedPageAssets(): Promise<void> {
   await Promise.all(getUnversionedPageAssetPaths().map(file => rm(join(config.dirs.dist, file), { force: true })));
+  await rm(join(config.dirs.dist, "css"), { recursive: true, force: true });
 }
 
 async function prepareBuildAssets(): Promise<AssetManifest> {
   const assetsDir = join(config.dirs.dist, "assets");
+  const cssAssetsDir = join(assetsDir, "css");
+  const jsAssetsDir = join(assetsDir, "js");
+  const mermaidAssetsDir = join(assetsDir, "mermaid");
 
   const stylesheet = await getMinifiedCss();
-  const stylesheetFileName = await emitHashedTextAsset(assetsDir, "site", ".css", stylesheet);
+  const stylesheetFileName = await emitHashedTextAsset(cssAssetsDir, "site", ".css", stylesheet);
 
   const fontCssDir = join(config.dirs.dist, "fonts", "source-han-serif-cn-vf");
   const fontCss = await readFileContent(join(config.dirs.public, "fonts", "source-han-serif-cn-vf", "result.css"));
@@ -363,26 +361,26 @@ async function prepareBuildAssets(): Promise<AssetManifest> {
   const katexStylesheetHref = await copyKatexAssets(join(config.dirs.dist, "katex"));
 
   const scripts: Record<string, string> = {
-    "mermaid-runtime": await prepareMermaidRuntime(assetsDir, MERMAID_CACHE_DIR),
+    "mermaid-runtime": await prepareMermaidRuntime(mermaidAssetsDir, MERMAID_CACHE_DIR, "/assets/mermaid"),
   };
 
   const assetManifest = {
-    stylesheetHref: `/assets/${stylesheetFileName}`,
+    stylesheetHref: `/assets/css/${stylesheetFileName}`,
     fontStylesheetHref: `/fonts/source-han-serif-cn-vf/${fontCssFileName}`,
     katexStylesheetHref,
     scripts,
   } satisfies AssetManifest;
 
   for (const definition of getClientScriptDefinitions()) {
-    const source = await loadClientScriptSource(definition, assetManifest, config.dirs.public, true);
-    const fileName = await emitHashedTextAsset(assetsDir, definition.fileName, ".js", source);
-    scripts[definition.key] = `/assets/${fileName}`;
+    const source = await loadClientScriptSource(definition, assetManifest, config.dirs.components, true);
+    const fileName = await emitHashedTextAsset(jsAssetsDir, definition.fileName, ".js", source);
+    scripts[definition.key] = `/assets/js/${fileName}`;
   }
 
   await minifySvgFiles(config.dirs.public, config.dirs.dist);
 
   return {
-    stylesheetHref: `/assets/${stylesheetFileName}`,
+    stylesheetHref: `/assets/css/${stylesheetFileName}`,
     fontStylesheetHref: `/fonts/source-han-serif-cn-vf/${fontCssFileName}`,
     katexStylesheetHref,
     scripts,

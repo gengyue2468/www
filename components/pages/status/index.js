@@ -1,61 +1,15 @@
+import { bindDropdownChoices, el as element } from "../../ui/dom.js";
+import { checkedAtFormatter, renderIncident, renderMonitor, stateInfo } from "./render.js";
+
 (() => {
   const tagName = "status-page";
   if (customElements.get(tagName)) return;
 
-  const checkedAtFormatter = new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const incidentDateFormatter = new Intl.DateTimeFormat("en", {
-    year: "numeric", month: "short", day: "numeric",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
-  });
-  const percentFormatter = new Intl.NumberFormat("en", {
-    style: "percent",
-    maximumFractionDigits: 2,
-  });
-  const latencyFormatter = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
   const nameOrder = new Intl.Collator("en", { sensitivity: "base", numeric: true });
   const sortChoices = [["default", "Default"], ["name-asc", "Name A–Z"], ["name-desc", "Name Z–A"],
     ["uptime", "24h uptime ↓"], ["latency", "Latency ↑"]];
   const filterChoices = [["all", "All"], ["up", "Operational"], ["down", "Down"],
     ["pending", "Pending"], ["maintenance", "Maintenance"], ["unknown", "Unknown"]];
-
-  const element = (tag, className, text) => {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text !== undefined) node.textContent = text;
-    return node;
-  };
-
-  const stateInfo = status => {
-    if (status == null || status === "") return { className: "unknown", label: "Unknown" };
-    switch (Number(status)) {
-      case 1: return { className: "up", label: "Operational" };
-      case 0: return { className: "down", label: "Down" };
-      case 2: return { className: "pending", label: "Pending" };
-      case 3: return { className: "maintenance", label: "Maintenance" };
-      default: return { className: "unknown", label: "Unknown" };
-    }
-  };
-
-  const formatCheckedAt = value => {
-    if (typeof value !== "string") return "";
-    const date = new Date(value.replace(" ", "T"));
-    return Number.isFinite(date.getTime()) ? checkedAtFormatter.format(date) : value;
-  };
-
-  const formatUptime = value => {
-    const uptime = Number(value);
-    return Number.isFinite(uptime) ? percentFormatter.format(Math.max(0, Math.min(1, uptime))) : "—";
-  };
-
-  const formatLatency = value => {
-    const latency = Number(value);
-    return value != null && Number.isFinite(latency) ? `${latencyFormatter.format(latency)} ms` : "Unavailable";
-  };
 
   class StatusPage extends HTMLElement {
     connectedCallback() {
@@ -106,23 +60,17 @@
     }
 
     setupChoices(kind, choices) {
-      const menu = this.querySelector(`[data-status-${kind}-options]`);
-      const label = this.querySelector(`[data-status-${kind}-label]`);
-      if (!menu || !label) return;
-      label.textContent = choices.find(([key]) => key === this[`${kind}Key`])?.[1] || choices[0][1];
-      menu.replaceChildren(...choices.map(([key, text]) => {
-        const button = element("button", "", text);
-        button.type = "button";
-        button.dataset.value = key;
-        button.setAttribute("aria-pressed", String(key === this[`${kind}Key`]));
-        button.addEventListener("click", () => {
+      bindDropdownChoices(this, {
+        menuSelector: `[data-status-${kind}-options]`,
+        labelSelector: `[data-status-${kind}-label]`,
+        choices,
+        value: this[`${kind}Key`],
+        signal: this.controller.signal,
+        onChange: key => {
           this[`${kind}Key`] = key;
-          label.textContent = text;
-          for (const option of menu.querySelectorAll("button")) option.setAttribute("aria-pressed", String(option.dataset.value === key));
           if (this.data) this.render(this.data);
-        }, { signal: this.controller.signal });
-        return button;
-      }));
+        },
+      });
     }
 
     scheduleRefresh() {
@@ -167,9 +115,7 @@
       } finally {
         controller.signal.removeEventListener("abort", abort);
         if (this.requestController === request) this.requestController = null;
-        if (this.controller === controller) {
-          this.loading = false;
-        }
+        if (this.controller === controller) this.loading = false;
       }
     }
 
@@ -197,10 +143,9 @@
           return (this.sortKey === "uptime" ? right - left : left - right) || byName;
         });
         const group = element("section", "status-group");
-        const heading = element("h2", "status-group-title", typeof groupData?.name === "string" ? groupData.name : "Services");
-        group.append(heading);
+        group.append(element("h2", "ui-rule-heading status-group-title", typeof groupData?.name === "string" ? groupData.name : "Services"));
         const list = element("div", "status-service-list");
-        for (const monitor of monitors) list.append(this.renderMonitor(monitor, heartbeatList[String(monitor?.id)]));
+        for (const monitor of monitors) list.append(renderMonitor(monitor, heartbeatList[String(monitor?.id)]));
         visible += monitors.length;
         if (list.childElementCount) group.append(list);
         else group.append(element("p", "status-empty", "No services to display."));
@@ -219,9 +164,7 @@
     renderNotices(data) {
       this.notices.replaceChildren();
       const maintenance = Array.isArray(data.maintenanceList) ? data.maintenanceList : [];
-      const notices = [
-        ...maintenance.map(item => ({ item, className: "maintenance", label: "Maintenance" })),
-      ];
+      const notices = maintenance.map(item => ({ item, className: "maintenance", label: "Maintenance" }));
       this.notices.hidden = notices.length === 0;
       for (const notice of notices) {
         const item = notice.item || {};
@@ -305,8 +248,8 @@
       this.currentIncidents.hidden = !current.length;
       this.currentIncidents.replaceChildren();
       if (current.length) {
-        this.currentIncidents.append(element("h2", "status-incident-heading", "Current incidents"));
-        for (const item of current) this.currentIncidents.append(this.renderIncident(item));
+        this.currentIncidents.append(element("h2", "ui-rule-heading status-incident-heading", "Current incidents"));
+        for (const item of current) this.currentIncidents.append(renderIncident(item));
       }
       const index = this.incidentPageIndex || 0;
       const page = this.incidentPages[index];
@@ -316,83 +259,12 @@
         seen.add(String(item.id));
         return true;
       });
-      this.history.replaceChildren(...history.map(item => this.renderIncident(item)));
+      this.history.replaceChildren(...history.map(item => renderIncident(item)));
       this.historyMessage.textContent = history.length ? "" : index || page.hasMore ? "No other incidents on this page." : "No past incidents.";
       this.historyPagination.hidden = index === 0 && !page.hasMore;
       this.historyPage.textContent = `Page ${index + 1}`;
       this.historyPrev.disabled = index === 0;
       this.historyNext.disabled = !page.hasMore;
-    }
-
-    renderIncident(item) {
-      const article = element("article", "status-incident");
-      const heading = element("div", "status-incident-header");
-      heading.append(element("h3", "status-incident-title", typeof item.title === "string" && item.title.trim() ? item.title : "Incident"));
-      if (typeof item.style === "string" && item.style.trim()) heading.append(element("span", "status-incident-style", item.style));
-      article.append(heading);
-      if (typeof item.content === "string" && item.content.trim()) article.append(element("p", "status-incident-content", item.content));
-      const meta = element("div", "status-incident-meta");
-      for (const [label, value] of [["Created", item.createdDate], ["Updated", item.lastUpdatedDate]]) {
-        if (typeof value !== "string" || !value.trim()) continue;
-        const date = new Date(value.replace(" ", "T"));
-        const row = element("span");
-        row.append(document.createTextNode(`${label}: `));
-        const time = element("time", "", Number.isFinite(date.getTime()) ? incidentDateFormatter.format(date) : value);
-        if (Number.isFinite(date.getTime())) time.dateTime = value.replace(" ", "T");
-        row.append(time);
-        meta.append(row);
-      }
-      if (meta.childElementCount) article.append(meta);
-      return article;
-    }
-
-    renderMonitor(monitor, history) {
-      const info = stateInfo(monitor?.status);
-      const row = element("article", `status-service is-${info.className}`);
-      const heading = element("div", "status-service-heading");
-      heading.append(element("span", "status-service-name", String(monitor?.name || "Unnamed service")));
-      heading.append(element("span", "status-service-state", info.label));
-      row.append(heading);
-
-      const checks = Array.isArray(history) ? history.slice(-30) : [];
-      if (checks.length) {
-        const svgNamespace = "http://www.w3.org/2000/svg";
-        const heartbeat = document.createElementNS(svgNamespace, "svg");
-        heartbeat.setAttribute("class", "status-heartbeat");
-        heartbeat.setAttribute("viewBox", `0 0 ${checks.length * 10} 16`);
-        heartbeat.setAttribute("preserveAspectRatio", "none");
-        const levels = "▁▂▃▄▅▆▇█";
-        const maxPing = Math.max(1, ...checks.map(check => Number(check?.ping) || 0));
-        heartbeat.setAttribute("role", "img");
-        const operational = checks.filter(check => check?.status === 1).length;
-        heartbeat.setAttribute("aria-label", `${monitor?.name || "Service"}: ${operational} of the last ${checks.length} checks operational, oldest to newest`);
-        for (const [index, check] of checks.entries()) {
-          const state = stateInfo(check?.status);
-          const ping = Math.max(0, Number(check?.ping) || 0);
-          const level = state.className === "up" ? Math.min(7, Math.round(ping / maxPing * 7)) : 0;
-          const dot = document.createElementNS(svgNamespace, "text");
-          dot.setAttribute("class", `status-heartbeat-dot is-${state.className} notranslate`);
-          dot.setAttribute("translate", "no");
-          dot.setAttribute("x", String(index * 10));
-          dot.setAttribute("y", "14");
-          dot.setAttribute("textLength", "10");
-          dot.setAttribute("lengthAdjust", "spacingAndGlyphs");
-          dot.textContent = levels[level];
-          dot.setAttribute("aria-hidden", "true");
-          const title = document.createElementNS(svgNamespace, "title");
-          title.textContent = `${state.label} · ${formatLatency(check?.ping)} · ${formatCheckedAt(check?.time)}`;
-          dot.append(title);
-          heartbeat.append(dot);
-        }
-        row.append(heartbeat);
-      }
-
-      const meta = element("div", "status-service-meta");
-      meta.append(element("span", "status-service-uptime", `24h ${formatUptime(monitor?.uptime24h)}`));
-      meta.append(element("span", "status-service-ping", formatLatency(monitor?.ping)));
-      row.append(meta);
-      if (monitor?.message) row.append(element("p", "status-service-message", String(monitor.message)));
-      return row;
     }
   }
 

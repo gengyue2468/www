@@ -14,7 +14,7 @@
     const open = XMLHttpRequest.prototype.open;
     const send = XMLHttpRequest.prototype.send;
     const requests = new WeakSet();
-    XMLHttpRequest.prototype.open = function(method, url, ...args) {
+    XMLHttpRequest.prototype.open = function (method, url, ...args) {
       const target = new URL(url, document.baseURI);
       const isComment = String(method).toUpperCase() === "POST" && target.origin === upstream.origin && target.pathname === newPath;
       requests.delete(this);
@@ -24,7 +24,7 @@
       }
       return open.call(this, method, url, ...args);
     };
-    XMLHttpRequest.prototype.send = function(...args) {
+    XMLHttpRequest.prototype.send = function (...args) {
       if (!requests.has(this)) return send.apply(this, args);
       requests.delete(this);
       const submission = pendingSubmission;

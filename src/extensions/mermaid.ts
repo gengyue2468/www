@@ -22,7 +22,7 @@ export const mermaidPlugin: Plugin = {
   clientScripts: [{
     key: "mermaid-diagram",
     fileName: "mermaid-diagram",
-    sourcePath: "js/mermaid-diagram.js",
+    sourcePath: "content/mermaid-diagram.js",
     transform: (source, assets) => {
       const src = assets.scripts["mermaid-runtime"];
       if (!src) throw new Error("Mermaid runtime asset is not available");

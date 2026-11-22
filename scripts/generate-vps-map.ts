@@ -11,7 +11,7 @@ const source =
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const output = process.argv[2]
   ? resolve(process.argv[2])
-  : resolve(root, "public/js/vps-map.json");
+  : resolve(root, "components/pages/vps/map.json");
 
 type Point = number[];
 type Polygon = Point[][];

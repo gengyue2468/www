@@ -28,5 +28,5 @@ export const codeBlockPlugin: Plugin = {
   name: "code-block",
   hooks: { beforeRenderPage: enhanceContent, beforeRenderPost: enhanceContent },
   webComponents: [{ tagName: "code-block", scriptKey: "code-block" }],
-  clientScripts: [{ key: "code-block", fileName: "code-block", sourcePath: "js/code-block.js" }],
+  clientScripts: [{ key: "code-block", fileName: "code-block", sourcePath: "content/code-block.js" }],
 };

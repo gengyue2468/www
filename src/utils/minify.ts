@@ -5,10 +5,16 @@ import { optimize } from "svgo";
 import { join } from "path";
 import { AppError, ErrorCode } from "./errors.js";
 
+const CSS_TARGETS = {
+  chrome: 111 << 16,
+  firefox: 113 << 16,
+  safari: (16 << 16) | (4 << 8),
+};
+
 /** Parse CSS instead of removing whitespace inside strings, URLs or calc(). */
 export function minifyCss(source: string, filename = "site.css", inline = false): string {
   try {
-    const options = { filename, code: Buffer.from(source), minify: true, errorRecovery: false };
+    const options = { filename, code: Buffer.from(source), minify: true, targets: CSS_TARGETS, errorRecovery: false };
     const result = inline ? transformStyleAttribute(options) : transform(options);
     return Buffer.from(result.code).toString();
   } catch (err) {
@@ -19,14 +25,25 @@ export function minifyCss(source: string, filename = "site.css", inline = false)
 /** Property mangling is opt-in and limited to audited internal names. */
 export function minifyJavaScript(source: string, options: { module?: boolean; inline?: boolean; internalProperties?: readonly string[] } = {}): string {
   try {
+    const isModule = options.module ?? true;
     const propertyPattern = options.internalProperties?.length
       ? new RegExp(`^(?:${options.internalProperties.map(name => name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})$`)
       : null;
     const result = minify_sync(source, {
       ecma: 2022,
-      module: options.module ?? true,
-      compress: { passes: 10, unsafe: false },
-      mangle: { properties: propertyPattern ? { regex: propertyPattern, builtins: false, keep_quoted: true } : false },
+      module: isModule,
+      toplevel: isModule,
+      compress: {
+        passes: 10,
+        toplevel: isModule,
+        hoist_funs: true,
+        drop_debugger: true,
+        unsafe: false,
+      },
+      mangle: {
+        toplevel: isModule,
+        properties: propertyPattern ? { regex: propertyPattern, builtins: false, keep_quoted: true } : false,
+      },
       parse: { bare_returns: options.inline === true },
       format: { comments: "some", inline_script: true },
     });

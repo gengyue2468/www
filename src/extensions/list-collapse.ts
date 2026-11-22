@@ -15,5 +15,5 @@ export const listCollapsePlugin: Plugin = {
     },
   }],
   webComponents: [{ tagName: "list-collapse", scriptKey: "list-collapse" }],
-  clientScripts: [{ key: "list-collapse", fileName: "list-collapse", sourcePath: "js/list-collapse.js" }],
+  clientScripts: [{ key: "list-collapse", fileName: "list-collapse", sourcePath: "content/list-collapse.js" }],
 };

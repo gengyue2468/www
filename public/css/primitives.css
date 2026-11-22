@@ -1,0 +1,333 @@
+/* Shared UI primitives reused across pages and Web Components. */
+
+/* 1. Accessibility visually hidden */
+.sr-only,
+.component-status,
+input.margin-toggle,
+.speedtest-controls legend,
+.speedtest-mode input {
+  display: block;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 2. Editorial two-column grid (main text column + margin aside) */
+.ui-editorial {
+  display: grid;
+  grid-template-columns: var(--width-content) var(--aside-gap) var(--aside-width);
+  align-items: start;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.ui-editorial-main {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.ui-editorial-aside {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: var(--aside-max-width);
+  margin-top: var(--spacing-sidenote-top);
+  font-size: var(--font-size-aside);
+  line-height: var(--line-height-sidenote);
+  text-indent: 0;
+  letter-spacing: 0.01em;
+}
+
+.ui-editorial-aside--sticky {
+  position: sticky;
+  top: var(--aside-sticky-top);
+  z-index: 1;
+}
+
+/* 3. Paper modal dialog (<site-dialog>) */
+site-dialog {
+  display: contents;
+}
+
+.ui-dialog {
+  width: min(100rem, calc(100vw - 1rem));
+  max-width: calc(100vw - 1rem);
+  max-height: calc(100dvh - 1rem);
+  box-sizing: border-box;
+  padding: 3.2rem 1rem 1rem;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.ui-dialog::backdrop {
+  background: var(--backdrop-paper);
+}
+
+.ui-dialog-close {
+  position: absolute;
+  top: 0.85rem;
+  right: 1rem;
+  display: grid;
+  place-items: center;
+  padding: 0.2em;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ui-dialog-close svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.3;
+}
+
+/* 4. Buttons & text actions */
+.ui-btn,
+.post-actions-button {
+  appearance: none;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid var(--surface-hover);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1em;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: normal;
+  list-style: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ui-btn:hover,
+.post-actions-button:hover {
+  border-color: var(--surface-hover);
+  background: var(--surface-hover);
+}
+
+.ui-link-btn {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-style: italic;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.ui-link-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ui-link-btn[hidden] {
+  display: none;
+}
+
+.ui-icon-btn {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ui-icon-btn:hover:not(:disabled),
+.ui-icon-btn:focus-visible {
+  background: var(--surface-hover);
+}
+
+.ui-icon-btn:disabled {
+  cursor: default;
+  opacity: 0.25;
+}
+
+/* 5. Sidebar dropdown filter controls */
+.ui-control {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.3em 1em;
+}
+
+.ui-control + .ui-control {
+  margin-top: 0.6rem;
+}
+
+.ui-control-label {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.ui-control .nav-menu-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ui-chevron {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+.ui-control details[open] .ui-chevron {
+  transform: rotate(180deg);
+}
+
+.ui-control .nav-dropdown-menu button {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ui-control .nav-dropdown-menu button[aria-pressed="true"] {
+  background: var(--surface-hover);
+}
+
+/* 6. Shared sequential overflow marquee */
+.ui-marquee {
+  --marquee-gap: 2rem;
+  --marquee-delay: 1.8s;
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ui-marquee[data-overflowing]:not([data-scrolling]) {
+  -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 1.4rem), transparent 100%);
+  mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 1.4rem), transparent 100%);
+}
+
+.ui-marquee[data-scrolling] {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 1rem, #000 calc(100% - 1.4rem), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 1rem, #000 calc(100% - 1.4rem), transparent 100%);
+}
+
+.ui-marquee [data-marquee-lane] {
+  display: flex;
+  width: max-content;
+  column-gap: var(--marquee-gap);
+}
+
+.ui-marquee [data-marquee-source],
+.ui-marquee [data-marquee-clone] {
+  flex: none;
+}
+
+.ui-marquee [data-marquee-clone][hidden] {
+  display: none;
+}
+
+.ui-marquee[data-scrolling] [data-marquee-lane] {
+  animation: ui-marquee var(--marquee-duration) linear var(--marquee-delay);
+}
+
+.ui-marquee[data-marquee-paused] [data-marquee-lane],
+.ui-marquee:focus-within [data-marquee-lane] {
+  animation-play-state: paused;
+}
+
+@media (hover: hover) {
+  .ui-marquee:hover [data-marquee-lane] {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes ui-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-1 * var(--marquee-distance))); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-marquee {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .ui-marquee [data-marquee-lane] {
+    animation: none !important;
+  }
+
+  .ui-marquee [data-marquee-clone] {
+    display: none;
+  }
+}
+
+/* 7. Typography helpers */
+.ui-rule-heading {
+  margin: 0 0 0.7rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: var(--font-size-h3);
+  font-style: italic;
+  font-weight: 400;
+}
+
+@media (max-width: 760px) {
+  .ui-editorial {
+    display: block;
+  }
+
+  .ui-editorial-aside {
+    position: static;
+    max-width: none;
+    margin: 2rem 0 0;
+  }
+
+  .ui-editorial-aside--dock {
+    position: sticky;
+    top: auto;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.6rem 1.5rem;
+    margin-top: 1.5rem;
+    padding-block: 0.5rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    background: var(--bg);
+  }
+
+  .ui-editorial-aside--dock .ui-control + .ui-control {
+    margin-top: 0;
+  }
+}

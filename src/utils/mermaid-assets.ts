@@ -73,7 +73,7 @@ async function fetchCachedBuildAsset(url: string, cachePath: string): Promise<st
   }
 }
 
-export async function prepareMermaidRuntime(assetsDir: string, cacheDir: string): Promise<string> {
+export async function prepareMermaidRuntime(assetsDir: string, cacheDir: string, publicPrefix = "/assets"): Promise<string> {
   const entryUrl = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/mermaid.esm.min.mjs`;
   const dependencyUrl = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/${CORE_DEPENDENCY}`;
   const [entry, dependency] = await Promise.all([
@@ -146,5 +146,5 @@ export async function prepareMermaidRuntime(assetsDir: string, cacheDir: string)
   const rewrittenEntry = optimizedEntry.replaceAll(coreModuleName, `./${dependencyFileName}`);
   const entryFileName = await emitHashedTextAsset(assetsDir, "mermaid-esm", ".mjs", rewrittenEntry);
   await validateModuleAssets(assetsDir, [...emittedModules.values(), entryFileName]);
-  return `/assets/${entryFileName}`;
+  return `${publicPrefix}/${entryFileName}`;
 }

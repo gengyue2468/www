@@ -1,4 +1,5 @@
 import type { Plugin } from "./plugin.js";
+import { bundleClientScript } from "../utils/bundle-client.js";
 
 export const trackPlugin: Plugin = {
   name: "track-page",
@@ -6,6 +7,7 @@ export const trackPlugin: Plugin = {
   clientScripts: [{
     key: "track-page",
     fileName: "track-page",
-    sourcePath: "js/track.js",
+    sourcePath: "pages/track/index.js",
+    transform: source => bundleClientScript(source, "pages/track/index.js"),
   }],
 };

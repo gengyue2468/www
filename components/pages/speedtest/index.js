@@ -1,4 +1,4 @@
-import { MIB, fetchCloudflareClientInfo, runSpeedTest, speedtestCooldownMs } from "./speedtest-engine.js";
+import { MIB, fetchCloudflareClientInfo, runSpeedTest, speedtestCooldownMs } from "./engine.js";
 
 // Trusted static markup: forms in Markdown are deliberately removed by the
 // site's sanitizer. Build the controls here without weakening that policy.

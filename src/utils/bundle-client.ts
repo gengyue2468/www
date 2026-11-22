@@ -1,19 +1,22 @@
-import { join } from "path";
+import { dirname, join, resolve } from "path";
+import config from "../config.js";
 
-/** Bundle local browser modules without leaving unhashed runtime imports. */
-export async function bundleClientScript(source: string, fileName: string): Promise<string> {
-  const directory = join(import.meta.dir, "../../public/js");
+/** Bundle browser component modules from components/ without leaving unhashed runtime imports. */
+export async function bundleClientScript(source: string, sourcePath: string, componentsDir = config.dirs.components): Promise<string> {
+  const entryPath = resolve(join(componentsDir, sourcePath));
+  const resolveDir = dirname(entryPath);
   const result = await Bun.build({
-    entrypoints: [join(directory, fileName)],
+    entrypoints: [entryPath],
     target: "browser",
     format: "esm",
+    minify: { whitespace: false, identifiers: false, syntax: true },
     plugins: [{ name: "client-source", setup(build) {
       build.onLoad({ filter: /\.js$/ }, args => {
-        if (args.path === join(directory, fileName)) return { contents: source, loader: "js", resolveDir: directory };
+        if (resolve(args.path) === entryPath) return { contents: source, loader: "js", resolveDir };
         return undefined;
       });
     } }],
   });
-  if (!result.success) throw new AggregateError(result.logs, `Could not bundle ${fileName}`);
+  if (!result.success) throw new AggregateError(result.logs, `Could not bundle ${sourcePath}`);
   return result.outputs[0].text();
 }

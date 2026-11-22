@@ -12,20 +12,29 @@ const INTERNAL_PROPERTIES = [
   "scheduleMarquees", "updateMarquees", "resetMarqueeCycle", "startMarquee", "advanceMarquee",
   "syncMarqueeVisibility", "marqueeQueue", "activeMarquee", "marqueeFrame", "marqueeDistance",
   "marqueeResizeObserver", "marquees", "motionQuery", "handleMotionChange",
+  "preserveUpdates", "syncVisibility", "offscreen",
   "setPlayedAt", "syncProgressClock", "updateProgress", "setProgress", "setPlaybackExtras",
-  "renderTrack", "renderUnavailable", "progressTimer", "progressSample",
+  "renderTrack", "renderUnavailable", "renderedTrackKey", "progressTimer", "progressSample",
   "requestController", "feedbackTimer", "resetButton", "tabController",
   "viewportObserver", "threadObserver", "loadIsso", "observeThread", "bindPostboxes",
   "mountCap", "handleSubmitClick", "enhanceVotes", "sortComments", "updateCount",
   "capLoading", "capLoaded", "schedulePosition", "positionMenu", "releaseOpen",
   "openController", "positionFrame", "usePopover", "mediaChange",
   "scheduleRefresh", "refreshTimer", "renderOverview", "renderNotices", "renderMonitor",
+  "incidentCurrent", "incidentPages", "incidentPageIndex", "incidentLoading", "incidentLoaded",
+  "incidentRequest", "incidentRetryCursor", "incidentRetryPage", "loadIncidents", "renderIncidents", "moveIncidentPage",
+  "setupChoices", "sortKey", "filterKey",
+  "mapDialog", "mapRestore", "fleetMarquee", "nodeViews", "streamSource", "fallbackController",
+  "reconnectTimer", "ageTimer", "applySnapshot", "connectStream", "loadSnapshot", "closeStream", "setupMapDialog", "setConnection",
   "showMessage", "showTracks", "revealHash", "noteIndex",
   "setupCalendarMedia", "enableCalendar", "disableCalendar", "renderCalendarWeekdays",
   "calendarMonthInRange", "moveCalendar", "loadCalendar", "renderCalendar", "selectDate",
   "clearDateFilter", "resetFeed", "observeNextPage", "renderMarkdown", "renderMemo",
   "calendarMonthLabel", "calendarPrevious", "calendarNext", "calendarWeekdays", "calendarGrid",
-  "dateFilter", "filterDate", "filterClear", "calendarMonth", "calendarCache", "feedGeneration",
+  "calendarEnabled", "calendarRequestId", "calendarLoading", "calendarDays", "calendarRange", "calendarError", "calendarRequestController",
+  "tagsRoot", "tagsList", "tagsOpen", "tagsDialog", "tagsAll", "tagsMessage", "tagsRetry",
+  "tagsLoaded", "tagsLoading", "tagsRequestController", "tagsResizeObserver", "tagsFitFrame", "loadTags", "scheduleTagFit",
+  "dateFilter", "filterDate", "filterClear", "selectedDate", "calendarMonth", "calendarCache", "feedGeneration",
   "calendarMedia", "handleCalendarMedia", "calendarController", "calendarGeneration",
   "paginationFrame", "checkScroll",
 ] as const;
@@ -33,11 +42,11 @@ const INTERNAL_PROPERTIES = [
 export async function loadClientScriptSource(
   definition: ClientScriptDefinition,
   assets: AssetManifest,
-  publicDir: string,
+  componentsDir: string,
   minify = false,
 ): Promise<string> {
   let source = definition.sourcePath
-    ? await readFileContent(join(publicDir, definition.sourcePath))
+    ? await readFileContent(join(componentsDir, definition.sourcePath))
     : await definition.source!(assets);
   source = definition.transform ? await definition.transform(source, assets) : source;
   if (!minify) return source;
