@@ -187,6 +187,10 @@ async function loadPostsFromDir(
   return sortPostsByDate(posts);
 }
 
+function buildCollectionEditorialHTML(mainHtml: string, tagsHtml: string): string {
+  return `<div class="ui-editorial"><div class="ui-editorial-main collection-main">${mainHtml}</div><aside class="ui-editorial-aside ui-editorial-aside--sticky collection-tags-aside" aria-label="Tags"><h2 class="collection-tags-heading">Tags</h2>${tagsHtml}</aside></div>`;
+}
+
 function buildCollectionIndex(
   posts: Post[],
   coll: CollectionConfig,
@@ -196,12 +200,13 @@ function buildCollectionIndex(
   assets: AssetManifest,
   year?: number
 ): string {
-  const tagsHtml = coll.tags ? `<div style="margin-top: 3rem;">${generateTagsHTML(buildTagIndex(posts), urlPrefix)}</div>` : "";
   const postsListHtml = posts.length > 0 ? generatePostsListHTML(posts, urlPrefix) : "<p>No posts yet.</p>";
+  const tagsHtml = coll.tags ? generateTagsHTML(buildTagIndex(posts), urlPrefix) : "";
+  const bodyHtml = coll.tags ? buildCollectionEditorialHTML(postsListHtml, tagsHtml) : postsListHtml;
 
   const contentData = { 
     title: capitalize(coll.name), 
-    postsList: postsListHtml + tagsHtml 
+    postsList: bodyHtml 
   };
   const renderedContent = renderTemplate(indexLayout, contentData);
 
@@ -408,8 +413,8 @@ async function buildTagPages(
 
       const contentData = {
         title: `Tag: #${escapeHtmlText(tag)}`,
-        tagsList: tagNavHtml,
-        postsList: postsListHtml,
+        tagsList: "",
+        postsList: buildCollectionEditorialHTML(postsListHtml, tagNavHtml),
       };
       const renderedContent = renderTemplate(tagsLayout, contentData);
 
@@ -466,8 +471,8 @@ async function buildTagPages(
 
   const contentData = {
     title: "All Tags",
-    tagsList: '',
-    postsList: `<p>共 ${uniqueTagCount} 个标签，${posts.length} 篇文章</p><div class="tags-cloud">${tagsCloudHtml}</div>`,
+    tagsList: "",
+    postsList: `<div class="ui-editorial"><aside class="ui-editorial-aside collection-summary-aside" aria-label="Tag summary"><p>共 ${uniqueTagCount} 个标签，${posts.length} 篇文章</p></aside><div class="ui-editorial-main collection-main"><div class="tags-cloud">${tagsCloudHtml}</div></div></div>`,
   };
   const renderedContent = renderTemplate(tagsLayout, contentData);
 

@@ -50,8 +50,9 @@ const COMPONENT_TEMPLATE = `
     overflow: hidden;
     margin: 0;
     padding: 0.45rem;
-    border: 1px solid var(--accent);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm, 2px);
+    box-shadow: var(--shadow-card);
     box-sizing: border-box;
     transition: opacity 0.2s ease;
   }
@@ -76,15 +77,15 @@ const COMPONENT_TEMPLATE = `
     width: 5rem;
     height: 5rem;
     margin-inline-end: 1.1rem;
-    border: 1px solid var(--accent);
+    border: 1px solid var(--border);
     box-sizing: border-box;
     overflow: hidden;
     border-radius: 2px;
     background-color: var(--accent);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23909090' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23909090' fill-opacity='0.75'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.669 11.538a.5.5 0 0 1-.686.165c-1.879-1.147-4.243-1.407-7.028-.77a.499.499 0 0 1-.222-.973c3.048-.696 5.662-.397 7.77.892a.5.5 0 0 1 .166.686m.979-2.178a.624.624 0 0 1-.858.205c-2.15-1.321-5.428-1.704-7.972-.932a.625.625 0 0 1-.362-1.194c2.905-.881 6.517-.454 8.986 1.063a.624.624 0 0 1 .206.858m.084-2.268C10.154 5.56 5.9 5.419 3.438 6.166a.748.748 0 1 1-.434-1.432c2.825-.857 7.523-.692 10.492 1.07a.747.747 0 1 1-.764 1.288'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 52%;
+    background-size: 46%;
   }
 
   .cover img {
@@ -209,7 +210,9 @@ const COMPONENT_TEMPLATE = `
     transition: transform 1s linear;
     pointer-events: none;
   }
-  .card[data-progress-reset]::after { transition: none; }
+  .card[data-progress-jump]::after {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
   @media (prefers-color-scheme: dark) {
     .card[data-progress-active]::after {
@@ -635,8 +638,11 @@ const COMPONENT_TEMPLATE = `
       const card = this.root.querySelector("[data-card]");
       if (card) {
         const ratio = position / sample.duration;
-        const previous = Number(card.style.getPropertyValue("--playback-progress"));
-        card.toggleAttribute("data-progress-reset", ratio < previous);
+        const rawPrevious = card.style.getPropertyValue("--playback-progress");
+        const previous = rawPrevious === "" ? 0 : Number(rawPrevious);
+        const jump = rawPrevious === "" || ratio < previous || ratio - previous > 0.03;
+        card.toggleAttribute("data-progress-jump", jump);
+        if (rawPrevious === "") void card.offsetWidth;
         card.style.setProperty("--playback-progress", `${ratio}`);
       }
       progress.setAttribute("aria-valuetext", `${formatDuration(position)} / ${formatDuration(sample.duration)}`);
@@ -660,7 +666,7 @@ const COMPONENT_TEMPLATE = `
       card?.toggleAttribute("data-progress-active", valid);
       if (!valid) {
         card?.style.removeProperty("--playback-progress");
-        card?.removeAttribute("data-progress-reset");
+        card?.removeAttribute("data-progress-jump");
         const progress = this.root.querySelector("[data-progress]");
         if (progress) {
           progress.value = 0;

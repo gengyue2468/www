@@ -348,7 +348,7 @@ status-page > .ui-editorial-main { grid-row: 1 / span 2; }
   width: 2rem;
   height: 2rem;
   padding: 0;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border);
   background: transparent;
   color: inherit;
   cursor: pointer;

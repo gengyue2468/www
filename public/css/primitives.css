@@ -64,9 +64,10 @@ site-dialog {
   box-sizing: border-box;
   padding: 3.2rem 1rem 1rem;
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border);
   background: var(--bg);
   color: var(--ink);
+  box-shadow: var(--shadow-elevated);
 }
 
 .ui-dialog::backdrop {
@@ -103,7 +104,7 @@ site-dialog {
   position: relative;
   cursor: pointer;
   padding: 0.2rem 0.65rem;
-  border: 1px solid var(--surface-hover);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: transparent;
   color: inherit;
@@ -119,7 +120,7 @@ site-dialog {
 
 .ui-btn:hover,
 .post-actions-button:hover {
-  border-color: var(--surface-hover);
+  border-color: var(--border);
   background: var(--surface-hover);
 }
 
@@ -296,7 +297,7 @@ site-dialog {
 .ui-rule-heading {
   margin: 0 0 0.7rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border);
   font-size: var(--font-size-h3);
   font-style: italic;
   font-weight: 400;

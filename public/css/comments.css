@@ -2,7 +2,7 @@
 :root {
   --isso-ink: var(--ink);
   --isso-muted: var(--ink-muted);
-  --isso-rule: var(--border-subtle);
+  --isso-rule: var(--border);
   --isso-accent: color-mix(in srgb, var(--ink) 78%, transparent);
   --isso-accent-soft: var(--surface-hover);
   --isso-code-surface: var(--surface-code);
