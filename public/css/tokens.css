@@ -113,7 +113,7 @@
     --ink: #e8e6e3;
     --surface-hover: oklch(26.9% 0 0);
     --surface-code: #242424;
-    --border: #333;
+    --border: #444;
     --border-subtle: color-mix(in srgb, var(--ink) 22%, transparent);
     --shadow-popover: 0 4px 12px rgba(0, 0, 0, 0.3);
     --shadow-elevated: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.3);

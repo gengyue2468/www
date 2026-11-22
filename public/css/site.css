@@ -430,7 +430,7 @@ site-dropdown[data-positioned] > details > .nav-dropdown-menu {
 
 .table-of-contents li::before {
   content: counters(toc-item, ".") " ";
-  color: var(--border);
+  color: var(--ink-muted);
   font-variant-numeric: tabular-nums;
   margin-right: 0.35rem;
 }
@@ -447,7 +447,7 @@ site-dropdown[data-positioned] > details > .nav-dropdown-menu {
   top: 50%;
   line-height: 1;
   transform: translateY(-50%);
-  color: var(--border);
+  color: var(--ink-muted);
   font-size: 0.75em;
   text-decoration: none;
   opacity: 0;
@@ -484,7 +484,7 @@ h4:hover .heading-anchor,
 }
 
 .post-nav-link span {
-  color: var(--border);
+  color: var(--ink-muted);
   font-size: 0.85em;
 }
 
@@ -684,8 +684,8 @@ section > .table-scroll {
   width: var(--width-content);
   margin: 1.4rem 0;
   padding: 0.7rem 1rem;
-  border-left: 3px solid var(--surface-hover);
-  background: color-mix(in srgb, var(--surface-hover) 10%, transparent);
+  border-left: 3px solid var(--border-subtle);
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
 }
 
 .admonition-title {

@@ -333,7 +333,7 @@
   width: 100%;
   min-height: 3.2rem;
   border-color: var(--isso-rule);
-  background: var(--accent);
+  background: var(--surface-hover);
   color: transparent;
   font: inherit;
   font-size: var(--font-size-body);
