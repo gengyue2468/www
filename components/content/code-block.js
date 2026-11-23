@@ -42,11 +42,17 @@
         this.button.title = "已复制";
         this.button.setAttribute("aria-label", "已复制");
         this.status.textContent = "代码已复制";
-      } catch {
+      } catch (error) {
         if (controller !== this.controller) return;
         this.button.title = "复制失败，请手动选择代码";
         this.button.setAttribute("aria-label", this.button.title);
         this.status.textContent = this.button.title;
+        if (typeof window !== "undefined" && typeof window.dispatchEvent === "function" && typeof CustomEvent === "function") {
+          const detail = error instanceof Error ? error.message : String(error || "");
+          window.dispatchEvent(new CustomEvent("site-toast", {
+            detail: { message: "Failed to copy code.", detail, tone: "error" },
+          }));
+        }
       } finally {
         if (controller === this.controller) {
           this.copying = false;

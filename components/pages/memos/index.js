@@ -1,5 +1,6 @@
 import "../../content/image-viewer.js";
 import "../../content/code-block.js";
+import { notifyError } from "../../ui/toast.js";
 import { renderMemo } from "./markdown.js";
 import {
   fitTagList,
@@ -201,10 +202,11 @@ import {
         this.tagsMessage.textContent = count ? "" : "No tags.";
         this.tagsLoaded = true;
         this.scheduleTagFit();
-      } catch {
+      } catch (error) {
         if (request.signal.aborted || this.tagsRequestController !== request) return;
         this.tagsMessage.textContent = "Tags unavailable.";
         this.tagsRetry.hidden = false;
+        notifyError("Failed to load tags.", error);
       } finally {
         if (this.tagsRequestController === request) {
           this.tagsRequestController = null;
@@ -287,11 +289,12 @@ import {
         this.calendarCache.set(month, { days, range });
         this.calendarError = false;
         this.renderCalendar();
-      } catch {
+      } catch (error) {
         if (request.signal.aborted || requestId !== this.calendarRequestId) return;
         this.calendarError = true;
         this.calendarDays = {};
         this.renderCalendar();
+        notifyError("Failed to load calendar.", error);
       } finally {
         if (this.calendarRequestController === request) this.calendarRequestController = null;
         if (requestId === this.calendarRequestId) {
@@ -418,12 +421,13 @@ import {
         this.loaded = true;
         this.setStatus(this.seen.size ? "" : "Nothing here");
         if (retryFocused) entries[0]?.node.querySelector(".memo-meta a")?.focus({ preventScroll: true });
-      } catch {
+      } catch (error) {
         if (controller.signal.aborted || request.signal.aborted || generation !== this.feedGeneration) return;
         this.failed = true;
         this.setStatus(this.loaded ? "Not loaded" : "Load failed");
         this.button.hidden = false;
         this.button.textContent = "重试";
+        notifyError(this.loaded ? "Failed to load more memos." : "Failed to load memos.", error);
       } finally {
         clearTimeout(timeout);
         controller.signal.removeEventListener("abort", abort);

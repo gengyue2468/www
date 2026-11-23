@@ -38,6 +38,12 @@
       } catch (error) {
         if (error?.name !== "AbortError") {
           this.showMessage("Recent tracks could not be loaded.");
+          if (typeof window !== "undefined" && typeof window.dispatchEvent === "function" && typeof CustomEvent === "function") {
+            const detail = error instanceof Error ? error.message : String(error || "");
+            window.dispatchEvent(new CustomEvent("site-toast", {
+              detail: { message: "Failed to load recent tracks.", detail, tone: "error" },
+            }));
+          }
         }
       }
     }

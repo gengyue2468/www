@@ -1,4 +1,5 @@
 import { MIB, fetchCloudflareClientInfo, runSpeedTest, speedtestCooldownMs } from "./engine.js";
+import { notifyError } from "../../ui/toast.js";
 
 // Trusted static markup: forms in Markdown are deliberately removed by the
 // site's sanitizer. Build the controls here without weakening that policy.
@@ -97,11 +98,14 @@ const SPEEDTEST_CONTROLS = `
       if (this.testController) return;
       const cooldown = speedtestCooldownMs();
       if (cooldown) {
-        this.text("[data-speedtest-status]", `Retry in ${Math.ceil(cooldown / 1000)}s.`);
+        const message = `Retry in ${Math.ceil(cooldown / 1000)}s.`;
+        this.text("[data-speedtest-status]", message);
+        notifyError(message);
         return;
       }
       if (!globalThis.ReadableStream || !globalThis.AbortController || !globalThis.crypto?.getRandomValues) {
         this.text("[data-speedtest-status]", "Browser unsupported.");
+        notifyError("Browser unsupported.");
         return;
       }
       const form = new FormData(this.form);
@@ -142,8 +146,10 @@ const SPEEDTEST_CONTROLS = `
           : /cooldown/i.test(detail) ? "Wait before retrying."
           : /no .*data/i.test(detail) ? "No data."
           : "Test failed.";
-        this.text("[data-speedtest-status]", phase ? `${phase}: ${message}` : message);
+        const summary = phase ? `${phase}: ${message}` : message;
+        this.text("[data-speedtest-status]", summary);
         this.querySelector("[data-speedtest-status]").title = detail;
+        notifyError(summary, detail);
         for (const row of this.querySelectorAll("[data-speedtest-direction][data-active]")) {
           row.querySelector("[data-speedtest-caption]").textContent = "Incomplete";
         }

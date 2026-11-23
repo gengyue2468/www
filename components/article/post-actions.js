@@ -42,7 +42,13 @@
         window.setTimeout(() => {
           link.textContent = originalText;
         }, 1600);
-      } catch {
+      } catch (error) {
+        if (typeof window !== "undefined" && typeof window.dispatchEvent === "function" && typeof CustomEvent === "function") {
+          const detail = error instanceof Error ? error.message : String(error || "");
+          window.dispatchEvent(new CustomEvent("site-toast", {
+            detail: { message: isMarkdown ? "Failed to copy Markdown." : "Failed to copy URL.", detail, tone: "error" },
+          }));
+        }
         if (isMarkdown) window.location.href = link.href;
       }
     }

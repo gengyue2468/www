@@ -1,5 +1,6 @@
 import { MarqueeController, createMarquee } from "../../ui/marquee.js";
 import { el } from "../../ui/dom.js";
+import { notifyError } from "../../ui/toast.js";
 
 (() => {
   const tagName = "track-page";
@@ -121,11 +122,12 @@ import { el } from "../../ui/dom.js";
         this.hasMore = data.hasMore === true && nextBefore != null;
         this.loaded = true;
         this.setMessage(this.seen.size ? "" : "No recently played tracks.");
-      } catch {
+      } catch (error) {
         if (request.signal.aborted || this.controller !== controller) return;
         this.failed = true;
         this.setMessage(this.loaded ? "Could not load more tracks. The loaded tracks are still here." : "Recent tracks are unavailable. Please try again.");
         this.retry.hidden = false;
+        notifyError(this.loaded ? "Failed to load more tracks." : "Failed to load tracks.", error);
       } finally {
         controller.signal.removeEventListener("abort", abort);
         if (this.requestController === request) this.requestController = null;

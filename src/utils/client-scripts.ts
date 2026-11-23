@@ -37,6 +37,7 @@ const INTERNAL_PROPERTIES = [
   "dateFilter", "filterDate", "filterClear", "selectedDate", "calendarMonth", "calendarCache", "feedGeneration",
   "calendarMedia", "handleCalendarMedia", "calendarController", "calendarGeneration",
   "paginationFrame", "checkScroll",
+  "pauseDismiss", "scheduleDismiss",
 ] as const;
 
 export async function loadClientScriptSource(

@@ -1,4 +1,5 @@
 import { bindDropdownChoices, el as element } from "../../ui/dom.js";
+import { notifyError } from "../../ui/toast.js";
 import { checkedAtFormatter, renderIncident, renderMonitor, stateInfo } from "./render.js";
 
 (() => {
@@ -107,10 +108,11 @@ import { checkedAtFormatter, renderIncident, renderMonitor, stateInfo } from "./
         this.loaded = true;
         this.setMessage("");
         this.scheduleRefresh();
-      } catch {
+      } catch (error) {
         if (request.signal.aborted || this.controller !== controller) return;
         this.setMessage(this.loaded ? "Update failed. Showing the last available results." : "Status is unavailable. Please try again.");
         this.retry.hidden = false;
+        notifyError(this.loaded ? "Failed to refresh status." : "Failed to load status.", error);
         this.scheduleRefresh();
       } finally {
         controller.signal.removeEventListener("abort", abort);
@@ -223,12 +225,13 @@ import { checkedAtFormatter, renderIncident, renderMonitor, stateInfo } from "./
         this.incidentLoaded = true;
         this.historyRetry.hidden = true;
         this.renderIncidents();
-      } catch {
+      } catch (error) {
         if (request.signal.aborted || this.controller !== controller) return;
         this.incidentRetryCursor = cursor;
         this.incidentRetryPage = pageIndex;
         this.historyMessage.textContent = this.incidentLoaded ? "Could not update incidents. Showing available results." : "Incidents unavailable.";
         this.historyRetry.hidden = false;
+        notifyError(this.incidentLoaded ? "Failed to refresh incidents." : "Failed to load incidents.", error);
       } finally {
         controller.signal.removeEventListener("abort", abort);
         if (this.incidentRequest === request) this.incidentRequest = null;

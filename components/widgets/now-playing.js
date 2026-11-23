@@ -1,4 +1,5 @@
 import { MarqueeController } from "../ui/marquee.js";
+import { notifyError } from "../ui/toast.js";
 
 const COMPONENT_TAG = "now-playing-card";
 
@@ -504,7 +505,7 @@ const COMPONENT_TEMPLATE = `
           nextInterval = Number.isFinite(deadline) ? Math.max(1000, deadline - Date.now()) : idleInterval;
           retryNotBefore = Date.now() + nextInterval;
         }
-        if (!response.ok) throw new Error("Spotify request failed");
+        if (!response.ok) throw new Error(`Spotify HTTP ${response.status}`);
         if (response.status === 204) return null;
         return response.json();
       })
@@ -534,12 +535,15 @@ const COMPONENT_TEMPLATE = `
         nextInterval = track.nowplaying && !track.playbackStale ? playingInterval : idleInterval;
         notify();
       })
-      .catch(() => {
+      .catch((error) => {
         if (!rateLimited) {
           failures = Math.min(failures + 1, 3);
           nextInterval = Math.min(maxErrorInterval, idleInterval * 1.5 ** (failures - 1));
         }
         if (!hasSuccessfulResult && (!controller.signal.aborted || timedOut)) {
+          if (failures === 1 || rateLimited) {
+            notifyError("Failed to load now playing.", timedOut ? "Request timed out" : error);
+          }
           isUnavailable = true;
           notify();
         }

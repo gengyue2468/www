@@ -6,6 +6,16 @@
   let pendingSubmission = null;
   let transportInstalled = false;
 
+  function notifyError(message, rawError) {
+    if (typeof window === "undefined" || typeof window.dispatchEvent !== "function" || typeof CustomEvent !== "function") return;
+    const raw = typeof rawError === "string" ? rawError.trim() : rawError instanceof Error ? (rawError.message || rawError.name || "").trim() : "";
+    const detail = raw ? { message, detail: raw, tone: "error" } : { message, tone: "error" };
+    if (typeof customElements === "undefined" || !customElements.get("site-toast")) {
+      (window.__siteToastQueue ||= []).push(detail);
+    }
+    window.dispatchEvent(new CustomEvent("site-toast", { detail }));
+  }
+
   // Isso sends JSON with XMLHttpRequest rather than submitting the widget's form field.
   function installCommentTransport(endpoint) {
     if (transportInstalled) return;
@@ -38,13 +48,24 @@
           if (this.status >= 200 && this.status < 300) return;
           let error = "";
           try { error = JSON.parse(this.responseText)?.error || ""; } catch { /* Isso or a proxy may return non-JSON. */ }
-          submission.message.textContent = this.status === 502 || this.status === 0 || this.status >= 500 && error !== "captcha_unavailable"
+          const uncertain = this.status === 502 || this.status === 0 || this.status >= 500 && error !== "captcha_unavailable";
+          const tooLarge = error === "body_too_large" || this.status === 413;
+          const capUnavailable = error === "captcha_unavailable" || this.status === 503;
+          submission.message.textContent = uncertain
             ? "评论提交结果不确定，请先刷新评论确认是否已发表，再重新验证。"
-            : error === "body_too_large" || this.status === 413
+            : tooLarge
               ? "评论过长，请缩短后重新验证。"
-              : error === "captcha_unavailable" || this.status === 503
+              : capUnavailable
                 ? "验证服务暂时不可用，请稍后重新验证。"
                 : "提交失败，请重新验证后再试。";
+          const rawDetail = `HTTP ${this.status}${error ? `: ${error}` : this.responseText?.trim() ? `: ${this.responseText.trim()}` : ""}`;
+          notifyError(uncertain
+            ? "Comment status uncertain. Please refresh."
+            : tooLarge
+              ? "Comment is too long."
+              : capUnavailable
+                ? "Verification unavailable. Try again later."
+                : "Failed to post comment.", rawDetail);
         }, { once: true });
       }
       return send.apply(this, args);
@@ -118,6 +139,7 @@
         })
         .catch(error => {
           console.error("Isso comments could not be loaded:", error);
+          notifyError("Failed to load comments.", error);
         })
         .finally(() => {
           this.loading = null;
@@ -174,6 +196,7 @@
           })
           .catch(error => {
             console.error("CAP could not be loaded:", error);
+            notifyError("Failed to load verification.", error);
           })
           .finally(() => {
             this.capLoading = null;
@@ -214,19 +237,33 @@
         gate.capToken = null;
         gate.dataset.state = "required";
       });
-      widget.addEventListener("error", () => {
+      widget.addEventListener("error", event => {
         gate.capToken = null;
         gate.dataset.state = "required";
+        notifyError("Verification failed. Please retry.", event?.detail?.message || event?.detail?.error || "CAP widget error");
       });
     }
 
     handleSubmitClick(event) {
-      if (!this.dataset.capEnabled) return;
       const target = event.target;
       if (!(target instanceof HTMLInputElement) || target.type !== "submit") return;
 
       const postbox = target.closest(".isso-postbox");
       if (!postbox) return;
+
+      const textarea = postbox.querySelector(".isso-textarea");
+      if (textarea && ("value" in textarea || textarea.isContentEditable)) {
+        const text = (typeof textarea.value === "string" ? textarea.value : textarea.textContent || "").trim();
+        if (text.length < 3) {
+          event.preventDefault();
+          event.stopPropagation();
+          textarea.focus?.();
+          notifyError("Comment must be at least 3 characters.");
+          return;
+        }
+      }
+
+      if (!this.dataset.capEnabled) return;
       const gate = postbox.querySelector(".isso-cap-gate");
       if (gate?.dataset.state === "solved" && gate.capToken) {
         gate.capMessage.textContent = "";

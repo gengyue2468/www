@@ -1,5 +1,6 @@
 import { MarqueeController, createMarquee } from "../../ui/marquee.js";
 import { bindDropdownChoices } from "../../ui/dom.js";
+import { notifyError } from "../../ui/toast.js";
 import {
   bytes,
   cpuAggregate,
@@ -209,14 +210,21 @@ import { createNode, syncItems, updateNode } from "./node-view.js";
           this.applySnapshot(data);
           this.snapshot = data;
           this.setConnection("Live");
-        } catch { this.setConnection("Invalid snapshot. Keeping previous data.", true); }
+        } catch (error) {
+          this.setConnection("Invalid snapshot. Keeping previous data.", true);
+          notifyError("Invalid server snapshot.", error);
+        }
       });
-      source.addEventListener("unavailable", () => {
-        if (this.streamSource === source) this.setConnection(this.snapshot ? "Unavailable. Showing last snapshot." : "Data unavailable.", true);
+      source.addEventListener("unavailable", event => {
+        if (this.streamSource === source) {
+          this.setConnection(this.snapshot ? "Unavailable. Showing last snapshot." : "Data unavailable.", true);
+          notifyError("Server data unavailable.", typeof event?.data === "string" ? event.data : undefined);
+        }
       });
       source.onerror = () => {
         if (this.streamSource !== source) return;
         this.setConnection(this.snapshot ? "Reconnecting. Showing last snapshot." : "Connection unavailable. Reconnecting…", true);
+        notifyError("Live stream disconnected.", `EventSource readyState=${source.readyState}`);
         if (source.readyState === EventSource.CLOSED) {
           source.close();
           this.streamSource = null;
@@ -237,8 +245,11 @@ import { createNode, syncItems, updateNode } from "./node-view.js";
         this.applySnapshot(data);
         this.snapshot = data;
         this.setConnection("Snapshot only. Refresh to update.", true);
-      } catch {
-        if (this.fallbackController === request && this.isConnected) this.setConnection("Snapshot unavailable.", true);
+      } catch (error) {
+        if (this.fallbackController === request && this.isConnected) {
+          this.setConnection("Snapshot unavailable.", true);
+          notifyError("Failed to load server status.", error);
+        }
       } finally {
         clearTimeout(timeout);
         if (this.fallbackController === request) this.fallbackController = null;

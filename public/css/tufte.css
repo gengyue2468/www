@@ -3,6 +3,12 @@ html {
   font-size: var(--font-base-size);
 }
 
+:root,
+:where(*) {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--ink) 32%, transparent) transparent;
+}
+
 body {
   width: var(--width-body);
   margin-left: auto;

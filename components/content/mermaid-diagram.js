@@ -70,6 +70,11 @@
       errorBox.textContent = "Diagram could not be rendered: " + message;
       element.append(errorBox);
       console.error("Mermaid rendering error:", error);
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function" && typeof CustomEvent === "function") {
+        window.dispatchEvent(new CustomEvent("site-toast", {
+          detail: { message: "Failed to render diagram.", detail: message, tone: "error" },
+        }));
+      }
     });
 
     loading.set(element, promise);
