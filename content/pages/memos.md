@@ -36,7 +36,7 @@ description: 碎碎念
   <p class="memos-status" data-memos-status role="status" aria-live="polite">Loading Memos...</p>
   <div class="memos-sentinel" data-memos-sentinel aria-hidden="true" hidden></div>
   <div class="memos-controls">
-    <button class="ui-link-btn" data-memos-retry type="button" hidden>重试</button>
+    <button class="ui-link-btn" data-memos-retry type="button" hidden>Retry</button>
   </div>
   <noscript><p>Enabled JavaScript to load memos.</p></noscript>
 </memos-feed>

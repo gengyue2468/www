@@ -1,6 +1,6 @@
 import { bindDropdownChoices, el as element } from "../../ui/dom.js";
 import { notifyError } from "../../ui/toast.js";
-import { checkedAtFormatter, renderIncident, renderMonitor, stateInfo } from "./render.js";
+import { formatShortDateTime, renderIncident, renderMonitor, stateInfo } from "./render.js";
 
 (() => {
   const tagName = "status-page";
@@ -100,7 +100,7 @@ import { checkedAtFormatter, renderIncident, renderMonitor, stateInfo } from "./
         this.data = data;
         this.render(data);
         if (this.updated) {
-          const time = element("time", "", checkedAtFormatter.format(new Date()));
+          const time = element("time", "", formatShortDateTime(new Date()));
           time.dateTime = new Date().toISOString();
           this.updated.replaceChildren(document.createTextNode("Last updated at "), time);
           this.updated.hidden = false;

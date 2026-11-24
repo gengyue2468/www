@@ -1,19 +1,13 @@
 import { MarqueeController, createMarquee } from "../../ui/marquee.js";
 import { el } from "../../ui/dom.js";
 import { notifyError } from "../../ui/toast.js";
+import { formatShortDateTime } from "../../ui/time.js";
 
 (() => {
   const tagName = "track-page";
   if (customElements.get(tagName)) return;
 
   const pageSize = 20;
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
   const safeImage = value => {
     if (typeof value !== "string" || !value.trim()) return null;
     try {
@@ -167,7 +161,7 @@ import { notifyError } from "../../ui/toast.js";
 
       const date = Number(track.playedAt) > 0 ? new Date(Number(track.playedAt) * 1000) : null;
       if (date && Number.isFinite(date.getTime())) {
-        const played = el("time", "track-played", formatter.format(date));
+        const played = el("time", "track-played", formatShortDateTime(date));
         played.dateTime = date.toISOString();
         link.append(played);
       }

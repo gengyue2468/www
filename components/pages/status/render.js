@@ -1,16 +1,7 @@
 import { el as element } from "../../ui/dom.js";
+import { formatDateTimeSeconds, formatShortDateTime } from "../../ui/time.js";
 
-export const checkedAtFormatter = new Intl.DateTimeFormat("en", {
-  month: "short",
-  day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
-const incidentDateFormatter = new Intl.DateTimeFormat("en", {
-  year: "numeric", month: "short", day: "numeric",
-  hour: "2-digit", minute: "2-digit", second: "2-digit",
-});
+export { formatShortDateTime };
 
 const percentFormatter = new Intl.NumberFormat("en", {
   style: "percent",
@@ -33,7 +24,7 @@ export function stateInfo(status) {
 export function formatCheckedAt(value) {
   if (typeof value !== "string") return "";
   const date = new Date(value.replace(" ", "T"));
-  return Number.isFinite(date.getTime()) ? checkedAtFormatter.format(date) : value;
+  return Number.isFinite(date.getTime()) ? formatShortDateTime(date) : value;
 }
 
 export function formatUptime(value) {
@@ -59,7 +50,7 @@ export function renderIncident(item) {
     const date = new Date(value.replace(" ", "T"));
     const row = element("span");
     row.append(document.createTextNode(`${label}: `));
-    const time = element("time", "", Number.isFinite(date.getTime()) ? incidentDateFormatter.format(date) : value);
+    const time = element("time", "", Number.isFinite(date.getTime()) ? formatDateTimeSeconds(date) : value);
     if (Number.isFinite(date.getTime())) time.dateTime = value.replace(" ", "T");
     row.append(time);
     meta.append(row);

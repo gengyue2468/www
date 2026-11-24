@@ -1,5 +1,6 @@
 import MarkdownIt from "markdown-it";
 import { el as element } from "../../ui/dom.js";
+import { formatDateTime } from "../../ui/time.js";
 
 const markdown = new MarkdownIt({ html: false, breaks: true, linkify: true });
 const linkOpen = markdown.renderer.rules.link_open;
@@ -18,11 +19,6 @@ for (const type of ["heading_open", "heading_close"]) {
     return renderer.renderToken(tokens, index, options);
   };
 }
-
-const formatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
 
 export function safeUrl(value) {
   if (typeof value !== "string" || !value.trim()) return null;
@@ -65,14 +61,14 @@ export function renderMemo(memo) {
   if (Number.isFinite(date.getTime())) {
     const permalink = element("a");
     permalink.href = `#${entry.id}`;
-    const time = element("time", "", formatter.format(date));
+    const time = element("time", "", formatDateTime(date));
     time.dateTime = date.toISOString();
     permalink.append(time);
     meta.append(permalink);
   }
   if (memo.pinned === true) meta.append(element("span", "memo-pinned", "置顶"));
   if (memo.updateTime && memo.updateTime !== memo.createTime && Number.isFinite(Date.parse(memo.updateTime))) {
-    const edited = element("time", "memo-edited", "已编辑");
+    const edited = element("time", "memo-edited", "Edited");
     edited.dateTime = new Date(memo.updateTime).toISOString();
     meta.append(edited);
   }

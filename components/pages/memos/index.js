@@ -357,7 +357,7 @@ import {
       else this.list.textContent = "";
       this.button.hidden = true;
       this.button.disabled = false;
-      this.button.textContent = "重试";
+      this.button.textContent = "Retry";
       this.sentinel.hidden = true;
     }
 
@@ -426,7 +426,7 @@ import {
         this.failed = true;
         this.setStatus(this.loaded ? "Not loaded" : "Load failed");
         this.button.hidden = false;
-        this.button.textContent = "重试";
+        this.button.textContent = "Retry";
         notifyError(this.loaded ? "Failed to load more memos." : "Failed to load memos.", error);
       } finally {
         clearTimeout(timeout);

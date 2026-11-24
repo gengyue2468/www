@@ -1,4 +1,5 @@
 import { el as element } from "../../ui/dom.js";
+import { formatDateTimeSeconds } from "../../ui/time.js";
 import flags from "./flags.json";
 
 export const STALE_MS = 180000;
@@ -6,7 +7,7 @@ export const number = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
 export const loadNumber = new Intl.NumberFormat("en", { maximumFractionDigits: 2 });
 export const preciseNumber = new Intl.NumberFormat("en", { maximumFractionDigits: 3 });
 export const nameOrder = new Intl.Collator("en", { sensitivity: "base", numeric: true });
-export const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "medium" });
+export const formatSnapshotDate = formatDateTimeSeconds;
 
 export const states = ["up", "down", "paused", "pending", "unknown"];
 export const sortChoices = [

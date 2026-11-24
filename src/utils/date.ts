@@ -27,6 +27,6 @@ export function formatDate(
     console.warn(`Invalid date: ${dateString}`);
     return "";
   }
-  const options = { ...dateConfig.options, timeZone: "UTC" } satisfies Intl.DateTimeFormatOptions;
+  const options = { ...dateConfig.options, timeZone: "Asia/Hong_Kong" } satisfies Intl.DateTimeFormatOptions;
   return date.toLocaleDateString(dateConfig.locale, options);
 }

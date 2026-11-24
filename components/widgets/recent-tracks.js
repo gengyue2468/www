@@ -89,10 +89,16 @@
           const date = new Date(track.playedAt * 1000);
           const time = document.createElement("time");
           time.dateTime = date.toISOString();
-          time.textContent = new Intl.DateTimeFormat(undefined, {
-            dateStyle: "medium",
-            timeStyle: "short",
+          const formatted = new Intl.DateTimeFormat("en-US", {
+            timeZone: "Asia/Hong_Kong",
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hourCycle: "h23",
           }).format(date);
+          time.textContent = `${formatted} HKT`;
           playedCell.append(time);
         } else {
           playedCell.textContent = "—";

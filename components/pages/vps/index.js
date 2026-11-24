@@ -4,7 +4,7 @@ import { notifyError } from "../../ui/toast.js";
 import {
   bytes,
   cpuAggregate,
-  dateFormat,
+  formatSnapshotDate,
   filterChoices,
   finite,
   flagCode,
@@ -321,7 +321,7 @@ import { createNode, syncItems, updateNode } from "./node-view.js";
       if (this.map) updateMap(this.map, countries);
       const empty = this.querySelector("[data-vps-empty]");
       if (empty) empty.hidden = !nodes.length || visible !== 0;
-      write(this.updated, `Snapshot ${dateFormat.format(new Date(data.generatedAt))}`);
+      write(this.updated, `Snapshot ${formatSnapshotDate(new Date(data.generatedAt))}`);
     }
   }
   customElements.define(tagName, VpsPage);

@@ -1,5 +1,6 @@
 import { MarqueeController } from "../ui/marquee.js";
 import { notifyError } from "../ui/toast.js";
+import { formatDateTime } from "../ui/time.js";
 
 const COMPONENT_TAG = "now-playing-card";
 
@@ -412,10 +413,6 @@ const COMPONENT_TEMPLATE = `
   const playingInterval = 10_000;
   const idleInterval = 30_000;
   const maxErrorInterval = 60_000;
-  const playedAtFormatter = new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
   let latestTrack = null;
   let latestObservedAt = 0;
   let boundary = null;
@@ -615,7 +612,7 @@ const COMPONENT_TEMPLATE = `
       const date = Number.isFinite(timestamp) ? new Date(timestamp * 1000) : null;
       const iso = date && Number.isFinite(date.getTime()) ? date.toISOString() : "";
       caption.hidden = !iso;
-      time.textContent = iso ? playedAtFormatter.format(date) : "";
+      time.textContent = iso ? formatDateTime(date) : "";
       if (iso) time.dateTime = iso;
       else time.removeAttribute("datetime");
       return !!iso;

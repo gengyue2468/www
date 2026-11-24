@@ -70,10 +70,10 @@ const config: Config = {
   ],
 
   date: {
-    locale: "zh-CN",
+    locale: "en-US",
     options: {
       year: "numeric",
-      month: "long",
+      month: "short",
       day: "numeric",
     },
   },

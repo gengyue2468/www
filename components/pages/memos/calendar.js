@@ -1,4 +1,5 @@
 import { el as element } from "../../ui/dom.js";
+import { HKT_TIME_ZONE } from "../../ui/time.js";
 
 const calendarMonthFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
@@ -20,11 +21,7 @@ const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 export function getTimeZone() {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-  } catch {
-    return "UTC";
-  }
+  return HKT_TIME_ZONE;
 }
 
 export function getMonthForNow(timeZone) {
