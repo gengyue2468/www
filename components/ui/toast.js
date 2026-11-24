@@ -7,7 +7,7 @@ export function formatErrorDetail(error) {
 
 export function showToast(message, options = {}) {
   if (typeof message !== "string" || !message.trim()) return;
-  if (typeof window === "undefined" || typeof CustomEvent !== "function") return;
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function" || typeof CustomEvent !== "function") return;
   const detailText = typeof options.detail === "string" ? options.detail.trim() : "";
   const detail = {
     message: message.trim(),

@@ -410,8 +410,12 @@ const COMPONENT_TEMPLATE = `
   };
 
   const cards = new Set();
-  const playingInterval = 10_000;
-  const idleInterval = 30_000;
+  const playingInterval = 3_000;
+  const staleInterval = 3_000;
+  const staleMaxFastRetries = 3;
+  const pausedInterval = 10_000;
+  const offlineInterval = 15_000;
+  const errorBaseInterval = 30_000;
   const maxErrorInterval = 60_000;
   let latestTrack = null;
   let latestObservedAt = 0;
@@ -422,6 +426,8 @@ const COMPONENT_TEMPLATE = `
   let pendingRequest = null;
   let retryNotBefore = 0;
   let failures = 0;
+  let staleKey = null;
+  let staleAttempts = 0;
 
   const trackKey = track => JSON.stringify([track.id || track.url || track.name, artistText(track), track.durationMs]);
   const updateBoundary = track => {
@@ -481,7 +487,7 @@ const COMPONENT_TEMPLATE = `
     const controller = new AbortController();
     let timedOut = false;
     let rateLimited = false;
-    let nextInterval = idleInterval;
+    let nextInterval = offlineInterval;
     const timeout = setTimeout(() => {
       timedOut = true;
       controller.abort();
@@ -499,7 +505,7 @@ const COMPONENT_TEMPLATE = `
           const retryAfter = header?.trim() || body?.retryAfter;
           const seconds = retryAfter == null || retryAfter === "" ? NaN : Number(retryAfter);
           const deadline = Number.isFinite(seconds) ? Date.now() + seconds * 1000 : Date.parse(retryAfter);
-          nextInterval = Number.isFinite(deadline) ? Math.max(1000, deadline - Date.now()) : idleInterval;
+          nextInterval = Number.isFinite(deadline) ? Math.max(1000, deadline - Date.now()) : errorBaseInterval;
           retryNotBefore = Date.now() + nextInterval;
         }
         if (!response.ok) throw new Error(`Spotify HTTP ${response.status}`);
@@ -510,11 +516,13 @@ const COMPONENT_TEMPLATE = `
         if (track == null || (typeof track === "object" && !track.name)) {
           latestTrack = null;
           boundary = null;
+          staleKey = null;
+          staleAttempts = 0;
           hasSuccessfulResult = true;
           isUnavailable = true;
           failures = 0;
           retryNotBefore = 0;
-          nextInterval = idleInterval;
+          nextInterval = offlineInterval;
           notify();
           return;
         }
@@ -529,13 +537,26 @@ const COMPONENT_TEMPLATE = `
         isUnavailable = false;
         failures = 0;
         retryNotBefore = 0;
-        nextInterval = track.nowplaying && !track.playbackStale ? playingInterval : idleInterval;
+        if (track.nowplaying && track.playbackStale) {
+          const key = trackKey(track);
+          if (staleKey === key) staleAttempts++;
+          else { staleKey = key; staleAttempts = 1; }
+          nextInterval = staleAttempts <= staleMaxFastRetries ? staleInterval : offlineInterval;
+        } else {
+          staleKey = null;
+          staleAttempts = 0;
+          nextInterval = track.nowplaying
+            ? playingInterval
+            : track.playbackSource === "player"
+              ? pausedInterval
+              : offlineInterval;
+        }
         notify();
       })
       .catch((error) => {
         if (!rateLimited) {
           failures = Math.min(failures + 1, 3);
-          nextInterval = Math.min(maxErrorInterval, idleInterval * 1.5 ** (failures - 1));
+          nextInterval = Math.min(maxErrorInterval, errorBaseInterval * 1.5 ** (failures - 1));
         }
         if (!hasSuccessfulResult && (!controller.signal.aborted || timedOut)) {
           if (failures === 1 || rateLimited) {

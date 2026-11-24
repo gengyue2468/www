@@ -21,9 +21,15 @@ export function stateInfo(status) {
   }
 }
 
+function parseUtcDate(value) {
+  if (typeof value !== "string" || !value.trim()) return new Date(NaN);
+  const iso = value.trim().replace(" ", "T");
+  return new Date(/(?:Z|[+-]\d{2}:?\d{2})$/i.test(iso) ? iso : `${iso}Z`);
+}
+
 export function formatCheckedAt(value) {
   if (typeof value !== "string") return "";
-  const date = new Date(value.replace(" ", "T"));
+  const date = parseUtcDate(value);
   return Number.isFinite(date.getTime()) ? formatShortDateTime(date) : value;
 }
 
@@ -47,11 +53,11 @@ export function renderIncident(item) {
   const meta = element("div", "status-incident-meta");
   for (const [label, value] of [["Created", item.createdDate], ["Updated", item.lastUpdatedDate]]) {
     if (typeof value !== "string" || !value.trim()) continue;
-    const date = new Date(value.replace(" ", "T"));
+    const date = parseUtcDate(value);
     const row = element("span");
     row.append(document.createTextNode(`${label}: `));
     const time = element("time", "", Number.isFinite(date.getTime()) ? formatDateTimeSeconds(date) : value);
-    if (Number.isFinite(date.getTime())) time.dateTime = value.replace(" ", "T");
+    if (Number.isFinite(date.getTime())) time.dateTime = date.toISOString();
     row.append(time);
     meta.append(row);
   }
@@ -67,7 +73,7 @@ export function renderMonitor(monitor, history) {
   heading.append(element("span", "status-service-state", info.label));
   row.append(heading);
 
-  const checks = Array.isArray(history) ? history.slice(-30) : [];
+  const checks = Array.isArray(history) ? history.slice(-50) : [];
   if (checks.length) {
     const svgNamespace = "http://www.w3.org/2000/svg";
     const heartbeat = document.createElementNS(svgNamespace, "svg");
