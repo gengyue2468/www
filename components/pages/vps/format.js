@@ -101,7 +101,7 @@ export function timeLabel(node, value, prefix = "") {
   const time = node.closest("time") || node;
   if (Number.isFinite(timestamp(value))) {
     time.dateTime = value;
-    time.title = dateFormat.format(new Date(value));
+    time.title = formatSnapshotDate(new Date(value));
   } else {
     time.removeAttribute("datetime");
     time.removeAttribute("title");
