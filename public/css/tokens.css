@@ -114,9 +114,9 @@
     --surface-hover: oklch(26.9% 0 0);
     --surface-code: #242424;
     --border: color-mix(in srgb, var(--ink) 11%, transparent);
-    --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.25);
-    --shadow-popover: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 20px rgba(0, 0, 0, 0.42);
-    --shadow-elevated: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 32px rgba(0, 0, 0, 0.55);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.25);
+    --shadow-popover: 0 8px 20px rgba(0, 0, 0, 0.42);
+    --shadow-elevated: 0 12px 32px rgba(0, 0, 0, 0.55);
     --highlight-target: #3a3a2a;
     --connector-color: #999;
     --ansi-bg: #111;

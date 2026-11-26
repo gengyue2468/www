@@ -1,4 +1,5 @@
 import { bindDropdownChoices, el as element } from "../../ui/dom.js";
+import { MarqueeController } from "../../ui/marquee.js";
 import { notifyError } from "../../ui/toast.js";
 import { formatShortDateTime, renderIncident, renderMonitor, stateInfo } from "./render.js";
 
@@ -45,6 +46,8 @@ import { formatShortDateTime, renderIncident, renderMonitor, stateInfo } from ".
     }
 
     disconnectedCallback() {
+      for (const marquee of this.marquees || []) marquee.disconnect();
+      this.marquees = [];
       this.requestController?.abort();
       this.incidentRequest?.abort();
       this.controller?.abort();
@@ -61,14 +64,16 @@ import { formatShortDateTime, renderIncident, renderMonitor, stateInfo } from ".
     }
 
     setupChoices(kind, choices) {
+      const isSort = kind === "sort";
       bindDropdownChoices(this, {
         menuSelector: `[data-status-${kind}-options]`,
         labelSelector: `[data-status-${kind}-label]`,
         choices,
-        value: this[`${kind}Key`],
+        value: isSort ? this.sortKey : this.filterKey,
         signal: this.controller.signal,
         onChange: key => {
-          this[`${kind}Key`] = key;
+          if (isSort) this.sortKey = key;
+          else this.filterKey = key;
           if (this.data) this.render(this.data);
         },
       });
@@ -246,13 +251,22 @@ import { formatShortDateTime, renderIncident, renderMonitor, stateInfo } from ".
     }
 
     renderIncidents() {
+      for (const marquee of this.marquees || []) marquee.disconnect();
+      this.marquees = [];
+      const mountIncident = (container, item) => {
+        const node = renderIncident(item);
+        container.append(node);
+        const marquee = new MarqueeController(node, node);
+        marquee.connect();
+        this.marquees.push(marquee);
+      };
       const current = this.incidentCurrent.filter(item => item && item.id != null);
       const currentIds = new Set(current.map(item => String(item.id)));
       this.currentIncidents.hidden = !current.length;
       this.currentIncidents.replaceChildren();
       if (current.length) {
         this.currentIncidents.append(element("h2", "ui-rule-heading status-incident-heading", "Current incidents"));
-        for (const item of current) this.currentIncidents.append(renderIncident(item));
+        for (const item of current) mountIncident(this.currentIncidents, item);
       }
       const index = this.incidentPageIndex || 0;
       const page = this.incidentPages[index];
@@ -262,7 +276,8 @@ import { formatShortDateTime, renderIncident, renderMonitor, stateInfo } from ".
         seen.add(String(item.id));
         return true;
       });
-      this.history.replaceChildren(...history.map(item => renderIncident(item)));
+      this.history.replaceChildren();
+      for (const item of history) mountIncident(this.history, item);
       this.historyMessage.textContent = history.length ? "" : index || page.hasMore ? "No other incidents on this page." : "No past incidents.";
       this.historyPagination.hidden = index === 0 && !page.hasMore;
       this.historyPage.textContent = `Page ${index + 1}`;

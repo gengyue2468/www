@@ -29,7 +29,6 @@ import { memosPlugin } from "./extensions/memos.js";
 import { statusPlugin } from "./extensions/status.js";
 import { vpsPlugin } from "./extensions/vps.js";
 import { trackPlugin } from "./extensions/track.js";
-import { speedtestPlugin } from "./extensions/speedtest.js";
 import { AppError, ErrorCode, errorReporter, isENOENT } from "./utils/errors.js";
 import { cleanBaseUrl } from "./utils/url.js";
 import { auditDist, type HtmlAuditIssueKind } from "./utils/html-audit.js";
@@ -65,7 +64,6 @@ registerPlugin(memosPlugin);
 registerPlugin(statusPlugin);
 registerPlugin(vpsPlugin);
 registerPlugin(trackPlugin);
-registerPlugin(speedtestPlugin);
 
 class PerformanceTimer {
   private times = new Map<string, number>();

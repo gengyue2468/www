@@ -3,9 +3,7 @@
 /* 1. Accessibility visually hidden */
 .sr-only,
 .component-status,
-input.margin-toggle,
-.speedtest-controls legend,
-.speedtest-mode input {
+input.margin-toggle {
   display: block;
   position: absolute;
   width: 1px;

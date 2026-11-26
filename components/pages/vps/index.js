@@ -183,14 +183,16 @@ import { createNode, syncItems, updateNode } from "./node-view.js";
     }
 
     setupChoices(kind, choices) {
+      const isSort = kind === "sort";
       bindDropdownChoices(this, {
         menuSelector: `[data-vps-${kind}-options]`,
         labelSelector: `[data-vps-${kind}-label]`,
         choices,
-        value: this[`${kind}Key`],
+        value: isSort ? this.sortKey : this.filterKey,
         signal: this.controller.signal,
         onChange: key => {
-          this[`${kind}Key`] = key;
+          if (isSort) this.sortKey = key;
+          else this.filterKey = key;
           if (this.snapshot) this.applySnapshot(this.snapshot);
         },
       });

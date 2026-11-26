@@ -240,7 +240,7 @@ status-page {
   overflow-wrap: anywhere;
 }
 status-page > .ui-editorial-main { grid-row: 1 / span 2; }
-.status-history { grid-row: 2; margin-top: 2rem; }
+.status-history { grid-row: 2; margin-top: 1.4rem; }
 .status-current-incidents { margin-bottom: 2rem; padding: 0; }
 .status-current-incidents[hidden],
 .status-history-pagination[hidden],
@@ -249,12 +249,14 @@ status-page > .ui-editorial-main { grid-row: 1 / span 2; }
 .status-updated[hidden],
 .status-message[hidden] { display: none; }
 .status-incident { margin: 1rem 0; padding: 0; }
-.status-incident-header { display: flex; justify-content: space-between; align-items: center; gap: 0.75em; }
-.status-incident-title { min-width: 0; margin: 0; font-size: inherit; font-weight: 400; }
+.status-incident-header { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75em; }
+.status-incident-title { flex: 1 1 auto; min-width: 0; margin: 0; font-size: inherit; font-weight: 400; }
 .status-incident-style { flex: none; opacity: 0.6; font-style: italic; }
 .status-incident-content { margin: 0.35rem 0; font: inherit; white-space: pre-wrap; }
 .status-incident-meta { margin-top: 0.4rem; opacity: 0.6; font-style: italic; }
-.status-incident-meta > span { display: block; }
+.status-incident-meta > span { display: flex; align-items: baseline; gap: 0.35em; }
+.status-incident-meta-label { flex: none; }
+.status-incident-meta-time { flex: 1 1 auto; min-width: 0; }
 .status-history-message { margin: 0.7rem 0; opacity: 0.6; font-style: italic; }
 .status-history-message:empty { display: none; }
 .status-history-pagination { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75em; margin-top: 1rem; }
@@ -649,94 +651,3 @@ track-page {
   }
 }
 
-/* ==========================================================================
-   Speedtest (<speedtest-page>)
-   ========================================================================== */
-.speedtest-controls {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.5rem 1.5rem;
-  margin-block: 0 0.6rem;
-}
-.speedtest-controls fieldset {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1.2rem;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-.speedtest-mode { cursor: pointer; }
-.speedtest-mode span { opacity: 0.5; }
-.speedtest-mode input:checked + span {
-  opacity: 1;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-.speedtest-mode input:focus-visible + span { outline: 2px solid currentColor; outline-offset: 4px; }
-.speedtest-controls fieldset:disabled { opacity: 0.5; }
-.speedtest-actions { display: flex; align-items: center; min-inline-size: 4ch; justify-content: flex-end; }
-.speedtest-actions button {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-decoration: underline;
-  text-underline-offset: var(--text-underline-offset);
-  cursor: pointer;
-}
-.speedtest-actions button:disabled { opacity: 0.4; cursor: default; }
-.speedtest-actions button[hidden] { display: none; }
-.speedtest-status { grid-column: 1 / -1; margin: 0; font: inherit; font-style: italic; opacity: 0.65; }
-.speedtest-latency {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.4rem 1.5rem;
-  margin-block: 0 1.8rem;
-  font-size: inherit;
-}
-.speedtest-latency > div { display: flex; flex-wrap: wrap; gap: 0.4em; }
-.speedtest-latency dt { opacity: 0.6; }
-.speedtest-latency dd { margin: 0; min-inline-size: 6ch; font-variant-numeric: tabular-nums; }
-.speedtest-latency small { font-size: inherit; opacity: 0.65; }
-.speedtest-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; margin-block: 0.5rem 1.5rem; }
-.speedtest-direction { min-width: 0; }
-.speedtest-direction h2 { margin: 0; font-size: var(--font-size-h3); }
-.speedtest-reading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2em; margin: 0.5rem 0 0; line-height: var(--line-height-base); }
-.speedtest-reading > [data-speedtest-rate] { font-size: var(--font-size-h1); font-variant-numeric: tabular-nums; }
-.speedtest-unit { opacity: 0.6; }
-.speedtest-chart { display: block; width: 100%; height: 4.5rem; margin-block: 0.8rem; overflow: visible; }
-.speedtest-chart path { fill: none; stroke: currentColor; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
-.speedtest-chart .speedtest-chart-baseline { opacity: 0.15; stroke-width: 1; }
-.speedtest-caption,
-.speedtest-detail {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.2em 1em;
-  margin: 0;
-  font-size: inherit;
-  line-height: var(--line-height-sidenote);
-}
-.speedtest-detail > span { white-space: nowrap; }
-.speedtest-detail { opacity: 0.6; }
-.speedtest-caption { font-style: italic; opacity: 0.65; }
-.speedtest-client-info { margin-bottom: 2rem; }
-.speedtest-client-info dl { margin: 0; }
-.speedtest-client-info dl > div + div { margin-top: 1rem; }
-.speedtest-client-info dt { opacity: 0.6; font-style: italic; }
-.speedtest-client-info dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
-
-@media (max-width: 760px) {
-  .speedtest-results { gap: 1.2rem; }
-}
-
-@media (max-width: 600px) {
-  .speedtest-results { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
-}

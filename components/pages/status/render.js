@@ -1,4 +1,5 @@
 import { el as element } from "../../ui/dom.js";
+import { createMarquee } from "../../ui/marquee.js";
 import { formatDateTimeSeconds, formatShortDateTime } from "../../ui/time.js";
 
 export { formatShortDateTime };
@@ -46,7 +47,12 @@ export function formatLatency(value) {
 export function renderIncident(item) {
   const article = element("article", "status-incident");
   const heading = element("div", "status-incident-header");
-  heading.append(element("h3", "status-incident-title", typeof item.title === "string" && item.title.trim() ? item.title : "Incident"));
+  const title = createMarquee({
+    tag: "h3",
+    className: "status-incident-title",
+    text: typeof item.title === "string" && item.title.trim() ? item.title : "Incident",
+  });
+  heading.append(title.root);
   if (typeof item.style === "string" && item.style.trim()) heading.append(element("span", "status-incident-style", item.style));
   article.append(heading);
   if (typeof item.content === "string" && item.content.trim()) article.append(element("p", "status-incident-content", item.content));
@@ -55,10 +61,12 @@ export function renderIncident(item) {
     if (typeof value !== "string" || !value.trim()) continue;
     const date = parseUtcDate(value);
     const row = element("span");
-    row.append(document.createTextNode(`${label}: `));
+    row.append(element("span", "status-incident-meta-label", `${label}:`));
+    const timeMarquee = createMarquee({ className: "status-incident-meta-time" });
     const time = element("time", "", Number.isFinite(date.getTime()) ? formatDateTimeSeconds(date) : value);
     if (Number.isFinite(date.getTime())) time.dateTime = date.toISOString();
-    row.append(time);
+    timeMarquee.source.append(time);
+    row.append(timeMarquee.root);
     meta.append(row);
   }
   if (meta.childElementCount) article.append(meta);
